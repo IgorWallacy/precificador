@@ -1,13 +1,142 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto+Flex:opsz@8..144&display=swap');
+
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: 'Roboto Flex', sans-serif;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.container {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(to right top, #612f74, #582b74, #4d2775, #412475, #332276, #481461, #4f074c, #500039, #460518, #321000, #201100, #0d0c02);
+    min-height: 745px;
+    width: 100%;
+    flex-wrap: wrap;
+    
+    
 }
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    
+}
+
+.header-item {
+
+display: flex;
+flex-direction: row;
+justify-content: space-around;
+
+color: white;
+padding: 5px;
+margin: 10px;
+flex-wrap: wrap;
+
+}
+
+.main {
+
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+color: white;
+padding: 25px;
+flex-wrap: wrap;
+width: 100%;
+
+}
+
+
+
+.form-precificador {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+   
+    flex-wrap: wrap;
+   
+
+}
+
+
+.form-precificador-input{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin: 5px;
+    flex-wrap: wrap;
+    
+    width: 100%;
+}
+
+.form-precificador-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin : 25px;
+    flex-wrap: wrap;
+    width: 150px;
+     
+}
+
+.pesquisa-rapida{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.footer {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ width: 50px;
+ flex-wrap: wrap;
+
+}
+
+
+
+.datatable-templating-demo{
+    
+    
+    
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color:  #f5f5dc;
+   
+    
+}
+
+.datatable-templating-demo .p-rowgroup-header span{
+    font-weight: 700;
+}
+
+.headerTemplateDataTable{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+   
+}
+
+
+
+
+
+
+
+

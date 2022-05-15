@@ -1,24 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
-import "primereact/resources/themes/md-light-deeppurple/theme.css";  //theme
-import "primereact/resources/primereact.min.css";                  //core css
-import "primeicons/primeicons.css";                                //icons
- 
+import "primereact/resources/themes/md-light-deeppurple/theme.css"; //theme
+import "primereact/resources/primereact.min.css"; //core css
+import "primeicons/primeicons.css"; //icons
 
+import Header from './components/header'
+import Footer from './components/footer'
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-     <div className="container">
-     
-     <App />
+    <div className=" fullscreen container">
+      
+        <div id="header">
+          <Header />
+        </div>
+
+        <div id="main">
+        <App />
+        </div>
+      
     
-     </div>
-   
+        
+       
+     
+    </div>
   </React.StrictMode>
 );
 

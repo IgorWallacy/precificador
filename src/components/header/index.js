@@ -5,10 +5,11 @@ import Argon from '../../assets/img/argon-white.png'
 const Header = () => {
     return (
         <>
-        <div className="header-item">
+        <div className='logo'>
          <img  style={{ width: '120px'}} 
          src={Argon} alt="img" />
-        </div>
+       </div>
+       
         </>
       );
 }

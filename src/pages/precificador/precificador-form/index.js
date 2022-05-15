@@ -2,8 +2,9 @@ import React, { useContext, useState, useRef } from "react";
 
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
-import { addLocale } from 'primereact/api';
+import { addLocale } from "primereact/api";
 import { Toast } from "primereact/toast";
+
 
 import api from "../../../services/axios";
 
@@ -16,14 +17,19 @@ const PrecificadorForm = () => {
   const { setProdutos } = useContext(Context);
   const { setLoading } = useContext(Context);
 
+
   const toast = useRef(null);
 
   const buscarProdutos = () => {
+    setProdutos([])
     let dataI = dataInicial.toISOString().slice(0, 10);
     let dataF = dataFinal.toISOString().slice(0, 10);
 
     if (dataI && dataF) {
       setLoading(true);
+      
+     
+
       api
         .get(`/produtos/precificar/${dataI}/${dataF}`)
         .then((response) => {
@@ -42,23 +48,62 @@ const PrecificadorForm = () => {
     }
   };
 
-
-  addLocale('pt-BR', {
+  addLocale("pt-BR", {
     firstDayOfWeek: 0,
-    dayNames: ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'],
-    dayNamesShort: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
-    dayNamesMin: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-    monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Maio', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-    today: 'Hoje',
-    clear: 'Limpar'
-});
+    dayNames: [
+      "domingo",
+      "segunda",
+      "terça",
+      "quarta",
+      "quinta",
+      "sexta",
+      "sábado",
+    ],
+    dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+    dayNamesMin: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"],
+    monthNames: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    monthNamesShort: [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Maio",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ],
+    today: "Hoje",
+    clear: "Limpar",
+  });
+
+  
 
   return (
     <>
+       
+      
       <Toast ref={toast} position="top-left"></Toast>
+      
       <div className="form-precificador">
-        <div className="form-precificador-input">
+     
+        <div  className="form-precificador-input">
           <h5>Período</h5>
           <Calendar
             placeholder="Informe a data inicial"

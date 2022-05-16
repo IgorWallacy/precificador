@@ -12,19 +12,18 @@ const Header = () => {
 
   const isLogado = useContext(Context)
 
-  const [name, setName] = useState()
-
-  const nome = () => {
-
-    let token = localStorage.getItem("access_token")
-    setName ( JSON.parse(token) ) 
-
-  }
+  const [nome, setNome] = useState("")
 
   
   useEffect ( () => {
 
-    console.log(nome)
+    let token = localStorage.getItem("access_token")
+    let a = JSON.parse(token)
+    
+    setNome(a.nome)
+
+    
+   
 
   }, [])
 
@@ -43,7 +42,7 @@ const Header = () => {
                shape="circle"
                
              />
-             <h4>{isLogado.usuarioLogado - name }</h4>
+             <h4>{isLogado.usuarioLogado   } - {nome} </h4>
              </div>
           ) : ( <></>)}
          

@@ -19,6 +19,7 @@ import api from "../../../services/axios";
 
 const Precificador = () => {
   const toast = useRef(null);
+  const [headers , setHeaders] = useState()
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
@@ -32,7 +33,7 @@ const Precificador = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  useEffect(() => {}, []);
+  useEffect(() => {  }, []);
 
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -78,6 +79,31 @@ const Precificador = () => {
     today: "Hoje",
     clear: "Limpar",
   });
+
+  const pegarTokenLocalStorage = () => {
+    let token = localStorage.getItem("access_token");
+    let a = JSON.parse(token);
+    var headers = {
+      'Authorization' : "Bearer " + a.access_token,
+      'Content-Type' : "application/x-www-form-urlencoded",
+    }; 
+    setHeaders(headers)
+
+    api.interceptors.request.use(
+      config => {
+        // Do something before request is sent
+    
+        config.headers["Authorization"] = "bearer " + a.access_token;
+        return config;
+      },
+      error => {
+        Promise.reject(error);
+      }
+    );
+    
+    
+    
+  }
 
   const margem = (rowData) => {
     //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
@@ -218,9 +244,12 @@ const Precificador = () => {
 
     _products2[index] = newData;
 
+    pegarTokenLocalStorage()
+   
     api
       .put(
         `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${_products2[index].idfamilia}/${_products2[index].precoNovo}`
+        ,  { headers : headers }
       )
       .then((response) => {
         //   toast.current.show({severity: 'success', summary: 'Success Message', detail: 'Order submitted'});
@@ -312,7 +341,7 @@ const Precificador = () => {
     }
   };
 
-  const header = renderHeader();
+  const headerDataTable = renderHeader();
 
   const agrupamento = (rowData) => {
     let i = parseInt(rowData.numeronotafiscal);
@@ -323,11 +352,14 @@ const Precificador = () => {
     let dataI = dataInicial.toISOString().slice(0, 10);
     let dataF = dataFinal.toISOString().slice(0, 10);
 
+    pegarTokenLocalStorage()
+
     if (dataI && dataF) {
       setLoading(true);
 
       api
-        .get(`/api_precificacao/produtos/precificar/${dataI}/${dataF}`)
+        
+        .get(`/api_precificacao/produtos/precificar/${dataI}/${dataF}` , { headers : headers })
         .then((response) => {
           setProdutos(response.data);
           setLoading(false);
@@ -423,7 +455,7 @@ const Precificador = () => {
               responsiveLayout="stack"
               emptyMessage="Nenhum produto encontrado para precificação"
               showGridlines
-              header={header}
+              header={headerDataTable}
               rowGroupMode="subheader"
               groupRowsBy={agrupamento}
               //  sortOrder={1}

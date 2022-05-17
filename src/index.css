@@ -10,6 +10,28 @@
 
 }
 
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #0fcaf0 #e7eec9;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #e7eec9;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #0fcaf0;
+    border-radius: 29px;
+    border: 1px inset #eeeded;
+  }
+
 .fullscreen {
     position: fixed;
     top: 0;
@@ -17,12 +39,7 @@
     bottom: 0;
     right: 0;
     overflow: auto;
-    background: #DC2424;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to top, #4A569D, #DC2424);
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to top, #4A569D, #DC2424);
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
     
   }
 
@@ -31,7 +48,7 @@
     justify-content: center;
     align-items: center;
    
-    background-color: bisque;
+    
     flex-wrap: wrap;
    
    
@@ -39,6 +56,7 @@
 }
 
 .container-global {
+   
     display: grid;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
@@ -65,7 +83,7 @@
 #main {
 
    
-    grid-row-start: 2;
+    grid-row-start: 1;
     grid-column-start: 1;
 
     grid-row-end: 4;
@@ -76,9 +94,9 @@
 .logo {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 10px;
+   margin: 0 40px;
    
 }
 
@@ -108,6 +126,7 @@
 }
 
 .form-precificador-btn {
+   
     display: flex;
     align-items: center;
     justify-content: center;
@@ -126,35 +145,6 @@
 
 
 
-.datatable-templating-demo {
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    background-color: #F5F5DC;
-    flex-wrap: wrap;
-
-}
-
-.datatable-templating-demo .p-rowgroup-header span {
-    font-weight: 700;
-}
-
-.headerTemplateDataTable {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: flex-start;
-    width: 100%;
-
-}
-
-.botao-voltar{
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-}
 
 .avatar  {
     display: flex;

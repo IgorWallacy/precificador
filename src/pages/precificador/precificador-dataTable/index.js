@@ -15,12 +15,9 @@ import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 
-
-
 import api from "../../../services/axios";
 
 const Precificador = () => {
- 
   const toast = useRef(null);
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,8 +33,6 @@ const Precificador = () => {
   });
 
   useEffect(() => {}, []);
-
- 
 
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -89,37 +84,29 @@ const Precificador = () => {
     let margem =
       ((rowData.precoNovo - rowData.precocusto) / rowData.precoNovo) * 100;
 
-    return (
-      new Intl.NumberFormat("pt-BR", {
-        style: "decimal",
-        currency: "BRL",
-        maximumSignificantDigits: "4",
-      }).format(margem) + " %"
-    );
-  };
+    // Margem em valor monetário: Preço de venda - Preço de compra
+    let rsmargem = rowData.precoNovo - rowData.precocusto;
 
-  const markup = (rowData) => {
-    //Markup em %: (Preço de venda - Preço de compra) / Preço de compra * 100.
-    let markup =
-      ((rowData.precoNovo - rowData.precocusto) / rowData.precocusto) * 100;
-    return (
-      new Intl.NumberFormat("pt-BR", {
-        style: "decimal",
-        currency: "BRL",
-        maximumSignificantDigits: "4",
-      }).format(markup) + " %"
-    );
-  };
-
-  const sugestaoVenda = (rowData) => {
-    let sugestao =
-      (rowData.precocusto * rowData.percentualmarkup) / 100 +
-      rowData.precocusto;
-
-    return new Intl.NumberFormat("pt-BR", {
+    let margemformatada = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(sugestao);
+    }).format(rsmargem);
+
+    let rsmargemformatada =
+      Intl.NumberFormat("pt-BR", {
+        style: "decimal",
+        currency: "BRL",
+        maximumSignificantDigits: "4",
+      }).format(margem) + " %";
+
+    return (
+      <>
+        <div style={{ textAlign: "center" }}>
+          {rsmargemformatada} <br />
+          {margemformatada}
+        </div>
+      </>
+    );
   };
 
   const RSmargemSugerida = (rowData) => {
@@ -131,47 +118,26 @@ const Precificador = () => {
 
     let RSmargem = sugestao - rowData.precocusto;
 
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(RSmargem);
-  };
-
-  const margemSugerida = (rowData) => {
-    let sugestao =
-      (rowData.precocusto * rowData.percentualmarkup) / 100 +
-      rowData.precocusto;
-
     let margemSugerida = ((sugestao - rowData.precocusto) / sugestao) * 100;
 
-    return (
-      new Intl.NumberFormat("pt-BR", {
+    let mgsf =
+      Intl.NumberFormat("pt-BR", {
         style: "decimal",
         currency: "BRL",
         maximumSignificantDigits: "4",
-      }).format(margemSugerida) + " %"
-    );
-  };
+      }).format(margemSugerida) + " %";
 
-  const percentualmarkupSugerido = (rowData) => {
-    let percentualmarkupSugerido = rowData.percentualmarkup;
-
-    return (
-      new Intl.NumberFormat("pt-BR", {
-        style: "decimal",
-        currency: "BRL",
-      }).format(percentualmarkupSugerido) + " %"
-    );
-  };
-
-  const RSmargem = (rowData) => {
-    // Margem em valor monetário: Preço de venda - Preço de compra
-    let margem = rowData.precoNovo - rowData.precocusto;
-
-    return new Intl.NumberFormat("pt-BR", {
+    let rsmsf = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(margem);
+    }).format(RSmargem);
+
+    return (
+      <>
+        {mgsf} <br />
+        {rsmsf}
+      </>
+    );
   };
 
   const precoCustoTemplate = (rowData) => {
@@ -182,10 +148,53 @@ const Precificador = () => {
   };
 
   const precoVendaTemplate = (rowData) => {
-    return new Intl.NumberFormat("pt-BR", {
+    let markup =
+      ((rowData.precoNovo - rowData.precocusto) / rowData.precocusto) * 100;
+
+    let markupFormatado =
+      Intl.NumberFormat("pt-BR", {
+        style: "decimal",
+        currency: "BRL",
+        maximumSignificantDigits: "4",
+      }).format(markup) + " %";
+
+    let preconovoFormatado = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(rowData.precoNovo);
+
+    return (
+      <>
+        {markupFormatado} <br />
+        {preconovoFormatado}
+      </>
+    );
+  };
+
+  const sugestaoVenda = (rowData) => {
+    let sugestao =
+      (rowData.precocusto * rowData.percentualmarkup) / 100 +
+      rowData.precocusto;
+
+    let sf = Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(sugestao);
+
+    let percentualmarkupSugerido = rowData.percentualmarkup;
+
+    let mkf =
+      Intl.NumberFormat("pt-BR", {
+        style: "decimal",
+        currency: "BRL",
+      }).format(percentualmarkupSugerido) + " %";
+
+    return (
+      <>
+        {mkf} <br />
+        {sf}
+      </>
+    );
   };
 
   const priceEditor = (options) => {
@@ -233,50 +242,9 @@ const Precificador = () => {
       });
   };
 
-  const exportExcel = () => {
-    import("xlsx").then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(produtos);
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
-      const excelBuffer = xlsx.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      saveAsExcelFile(excelBuffer, "produtos_precificados");
-    });
-  };
-
-  const saveAsExcelFile = (buffer, fileName) => {
-    import("file-saver").then((module) => {
-      if (module && module.default) {
-        let EXCEL_TYPE =
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-        let EXCEL_EXTENSION = ".xlsx";
-        const data = new Blob([buffer], {
-          type: EXCEL_TYPE,
-        });
-
-        module.default.saveAs(
-          data,
-          fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
-        );
-      }
-    });
-  };
-
   const renderHeader = () => {
     return (
       <div className="pesquisa-rapida">
-        <div className="flex align-items-center export-buttons">
-          <Button
-            type="button"
-            onClick={exportExcel}
-            icon="pi pi-file-excel"
-            style={{ marginRight: "10px" }}
-            className="p-button-success mr-2"
-            data-pr-tooltip="Exportar para Excel"
-          />
-        </div>
-
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -337,7 +305,8 @@ const Precificador = () => {
     } else {
       return (
         <React.Fragment>
-          <h5> {rowData.descricao}</h5>
+          {" "}
+          <h5>{rowData.descricao}</h5>
         </React.Fragment>
       );
     }
@@ -410,6 +379,7 @@ const Precificador = () => {
             <Button
               icon="pi pi-search"
               label="Pesquisar"
+              className="p-button-rounded p-button-secondary p-button-lg"
               onClick={() => buscarProdutos()}
             />
           </div>
@@ -418,14 +388,10 @@ const Precificador = () => {
         <>
           <div className="datatable-templating-demo p-fluid">
             <Button
-              label="Voltar "
-              className="p-button-rounded p-button-danger"
+              className="p-button-rounded p-button-danger p-button-lg"
               icon="pi pi-arrow-left"
               style={{
-                padding: "10px",
                 margin: "10px",
-                width: "150px",
-                height: "100%",
               }}
               onClick={() => setProdutos([])}
             />
@@ -433,16 +399,17 @@ const Precificador = () => {
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
-              style={{ height: "95vh", width: "95vw" }}
+              style={{ height: "75vh", width: "95vw" }}
               breakpoint="960px"
               loading={loading}
+              stripedRows
               value={produtos}
-              selectionMode="multiple"
+              //  selectionMode="multiple"
               //   reorderableColumns
               editMode="row"
               dataKey="idproduto"
               onRowEditComplete={onRowEditComplete}
-              scrollDirection="both"
+              scrollDirection="vertical"
               scrollable
               scrollHeight="flex"
               globalFilterFields={[
@@ -452,8 +419,8 @@ const Precificador = () => {
                 "razaosocial",
               ]}
               filters={filters2}
-              size="large"
-              responsiveLayout="scroll"
+              //size="large"
+              responsiveLayout="stack"
               emptyMessage="Nenhum produto encontrado para precificação"
               showGridlines
               header={header}
@@ -461,88 +428,57 @@ const Precificador = () => {
               groupRowsBy={agrupamento}
               //  sortOrder={1}
               rowGroupHeaderTemplate={headerTemplate}
-              //resizableColumns
-              //columnResizeMode="fit"
+              // resizableColumns
+              // columnResizeMode="expand"
             >
+              <Column field="idfilial" header="Filial"></Column>
               <Column
-                style={{ width: "5%" }}
-                field="idfilial"
-                header="Filial"
-              ></Column>
-              <Column
-                style={{ width: "10%" }}
+                header="Código de barras / Código interno"
                 field={EanOrCodigo}
-                header="Código / Ean"
               ></Column>
 
               <Column
-                style={{ width: "20%" }}
                 field="descricao"
                 header="Produto"
                 body={familiaIcone}
+                bodyStyle={{ textAlign: "center" }}
               ></Column>
               <Column
-                style={{ width: "5%" }}
                 field={precoCustoTemplate}
-                header="R$ Custo"
+                header="Custo"
                 body={precoCustoTemplate}
+                bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column
-                style={{ width: "7%" }}
-                field={margemSugerida}
-                header="%Margem sugerida"
-                body={margemSugerida}
-              ></Column>
-
-              <Column
-                style={{ width: "5%" }}
                 field={RSmargemSugerida}
-                header="R$ Margem sugerida"
+                header="Margem sugerida"
                 body={RSmargemSugerida}
+                bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column
-                style={{ width: "7%" }}
-                field={percentualmarkupSugerido}
-                header="%Markup sugerido"
-                body={percentualmarkupSugerido}
-              ></Column>
-
-              <Column
-                style={{ fontWeight: "600", width: "5%" }}
+                style={{ fontWeight: "600" }}
                 field={sugestaoVenda}
-                header="Sugestão de venda (Markup sugerido)"
+                header="Sugestão (Markup, Venda)"
                 body={sugestaoVenda}
+                bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column
-                style={{ width: "7%" }}
                 field={margem}
-                header="%Margem atual"
+                header="Margem atual"
                 body={margem}
-              ></Column>
-
-              <Column
-                style={{ width: "5%" }}
-                field={RSmargem}
-                header="R$ Margem atual"
-                body={RSmargem}
-              ></Column>
-
-              <Column
-                style={{ width: "7%" }}
-                field={markup}
-                header="%Markup atual"
-                body={markup}
+                bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column
                 field="precoNovo"
-                header="R$ Venda atual"
+                header="Atual (markup, venda)"
                 body={precoVendaTemplate}
-                style={{ fontWeight: "600", width: "7%" }}
+                style={{ fontWeight: "600" }}
                 editor={(options) => priceEditor(options)}
+                bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column

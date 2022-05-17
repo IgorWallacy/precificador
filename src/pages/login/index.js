@@ -10,10 +10,10 @@ import { Toast } from "primereact/toast";
 
 import axios from "axios";
 
+import Logo from "../../assets/img/logo_duca.png";
+
 const Login = () => {
-
   const toast = useRef(null);
-
 
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
@@ -49,10 +49,10 @@ const Login = () => {
       .post("/oauth/token", { params, headers })
       .then((response) => {
         isLogado.setLogado(true);
-        isLogado.setUsuarioLogado(usuario)
-        const accessToken = JSON.stringify(response.data)
+        isLogado.setUsuarioLogado(usuario);
+        const accessToken = JSON.stringify(response.data);
 
-        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem("access_token", accessToken);
 
         navigate("/precificar");
       })
@@ -70,36 +70,45 @@ const Login = () => {
 
   return (
     <>
-     <Toast ref={toast} position="top-center" />
-      <div className="container-formulario-login">
-        <div className="container" id="container">
-          <div className="form-container sign-in-container">
-            <div className="form-action">
-              <h3>Acesso ao sistema</h3>
+      <Toast ref={toast} position="top-center" />
 
-              <span>Utilize seu login e senha uniplus </span>
-
-              <input
-                type="text"
-                placeholder="Código"
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
-              />
-              <input
-                type="password"
-                placeholder="Senha"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-              />
-
-              <button onClick={() => login()}>Entrar</button>
-            </div>
+      <div className="container" id="container">
+        <div className="form-container sign-up-container"></div>
+        <div className="form-container sign-in-container">
+          <div className="form-login-container">
+            <span> Utilize sua conta uniplus parara acesso ao sistema </span>
+            <input
+              type="text"
+              value={usuario}
+              style={{ width: "25%" }}
+              placeholder="Código"
+              onChange={(e) => setUsuario(e.target.value)}
+            />
+            <input
+              type="password"
+              value={senha}
+              style={{ width: "25%" }}
+              placeholder="Senha"
+              onChange={(e) => setSenha(e.target.value)}
+            />
+          
+            <button onClick={() => login()}>Acessar</button>
           </div>
-          <div className="overlay-container">
-            <div className="overlay">
-              <div className="overlay-panel overlay-right">
-                <h1>Bem vindo</h1>
-              </div>
+        </div>
+        <div className="overlay-container">
+          <div className="overlay">
+            <div className="overlay-panel overlay-left">
+              <h1>Welcome Back!</h1>
+              <p>
+                To keep connected with us please login with your personal info
+              </p>
+              <button className="ghost" id="signIn">
+                Sign In
+              </button>
+            </div>
+            <div className="overlay-panel overlay-right">
+              <h1>Bem vindo(a)!</h1>
+              <img src={Logo} style={{ width: "450px" }} alt="logo do sistema" />
             </div>
           </div>
         </div>

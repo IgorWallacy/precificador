@@ -1,0 +1,46 @@
+.datatable-templating-demo {
+
+    display: flex;
+    background-color: beige;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+   
+
+}
+
+
+
+
+.headerTemplateDataTable {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-center;
+    width: 100%;
+
+}
+
+.botao-voltar{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.datatable-templating-demo .p-datatable-tbody{
+ background-color: beige;
+}
+
+.datatable-templating-demo .table-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.datatable-templating-demo .table-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+

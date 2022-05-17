@@ -1,5 +1,4 @@
-
-
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
 * {
 	box-sizing: border-box;
@@ -12,14 +11,8 @@ body {
 	align-items: center;
 	flex-direction: column;
 	font-family: 'Montserrat', sans-serif;
-	height: 100vh;
+	height: 95vh;
 	margin: -20px 0 50px;
-}
-
-.container-formulario-login {
-	display: flex;
-	justify-content: center;
-	align-items: center;
 }
 
 h1 {
@@ -52,8 +45,9 @@ a {
 
 button {
 	border-radius: 20px;
-	border: 1px solid #FF4B2B;
-	background-color: #FF4B2B;
+	border: 1px solid #f4917f;
+	background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
+
 	color: #FFFFFF;
 	font-size: 12px;
 	font-weight: bold;
@@ -76,8 +70,14 @@ button.ghost {
 	border-color: #FFFFFF;
 }
 
-.form-action {
-	background-color: #FFFFFF;
+.form-login-container {
+	background: #FF416C;
+	background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
+	background: linear-gradient(to right, #FF4B2B, #FF416C);
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 0 0;
+	color: #FFFFFF;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -89,23 +89,15 @@ button.ghost {
 
 input {
 	background-color: #eee;
+	border-radius: 20px;
 	border: none;
 	padding: 12px 15px;
 	margin: 8px 0;
 	width: 100%;
+	outline: none;
 }
 
-.container {
-	background-color: #fff;
-	border-radius: 10px;
-  	box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
-			0 10px 10px rgba(0,0,0,0.22);
-	position: relative;
-	overflow: hidden;
-	width: 768px;
-	max-width: 100%;
-	min-height: 480px;
-}
+
 
 .form-container {
 	position: absolute;
@@ -166,13 +158,7 @@ input {
 }
 
 .overlay {
-	background: #FF416C;
-	background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
-	background: linear-gradient(to right, #FF4B2B, #FF416C);
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position: 0 0;
-	color: #FFFFFF;
+	
 	position: relative;
 	left: -100%;
 	height: 100%;

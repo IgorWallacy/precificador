@@ -3,7 +3,7 @@ import React , {useContext, useEffect, useState} from 'react';
 import "./styles.css";
 
 
-import Argon from "../../assets/img/argon-white.png";
+import Argon from "../../assets/img/logo_duca.png";
 import { Avatar } from "primereact/avatar";
 
 import Context from '../../contexts'
@@ -30,7 +30,7 @@ const Header = () => {
   return (
     <>
       <div className="logo">
-        <img style={{ width: "120px" }} src={Argon} alt="img" />
+        <img style={{ width: "300px" , borderRadius : '20px' }} src={Argon} alt="img" />
           
           {(isLogado.logado) ? (
              <div className="avatar">

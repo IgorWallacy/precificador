@@ -48,6 +48,7 @@ const Login = () => {
     api
       .post("/oauth/token", { params, headers })
       .then((response) => {
+        localStorage.clear()
         isLogado.setLogado(true);
         isLogado.setUsuarioLogado(usuario);
         const accessToken = JSON.stringify(response.data);
@@ -58,13 +59,29 @@ const Login = () => {
       })
       .catch((error) => {
         isLogado.setLogado(false);
+        localStorage.clear()
+        console.log(error)
 
+        if(error.message === 'timeout of 1000ms exceeded') {
+
+          toast.current.show({
+            severity: "error",
+            summary: "Erro ao conectar com o servidor ",
+            detail: "Estamos com problemas ao conectar com o servidor. Favor, tente mais tarde ",
+            sticky: true
+            
+          });
+
+        }
+
+        if(error.response.data.error === 'invalid_grant'){
         toast.current.show({
           severity: "error",
           summary: "Usuário e/ou senha inválidos",
-          detail: "Favor, tente novamnte",
+          detail: "Tente novamente!",
           life: 3000,
         });
+      }
       });
   };
 

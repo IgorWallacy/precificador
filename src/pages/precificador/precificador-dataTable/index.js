@@ -10,6 +10,7 @@ import { Toast } from "primereact/toast";
 import { FilterMatchMode } from "primereact/api";
 import { Avatar } from "primereact/avatar";
 import { Tooltip } from "primereact/tooltip";
+import { Dropdown } from "primereact/dropdown";
 
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
@@ -19,9 +20,11 @@ import api from "../../../services/axios";
 import { useNavigate } from "react-router-dom";
 
 const Precificador = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [filiaisSelect, setFiliaisSelect] = useState([]);
   const toast = useRef(null);
-  const [headers , setHeaders] = useState()
+  const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
+  const [headers, setHeaders] = useState();
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
@@ -35,7 +38,10 @@ const Precificador = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  useEffect(() => {  }, []);
+  useEffect(() => {
+    pegarTokenLocalStorage();
+    usarTabelaFormacaoPreecoProduto();
+  }, []);
 
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -86,26 +92,23 @@ const Precificador = () => {
     let token = localStorage.getItem("access_token");
     let a = JSON.parse(token);
     var headers = {
-      'Authorization' : "Bearer " + a.access_token,
-      'Content-Type' : "application/x-www-form-urlencoded",
-    }; 
-    setHeaders(headers)
+      Authorization: "Bearer " + a.access_token,
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+    setHeaders(headers);
 
     api.interceptors.request.use(
-      config => {
+      (config) => {
         // Do something before request is sent
-    
+
         config.headers["Authorization"] = "bearer " + a.access_token;
         return config;
       },
-      error => {
+      (error) => {
         Promise.reject(error);
       }
     );
-    
-    
-    
-  }
+  };
 
   const margem = (rowData) => {
     //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
@@ -239,6 +242,25 @@ const Precificador = () => {
     );
   };
 
+  const usarTabelaFormacaoPreecoProduto = () => {
+    api
+      .get("/api/filial", { headers: headers })
+      .then((response) => {
+        setQuantidadeFilial(response.data);
+
+        if (quantidadeFilial.length < 1) {
+          console.log("tem uma filial" + quantidadeFilial.length);
+          setQuantidadeFilial(0);
+        } else {
+          //  console.log('Tem diuas ou mais filial' + quantidadeFilial.length)
+        }
+      })
+      .catch((error) => {
+        // console.log(error)
+        navigate("/");
+      });
+  };
+
   const onRowEditComplete = (e) => {
     let _products2 = [...produtos];
 
@@ -246,12 +268,18 @@ const Precificador = () => {
 
     _products2[index] = newData;
 
-    pegarTokenLocalStorage()
-   
+    pegarTokenLocalStorage();
+
+    let intFamilia = 0;
+
+    if (_products2[index].idfamilia != null) {
+      intFamilia = parseInt(_products2[index].idfamilia);
+    }
+
     api
       .put(
-        `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${_products2[index].idfamilia}/${_products2[index].precoNovo}`
-        ,  { headers : headers }
+        `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${intFamilia}/${_products2[index].precoNovo}`,
+        { headers: headers }
       )
       .then((response) => {
         //   toast.current.show({severity: 'success', summary: 'Success Message', detail: 'Order submitted'});
@@ -270,12 +298,10 @@ const Precificador = () => {
           detail: ` Erro ao atualizar ${_products2[index].descricao}  ... Erro : ${error}  `,
         });
 
-      
-        if(error.response.status === 401) {
-          navigate("/")
-         
+        if (error.response.status === 401) {
+          navigate("/");
         }
-      //  setProdutos([]);
+        //  setProdutos([]);
       });
   };
 
@@ -357,61 +383,77 @@ const Precificador = () => {
   };
 
   const buscarProdutos = () => {
-   
+    pegarTokenLocalStorage();
 
-    pegarTokenLocalStorage()
+    usarTabelaFormacaoPreecoProduto();
 
-    if(dataInicial === undefined || dataFinal === undefined){
+    if (dataInicial === undefined || dataFinal === undefined) {
       toast.current.show({
         severity: "error",
         summary: "Erro",
         detail: ` Informe a data inicial e final  `,
       });
-
-  
     } else {
+      let dataI = dataInicial?.toISOString().slice(0, 10);
+      let dataF = dataFinal?.toISOString().slice(0, 10);
 
-    let dataI = dataInicial?.toISOString().slice(0, 10);
-    let dataF = dataFinal?.toISOString().slice(0, 10);
+      if (dataI && dataF) {
+        setLoading(true);
 
-   
+        api
 
-    if (dataI && dataF) {
-      setLoading(true);
-
-      api
-        
-        .get(`/api_precificacao/produtos/precificar/${dataI}/${dataF}` , { headers : headers })
-        .then((response) => {
-          setProdutos(response.data);
-          setLoading(false);
-          if(produtos.length < 1) {
-            toast.current.show({
-              severity: "warn",
-              summary: "Aviso",
-              detail: ` Nenhum produto encontrado para precificação !  `,
-            });
-          }
-        })
-        .catch((error) => {
-         
-
-          if(error?.response?.status === 401) {
-            navigate("/")
+          .get(`/api_precificacao/produtos/precificar/${dataI}/${dataF}`, {
+            headers: headers,
+          })
+          .then((response) => {
+            setProdutos(response.data);
+            setLoading(false);
            
-          }
+            if (response.data.length === 0) {
+              toast.current.show({
+                severity: "warn",
+                summary: "Aviso",
+                detail: ` Nenhum produto encontrado para precificação !  `,
+              });
+            }
+          })
+          .catch((error) => {
+            if (error?.response?.status === 401) {
+              navigate("/");
+            }
 
-          toast.current.show({
-            severity: "error",
-            summary: "Erro",
-            detail: ` ${error}  `,
+            toast.current.show({
+              severity: "error",
+              summary: "Erro",
+              detail: ` ${error}  `,
+            });
+
+            setLoading(false);
           });
+      }
+    }
+  };
 
-        
-
-          setLoading(false);
-        });
-    }}
+  const MostraListaFilial = () => {
+   
+   if( quantidadeFilial.length > 1 )  {
+      return( 
+      <>
+        <div>
+          <h4>Filial</h4>
+        </div>
+        <Dropdown
+          showClear
+          onChange={(e) => setFiliaisSelect(e.value)}
+          value={filiaisSelect}
+          options={quantidadeFilial}
+          optionLabel="razaosocial"
+          placeholder="Selecione uma filial "
+        />
+      </>
+    )} else { return(
+      <></>
+    )};
   };
 
   return (
@@ -421,7 +463,9 @@ const Precificador = () => {
         <>
           <div className="form-precificador">
             <div className="form-precificador-input">
-              <h5>Período</h5>
+              <div>
+                <h5>Período</h5>
+              </div>
               <Calendar
                 placeholder="Informe a data inicial"
                 dateFormat="dd/mm/yy"
@@ -431,8 +475,11 @@ const Precificador = () => {
                 showButtonBar
                 locale="pt-BR"
               />
-
-              <h5>até</h5>
+            </div>
+            <div className="form-precificador-input">
+              <div>
+                <h5>até</h5>
+              </div>
 
               <Calendar
                 placeholder="Informe a data final"
@@ -443,6 +490,10 @@ const Precificador = () => {
                 showButtonBar
                 locale="pt-BR"
               />
+            </div>
+
+            <div className="form-precificador-input">
+              <MostraListaFilial />
             </div>
           </div>
           <div className="form-precificador-btn">
@@ -456,8 +507,8 @@ const Precificador = () => {
         </>
       ) : (
         <>
-          <div className="datatable-templating-demo p-fluid">
-            <Button
+          <div className="botao-voltar">
+             <Button
               className="p-button-rounded p-button-danger p-button-lg"
               icon="pi pi-arrow-left"
               style={{
@@ -465,11 +516,14 @@ const Precificador = () => {
               }}
               onClick={() => setProdutos([])}
             />
+          </div>
+          <div className="datatable-templating-demo p-fluid">
+         
 
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
-              style={{ height: "75vh", width: "95vw" }}
+              style={{ height: "75vh", width: "99vw", alignContent: 'center', justifyContent: 'center'   }}
               breakpoint="960px"
               loading={loading}
               stripedRows

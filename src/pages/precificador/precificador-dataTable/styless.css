@@ -4,8 +4,11 @@
     background-color: beige;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     flex-wrap: wrap;
+  
+    width: 100%;
+    padding: 25px 0px;
    
 
 }
@@ -22,14 +25,11 @@
 
 }
 
-.botao-voltar{
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-}
+
 
 .datatable-templating-demo .p-datatable-tbody{
  background-color: beige;
+
 }
 
 .datatable-templating-demo .table-header {

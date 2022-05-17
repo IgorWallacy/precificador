@@ -16,8 +16,10 @@ import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 
 import api from "../../../services/axios";
+import { useNavigate } from "react-router-dom";
 
 const Precificador = () => {
+  const navigate = useNavigate()
   const toast = useRef(null);
   const [headers , setHeaders] = useState()
   const [produtos, setProdutos] = useState([]);
@@ -267,7 +269,13 @@ const Precificador = () => {
           summary: "Erro",
           detail: ` Erro ao atualizar ${_products2[index].descricao}  ... Erro : ${error}  `,
         });
-        setProdutos([]);
+
+      
+        if(error.response.status === 401) {
+          navigate("/")
+         
+        }
+      //  setProdutos([]);
       });
   };
 
@@ -365,11 +373,20 @@ const Precificador = () => {
           setLoading(false);
         })
         .catch((error) => {
+         
+
+          if(error.response.status === 401) {
+            navigate("/")
+           
+          }
+
           toast.current.show({
             severity: "error",
             summary: "Erro",
             detail: ` ${error}  `,
           });
+
+        
 
           setLoading(false);
         });

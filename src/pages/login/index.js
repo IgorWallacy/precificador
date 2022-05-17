@@ -80,14 +80,14 @@ const Login = () => {
             <input
               type="text"
               value={usuario}
-              style={{ width: "25%" }}
+              style={{ width: "35%" }}
               placeholder="Código"
               onChange={(e) => setUsuario(e.target.value)}
             />
             <input
               type="password"
               value={senha}
-              style={{ width: "25%" }}
+              style={{ width: "35%" }}
               placeholder="Senha"
               onChange={(e) => setSenha(e.target.value)}
             />

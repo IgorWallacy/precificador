@@ -357,10 +357,24 @@ const Precificador = () => {
   };
 
   const buscarProdutos = () => {
-    let dataI = dataInicial.toISOString().slice(0, 10);
-    let dataF = dataFinal.toISOString().slice(0, 10);
+   
 
     pegarTokenLocalStorage()
+
+    if(dataInicial === undefined || dataFinal === undefined){
+      toast.current.show({
+        severity: "error",
+        summary: "Erro",
+        detail: ` Informe a data inicial e final  `,
+      });
+
+  
+    } else {
+
+    let dataI = dataInicial?.toISOString().slice(0, 10);
+    let dataF = dataFinal?.toISOString().slice(0, 10);
+
+   
 
     if (dataI && dataF) {
       setLoading(true);
@@ -371,11 +385,18 @@ const Precificador = () => {
         .then((response) => {
           setProdutos(response.data);
           setLoading(false);
+          if(produtos.length < 1) {
+            toast.current.show({
+              severity: "warn",
+              summary: "Aviso",
+              detail: ` Nenhum produto encontrado para precificação !  `,
+            });
+          }
         })
         .catch((error) => {
          
 
-          if(error.response.status === 401) {
+          if(error?.response?.status === 401) {
             navigate("/")
            
           }
@@ -390,7 +411,7 @@ const Precificador = () => {
 
           setLoading(false);
         });
-    }
+    }}
   };
 
   return (

@@ -11,7 +11,7 @@ import { FilterMatchMode } from "primereact/api";
 import { Avatar } from "primereact/avatar";
 import { Tooltip } from "primereact/tooltip";
 import { Dropdown } from "primereact/dropdown";
-
+import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
@@ -408,7 +408,7 @@ const Precificador = () => {
           .then((response) => {
             setProdutos(response.data);
             setLoading(false);
-           
+
             if (response.data.length === 0) {
               toast.current.show({
                 severity: "warn",
@@ -434,26 +434,49 @@ const Precificador = () => {
     }
   };
 
-  const MostraListaFilial = () => {
-   
-   if( quantidadeFilial.length > 1 )  {
-      return( 
-      <>
-        <div>
-          <h4>Filial</h4>
-        </div>
-        <Dropdown
-          showClear
-          onChange={(e) => setFiliaisSelect(e.value)}
-          value={filiaisSelect}
-          options={quantidadeFilial}
-          optionLabel="razaosocial"
-          placeholder="Selecione uma filial "
+  const botaovoltar = (
+    <React.Fragment>
+     
+        <Button
+          className="p-button-rounded p-button-danger p-button-lg"
+          icon="pi pi-arrow-left"
+          style={{
+            margin: "10px",
+          }}
+          onClick={() => setProdutos([])}
         />
-      </>
-    )} else { return(
-      <></>
-    )};
+      
+    </React.Fragment>
+  );
+
+  const botaoatualizar = (
+    <React.Fragment>
+       <Button  onClick={() => buscarProdutos()} tooltip="Atualizar" tooltipOptions={{position : 'bottom'}} icon="pi pi-refresh" className=" p-button-rounded p-button-secondary p-button-lg" />
+       
+        
+    </React.Fragment>
+  );
+
+  const MostraListaFilial = () => {
+    if (quantidadeFilial.length > 1) {
+      return (
+        <>
+          <div>
+            <h4>Filial</h4>
+          </div>
+          <Dropdown
+            showClear
+            onChange={(e) => setFiliaisSelect(e.value)}
+            value={filiaisSelect}
+            options={quantidadeFilial}
+            optionLabel="razaosocial"
+            placeholder="Selecione uma filial "
+          />
+        </>
+      );
+    } else {
+      return <></>;
+    }
   };
 
   return (
@@ -507,23 +530,18 @@ const Precificador = () => {
         </>
       ) : (
         <>
-          <div className="botao-voltar">
-             <Button
-              className="p-button-rounded p-button-danger p-button-lg"
-              icon="pi pi-arrow-left"
-              style={{
-                margin: "10px",
-              }}
-              onClick={() => setProdutos([])}
-            />
-          </div>
-          <div className="datatable-templating-demo p-fluid">
-         
+          <Toolbar left={botaovoltar} right={botaoatualizar} />
 
+          <div className="datatable-templating-demo p-fluid">
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
-              style={{ height: "75vh", width: "99vw", alignContent: 'center', justifyContent: 'center'   }}
+              style={{
+                height: "75vh",
+                width: "99vw",
+                alignContent: "center",
+                justifyContent: "center",
+              }}
               breakpoint="960px"
               loading={loading}
               stripedRows

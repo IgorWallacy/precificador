@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 
 const Precificador = () => {
   const navigate = useNavigate();
-  const [filiaisSelect, setFiliaisSelect] = useState([]);
+  const [filiaisSelect, setFiliaisSelect] = useState(0);
   const toast = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
   const [headers, setHeaders] = useState();
@@ -249,7 +249,7 @@ const Precificador = () => {
         setQuantidadeFilial(response.data);
 
         if (quantidadeFilial.length < 1) {
-          console.log("tem uma filial" + quantidadeFilial.length);
+          // console.log("tem uma filial" + quantidadeFilial.length);
           setQuantidadeFilial(0);
         } else {
           //  console.log('Tem diuas ou mais filial' + quantidadeFilial.length)
@@ -389,8 +389,8 @@ const Precificador = () => {
 
     if (dataInicial === undefined || dataFinal === undefined) {
       toast.current.show({
-        severity: "error",
-        summary: "Erro",
+        severity: "warn",
+        summary: "Aviso",
         detail: ` Informe a data inicial e final  `,
       });
     } else {
@@ -398,15 +398,24 @@ const Precificador = () => {
       let dataF = dataFinal?.toISOString().slice(0, 10);
 
       if (dataI && dataF) {
+       
+        
+        let filialId =   filiaisSelect ? filiaisSelect.id : 0;
+ 
+
         setLoading(true);
 
         api
 
-          .get(`/api_precificacao/produtos/precificar/${dataI}/${dataF}`, {
-            headers: headers,
-          })
+          .get(
+            `/api_precificacao/produtos/precificar/${dataI}/${dataF}/${filialId}`,
+            {
+              headers: headers,
+            }
+          )
           .then((response) => {
             setProdutos(response.data);
+            // console.log(response.data)
             setLoading(false);
 
             if (response.data.length === 0) {
@@ -436,24 +445,26 @@ const Precificador = () => {
 
   const botaovoltar = (
     <React.Fragment>
-     
-        <Button
-          className="p-button-rounded p-button-danger p-button-lg"
-          icon="pi pi-arrow-left"
-          style={{
-            margin: "10px",
-          }}
-          onClick={() => setProdutos([])}
-        />
-      
+      <Button
+        className="p-button-rounded p-button-danger p-button-lg"
+        icon="pi pi-arrow-left"
+        style={{
+          margin: "10px",
+        }}
+        onClick={() => setProdutos([])}
+      />
     </React.Fragment>
   );
 
   const botaoatualizar = (
     <React.Fragment>
-       <Button  onClick={() => buscarProdutos()} tooltip="Atualizar" tooltipOptions={{position : 'bottom'}} icon="pi pi-refresh" className=" p-button-rounded p-button-secondary p-button-lg" />
-       
-        
+      <Button
+        onClick={() => buscarProdutos()}
+        tooltip="Atualizar"
+        tooltipOptions={{ position: "bottom" }}
+        icon="pi pi-refresh"
+        className=" p-button-rounded p-button-secondary p-button-lg"
+      />
     </React.Fragment>
   );
 
@@ -573,7 +584,7 @@ const Precificador = () => {
               // resizableColumns
               // columnResizeMode="expand"
             >
-              <Column field="idfilial" header="Filial"></Column>
+              <Column field="nomeFilial" header="Filial"></Column>
               <Column
                 header="Código de barras / Código interno"
                 field={EanOrCodigo}

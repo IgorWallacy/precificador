@@ -45,6 +45,8 @@ const Login = () => {
   });
 
   const login = () => {
+    isLogado.setLogado(false)
+    localStorage.clear()
     api
       .post("/oauth/token", { params, headers })
       .then((response) => {

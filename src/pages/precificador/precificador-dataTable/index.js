@@ -41,6 +41,7 @@ const Precificador = () => {
   useEffect(() => {
     pegarTokenLocalStorage();
     usarTabelaFormacaoPreecoProduto();
+    // eslint-disable-next-line 
   }, []);
 
   addLocale("pt-BR", {
@@ -253,6 +254,7 @@ const Precificador = () => {
           setQuantidadeFilial(0);
         } else {
           //  console.log('Tem diuas ou mais filial' + quantidadeFilial.length)
+          
         }
       })
       .catch((error) => {
@@ -305,6 +307,7 @@ const Precificador = () => {
       });
   };
 
+ 
   const renderHeader = () => {
     return (
       <div className="pesquisa-rapida">
@@ -346,6 +349,9 @@ const Precificador = () => {
           <span className="image-text"> Fornecedor : {data.razaosocial} </span>
           <span className="image-text">
             Nota fiscal : {data.numeronotafiscal}
+          </span>
+          <span>
+           Filial de entrada : {data.nomeFilial} 
           </span>
         </div>
       </React.Fragment>
@@ -404,6 +410,7 @@ const Precificador = () => {
  
 
         setLoading(true);
+        
 
         api
 
@@ -555,9 +562,9 @@ const Precificador = () => {
               }}
               breakpoint="960px"
               loading={loading}
-              stripedRows
+           //   stripedRows
               value={produtos}
-              //  selectionMode="multiple"
+                selectionMode="multiple"
               //   reorderableColumns
               editMode="row"
               dataKey="idproduto"
@@ -584,7 +591,7 @@ const Precificador = () => {
               // resizableColumns
               // columnResizeMode="expand"
             >
-              <Column field="nomeFilial" header="Filial"></Column>
+              
               <Column
                 header="Código de barras / Código interno"
                 field={EanOrCodigo}
@@ -605,7 +612,7 @@ const Precificador = () => {
 
               <Column
                 field={RSmargemSugerida}
-                header="Margem sugerida"
+                header="Sugestão (Margem%, Lucro)"
                 body={RSmargemSugerida}
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
@@ -613,21 +620,21 @@ const Precificador = () => {
               <Column
                 style={{ fontWeight: "600" }}
                 field={sugestaoVenda}
-                header="Sugestão (Markup, Venda)"
+                header="Sugestão (Markup%, Venda)"
                 body={sugestaoVenda}
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column
                 field={margem}
-                header="Margem atual"
+                header="Atual (Margem%, Lucro)"
                 body={margem}
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column
                 field="precoNovo"
-                header="Atual (markup, venda)"
+                header="Atual (Markup, Venda)"
                 body={precoVendaTemplate}
                 style={{ fontWeight: "600" }}
                 editor={(options) => priceEditor(options)}

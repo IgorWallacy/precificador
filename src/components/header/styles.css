@@ -1,0 +1,10 @@
+@import "~react-component-countdown-timer/lib/styles.css";
+
+
+.expira {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    color: #FFF;
+}

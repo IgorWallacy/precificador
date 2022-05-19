@@ -32,7 +32,13 @@
     justify-content: space-around;
     align-items: flex-center;
     width: 100%;
+   
 
+}
+
+.image-text {
+    font-weight: 600;
+    color: #573EB8;
 }
 
 

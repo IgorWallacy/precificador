@@ -136,7 +136,8 @@
 .form-precificador-btn {
    
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    color: #FFF;
     align-items: center;
     justify-content: center;
     margin: 25px;
@@ -163,3 +164,19 @@
     color: #FFF;
     
 }
+
+.p-selectbutton .p-button.p-highlight .p-focus {
+  background-color: #0fcaf0; 
+ 
+  
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.p-selectbutton .p-button.p-highlight{
+  background-color: #0fcaf0;
+}
+
+.p-selectbutton .p-button.p-highlight:hover {
+  background-color: #c080be;
+}
+

@@ -15,6 +15,8 @@ import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
+import { SelectButton } from "primereact/selectbutton";
+import { Tag } from "primereact/tag";
 
 import api from "../../../services/axios";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +32,11 @@ const Precificador = () => {
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
+  const [replicarPreco, setReplicarPreco] = useState(0);
+  const replicarPrecoOpcoes = [
+    { label: "Sim", value: 1 },
+    { label: "Não", value: 0 },
+  ];
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -41,7 +48,7 @@ const Precificador = () => {
   useEffect(() => {
     pegarTokenLocalStorage();
     usarTabelaFormacaoPreecoProduto();
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
   }, []);
 
   addLocale("pt-BR", {
@@ -254,7 +261,6 @@ const Precificador = () => {
           setQuantidadeFilial(0);
         } else {
           //  console.log('Tem diuas ou mais filial' + quantidadeFilial.length)
-          
         }
       })
       .catch((error) => {
@@ -278,9 +284,11 @@ const Precificador = () => {
       intFamilia = parseInt(_products2[index].idfamilia);
     }
 
+   
+
     api
       .put(
-        `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${intFamilia}/${_products2[index].precoNovo}`,
+        `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${intFamilia}/${_products2[index].precoNovo}/${_products2[index].idfilial}/${replicarPreco}`,
         { headers: headers }
       )
       .then((response) => {
@@ -307,7 +315,6 @@ const Precificador = () => {
       });
   };
 
- 
   const renderHeader = () => {
     return (
       <div className="pesquisa-rapida">
@@ -350,9 +357,7 @@ const Precificador = () => {
           <span className="image-text">
             Nota fiscal : {data.numeronotafiscal}
           </span>
-          <span>
-           Filial de entrada : {data.nomeFilial} 
-          </span>
+          <span className="image-text">Filial de entrada : {data.nomeFilial}</span>
         </div>
       </React.Fragment>
     );
@@ -393,78 +398,80 @@ const Precificador = () => {
 
     usarTabelaFormacaoPreecoProduto();
 
-    if (dataInicial === undefined || dataFinal === undefined) {
+    if (replicarPreco === undefined) {
+     
       toast.current.show({
         severity: "warn",
         summary: "Aviso",
-        detail: ` Informe a data inicial e final  `,
+        detail: ` Informe se deseja replicar a precificação para todas as filiais (Sim ou Não) `,
       });
     } else {
-      let dataI = dataInicial?.toISOString().slice(0, 10);
-      let dataF = dataFinal?.toISOString().slice(0, 10);
+      if (dataInicial === undefined || dataFinal === undefined) {
+        toast.current.show({
+          severity: "warn",
+          summary: "Aviso",
+          detail: ` Informe a data inicial e final  `,
+        });
+      } else {
+        let dataI = dataInicial?.toISOString().slice(0, 10);
+        let dataF = dataFinal?.toISOString().slice(0, 10);
 
-      if (dataI && dataF) {
-       
-        
-        let filialId =   filiaisSelect ? filiaisSelect.id : 0;
- 
+        if (dataI && dataF) {
+          let filialId = filiaisSelect ? filiaisSelect.id : 0;
 
-        setLoading(true);
-        
+          setLoading(true);
 
-        api
+          api
 
-          .get(
-            `/api_precificacao/produtos/precificar/${dataI}/${dataF}/${filialId}`,
-            {
-              headers: headers,
-            }
-          )
-          .then((response) => {
-            setProdutos(response.data);
-            // console.log(response.data)
-            setLoading(false);
+            .get(
+              `/api_precificacao/produtos/precificar/${dataI}/${dataF}/${filialId}`,
+              {
+                headers: headers,
+              }
+            )
+            .then((response) => {
+              setProdutos(response.data);
+              // console.log(response.data)
+              setLoading(false);
 
-            if (response.data.length === 0) {
+              if (response.data.length === 0) {
+                toast.current.show({
+                  severity: "warn",
+                  summary: "Aviso",
+                  detail: ` Nenhum produto encontrado para precificação !  `,
+                });
+              }
+            })
+            .catch((error) => {
+              if (error?.response?.status === 401) {
+                navigate("/");
+              }
+
               toast.current.show({
-                severity: "warn",
-                summary: "Aviso",
-                detail: ` Nenhum produto encontrado para precificação !  `,
+                severity: "error",
+                summary: "Erro",
+                detail: ` ${error}  `,
               });
-            }
-          })
-          .catch((error) => {
-            if (error?.response?.status === 401) {
-              navigate("/");
-            }
 
-            toast.current.show({
-              severity: "error",
-              summary: "Erro",
-              detail: ` ${error}  `,
+              setLoading(false);
             });
-
-            setLoading(false);
-          });
+        }
       }
     }
   };
-
   const botaovoltar = (
     <React.Fragment>
       <Button
         className="p-button-rounded p-button-danger p-button-lg"
+        tooltip="Voltar"
+        tooltipOptions={{ position: "bottom" }}
         icon="pi pi-arrow-left"
         style={{
           margin: "10px",
         }}
         onClick={() => setProdutos([])}
       />
-    </React.Fragment>
-  );
 
-  const botaoatualizar = (
-    <React.Fragment>
       <Button
         onClick={() => buscarProdutos()}
         tooltip="Atualizar"
@@ -474,6 +481,50 @@ const Precificador = () => {
       />
     </React.Fragment>
   );
+
+  const botaoatualizar =
+    quantidadeFilial.length > 1 ? (
+      <React.Fragment>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <h5
+            style={{
+              color: replicarPreco ? "green" : "red",
+              margin: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            {" "}
+            Deseja replicar os preços para todas as filiais ?{" "}
+          </h5>
+
+          {replicarPreco ? (
+            <Tag
+              className="mr-2"
+              rounded
+              value="Sim"
+              severity="success"
+              icon="pi pi-check"
+            ></Tag>
+          ) : (
+            <Tag
+              className="mr-2"
+              icon="pi pi-times"
+              rounded
+              severity="danger"
+              value="Não"
+            ></Tag>
+          )}
+        </div>
+      </React.Fragment>
+    ) : (
+      <></>
+    );
 
   const MostraListaFilial = () => {
     if (quantidadeFilial.length > 1) {
@@ -490,6 +541,23 @@ const Precificador = () => {
             optionLabel="razaosocial"
             placeholder="Selecione uma filial "
           />
+        </>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const MostraSelectReplicarPrecoFilial = () => {
+    if (quantidadeFilial.length > 1) {
+      return (
+        <>
+          <h5 style={{ margin: "5px" }}>Replicar preços para filiais ?</h5>
+          <SelectButton
+            value={replicarPreco}
+            options={replicarPrecoOpcoes}
+            onChange={(e) => setReplicarPreco(e.value)}
+          ></SelectButton>
         </>
       );
     } else {
@@ -538,6 +606,9 @@ const Precificador = () => {
             </div>
           </div>
           <div className="form-precificador-btn">
+            <MostraSelectReplicarPrecoFilial />
+          </div>
+          <div className="form-precificador-btn">
             <Button
               icon="pi pi-search"
               label="Pesquisar"
@@ -562,9 +633,9 @@ const Precificador = () => {
               }}
               breakpoint="960px"
               loading={loading}
-           //   stripedRows
+              //   stripedRows
               value={produtos}
-                selectionMode="multiple"
+              selectionMode="multiple"
               //   reorderableColumns
               editMode="row"
               dataKey="idproduto"
@@ -591,7 +662,6 @@ const Precificador = () => {
               // resizableColumns
               // columnResizeMode="expand"
             >
-              
               <Column
                 header="Código de barras / Código interno"
                 field={EanOrCodigo}

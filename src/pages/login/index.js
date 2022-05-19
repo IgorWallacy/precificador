@@ -37,9 +37,15 @@ const Login = () => {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
+  //PRODUCAO
+  const baseURL = window.location.protocol +'//'+ window.location.hostname + ':2096'
+
+  //DESENVOLVIMENTO
+  //const baseURL = "http://localhost:2096"
+
   const api = axios.create({
-    baseURL: "http://localhost:2096",
-    timeout: 1000,
+    baseURL: baseURL,
+    timeout : 1000,
     headers: headers,
     params: params,
   });
@@ -62,7 +68,7 @@ const Login = () => {
       .catch((error) => {
         isLogado.setLogado(false);
         localStorage.clear()
-        console.log(error)
+      //  console.log(error)
 
         if(error.message === 'timeout of 1000ms exceeded') {
 

@@ -25,7 +25,7 @@ export default function Router() {
     <Context.Provider value={{ logado, setLogado , usuarioLogado, setUsuarioLogado }}>
       <Routes>
         <Route path="/" element={<Login />} />
-          <Route   element={<PrivateRoutes />}>
+          <Route path="/"  element={<PrivateRoutes />}>
           <Route path="precificar" element={<App />} />
          
         </Route>

@@ -21,6 +21,8 @@ import { Tag } from "primereact/tag";
 import api from "../../../services/axios";
 import { useNavigate } from "react-router-dom";
 
+import moment from "moment";
+
 const Precificador = () => {
   const navigate = useNavigate();
   const [filiaisSelect, setFiliaisSelect] = useState(0);
@@ -358,6 +360,7 @@ const Precificador = () => {
             Nota fiscal : {data.numeronotafiscal}
           </span>
           <span className="image-text">Filial de entrada : {data.nomeFilial}</span>
+          <span className="image-text">Data de entrada : {moment(data.entradasaida).format("DD/MM/yyyy")}</span>
         </div>
       </React.Fragment>
     );
@@ -413,8 +416,10 @@ const Precificador = () => {
           detail: ` Informe a data inicial e final  `,
         });
       } else {
-        let dataI = dataInicial?.toISOString().slice(0, 10);
-        let dataF = dataFinal?.toISOString().slice(0, 10);
+        let dataI = dataInicial?.toISOString().slice(0, 20);
+        let dataF = dataFinal?.toISOString().slice(0, 20);
+
+        
 
         if (dataI && dataF) {
           let filialId = filiaisSelect ? filiaisSelect.id : 0;
@@ -583,6 +588,7 @@ const Precificador = () => {
                 onChange={(e) => setDataInicial(e.value)}
                 showButtonBar
                 locale="pt-BR"
+                showTime showSeconds
               />
             </div>
             <div className="form-precificador-input">
@@ -598,6 +604,7 @@ const Precificador = () => {
                 onChange={(e) => setDataFinal(e.value)}
                 showButtonBar
                 locale="pt-BR"
+                showTime showSeconds
               />
             </div>
 

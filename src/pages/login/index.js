@@ -38,7 +38,7 @@ const Login = () => {
   };
 
   //PRODUCAO
-  const baseURL = window.location.protocol +'//'+ window.location.hostname + ':2096'
+  const baseURL = window.location.protocol +'//'+ window.location.hostname + ':1010'
 
   //DESENVOLVIMENTO
   //const baseURL = "http://localhost:2096"
@@ -101,18 +101,18 @@ const Login = () => {
         <div className="form-container sign-up-container"></div>
         <div className="form-container sign-in-container">
           <div className="form-login-container">
-            <span> Utilize sua conta uniplus parara acesso ao sistema </span>
+            <h4> Utilize sua conta uniplus para acesso ao sistema </h4>
             <input
               type="text"
               value={usuario}
-              style={{ width: "35%" }}
+              style={{ width: "50%" }}
               placeholder="Código"
               onChange={(e) => setUsuario(e.target.value)}
             />
             <input
               type="password"
               value={senha}
-              style={{ width: "35%" }}
+              style={{ width: "50%" }}
               placeholder="Senha"
               onChange={(e) => setSenha(e.target.value)}
             />
@@ -123,13 +123,7 @@ const Login = () => {
         <div className="overlay-container">
           <div className="overlay">
             <div className="overlay-panel overlay-left">
-              <h1>Welcome Back!</h1>
-              <p>
-                To keep connected with us please login with your personal info
-              </p>
-              <button className="ghost" id="signIn">
-                Sign In
-              </button>
+              
             </div>
             <div className="overlay-panel overlay-right">
               <h1>Bem vindo(a)!</h1>

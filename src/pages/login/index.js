@@ -38,25 +38,26 @@ const Login = () => {
   };
 
   //PRODUCAO
-  const baseURL = window.location.protocol +'//'+ window.location.hostname + ':1010'
+  const baseURL =
+    window.location.protocol + "//" + window.location.hostname + ":1010";
 
   //DESENVOLVIMENTO
   //const baseURL = "http://localhost:2096"
 
   const api = axios.create({
     baseURL: baseURL,
-    timeout : 1000,
+    timeout: 1000,
     headers: headers,
     params: params,
   });
 
   const login = () => {
-    isLogado.setLogado(false)
-    localStorage.clear()
+    isLogado.setLogado(false);
+    localStorage.clear();
     api
       .post("/oauth/token", { params, headers })
       .then((response) => {
-        localStorage.clear()
+        localStorage.clear();
         isLogado.setLogado(true);
         isLogado.setUsuarioLogado(usuario);
         const accessToken = JSON.stringify(response.data);
@@ -67,29 +68,38 @@ const Login = () => {
       })
       .catch((error) => {
         isLogado.setLogado(false);
-        localStorage.clear()
-      //  console.log(error)
+        localStorage.clear();
+        //  console.log(error)
 
-        if(error.message === 'timeout of 1000ms exceeded') {
+        console.log(error);
 
+        if (error.code === "401") {
+          toast.current.show({
+            severity: "error",
+            summary: "Token expirado ",
+            detail: "Atualize a pagina e faça login novamente ",
+            sticky: true,
+          });
+        }
+
+        if (error.message === "timeout of 1000ms exceeded") {
           toast.current.show({
             severity: "error",
             summary: "Erro ao conectar com o servidor ",
-            detail: "Estamos com problemas ao conectar com o servidor. Favor, tente mais tarde ",
-            sticky: true
-            
+            detail:
+              "Estamos com problemas ao conectar com o servidor. Favor, tente mais tarde ",
+            sticky: true,
           });
-
         }
 
-        if(error.response.data.error === 'invalid_grant'){
-        toast.current.show({
-          severity: "error",
-          summary: "Usuário e/ou senha inválidos",
-          detail: "Tente novamente!",
-          life: 3000,
-        });
-      }
+        if (error.response.data.error === "invalid_grant") {
+          toast.current.show({
+            severity: "error",
+            summary: "Usuário e/ou senha inválidos",
+            detail: "Tente novamente!",
+            life: 3000,
+          });
+        }
       });
   };
 
@@ -116,18 +126,20 @@ const Login = () => {
               placeholder="Senha"
               onChange={(e) => setSenha(e.target.value)}
             />
-          
+
             <button onClick={() => login()}>Acessar</button>
           </div>
         </div>
         <div className="overlay-container">
           <div className="overlay">
-            <div className="overlay-panel overlay-left">
-              
-            </div>
+            <div className="overlay-panel overlay-left"></div>
             <div className="overlay-panel overlay-right">
               <h1>Bem vindo(a)!</h1>
-              <img src={Logo} style={{ width: "450px" }} alt="logo do sistema" />
+              <img
+                src={Logo}
+                style={{ width: "450px" }}
+                alt="logo do sistema"
+              />
             </div>
           </div>
         </div>

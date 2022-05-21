@@ -22,6 +22,9 @@ const Header = () => {
     localStorage.clear();
     isLogado.setLogado(false);
     navigate("/");
+    
+   
+  //  window.location.href('/')
   };
 
   useEffect(() => {
@@ -30,6 +33,27 @@ const Header = () => {
 
     setNome(a.nome);
   }, []);
+
+  const isTokenValid = () => {
+    let currentDate = new Date();
+    let token = localStorage.getItem("access_token")
+    let a = JSON.parse(token);
+   
+    if (a.expires_in * 1000 < currentDate.getTime()) {
+     
+      
+    //  navigate('/')
+   //   window.location.href("/")
+      window.location.reload()
+      localStorage.clear()
+     
+      return true
+     
+    } 
+   
+    return false;
+    
+  }
 
   return (
     <>
@@ -84,7 +108,7 @@ const Header = () => {
             responsive
             color="#FFF"
             backgroundColor="#db3236"
-            onEnd={() => document.location.reload(true)}
+            onEnd={() => isTokenValid()}
             hourTitle="Hora(s)"
             minuteTitle="Min"
             secondTitle="Seg"

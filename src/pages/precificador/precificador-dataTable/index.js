@@ -19,12 +19,12 @@ import { SelectButton } from "primereact/selectbutton";
 import { Tag } from "primereact/tag";
 
 import api from "../../../services/axios";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
 import moment from "moment";
 
 const Precificador = () => {
-  const navigate = useNavigate();
+//  const navigate = useNavigate();
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const toast = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
@@ -267,7 +267,7 @@ const Precificador = () => {
       })
       .catch((error) => {
         // console.log(error)
-        navigate("/");
+    //    navigate("/");
       });
   };
 
@@ -311,7 +311,7 @@ const Precificador = () => {
         });
 
         if (error.response.status === 401) {
-          navigate("/");
+        //  navigate("/");
         }
         //  setProdutos([]);
       });
@@ -360,7 +360,7 @@ const Precificador = () => {
             Nota fiscal : {data.numeronotafiscal}
           </span>
           <span className="image-text">Filial de entrada : {data.nomeFilial}</span>
-          <span className="image-text">Data de entrada : {moment(data.entradasaida).format("DD/MM/yyyy")}</span>
+          <span className="image-text">Data de inclusão : {moment(data.entradasaida).format("DD/MM/yyyy - HH:mm")}</span>
         </div>
       </React.Fragment>
     );
@@ -449,7 +449,7 @@ const Precificador = () => {
             })
             .catch((error) => {
               if (error?.response?.status === 401) {
-                navigate("/");
+             //   navigate("/");
               }
 
               toast.current.show({
@@ -583,12 +583,14 @@ const Precificador = () => {
               <Calendar
                 placeholder="Informe a data inicial"
                 dateFormat="dd/mm/yy"
-                viewDate={dataInicial}
+                viewDate={new Date(new Date().setHours(0,0,0,0))}
+                
                 value={dataInicial}
                 onChange={(e) => setDataInicial(e.value)}
                 showButtonBar
                 locale="pt-BR"
                 showTime showSeconds
+                
               />
             </div>
             <div className="form-precificador-input">
@@ -599,7 +601,7 @@ const Precificador = () => {
               <Calendar
                 placeholder="Informe a data final"
                 dateFormat="dd/mm/yy"
-                viewDate={dataFinal}
+                
                 value={dataFinal}
                 onChange={(e) => setDataFinal(e.value)}
                 showButtonBar

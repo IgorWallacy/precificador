@@ -2,20 +2,25 @@ import React, { useContext, useEffect, useState } from "react";
 
 import "./styles.css";
 
-import Argon from "../../assets/img/logo_duca.png";
 import { Avatar } from "primereact/avatar";
-import { Tooltip } from "primereact/tooltip";
+
 import { Button } from "primereact/button";
+import { Sidebar } from 'primereact/sidebar';
+import { Toolbar } from 'primereact/toolbar';
 
 import Context from "../../contexts";
 import { useNavigate } from "react-router-dom";
 
 import CountdownTimer from "react-component-countdown-timer";
 
+import Logo from '../../assets/img/logo_duca.png'
+
 const Header = () => {
   const isLogado = useContext(Context);
 
   const [nome, setNome] = useState("");
+  const [visibleLeft, setVisibleLeft] = useState(false);
+
   let navigate = useNavigate();
 
   const logout = () => {
@@ -57,31 +62,22 @@ const Header = () => {
 
   return (
     <>
+      
+     
+      <Sidebar visible={visibleLeft}  position="top" onHide={() => setVisibleLeft(false)}>
+
+     
       <div className="logo">
-        <img
-          style={{ width: "300px", borderRadius: "20px" }}
-          src={Argon}
-          alt="img"
-        />
 
-        
-
+      
+      
+      
         {isLogado.logado ? (
           <>
             <div className="avatar">
-              <Tooltip
-                target=".tooltip-avatar"
-                autoHide={false}
-                position="bottom"
-              >
-                <Button
-                  label="Sair"
-                  onClick={() => logout()}
-                  type="button"
-                  icon="pi pi-times"
-                  className="p-button-rounded p-button-danger ml-2"
-                ></Button>
-              </Tooltip>
+              
+               
+            
 
               
 
@@ -115,12 +111,33 @@ const Header = () => {
             count={JSON.parse(localStorage.getItem("access_token")).expires_in}
             hideDay
           />
+          
         </div>
+
+        <Button
+                  label="Sair"
+                  onClick={() => logout()}
+                  type="button"
+                  icon="pi pi-times"
+                  className="p-button-rounded p-button-danger ml-2"
+                ></Button>
+        
           </>
         ) : (
           <></>
         )}
       </div>
+      </Sidebar>
+     
+      <div className="logo-rodape">
+      <img src={Logo} width="350px" alt="logo do sistema" />
+      </div>
+
+      <div className="botao-menu">
+      <Toolbar left={ <Button  className=" p-button-sm p-button-rounded p-button-primary" icon="pi pi-align-justify" onClick={() => setVisibleLeft(true)}  />} />
+     
+      </div>
+
     </>
   );
 };

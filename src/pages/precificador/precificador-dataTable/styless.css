@@ -17,8 +17,7 @@
 
 .p-toolbar {
     width: 100%;
-    border-top-right-radius: 50px;
-    border-top-left-radius: 50px;
+    background-color:  #6951;
     
     
 }
@@ -45,6 +44,7 @@
 
 .datatable-templating-demo .p-datatable-tbody{
  background-color: beige;
+ 
 
 }
 

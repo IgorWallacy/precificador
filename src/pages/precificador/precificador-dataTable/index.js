@@ -35,6 +35,7 @@ const Precificador = () => {
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
   const [replicarPreco, setReplicarPreco] = useState(0);
+  const [expandedRows, setExpandedRows] = useState([]);
   const replicarPrecoOpcoes = [
     { label: "Sim", value: 1 },
     { label: "Não", value: 0 },
@@ -94,8 +95,8 @@ const Precificador = () => {
       "Nov",
       "Dez",
     ],
-    today: "Hoje",
-    clear: "Limpar",
+    today: " Agora ",
+    clear: " Limpar ",
   });
 
   const pegarTokenLocalStorage = () => {
@@ -352,10 +353,10 @@ const Precificador = () => {
   const headerTemplate = (data) => {
     return (
       <React.Fragment>
-        <div className="headerTemplateDataTable">
+        <div  className="headerTemplateDataTable">
           <Avatar icon="pi pi-user" shape="circle" />
 
-          <span className="image-text"> Fornecedor : {data.razaosocial} </span>
+          <span  className="image-text"> Fornecedor : {data.razaosocial} </span>
           <span className="image-text">
             Nota fiscal : {data.numeronotafiscal}
           </span>
@@ -467,12 +468,12 @@ const Precificador = () => {
   const botaovoltar = (
     <React.Fragment>
       <Button
-        className="p-button-rounded p-button-danger p-button-lg"
+        className="p-button-rounded p-button-danger p-button-sm"
         tooltip="Voltar"
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-arrow-left"
         style={{
-          margin: "10px",
+          margin: "0px 10px",
         }}
         onClick={() => setProdutos([])}
       />
@@ -482,7 +483,7 @@ const Precificador = () => {
         tooltip="Atualizar"
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-refresh"
-        className=" p-button-rounded p-button-secondary p-button-lg"
+        className=" p-button-rounded p-button-secondary p-button-sm"
       />
     </React.Fragment>
   );
@@ -497,22 +498,16 @@ const Precificador = () => {
             flexDirection: "column",
           }}
         >
-          <h5
-            style={{
-              color: replicarPreco ? "green" : "red",
-              margin: "5px",
-              fontWeight: "bold",
-            }}
-          >
-            {" "}
-            Deseja replicar os preços para todas as filiais ?{" "}
-          </h5>
+         
+
+         
 
           {replicarPreco ? (
             <Tag
               className="mr-2"
+              
               rounded
-              value="Sim"
+              value="Replicar a atualização de preços para todas as filiais"
               severity="success"
               icon="pi pi-check"
             ></Tag>
@@ -522,7 +517,7 @@ const Precificador = () => {
               icon="pi pi-times"
               rounded
               severity="danger"
-              value="Não"
+              value="Não replicar a atualização de preços para todas as filiais"
             ></Tag>
           )}
         </div>
@@ -634,11 +629,14 @@ const Precificador = () => {
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
+            
               style={{
-                height: "75vh",
+                height: "99vh",
                 width: "99vw",
                 alignContent: "center",
                 justifyContent: "center",
+                fontSize : '14px',
+                textAlign : 'center'
               }}
               breakpoint="960px"
               loading={loading}
@@ -668,8 +666,10 @@ const Precificador = () => {
               groupRowsBy={agrupamento}
               //  sortOrder={1}
               rowGroupHeaderTemplate={headerTemplate}
-              // resizableColumns
+               resizableColumns
               // columnResizeMode="expand"
+              expandableRowGroups
+              expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
             >
               <Column
                 header="Código de barras / Código interno"
@@ -680,6 +680,7 @@ const Precificador = () => {
                 field="descricao"
                 header="Produto"
                 body={familiaIcone}
+               
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
               <Column
@@ -697,7 +698,7 @@ const Precificador = () => {
               ></Column>
 
               <Column
-                style={{ fontWeight: "600" }}
+                style={{ fontWeight: "600", fontSize : '14px' }}
                 field={sugestaoVenda}
                 header="Sugestão (Markup%, Venda)"
                 body={sugestaoVenda}

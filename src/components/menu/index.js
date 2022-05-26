@@ -9,7 +9,8 @@ const Menu = () => {
     {
       label: "Início",
       icon: "pi pi-fw pi-globe",
-      items: [{ label: "Dashboard", icon: " pi pi-home" }],
+      command: () => navigate("/menu")
+    
     },
     {
       label: "Precificação",

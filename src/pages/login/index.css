@@ -9,7 +9,7 @@ body {
 .botao-login {
 	border-radius: 20px;
 	border: 1px solid #f4917f;
-	background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
+	background-image: linear-gradient(to left bottom, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
     margin: 10px;
 	color: #FFFFFF;
 	font-size: 12px;
@@ -60,7 +60,16 @@ body {
 	justify-content: center;
 }
 
+.fundo {
 
+	background-color: #8ea3e3;
+	
+
+}
+
+.logo-login {
+	background-color: #8ea3e3;
+}
 
 
 

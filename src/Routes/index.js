@@ -10,6 +10,7 @@ import PrecificadorExecuta from '../pages/precificador/executa/precificador-data
 
 import Context from "../contexts";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import MenuInterativo from "../pages/menu-interativo";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -30,6 +31,7 @@ export default function Router() {
       <Routes>
         <Route path="/" element={<Login />} />
           <Route path="/"  element={<PrivateRoutes />}>
+          <Route path="menu" element={<MenuInterativo />} />
           <Route path="precificar-agendar" element={<App />} />
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
          

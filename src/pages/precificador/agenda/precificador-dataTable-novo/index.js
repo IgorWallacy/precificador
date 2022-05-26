@@ -522,24 +522,7 @@ const PrecificadorAgenda = () => {
 
          
 
-          {replicarPreco ? (
-            <Tag
-              className="mr-2"
-              style={{margin : '10px'}}
-              rounded
-              value="Replicar a atualização de preços para todas as filiais"
-              severity="success"
-              icon="pi pi-check"
-            ></Tag>
-          ) : (
-            <Tag
-              className="mr-2"
-              icon="pi pi-times"
-              rounded
-              severity="danger"
-              value="Não replicar a atualização de preços para todas as filiais"
-            ></Tag>
-          )}
+        
         </div>
       </React.Fragment>
     ) : (
@@ -643,7 +626,7 @@ const PrecificadorAgenda = () => {
             </div>
           </div>
           <div className="form-precificador-btn">
-            <MostraSelectReplicarPrecoFilial />
+            
           </div>
           <div className="form-precificador-btn">
             <Button

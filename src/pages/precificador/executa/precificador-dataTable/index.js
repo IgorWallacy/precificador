@@ -18,8 +18,7 @@ import { addLocale } from "primereact/api";
 import { SelectButton } from "primereact/selectbutton";
 import { Tag } from "primereact/tag";
 
-import Typing from 'react-typing-animation';
-
+import Typing from "react-typing-animation";
 
 import api from "../../../../services/axios";
 //import { useNavigate } from "react-router-dom";
@@ -233,34 +232,31 @@ const PrecificadorExecuta = () => {
       currency: "BRL",
     }).format(rowData.precoAtual);
 
-    return (
-      rowData.precoAtual === rowData.precoagendado ?(  
+    return rowData.precoAtual === rowData.precoagendado ? (
       <>
-    
-       <div style={{ display : 'flex' ,flexDirection:'column', rowGap : '1px', color : '#0F9D58' }} >
-        <div> {markupFormatado} </div>
-      
-       
-     <div> {precoAtualFormatado}</div>  
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            rowGap: "1px",
+            color: "#0F9D58",
+          }}
+        >
+          <div> {markupFormatado} </div>
 
-        <Tag  icon="pi pi-check-square" severity="success"></Tag>
-        
-      
+          <div> {precoAtualFormatado}</div>
 
+          
         </div>
-    
-    
       </>
     ) : (
       <>
-       <div style={{ color : '#f69c22' }} >
-        
-        {markupFormatado} <br />
-        {precoAtualFormatado} 
+        <div style={{ color: "#f69c22" }}>
+          {markupFormatado} <br />
+          {precoAtualFormatado}
         </div>
       </>
-    ))
-    
+    );
   };
 
   const sugestaoVenda = (rowData) => {
@@ -285,6 +281,29 @@ const PrecificadorExecuta = () => {
       <>
         {mkf} <br />
         {sf}
+      </>
+    );
+  };
+
+  const status = (rowData) => {
+    return rowData.precoAtual === rowData.precoagendado ? (
+      <>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            rowGap: "1px",
+            color: "#0F9D58",
+          }}
+        >
+          <Tag value="Preço OK" icon="pi pi-check-square" severity="success"></Tag>
+        </div>
+      </>
+    ) : (
+      <>
+        <div style={{ color: "#f69c22" }}>
+        <Tag value="Checar Preço" icon="pi pi-exclamation-circle" severity="warn"></Tag>
+        </div>
       </>
     );
   };
@@ -415,6 +434,11 @@ const PrecificadorExecuta = () => {
             Data de inclusão :{" "}
             {moment(data.entradasaida).format("DD/MM/yyyy - HH:mm")}
           </span>
+
+          <span className="image-text">
+            Agendado para :{" "}
+            {moment(data.dataagendada).format("DD/MM/yyyy - ( dddd )")}
+          </span>
         </div>
       </React.Fragment>
     );
@@ -487,7 +511,7 @@ const PrecificadorExecuta = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-              console.log(response.data);
+          //    console.log(response.data);
               setLoading(false);
 
               if (response.data.length === 0) {
@@ -601,10 +625,7 @@ const PrecificadorExecuta = () => {
       return (
         <>
           <h5 style={{ margin: "10px" }}>
-         
-             Replicar os preços para todas as filiais ?
-           
-          
+            Replicar os preços para todas as filiais ?
           </h5>
           <SelectButton
             value={replicarPreco}
@@ -627,13 +648,12 @@ const PrecificadorExecuta = () => {
       </div>
 
       <div className="agenda-label">
-      <i className="pi pi-sync" style={{'fontSize': '2em'}}></i>
-      <Typing>
-    <h1> Pesquisar por agendamento</h1>
+        <i className="pi pi-sync" style={{ fontSize: "2em" }}></i>
+        <Typing>
+          <h1> Pesquisar por agendamento</h1>
 
-    <span>Atualizar preço de venda </span> 
-      
-      </Typing>
+          <span>Atualizar preço de venda </span>
+        </Typing>
       </div>
 
       {produtos.length < 1 ? (
@@ -655,8 +675,8 @@ const PrecificadorExecuta = () => {
                   onChange={(e) => setDataInicial(e.target.value)}
                   showButtonBar
                   locale="pt-BR"
-               //   showTime
-                //  showSeconds
+                  //   showTime
+                  //  showSeconds
                 />
               </div>
               <div className="form-precificador-input">
@@ -674,9 +694,9 @@ const PrecificadorExecuta = () => {
                   onChange={(e) => setDataFinal(e.value)}
                   showButtonBar
                   locale="pt-BR"
-              //    showTime
-                //  showSeconds
-                /> 
+                  //    showTime
+                  //  showSeconds
+                />
               </div>
 
               <div className="form-precificador-input">
@@ -788,7 +808,10 @@ const PrecificadorExecuta = () => {
                   field={margem}
                   header="Agendado (Margem%, Lucro)"
                   body={margem}
-                  bodyStyle={{ textAlign: "center" , color : '#07a615', backgroundColor: '#fffdd0' }}
+                  bodyStyle={{
+                    textAlign: "center",
+                   
+                  }}
                 ></Column>
 
                 <Column
@@ -797,15 +820,31 @@ const PrecificadorExecuta = () => {
                   body={precoAgendadoTemplate}
                   style={{ fontWeight: "600" }}
                   editor={(options) => priceEditor(options)}
-                  bodyStyle={{ textAlign: "center" , color : '#07a615', backgroundColor: '#fffdd0' }}
+                  bodyStyle={{
+                    textAlign: "center",
+                  
+                  }}
                 ></Column>
 
                 <Column
                   field={precoAtualTemplate}
                   header="Atual (Markup%, Venda)"
                   style={{ fontWeight: "600" }}
-                  bodyStyle={{  textAlign: "center" ,  backgroundColor: '#fef4f3' }}
+                  bodyStyle={{
+                    textAlign: "center",
+                  
+                  }}
                   body={precoAtualTemplate}
+                ></Column>
+
+                <Column
+                field= {status}
+                  header="Status"
+                  style={{ fontWeight: "600" }}
+                  bodyStyle={{
+                    textAlign: "center",
+                   
+                  }}
                 ></Column>
 
                 <Column
@@ -814,8 +853,6 @@ const PrecificadorExecuta = () => {
                   headerStyle={{ width: "10%", minWidth: "8rem" }}
                   bodyStyle={{ textAlign: "center" }}
                 ></Column>
-
-             
               </DataTable>
             </div>
           </div>

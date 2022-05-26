@@ -71,7 +71,7 @@ const Login = () => {
 
         localStorage.setItem("access_token", accessToken);
 
-        navigate("/precificar-agendar");
+        navigate("/menu");
       })
       .catch((error) => {
         isLogado.setLogado(false);
@@ -118,7 +118,7 @@ const Login = () => {
 
 
     <div style={{marginTop:'15rem'}} className="grid grid-nogutter surface-0 text-800">
-    <div className="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
+    <div className="fundo col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
         <section>
        
       
@@ -126,7 +126,7 @@ const Login = () => {
         <div>
        
         </div>
-        <h4 style={{fontSize:'20px' , margin:'15px'}}>  <Typing speed={100}  startDelay={10} >Utilize sua conta uniplus para acesso ao sistema</Typing> </h4>
+        <h4 style={{  fontSize:'20px' , margin:'15px', color : '#FFF'}}>  <Typing speed={100}  startDelay={10} >Utilize sua conta uniplus para acesso ao sistema</Typing> </h4>
         <form onSubmit={login}>
         <div>
         <InputText autoFocus
@@ -155,7 +155,7 @@ const Login = () => {
          
         </section>
     </div>
-    <div className="col-12 md:col-6 overflow-hidden">
+    <div className=" logo-login col-12 md:col-6 overflow-hidden">
     <img src={Logo} alt="logo-sistema"   className="md:ml-auto block md:h-full" style={{ clipPath: 'polygon(8% 0, 100% 0%, 100% 100%, 0 100%)' }} />
     </div>
 </div>

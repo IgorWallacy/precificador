@@ -14,7 +14,9 @@ import axios from "axios";
 
 import Logo from "../../assets/img/logo_duca.png";
 
+import Typing from 'react-typing-animation';
 
+import "primeflex/primeflex.css";
 
 const Login = () => {
   const toast = useRef(null);
@@ -112,38 +114,51 @@ const Login = () => {
     <>
       <Toast ref={toast} position="top-center" />
 
-           <div className="container" id="container">
+          
+
+
+    <div style={{marginTop:'15rem'}} className="grid grid-nogutter surface-0 text-800">
+    <div className="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
+        <section>
+       
       
-          <div className="form-login">
-            <div>
-            <img src={Logo} alt="logo-sistema" width={'450px'} />
-            </div>
-            <h4 style={{fontSize:'20px' , margin:'15px'}}> Utilize sua conta uniplus para acesso ao sistema </h4>
-            <form onSubmit={login}>
-            <div>
-            <InputText autoFocus
-              type="text"
-              value={usuario}
-              style={{ width: "100%", margin:'5px' }}
-              placeholder="Código"
-              onChange={(e) => setUsuario(e.target.value)}
-            />
-            </div>
-            <div>
-            <InputText  
-              type="password"
-              value={senha}
-              style={{ width: "100%", margin : '5px' }}
-              placeholder="Senha"
-              onChange={(e) => setSenha(e.target.value)}
-            />
-            </div>
-           <div style={{textAlign:"center"}}>
-            <input type="submit" className="botao-login" value="Acessar"  ></input> 
-            </div>
-            </form>
-            </div>
-          </div>
+      <div className="form-login">
+        <div>
+       
+        </div>
+        <h4 style={{fontSize:'20px' , margin:'15px'}}>  <Typing speed={100}  startDelay={10} >Utilize sua conta uniplus para acesso ao sistema</Typing> </h4>
+        <form onSubmit={login}>
+        <div>
+        <InputText autoFocus
+          type="text"
+          value={usuario}
+          style={{ width: "100%", margin:'5px' }}
+          placeholder="Código"
+          onChange={(e) => setUsuario(e.target.value)}
+        />
+        </div>
+        <div>
+        <InputText  
+          type="password"
+          value={senha}
+          style={{ width: "100%", margin : '5px' }}
+          placeholder="Senha"
+          onChange={(e) => setSenha(e.target.value)}
+        />
+        </div>
+       <div style={{textAlign:"center"}}>
+        <input type="submit" className="botao-login" value="Acessar"  ></input> 
+        </div>
+        </form>
+        </div>
+      
+         
+        </section>
+    </div>
+    <div className="col-12 md:col-6 overflow-hidden">
+    <img src={Logo} alt="logo-sistema"   className="md:ml-auto block md:h-full" style={{ clipPath: 'polygon(8% 0, 100% 0%, 100% 100%, 0 100%)' }} />
+    </div>
+</div>
         
         
       

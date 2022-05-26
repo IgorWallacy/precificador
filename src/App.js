@@ -12,10 +12,10 @@ function App() {
         <Header/>
       </div>
 
-      <div className="container-flex">
+     
         <Main />
        
-      </div>
+    
 
       
       

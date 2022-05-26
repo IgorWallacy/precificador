@@ -7,10 +7,14 @@ import { useNavigate } from "react-router-dom";
 import Context from "../../contexts";
 
 import { Toast } from "primereact/toast";
+import { InputText } from 'primereact/inputtext';
+
 
 import axios from "axios";
 
 import Logo from "../../assets/img/logo_duca.png";
+
+
 
 const Login = () => {
   const toast = useRef(null);
@@ -51,7 +55,8 @@ const Login = () => {
     params: params,
   });
 
-  const login = () => {
+  const login = (e) => {
+    e.preventDefault()
     isLogado.setLogado(false);
     localStorage.clear();
     api
@@ -64,7 +69,7 @@ const Login = () => {
 
         localStorage.setItem("access_token", accessToken);
 
-        navigate("/precificar");
+        navigate("/precificar-agendar");
       })
       .catch((error) => {
         isLogado.setLogado(false);
@@ -107,43 +112,41 @@ const Login = () => {
     <>
       <Toast ref={toast} position="top-center" />
 
-      <div className="container" id="container">
-        <div className="form-container sign-up-container"></div>
-        <div className="form-container sign-in-container">
-          <div className="form-login-container">
-            <h4> Utilize sua conta uniplus para acesso ao sistema </h4>
-            <input
+           <div className="container" id="container">
+      
+          <div className="form-login">
+            <div>
+            <img src={Logo} alt="logo-sistema" width={'450px'} />
+            </div>
+            <h4 style={{fontSize:'20px' , margin:'15px'}}> Utilize sua conta uniplus para acesso ao sistema </h4>
+            <form onSubmit={login}>
+            <div>
+            <InputText autoFocus
               type="text"
               value={usuario}
-              style={{ width: "50%" }}
+              style={{ width: "100%", margin:'5px' }}
               placeholder="Código"
               onChange={(e) => setUsuario(e.target.value)}
             />
-            <input
+            </div>
+            <div>
+            <InputText  
               type="password"
               value={senha}
-              style={{ width: "50%" }}
+              style={{ width: "100%", margin : '5px' }}
               placeholder="Senha"
               onChange={(e) => setSenha(e.target.value)}
             />
-
-            <button onClick={() => login()}>Acessar</button>
-          </div>
-        </div>
-        <div className="overlay-container">
-          <div className="overlay">
-            <div className="overlay-panel overlay-left"></div>
-            <div className="overlay-panel overlay-right">
-              <h1>Bem vindo(a)!</h1>
-              <img
-                src={Logo}
-                style={{ width: "450px" }}
-                alt="logo do sistema"
-              />
+            </div>
+           <div style={{textAlign:"center"}}>
+            <input type="submit" className="botao-login" value="Acessar"  ></input> 
+            </div>
+            </form>
             </div>
           </div>
-        </div>
-      </div>
+        
+        
+      
     </>
   );
 };

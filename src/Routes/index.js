@@ -4,6 +4,10 @@ import App from "../App";
 import Login from "../pages/login";
 
 
+import PrecificadorExecuta from '../pages/precificador/executa/precificador-dataTable'
+
+
+
 import Context from "../contexts";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
@@ -26,7 +30,8 @@ export default function Router() {
       <Routes>
         <Route path="/" element={<Login />} />
           <Route path="/"  element={<PrivateRoutes />}>
-          <Route path="precificar" element={<App />} />
+          <Route path="precificar-agendar" element={<App />} />
+          <Route path="precificar-executar" element={<PrecificadorExecuta />} />
          
         </Route>
       </Routes>

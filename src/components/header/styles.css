@@ -14,7 +14,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
+    border: none;
     padding: 20px;
     margin: 15px 20px;
     width: 20px;
@@ -25,4 +25,24 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+
+    transform: translateY(0px);
+    animation: float 5s ease-in-out infinite;
 }
+
+
+@keyframes float {
+
+	0%{
+		transform: translate(0px);
+	}
+
+	50%{
+		transform: translateY(30px);
+	}
+
+	100% {
+		transform: translateY(0px);
+	}
+}
+

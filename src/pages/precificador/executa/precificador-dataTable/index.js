@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import "./styless.css";
-
+import Header from "../../../../components/header";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
@@ -18,13 +18,16 @@ import { addLocale } from "primereact/api";
 import { SelectButton } from "primereact/selectbutton";
 import { Tag } from "primereact/tag";
 
-import api from "../../../services/axios";
+import Typing from 'react-typing-animation';
+
+
+import api from "../../../../services/axios";
 //import { useNavigate } from "react-router-dom";
 
 import moment from "moment";
 
-const Precificador = () => {
-//  const navigate = useNavigate();
+const PrecificadorExecuta = () => {
+  //  const navigate = useNavigate();
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const toast = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
@@ -124,10 +127,11 @@ const Precificador = () => {
   const margem = (rowData) => {
     //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
     let margem =
-      ((rowData.precoNovo - rowData.precocusto) / rowData.precoNovo) * 100;
+      ((rowData.precoagendado - rowData.precocusto) / rowData.precoagendado) *
+      100;
 
     // Margem em valor monetário: Preço de venda - Preço de compra
-    let rsmargem = rowData.precoNovo - rowData.precocusto;
+    let rsmargem = rowData.precoagendado - rowData.precocusto;
 
     let margemformatada = Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -189,9 +193,9 @@ const Precificador = () => {
     }).format(rowData.precocusto);
   };
 
-  const precoVendaTemplate = (rowData) => {
+  const precoAgendadoTemplate = (rowData) => {
     let markup =
-      ((rowData.precoNovo - rowData.precocusto) / rowData.precocusto) * 100;
+      ((rowData.precoagendado - rowData.precocusto) / rowData.precocusto) * 100;
 
     let markupFormatado =
       Intl.NumberFormat("pt-BR", {
@@ -200,17 +204,63 @@ const Precificador = () => {
         maximumSignificantDigits: "4",
       }).format(markup) + " %";
 
-    let preconovoFormatado = Intl.NumberFormat("pt-BR", {
+    let precoagendadoFormatado = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(rowData.precoNovo);
+    }).format(rowData.precoagendado);
 
     return (
       <>
         {markupFormatado} <br />
-        {preconovoFormatado}
+        {precoagendadoFormatado}
       </>
     );
+  };
+
+  const precoAtualTemplate = (rowData) => {
+    let markup =
+      ((rowData.precoAtual - rowData.precocusto) / rowData.precocusto) * 100;
+
+    let markupFormatado =
+      Intl.NumberFormat("pt-BR", {
+        style: "decimal",
+        currency: "BRL",
+        maximumSignificantDigits: "4",
+      }).format(markup) + " %";
+
+    let precoAtualFormatado = Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(rowData.precoAtual);
+
+    return (
+      rowData.precoAtual === rowData.precoagendado ?(  
+      <>
+    
+       <div style={{ display : 'flex' ,flexDirection:'column', rowGap : '1px', color : '#0F9D58' }} >
+        <div> {markupFormatado} </div>
+      
+       
+     <div> {precoAtualFormatado}</div>  
+
+        <Tag  icon="pi pi-check-square" severity="success"></Tag>
+        
+      
+
+        </div>
+    
+    
+      </>
+    ) : (
+      <>
+       <div style={{ color : '#f69c22' }} >
+        
+        {markupFormatado} <br />
+        {precoAtualFormatado} 
+        </div>
+      </>
+    ))
+    
   };
 
   const sugestaoVenda = (rowData) => {
@@ -268,7 +318,7 @@ const Precificador = () => {
       })
       .catch((error) => {
         // console.log(error)
-    //    navigate("/");
+        //    navigate("/");
       });
   };
 
@@ -287,11 +337,9 @@ const Precificador = () => {
       intFamilia = parseInt(_products2[index].idfamilia);
     }
 
-   
-
     api
       .put(
-        `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${intFamilia}/${_products2[index].precoNovo}/${_products2[index].idfilial}/${replicarPreco}`,
+        `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${intFamilia}/${_products2[index].precoagendado}/${_products2[index].idfilial}/${replicarPreco}`,
         { headers: headers }
       )
       .then((response) => {
@@ -301,7 +349,7 @@ const Precificador = () => {
         toast.current.show({
           severity: "success",
           summary: "Sucesso",
-          detail: ` ${_products2[index].descricao} atualizado para R$ ${_products2[index].precoNovo}  `,
+          detail: ` ${_products2[index].descricao} atualizado para R$ ${_products2[index].precoagendado}  `,
         });
       })
       .catch((error) => {
@@ -312,7 +360,7 @@ const Precificador = () => {
         });
 
         if (error.response.status === 401) {
-        //  navigate("/");
+          //  navigate("/");
         }
         //  setProdutos([]);
       });
@@ -353,15 +401,20 @@ const Precificador = () => {
   const headerTemplate = (data) => {
     return (
       <React.Fragment>
-        <div  className="headerTemplateDataTable">
+        <div className="headerTemplateDataTable">
           <Avatar icon="pi pi-user" shape="circle" />
 
-          <span  className="image-text"> Fornecedor : {data.razaosocial} </span>
+          <span className="image-text"> Fornecedor : {data.razaosocial} </span>
           <span className="image-text">
             Nota fiscal : {data.numeronotafiscal}
           </span>
-          <span className="image-text">Filial de entrada : {data.nomeFilial}</span>
-          <span className="image-text">Data de inclusão : {moment(data.entradasaida).format("DD/MM/yyyy - HH:mm")}</span>
+          <span className="image-text">
+            Filial de entrada : {data.nomeFilial}
+          </span>
+          <span className="image-text">
+            Data de inclusão :{" "}
+            {moment(data.entradasaida).format("DD/MM/yyyy - HH:mm")}
+          </span>
         </div>
       </React.Fragment>
     );
@@ -373,9 +426,9 @@ const Precificador = () => {
         <React.Fragment>
           <h5>{rowData.descricao}</h5>
           <Button
-            className="p-button-rounded p-button-primary"
+            className="p-button-rounded p-button-secondary p-button-sm"
             tooltip="Será atualizado o preço da família"
-            style={{ fontSize: "2rem", marginLeft: "5px" }}
+            style={{ width: "1rem", margin: "5px" }}
             icon="pi pi-users"
           />
         </React.Fragment>
@@ -403,7 +456,6 @@ const Precificador = () => {
     usarTabelaFormacaoPreecoProduto();
 
     if (replicarPreco === undefined) {
-     
       toast.current.show({
         severity: "warn",
         summary: "Aviso",
@@ -420,8 +472,6 @@ const Precificador = () => {
         let dataI = dataInicial?.toISOString().slice(0, 20);
         let dataF = dataFinal?.toISOString().slice(0, 20);
 
-        
-
         if (dataI && dataF) {
           let filialId = filiaisSelect ? filiaisSelect.id : 0;
 
@@ -437,7 +487,7 @@ const Precificador = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-              // console.log(response.data)
+              console.log(response.data);
               setLoading(false);
 
               if (response.data.length === 0) {
@@ -450,7 +500,7 @@ const Precificador = () => {
             })
             .catch((error) => {
               if (error?.response?.status === 401) {
-             //   navigate("/");
+                //   navigate("/");
               }
 
               toast.current.show({
@@ -483,7 +533,7 @@ const Precificador = () => {
         tooltip="Atualizar"
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-refresh"
-        className=" p-button-rounded p-button-secondary p-button-sm"
+        className=" p-button-rounded p-button-success p-button-sm"
       />
     </React.Fragment>
   );
@@ -498,14 +548,10 @@ const Precificador = () => {
             flexDirection: "column",
           }}
         >
-         
-
-         
-
           {replicarPreco ? (
             <Tag
               className="mr-2"
-              
+              style={{ margin: "10px" }}
               rounded
               value="Replicar a atualização de preços para todas as filiais"
               severity="success"
@@ -540,6 +586,8 @@ const Precificador = () => {
             options={quantidadeFilial}
             optionLabel="razaosocial"
             placeholder="Selecione uma filial "
+            emptyMessage="Nenhuma filial encontrada."
+            dropdownIcon="pi pi-chevron-down"
           />
         </>
       );
@@ -552,7 +600,12 @@ const Precificador = () => {
     if (quantidadeFilial.length > 1) {
       return (
         <>
-          <h5 style={{ margin: "5px" }}>Replicar preços para filiais ?</h5>
+          <h5 style={{ margin: "10px" }}>
+         
+             Replicar os preços para todas as filiais ?
+           
+          
+          </h5>
           <SelectButton
             value={replicarPreco}
             options={replicarPrecoOpcoes}
@@ -568,166 +621,203 @@ const Precificador = () => {
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
+
+      <div className="header">
+        <Header />
+      </div>
+
+      <div className="agenda-label">
+      <i className="pi pi-sync" style={{'fontSize': '2em'}}></i>
+      <Typing>
+    <h1> Pesquisar por agendamento</h1>
+
+    <span>Atualizar preço de venda </span> 
+      
+      </Typing>
+      </div>
+
       {produtos.length < 1 ? (
         <>
-          <div className="form-precificador">
-            <div className="form-precificador-input">
-              <div>
-                <h5>Período</h5>
+          <div className="container-flex">
+            <div className="form-precificador">
+              <div className="form-precificador-input">
+                <div>
+                  <h5>Período</h5>
+                </div>
+                <Calendar
+                  required
+                  showIcon
+                  placeholder="Informe a data inicial do agendamento"
+                  dateFormat="dd/mm/yy "
+                  viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                  hideOnDateTimeSelect
+                  value={dataInicial}
+                  onChange={(e) => setDataInicial(e.target.value)}
+                  showButtonBar
+                  locale="pt-BR"
+               //   showTime
+                //  showSeconds
+                />
               </div>
-              <Calendar
-                placeholder="Informe a data inicial"
-                dateFormat="dd/mm/yy"
-                viewDate={new Date(new Date().setHours(0,0,0,0))}
-                
-                value={dataInicial}
-                onChange={(e) => setDataInicial(e.value)}
-                showButtonBar
-                locale="pt-BR"
-                showTime showSeconds
-                
-              />
-            </div>
-            <div className="form-precificador-input">
-              <div>
-                <h5>até</h5>
+              <div className="form-precificador-input">
+                <div>
+                  <h5>até</h5>
+                </div>
+
+                <Calendar
+                  required
+                  showIcon
+                  placeholder="Informe a data final do agendamento"
+                  dateFormat="dd/mm/yy"
+                  hideOnDateTimeSelect
+                  value={dataFinal}
+                  onChange={(e) => setDataFinal(e.value)}
+                  showButtonBar
+                  locale="pt-BR"
+              //    showTime
+                //  showSeconds
+                /> 
               </div>
 
-              <Calendar
-                placeholder="Informe a data final"
-                dateFormat="dd/mm/yy"
-                
-                value={dataFinal}
-                onChange={(e) => setDataFinal(e.value)}
-                showButtonBar
-                locale="pt-BR"
-                showTime showSeconds
+              <div className="form-precificador-input">
+                <MostraListaFilial />
+              </div>
+            </div>
+            <div className="form-precificador-btn">
+              <MostraSelectReplicarPrecoFilial />
+            </div>
+            <div className="form-precificador-btn">
+              <Button
+                icon="pi pi-search"
+                label="Pesquisar"
+                className="p-button-rounded p-button-success p-button-md"
+                onClick={() => buscarProdutos()}
               />
             </div>
-
-            <div className="form-precificador-input">
-              <MostraListaFilial />
-            </div>
-          </div>
-          <div className="form-precificador-btn">
-            <MostraSelectReplicarPrecoFilial />
-          </div>
-          <div className="form-precificador-btn">
-            <Button
-              icon="pi pi-search"
-              label="Pesquisar"
-              className="p-button-rounded p-button-secondary p-button-lg"
-              onClick={() => buscarProdutos()}
-            />
           </div>
         </>
       ) : (
         <>
-          <Toolbar left={botaovoltar} right={botaoatualizar} />
+          <div className="container-flex">
+            <Toolbar
+              style={{ border: "none" }}
+              left={botaovoltar}
+              right={botaoatualizar}
+            />
 
-          <div className="datatable-templating-demo p-fluid">
-            <Tooltip target=".export-buttons>button" position="bottom" />
+            <div className="datatable-templating-demo p-fluid">
+              <Tooltip target=".export-buttons>button" position="bottom" />
 
-            <DataTable
-            
-              style={{
-                height: "99vh",
-                width: "99vw",
-                alignContent: "center",
-                justifyContent: "center",
-                fontSize : '14px',
-                textAlign : 'center'
-              }}
-              breakpoint="960px"
-              loading={loading}
-              //   stripedRows
-              value={produtos}
-              selectionMode="multiple"
-              //   reorderableColumns
-              editMode="row"
-              dataKey="idproduto"
-              onRowEditComplete={onRowEditComplete}
-              scrollDirection="vertical"
-              scrollable
-              scrollHeight="flex"
-              globalFilterFields={[
-                "descricao",
-                "ean",
-                "numeronotafiscal",
-                "razaosocial",
-              ]}
-              filters={filters2}
-              //size="large"
-              responsiveLayout="stack"
-              emptyMessage="Nenhum produto encontrado para precificação"
-              showGridlines
-              header={headerDataTable}
-              rowGroupMode="subheader"
-              groupRowsBy={agrupamento}
-              //  sortOrder={1}
-              rowGroupHeaderTemplate={headerTemplate}
-               resizableColumns
-              // columnResizeMode="expand"
-              expandableRowGroups
-              expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
-            >
-              <Column
-                header="Código de barras / Código interno"
-                field={EanOrCodigo}
-              ></Column>
+              <DataTable
+                style={{
+                  height: "99vh",
+                  width: "99vw",
+                  alignContent: "center",
+                  justifyContent: "center",
+                  fontSize: "14px",
+                  textAlign: "center",
+                }}
+                breakpoint="960px"
+                loading={loading}
+                stripedRows
+                value={produtos}
+                selectionMode="single"
+                //   reorderableColumns
+                editMode="row"
+                dataKey="idproduto"
+                onRowEditComplete={onRowEditComplete}
+                scrollDirection="vertical"
+                scrollable
+                scrollHeight="flex"
+                globalFilterFields={[
+                  "descricao",
+                  "ean",
+                  "numeronotafiscal",
+                  "razaosocial",
+                ]}
+                filters={filters2}
+                size="large"
+                responsiveLayout="stack"
+                emptyMessage="Nenhum produto encontrado para precificação"
+                showGridlines
+                header={headerDataTable}
+                rowGroupMode="subheader"
+                groupRowsBy={agrupamento}
+                //  sortOrder={1}
+                rowGroupHeaderTemplate={headerTemplate}
+                resizableColumns
+                // columnResizeMode="expand"
+                expandableRowGroups
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+              >
+                <Column
+                  header="Código de barras / Código interno"
+                  field={EanOrCodigo}
+                ></Column>
 
-              <Column
-                field="descricao"
-                header="Produto"
-                body={familiaIcone}
-               
-                bodyStyle={{ textAlign: "center" }}
-              ></Column>
-              <Column
-                field={precoCustoTemplate}
-                header="Custo"
-                body={precoCustoTemplate}
-                bodyStyle={{ textAlign: "center" }}
-              ></Column>
+                <Column
+                  field="descricao"
+                  header="Produto"
+                  body={familiaIcone}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
+                <Column
+                  field={precoCustoTemplate}
+                  header="Custo"
+                  body={precoCustoTemplate}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
 
-              <Column
-                field={RSmargemSugerida}
-                header="Sugestão (Margem%, Lucro)"
-                body={RSmargemSugerida}
-                bodyStyle={{ textAlign: "center" }}
-              ></Column>
+                <Column
+                  field={RSmargemSugerida}
+                  header="Sugestão (Margem%, Lucro)"
+                  body={RSmargemSugerida}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
 
-              <Column
-                style={{ fontWeight: "600", fontSize : '14px' }}
-                field={sugestaoVenda}
-                header="Sugestão (Markup%, Venda)"
-                body={sugestaoVenda}
-                bodyStyle={{ textAlign: "center" }}
-              ></Column>
+                <Column
+                  style={{ fontWeight: "600", fontSize: "14px" }}
+                  field={sugestaoVenda}
+                  header="Sugestão (Markup%, Venda)"
+                  body={sugestaoVenda}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
 
-              <Column
-                field={margem}
-                header="Atual (Margem%, Lucro)"
-                body={margem}
-                bodyStyle={{ textAlign: "center" }}
-              ></Column>
+                <Column
+                  field={margem}
+                  header="Agendado (Margem%, Lucro)"
+                  body={margem}
+                  bodyStyle={{ textAlign: "center" , color : '#07a615', backgroundColor: '#fffdd0' }}
+                ></Column>
 
-              <Column
-                field="precoNovo"
-                header="Atual (Markup, Venda)"
-                body={precoVendaTemplate}
-                style={{ fontWeight: "600" }}
-                editor={(options) => priceEditor(options)}
-                bodyStyle={{ textAlign: "center" }}
-              ></Column>
+                <Column
+                  field="precoagendado"
+                  header="Agendado (Markup, Venda)"
+                  body={precoAgendadoTemplate}
+                  style={{ fontWeight: "600" }}
+                  editor={(options) => priceEditor(options)}
+                  bodyStyle={{ textAlign: "center" , color : '#07a615', backgroundColor: '#fffdd0' }}
+                ></Column>
 
-              <Column
-                header="Editar"
-                rowEditor
-                headerStyle={{ width: "10%", minWidth: "8rem" }}
-                bodyStyle={{ textAlign: "center" }}
-              ></Column>
-            </DataTable>
+                <Column
+                  field={precoAtualTemplate}
+                  header="Atual (Markup%, Venda)"
+                  style={{ fontWeight: "600" }}
+                  bodyStyle={{  textAlign: "center" ,  backgroundColor: '#fef4f3' }}
+                  body={precoAtualTemplate}
+                ></Column>
+
+                <Column
+                  header="Editar"
+                  rowEditor
+                  headerStyle={{ width: "10%", minWidth: "8rem" }}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
+
+             
+              </DataTable>
+            </div>
           </div>
         </>
       )}
@@ -735,4 +825,4 @@ const Precificador = () => {
   );
 };
 
-export default Precificador;
+export default PrecificadorExecuta;

@@ -27,9 +27,9 @@
 
 .headerTemplateDataTable {
     display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: flex-center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
     width: 100%;
    
 
@@ -48,17 +48,8 @@
 
 }
 
-.datatable-templating-demo .table-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-}
 
-.datatable-templating-demo .table-body {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+
 
 .agenda-label {
     display: flex;
@@ -69,4 +60,16 @@
     align-items: center;
     color: #FFF;
     margin: 20px;
+}
+
+
+
+
+.p-datatable .p-datatable-tbody  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+   
 }

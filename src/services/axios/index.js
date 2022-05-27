@@ -8,8 +8,8 @@ import axios from "axios";
 
   const api = axios.create({
     baseURL: baseURL,
-    headers: {'Authorization': 'Bearer '+ JSON.parse(localStorage.getItem('access_token'))},
-    timeout : 3000
+    headers: {'Authorization': 'Bearer '+ JSON.parse(localStorage.getItem('access_token'))}
+   
 
   });
 

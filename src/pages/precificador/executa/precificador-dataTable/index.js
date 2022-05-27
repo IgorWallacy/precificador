@@ -245,8 +245,6 @@ const PrecificadorExecuta = () => {
           <div> {markupFormatado} </div>
 
           <div> {precoAtualFormatado}</div>
-
-          
         </div>
       </>
     ) : (
@@ -296,13 +294,21 @@ const PrecificadorExecuta = () => {
             color: "#0F9D58",
           }}
         >
-          <Tag value="Preço OK" icon="pi pi-check-square" severity="success"></Tag>
+          <Tag
+            value="Preço Ok"
+            icon="pi pi-check-square"
+            severity="success"
+          ></Tag>
         </div>
       </>
     ) : (
       <>
         <div style={{ color: "#f69c22" }}>
-        <Tag value="Checar Preço" icon="pi pi-exclamation-circle" severity="warn"></Tag>
+          <Tag
+            value="Checar preço "
+            icon="pi pi-exclamation-circle"
+            severity="warning"
+          ></Tag>
         </div>
       </>
     );
@@ -511,7 +517,7 @@ const PrecificadorExecuta = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-          //    console.log(response.data);
+              //    console.log(response.data);
               setLoading(false);
 
               if (response.data.length === 0) {
@@ -649,11 +655,14 @@ const PrecificadorExecuta = () => {
 
       <div className="agenda-label">
         <i className="pi pi-sync" style={{ fontSize: "2em" }}></i>
-        <Typing>
-          <h1> Pesquisar por agendamento</h1>
-
-          <span>Atualizar preço de venda </span>
-        </Typing>
+        <Typing >
+            
+           <h1> Pesquisar agendamentos </h1>
+           <Typing.Delay ms={1000}  />
+            
+           <h4>Atualizar os preços de venda</h4>
+         
+           </Typing>
       </div>
 
       {produtos.length < 1 ? (
@@ -708,8 +717,8 @@ const PrecificadorExecuta = () => {
             </div>
             <div className="form-precificador-btn">
               <Button
-                icon="pi pi-search"
-                label="Pesquisar"
+                icon={loading ?  'pi pi-spin pi-spinner': 'pi pi-search' }
+                label={loading ? 'Pesquisando ...' : ' Pesquisar '} disabled={loading}
                 className="p-button-rounded p-button-success p-button-md"
                 onClick={() => buscarProdutos()}
               />
@@ -790,10 +799,12 @@ const PrecificadorExecuta = () => {
                 ></Column>
 
                 <Column
-                  field={RSmargemSugerida}
-                  header="Sugestão (Margem%, Lucro)"
-                  body={RSmargemSugerida}
-                  bodyStyle={{ textAlign: "center" }}
+                  field={margem}
+                  header="Agendado (Margem%, Lucro)"
+                  body={margem}
+                  bodyStyle={{
+                    textAlign: "center",
+                  }}
                 ></Column>
 
                 <Column
@@ -805,16 +816,6 @@ const PrecificadorExecuta = () => {
                 ></Column>
 
                 <Column
-                  field={margem}
-                  header="Agendado (Margem%, Lucro)"
-                  body={margem}
-                  bodyStyle={{
-                    textAlign: "center",
-                   
-                  }}
-                ></Column>
-
-                <Column
                   field="precoagendado"
                   header="Agendado (Markup, Venda)"
                   body={precoAgendadoTemplate}
@@ -822,7 +823,6 @@ const PrecificadorExecuta = () => {
                   editor={(options) => priceEditor(options)}
                   bodyStyle={{
                     textAlign: "center",
-                  
                   }}
                 ></Column>
 
@@ -832,18 +832,16 @@ const PrecificadorExecuta = () => {
                   style={{ fontWeight: "600" }}
                   bodyStyle={{
                     textAlign: "center",
-                  
                   }}
                   body={precoAtualTemplate}
                 ></Column>
 
                 <Column
-                field= {status}
+                  field={status}
                   header="Status"
                   style={{ fontWeight: "600" }}
                   bodyStyle={{
                     textAlign: "center",
-                   
                   }}
                 ></Column>
 

@@ -156,7 +156,7 @@ const Login = () => {
         </section>
     </div>
     <div className=" logo-login col-12 md:col-6 overflow-hidden">
-    <img src={Logo} alt="logo-sistema"   className="md:ml-auto block md:h-full" style={{ clipPath: 'polygon(8% 0, 100% 0%, 100% 100%, 0 100%)' }} />
+    <img src={Logo} alt="logo-sistema"   className="md:ml-auto block md:h-full" style={{ width : '100vh', backgroundColor:"whitesmoke", clipPath: 'polygon(8% 0, 100% 0%, 100% 100%, 0 100%)' }} />
     </div>
 </div>
         

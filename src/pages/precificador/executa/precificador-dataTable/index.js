@@ -240,6 +240,7 @@ const PrecificadorExecuta = () => {
             flexDirection: "column",
             rowGap: "1px",
             color: "#0F9D58",
+            margin: "5px",
           }}
         >
           <div> {markupFormatado} </div>
@@ -249,9 +250,17 @@ const PrecificadorExecuta = () => {
       </>
     ) : (
       <>
-        <div style={{ color: "#f69c22" }}>
-          {markupFormatado} <br />
-          {precoAtualFormatado}
+        <div
+          style={{
+            color: "#f69c22",
+            margin: "5px",
+            display: "flex",
+            flexDirection: "column",
+            rowGap: "1px",
+          }}
+        >
+          <div> {markupFormatado} </div>
+          <div> {precoAtualFormatado}</div>
         </div>
       </>
     );
@@ -277,8 +286,20 @@ const PrecificadorExecuta = () => {
 
     return (
       <>
-        {mkf} <br />
-        {sf}
+        <div>
+          <div>{mkf}</div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "2px",
+            }}
+          >
+            {sf}
+          </div>
+        </div>
       </>
     );
   };
@@ -655,14 +676,12 @@ const PrecificadorExecuta = () => {
 
       <div className="agenda-label">
         <i className="pi pi-sync" style={{ fontSize: "2em" }}></i>
-        <Typing >
-            
-           <h1> Pesquisar agendamentos </h1>
-           <Typing.Delay ms={1000}  />
-            
-           <h4>Atualizar os preços de venda</h4>
-         
-           </Typing>
+        <Typing>
+          <h1> Pesquisar agendamentos </h1>
+          <Typing.Delay ms={1000} />
+
+          <h4>Atualizar os preços de venda</h4>
+        </Typing>
       </div>
 
       {produtos.length < 1 ? (
@@ -717,8 +736,9 @@ const PrecificadorExecuta = () => {
             </div>
             <div className="form-precificador-btn">
               <Button
-                icon={loading ?  'pi pi-spin pi-spinner': 'pi pi-search' }
-                label={loading ? 'Pesquisando ...' : ' Pesquisar '} disabled={loading}
+                icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
+                label={loading ? "Pesquisando ..." : " Pesquisar "}
+                disabled={loading}
                 className="p-button-rounded p-button-success p-button-md"
                 onClick={() => buscarProdutos()}
               />
@@ -781,7 +801,7 @@ const PrecificadorExecuta = () => {
                 onRowToggle={(e) => setExpandedRows(e.data)}
               >
                 <Column
-                  header="Código de barras / Código interno"
+                  header="Código "
                   field={EanOrCodigo}
                 ></Column>
 
@@ -800,7 +820,16 @@ const PrecificadorExecuta = () => {
 
                 <Column
                   field={margem}
-                  header="Agendado (Margem%, Lucro)"
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Agendado <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
+                    </>
+                  }
                   body={margem}
                   bodyStyle={{
                     textAlign: "center",
@@ -810,14 +839,32 @@ const PrecificadorExecuta = () => {
                 <Column
                   style={{ fontWeight: "600", fontSize: "14px" }}
                   field={sugestaoVenda}
-                  header="Sugestão (Markup%, Venda)"
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Sugestão <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
                   body={sugestaoVenda}
                   bodyStyle={{ textAlign: "center" }}
                 ></Column>
 
                 <Column
                   field="precoagendado"
-                  header="Agendado (Markup, Venda)"
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Preço Agendado <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
                   body={precoAgendadoTemplate}
                   style={{ fontWeight: "600" }}
                   editor={(options) => priceEditor(options)}
@@ -828,7 +875,16 @@ const PrecificadorExecuta = () => {
 
                 <Column
                   field={precoAtualTemplate}
-                  header="Atual (Markup%, Venda)"
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Preço Atual <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
                   style={{ fontWeight: "600" }}
                   bodyStyle={{
                     textAlign: "center",

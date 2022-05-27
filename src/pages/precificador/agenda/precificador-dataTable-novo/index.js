@@ -16,6 +16,9 @@ import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 import { SelectButton } from "primereact/selectbutton";
 import { Tag } from "primereact/tag";
+import { Row } from 'primereact/row';
+import { ColumnGroup } from 'primereact/columngroup';
+
 
 import api from "../../../../services/axios";
 
@@ -624,6 +627,8 @@ const PrecificadorAgenda = () => {
     }
   };
 
+ 
+
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
@@ -696,6 +701,7 @@ const PrecificadorAgenda = () => {
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
+             
               style={{
                 height: "99vh",
                 width: "99vw",
@@ -739,8 +745,9 @@ const PrecificadorAgenda = () => {
               onRowToggle={(e) => setExpandedRows(e.data)}
             >
               <Column
-                header="Código de barras / Código interno"
+                header={<> Código </>}
                 field={EanOrCodigo}
+                style={{textAlign : 'center'}}
               ></Column>
 
               <Column
@@ -758,7 +765,7 @@ const PrecificadorAgenda = () => {
 
               <Column
                 field={margemAtual}
-                header="Atual (Margem%, Lucro)"
+                header={<> <div> Preço Atual <hr/> </div> <br/> <div> Margem % </div> <br/> <div> Lucro </div> </>}
                 body={margemAtual}
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
@@ -766,7 +773,7 @@ const PrecificadorAgenda = () => {
 
               <Column
                 field={margem}
-                header="Agendado (Margem%, Lucro)"
+                header={<> <div> Preço Agendado <hr/> </div> <br/> <div> Margem % </div> <br/> <div> Lucro </div> </>}
                 body={margem}
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
@@ -774,14 +781,14 @@ const PrecificadorAgenda = () => {
             <Column
                 style={{ fontWeight: "600", fontSize: "14px" }}
                 field={sugestaoVenda}
-                header="Sugestão (Markup%, Venda)"
+                header={<> <div> Sugestão <hr/> </div> <br/> <div> Markup % </div> <br/> <div> Venda </div> </>}
                 body={sugestaoVenda}
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
 
               <Column
                 field={precoAtualTemplate}
-                header="Preço atual (Markup%, Venda)"
+                header={<> <div> Preço Atual <hr/> </div> <br/> <div> Markup % </div> <br/> <div> Venda </div> </>}
                 style={{ fontWeight: "600" }}
                 bodyStyle={{
                   textAlign: "center",
@@ -791,7 +798,7 @@ const PrecificadorAgenda = () => {
 
               <Column
                 field="precoagendado"
-                header="Preço agendado (Markup%, Venda)"
+                header={<> <div> Preço Agendado <hr/> </div> <br/> <div> Markup % </div> <br/> <div> Venda </div> </>}
                 style={{ fontWeight: "600" }}
                 editor={(options) => priceEditor(options)}
                 body={precoAgendoTemplate}

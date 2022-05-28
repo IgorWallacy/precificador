@@ -29,6 +29,19 @@ const Menu = () => {
         },
       ],
     },
+    {
+      label: "Vendas",
+      icon: "pi pi-shopping-cart",
+      items: [
+        {
+          label: "Vendas por meio de pagamento",
+          icon: "pi pi-shopping-bag",
+          command: () => navigate("/vendas"),
+        }
+
+       
+      ],
+    },
   ];
 
   return (

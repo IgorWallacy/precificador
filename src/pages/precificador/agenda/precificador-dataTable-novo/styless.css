@@ -65,11 +65,3 @@
 
 
 
-.p-datatable .p-datatable-tbody  {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-
-   
-}

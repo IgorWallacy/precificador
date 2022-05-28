@@ -14,10 +14,8 @@ import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
-import { SelectButton } from "primereact/selectbutton";
 import { Tag } from "primereact/tag";
-import { Row } from 'primereact/row';
-import { ColumnGroup } from 'primereact/columngroup';
+
 
 
 import api from "../../../../services/axios";
@@ -40,10 +38,7 @@ const PrecificadorAgenda = () => {
   const [agendar, setAgendar] = useState(new Date());
   const [replicarPreco, setReplicarPreco] = useState(0);
   const [expandedRows, setExpandedRows] = useState([]);
-  const replicarPrecoOpcoes = [
-    { label: "Sim", value: 1 },
-    { label: "Não", value: 0 },
-  ];
+
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -312,15 +307,7 @@ const PrecificadorAgenda = () => {
     );
   };
 
-  const dataEditor = (options) => {
-    return (
-      <InputText
-        type="date"
-        value={options.value}
-        onChange={(e) => options.editorCallback(e.target.value)}
-      />
-    );
-  };
+ 
 
   const usarTabelaFormacaoPreecoProduto = () => {
     api
@@ -608,24 +595,7 @@ const PrecificadorAgenda = () => {
     }
   };
 
-  const MostraSelectReplicarPrecoFilial = () => {
-    if (quantidadeFilial.length > 1) {
-      return (
-        <>
-          <h5 style={{ margin: "10px" }}>
-            Replicar os preços para todas as filiais ?
-          </h5>
-          <SelectButton
-            value={replicarPreco}
-            options={replicarPrecoOpcoes}
-            onChange={(e) => setReplicarPreco(e.value)}
-          ></SelectButton>
-        </>
-      );
-    } else {
-      return <></>;
-    }
-  };
+  
 
  
 

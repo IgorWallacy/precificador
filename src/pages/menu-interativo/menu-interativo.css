@@ -32,14 +32,29 @@
 .opcoes-menu {
     display: flex;
     justify-content: center;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     color: #FFFF;
     gap: 25px;
     flex-wrap: wrap;
     margin: 5rem 5rem;
+  
+   
+
+}
+
+.menu-categoria {
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    color: #FFFF;
+  
+    flex-wrap: wrap;
     border: 1px solid #FFFF;
     border-radius: 50px;
+    margin-top: 25px;
     padding: 25px;
 
 }

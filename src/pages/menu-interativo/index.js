@@ -1,57 +1,104 @@
 import React, { useEffect, useState } from "react";
 
+import api from "../../services/axios";
+
 import "./menu-interativo.css";
 
-import Typing from 'react-typing-animation';
-import { Button } from 'primereact/button';
+import Typing from "react-typing-animation";
+import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 
-
 const MenuInterativo = () => {
+  const [nome, setNome] = useState("");
+  const [headers, setHeaders] = useState();
 
-    const [nome, setNome] = useState("");
-   
-   
+  const navigate = useNavigate();
 
-    const navigate = useNavigate()
+  const pegarTokenLocalStorage = () => {
+    let token = localStorage.getItem("access_token");
+    let a = JSON.parse(token);
+    var headers = {
+      Authorization: "Bearer " + a.access_token,
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+    setHeaders(headers);
 
-    useEffect ( () => {
-        let token = localStorage.getItem("access_token");
-        let a = JSON.parse(token);
-       
-        
-        setNome(a.nome);
-    }, [])
+    api.interceptors.request.use(
+      (config) => {
+        // Do something before request is sent
 
-    const greetingMessage = () => {
-      //let h = new Date().toLocaleTimeString('pt-BR', { hour: 'numeric', hour12: false }); 
-      let h = new Date().getHours();
-      switch (true) {
-        case h <= 5: return 'Bom dia';
-        case h < 12: return 'Bom dia';
-        case h < 18: return 'Boa tarde';
-        default: return 'Boa noite';
+        config.headers["Authorization"] = "bearer " + a.access_token;
+        return config;
+      },
+      (error) => {
+        Promise.reject(error);
       }
-          
+    );
+  };
+
+  useEffect(() => {
+    pegarTokenLocalStorage();
+
+    let token = localStorage.getItem("access_token");
+    let a = JSON.parse(token);
+
+    setNome(a.nome);
+  }, []);
+
+  const greetingMessage = () => {
+    //let h = new Date().toLocaleTimeString('pt-BR', { hour: 'numeric', hour12: false });
+    let h = new Date().getHours();
+    switch (true) {
+      case h <= 5:
+        return "Bom dia";
+      case h < 12:
+        return "Bom dia";
+      case h < 18:
+        return "Boa tarde";
+      default:
+        return "Boa noite";
     }
-    
+  };
 
   return (
     <>
       <div className="menu-interativo">
-      <Typing speed={100}  startDelay={10} >
-        <div className="texto-menu-interativo"><em>{greetingMessage()}</em> <h1>{nome}</h1> 
-        <em>o que você deseja fazer hoje ? </em> </div>
+        <Typing speed={100} startDelay={10}>
+          <div className="texto-menu-interativo">
+            <em>{greetingMessage()}</em> <h1>{nome}</h1>
+            <em>o que você deseja fazer hoje ? </em>{" "}
+          </div>
         </Typing>
       </div>
-      <div className="opcoes-menu">
-      <Button label="Agendar precificação"  
-      icon="pi pi-calendar"  className="p-button-rounded p-button-help p-button-lg"
-      onClick= {() => navigate('/precificar-agendar')} />
-      <Button label="Executar precificação"  icon="pi pi-sync"  className="p-button-rounded p-button-help p-button-lg"
-      onClick={() => navigate('/precificar-executar')}
-      />
-     
+      <div className="menu-categoria">
+        {" "}
+        <h1>Precificar</h1>
+        <div className="opcoes-menu">
+          <Button
+            label="Agendar precificação"
+            icon="pi pi-calendar"
+            className="p-button-rounded p-button-help p-button-lg"
+            onClick={() => navigate("/precificar-agendar")}
+          />
+          <Button
+            label="Executar precificação"
+            icon="pi pi-sync"
+            className="p-button-rounded p-button-help p-button-lg"
+            onClick={() => navigate("/precificar-executar")}
+          />
+        </div>
+      </div>
+      <div className="menu-categoria">
+        {" "}
+        <h1>Vendas</h1>
+        <div className="opcoes-menu">
+          <Button
+            label="Relatório de Vendas do PDV"
+            icon="pi pi-shopping-cart"
+            className="p-button-rounded p-button-help p-button-lg"
+            onClick={() => navigate("/vendas")}
+          />
+        </div>
       </div>
     </>
   );

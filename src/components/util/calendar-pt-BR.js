@@ -1,0 +1,53 @@
+import { addLocale } from "primereact/api";
+
+
+const calendarioPtBR = () => {
+
+    addLocale("pt-BR", {
+        firstDayOfWeek: 0,
+        dayNames: [
+          "domingo",
+          "segunda",
+          "terça",
+          "quarta",
+          "quinta",
+          "sexta",
+          "sábado",
+        ],
+        dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+        dayNamesMin: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"],
+        monthNames: [
+          "Janeiro",
+          "Fevereiro",
+          "Março",
+          "Abril",
+          "Maio",
+          "Junho",
+          "Julho",
+          "Agosto",
+          "Setembro",
+          "Outubro",
+          "Novembro",
+          "Dezembro",
+        ],
+        monthNamesShort: [
+          "Jan",
+          "Fev",
+          "Mar",
+          "Abr",
+          "Maio",
+          "Jun",
+          "Jul",
+          "Ago",
+          "Set",
+          "Out",
+          "Nov",
+          "Dez",
+        ],
+        today: " Agora ",
+        clear: " Limpar ",
+      });
+
+}
+
+export default calendarioPtBR

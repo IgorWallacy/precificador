@@ -1,0 +1,76 @@
+.container {
+
+    display : flex;
+    flex-direction : row;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFF;
+    flex-wrap: wrap;
+    margin: 5px;
+    padding :5px;
+    
+  
+  }
+  
+  .btn{
+    display: flex;
+    justify-content: center;
+    height: 35px;
+  }
+  
+  .field {
+   
+    display : flex;
+    justify-content : space-between;
+    align-items : space-between;
+    margin : 5px;
+    padding : 5px;
+    flex-wrap: wrap;
+    border : 1px solid #FFF;
+  }
+  
+  .buttons {
+  
+    display : flex;
+    background-color: #FFF;
+    justify-content : center;
+    align-items : center;
+    flex-wrap: wrap;
+    padding: 20px;
+  
+  }
+  
+  .cards-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content : center;
+  align-items : center;
+  background-color: #FFF;
+  border : 1px solid #FFF;
+  margin : 5px;
+  }
+  
+  .card {
+    display: flex;
+    flex-direction: column;
+    margin : 5px;
+    padding : 5px;
+    border : 1px solid #FFF;
+    background-color: #FFF
+   
+  }
+  
+  .card-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin : 5px;
+    padding : 5px;
+    border : 1px solid #FFF;
+    background-color: #FFF;
+    flex-wrap: wrap;
+   
+  }
+  
+  
+  

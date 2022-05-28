@@ -11,6 +11,7 @@ import PrecificadorExecuta from '../pages/precificador/executa/precificador-data
 import Context from "../contexts";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import MenuInterativo from "../pages/menu-interativo";
+import VendasDataTableComponent from "../pages/vendas/data-table-vendas-por-finalizador";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -34,6 +35,7 @@ export default function Router() {
           <Route path="menu" element={<MenuInterativo />} />
           <Route path="precificar-agendar" element={<App />} />
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
+          <Route path="vendas" element={<VendasDataTableComponent />} />
          
         </Route>
       </Routes>

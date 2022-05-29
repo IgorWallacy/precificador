@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import { faCalendarWeek, faCashRegister, faStore } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import './index.css'
 
 import Header from '../../../components/header'
@@ -21,7 +24,7 @@ import { Skeleton } from "primereact/skeleton";
 
 
 function VendasDataTableComponent() {
-  const [loja, setLoja] = useState({ codigo: "1" });
+  const [loja, setLoja] = useState(0);
   const [filiais, setFiliais] = useState();
   const [pdv, setPdv] = useState({ pdv: "0" });
   const [vendas, setVendas] = useState();
@@ -45,6 +48,7 @@ function VendasDataTableComponent() {
 
   function clearFields() {
     setVendas(null);
+    setLoja(0)
 
     setPdv({ pdv: "0" });
 
@@ -57,10 +61,13 @@ function VendasDataTableComponent() {
 
   const getVendasTotal = () => {
     setLoading(true);
+    setVendas(null);
+    setTotalGeralNfce(0);
+    setTotalGeralECF(0);
+    setTotalGeral(0);
+  
 
-    clearFields();
-
-    if (!loja || !dataInicial || !dataFinal) {
+    if ( !dataInicial || !dataFinal) {
       toast.current.show({
         severity: "warn",
         summary: "Aviso",
@@ -80,12 +87,19 @@ function VendasDataTableComponent() {
     let dateI = new Date(dataInicial).toISOString().split("T")[0];
     let dateF = new Date(dataFinal).toISOString().split("T")[0];
 
+    let codigo = loja?.codigo
+
+    if(!loja) {
+       codigo = 0
+    }
+
     await api
-      .get(`/api_vga/vendas/pdvs/${loja.codigo}/${dateI}/${dateF}`)
+      .get(`/api_vga/vendas/pdvs/${codigo}/${dateI}/${dateF}`)
       .then((response) => {
         setPdvSelectItems(response.data);
       })
       .catch((err) => {
+        setLoading(false)
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -102,6 +116,7 @@ function VendasDataTableComponent() {
         setFiliais(response.data);
       })
       .catch((err) => {
+        setLoading(false)
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -119,15 +134,22 @@ function VendasDataTableComponent() {
       setPdv({ pdv: "0" });
     }
 
+    let codigo = loja?.codigo
+
+    if(!loja) {
+       codigo = 0
+    }
+
     await api
       .get(
-        `/api_vga/vendas/total/${loja.codigo}/${dateI}/${dateF}/${pdv.pdv}`
+        `/api_vga/vendas/total/${codigo}/${dateI}/${dateF}/${pdv.pdv}`
       )
       .then((response) => {
         setVendas(response.data);
         setLoading(false);
       })
       .catch((err) => {
+        setLoading(false)
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -145,14 +167,21 @@ function VendasDataTableComponent() {
       setPdv({ pdv: "0" });
     }
 
+    let codigo = loja?.codigo
+
+    if(!loja) {
+       codigo = 0
+    }
+
     await api
       .get(
-        `/api_vga/vendas/nfce/${loja.codigo}/${dateI}/${dateF}/${pdv.pdv}`
+        `/api_vga/vendas/nfce/${codigo}/${dateI}/${dateF}/${pdv.pdv}`
       )
       .then((response) => {
         setVendasNfce(response.data);
       })
       .catch((err) => {
+        setLoading(false)
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -170,14 +199,21 @@ function VendasDataTableComponent() {
       setPdv({ pdv: "0" });
     }
 
+    let codigo = loja?.codigo
+
+    if(!loja) {
+       codigo = 0
+    }
+
     await api
       .get(
-        `/api_vga/vendas/ecf/${loja.codigo}/${dateI}/${dateF}/${pdv.pdv}`
+        `/api_vga/vendas/ecf/${codigo}/${dateI}/${dateF}/${pdv.pdv}`
       )
       .then((r) => {
         setVendasECF(r.data);
       })
       .catch((err) => {
+        setLoading(false)
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -277,11 +313,11 @@ function VendasDataTableComponent() {
                     Forma de Pagamento
                   </span>
                   <div className="text-900 font-medium text-xl">
-                    {data.nomefinalizador} 
+                   <strong>  {data.nomefinalizador.toUpperCase()} </strong> 
                   </div>
                 </div>
                 <div
-                  className="flex align-items-center justify-content-center bg-blue-100 border-round"
+                  className="flex align-items-center justify-content-center  border-round"
                   style={{ width: "2.5rem", height: "2.5rem" }}
                 >
                   <i className="pi pi-shopping-cart text-blue-500 text-xl"></i>
@@ -294,7 +330,7 @@ function VendasDataTableComponent() {
               <div className="flex justify-content-between mb-3">
                 <div>
                   <span className="block text-500 font-medium mb-3">
-                    Total Nfc-e
+                   NFCE-e
                   </span>
                   <div className="text-900 font-medium text-xl">
                     {totalnfceF}
@@ -314,7 +350,7 @@ function VendasDataTableComponent() {
               <div className="flex justify-content-between mb-3">
                 <div>
                   <span className="block text-500 font-medium mb-3">
-                    Total ECF
+                     ECF
                   </span>
                   <div className="text-900 font-medium text-xl">
                     {totalecfF}
@@ -325,7 +361,7 @@ function VendasDataTableComponent() {
                   className="flex align-items-center justify-content-center bg-green-100 border-round"
                   style={{ width: "2.5rem", height: "2.5rem" }}
                 >
-                  <i className="pi pi-money-bill text-green-500 text-xl"></i>
+                  <i className="pi pi-dollar text-green-500 text-xl"></i>
                 </div>
               </div>
             </div>
@@ -335,7 +371,7 @@ function VendasDataTableComponent() {
               <div className="flex justify-content-between mb-3">
                 <div>
                   <span className="block text-800 font-medium mb-3">
-                   <h2> Total - {data.nomefinalizador}  </h2>
+                   <h2> <strong> TOTAL {data.nomefinalizador.toUpperCase()} </strong>  </h2>
                   </span>
                   <div className="text-900 font-medium text-xl">{totalF}</div>
                 </div>
@@ -344,7 +380,7 @@ function VendasDataTableComponent() {
                   className="flex align-items-center justify-content-center bg-green-100 border-round"
                   style={{ width: "2.5rem", height: "2.5rem" }}
                 >
-                  <i className="pi pi-dollar text-green-500 text-xl"></i>
+                  <i className="pi pi-wallet text-green-500 text-xl"></i>
                 </div>
               </div>
             </div>
@@ -422,6 +458,48 @@ function VendasDataTableComponent() {
     clear: " Limpar ",
   });
 
+  const itemTemplateStore = (option) => {
+    return (
+        <div className="flex align-items-center">
+           <FontAwesomeIcon style={{margin:'1rem'}} icon={faStore} />
+          
+            <div> {option.codigo} - {option.nome.substring(0,15)}</div>
+        </div>
+    );
+}
+
+const selectedStore = (option) => {
+  return (
+      <div className="flex align-items-center">
+         <FontAwesomeIcon style={{margin:'1rem'}} icon={faStore} />
+        
+          <div> {option?.codigo} - {option?.nome.substring(0,15)}</div>
+      </div>
+  );
+}
+
+const selectedTemplatePDV = (option, props) => {
+  if (option) {
+      return (
+        <div className="flex align-items-center">
+        <FontAwesomeIcon  style={{margin:'1rem'}} icon={faCashRegister} />
+         PDV  
+         <div>{option.pdv}</div>
+     </div>
+      );
+  }}
+
+const itemTemplateCashier = (option) => {
+  return (
+      <div className="flex align-items-center">
+         <FontAwesomeIcon  style={{margin:'1rem'}} icon={faCashRegister} />
+          PDV  
+          <div>{option.pdv}</div>
+      </div>
+  );
+}
+
+
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
@@ -431,6 +509,7 @@ function VendasDataTableComponent() {
       <div className="container">
       <div className=" cards-info">
         <div className="field">
+        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faCalendarWeek} />
           <Calendar
           locale="pt-BR"
            showIcon
@@ -445,6 +524,7 @@ function VendasDataTableComponent() {
         </div>
 
         <div className="field">
+        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faCalendarWeek} />
           <Calendar
           showIcon
           locale="pt-BR"
@@ -459,11 +539,13 @@ function VendasDataTableComponent() {
         </div>
 
         <div className="field">
+        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faStore} />
           <Dropdown
-           showClear
-         
+           
+           itemTemplate={itemTemplateStore} 
             style={{ marginRight: "5px" }}
             value={loja}
+            valueTemplate={selectedStore}
             options={filiais}
             optionLabel="nome"
             onChange={(e) => setLoja(e.target.value)}
@@ -471,8 +553,11 @@ function VendasDataTableComponent() {
           />
         </div>
         <div className="field">
+        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faCashRegister} /> 
           <Dropdown
-          showClear
+            itemTemplate={itemTemplateCashier} 
+            valueTemplate={selectedTemplatePDV}
+          
             value={pdv}
             options={pdvSelectItems}
             optionLabel="pdv"
@@ -483,18 +568,19 @@ function VendasDataTableComponent() {
      
       <div className="buttons">
         <Button
-          icon="pi pi-search"
+          icon={ loading ? 'pi pi-spin pi-spinner' : 'pi pi-search'}
           onClick={() => getVendasTotal()}
           className="p-button-rounded p-button-success"
-          style={{ marginLeft: "25px" }}
+          style={{ margin: "5px" }}
           aria-label="Search"
-          label="Pesquisar"
+          label={loading ? 'Pesquisando...' : 'Pesquisar'}
+          disabled={loading}
         />
 
         <Button
           onClick={clearFields}
           icon="pi pi-times"
-          style={{ marginLeft: "15px" }}
+          style={{ margin: "5px" }}
           className="p-button-rounded p-button-danger"
           aria-label="Cancel"
           label="Limpar"
@@ -515,7 +601,7 @@ function VendasDataTableComponent() {
                       Total Geral NFCE-e
                     </span>
                     <div className="text-900 font-medium text-xl">
-                  <h1>    {totalGeralNfce ? totalGeralNfce : <Skeleton  />} </h1>
+                  <h1>    {totalGeralNfce  } </h1>
                     </div>
                   </div>
 
@@ -537,7 +623,7 @@ function VendasDataTableComponent() {
                       Total Geral ECF
                     </span>
                     <div className="text-900 font-medium text-xl">
-                   <h1> {totalGeralECF ? totalGeralECF : <Skeleton  />} </h1>
+                   <h1> {totalGeralECF } </h1>
                     </div>
                   </div>
 
@@ -559,7 +645,7 @@ function VendasDataTableComponent() {
                       Total Geral
                     </span>
                     <div className="text-900 font-medium text-xl">
-                   <h1>   {totalGeral  ? totalGeral : <Skeleton  />} </h1>
+                   <h1>   {totalGeral  } </h1>
                     </div>
                   </div>
 
@@ -567,7 +653,7 @@ function VendasDataTableComponent() {
                     className="flex align-items-center justify-content-center bg-green-100 border-round"
                     style={{ width: "2.5rem", height: "2.5rem" }}
                   >
-                    <i className="pi pi-dollar text-green-500 text-xl"></i>
+                    <i className="pi pi-wallet text-green-500 text-xl"></i>
                   </div>
                 </div>
               </div>

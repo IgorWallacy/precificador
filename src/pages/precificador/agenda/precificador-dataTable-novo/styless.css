@@ -28,8 +28,8 @@
 .headerTemplateDataTable {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
+    justify-content: flex-start;
+    align-items: flex-start;
     width: 100%;
    
 
@@ -47,6 +47,7 @@
  
 
 }
+
 
 
 

@@ -11,7 +11,8 @@
 
 .texto-menu-interativo {
 
-    font-size: 45px;
+   
+    font-size: 2rem;
     font-family: 'Poppins', sans-serif;
 
 }
@@ -20,13 +21,18 @@
 
 .menu-interativo {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
-    gap: 25px;
+    gap: 50px;
     flex-wrap: wrap;
-    margin-top: 5rem;
+   
     color: #FFFF;
+    border: 1px solid #FFFF;
+    padding: 15px;
+    margin: 5px 5px ;
+    border-radius: 50px;
+  
 }
 
 .opcoes-menu {
@@ -37,7 +43,7 @@
     color: #FFFF;
     gap: 25px;
     flex-wrap: wrap;
-    margin: 5rem 5rem;
+  
   
    
 
@@ -50,9 +56,9 @@
     flex-direction: column;
     align-items: center;
     color: #FFFF;
-  
+     gap: 25px;
     flex-wrap: wrap;
-    border: 1px solid #FFFF;
+  
     border-radius: 50px;
     margin-top: 25px;
     padding: 25px;

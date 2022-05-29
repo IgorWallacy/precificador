@@ -1,6 +1,8 @@
 .container {
 
     display : flex;
+    border-top-left-radius: 50px ;
+    border-top-right-radius: 50px ;
     flex-direction : row;
     justify-content: center;
     align-items: center;
@@ -37,24 +39,30 @@
     align-items : center;
     flex-wrap: wrap;
     padding: 20px;
+    margin: 5px;
   
   }
   
   .cards-info {
   display: flex;
+  flex-direction: row;
+  padding: 20px;
   flex-wrap: wrap;
   justify-content : center;
   align-items : center;
   background-color: #FFF;
-  border : 1px solid #FFF;
-  margin : 5px;
+ 
+  margin : 10px 8px;
   }
   
   .card {
     display: flex;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+   
     flex-direction: column;
     margin : 5px;
-    padding : 5px;
+    padding : 15px;
     border : 1px solid #FFF;
     background-color: #FFF
    
@@ -69,6 +77,7 @@
     border : 1px solid #FFF;
     background-color: #FFF;
     flex-wrap: wrap;
+   
    
   }
   

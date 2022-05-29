@@ -7,14 +7,14 @@ import { useNavigate } from "react-router-dom";
 import Context from "../../contexts";
 
 import { Toast } from "primereact/toast";
-import { InputText } from 'primereact/inputtext';
+import { InputText } from "primereact/inputtext";
 
-
+import { Button } from "primereact/button";
 import axios from "axios";
 
 import Logo from "../../assets/img/logo_duca.png";
 
-import Typing from 'react-typing-animation';
+import Typing from "react-typing-animation";
 
 import "primeflex/primeflex.css";
 
@@ -23,6 +23,7 @@ const Login = () => {
 
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const isLogado = useContext(Context);
 
@@ -52,16 +53,17 @@ const Login = () => {
 
   const api = axios.create({
     baseURL: baseURL,
-    timeout: 1000,
     headers: headers,
     params: params,
   });
 
-  const login = (e) => {
-    e.preventDefault()
+  async function login(e) {
+    e.preventDefault();
     isLogado.setLogado(false);
     localStorage.clear();
-    api
+    setLoading(true);
+
+    await api
       .post("/oauth/token", { params, headers })
       .then((response) => {
         localStorage.clear();
@@ -74,11 +76,16 @@ const Login = () => {
         navigate("/menu");
       })
       .catch((error) => {
+        setLoading(false);
         isLogado.setLogado(false);
         localStorage.clear();
-        //  console.log(error)
 
-        console.log(error);
+        toast.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${error}`,
+          sticky: true,
+        });
 
         if (error.code === "401") {
           toast.current.show({
@@ -108,60 +115,73 @@ const Login = () => {
           });
         }
       });
-  };
+  }
 
   return (
     <>
       <Toast ref={toast} position="top-center" />
 
-          
-
-
-    <div style={{marginTop:'15rem'}} className="grid grid-nogutter surface-0 text-800">
-    <div className="fundo col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
-        <section>
-       
-      
-      <div className="form-login">
-        <div>
-       
+      <div
+        style={{ marginTop: "10rem" }}
+        className="grid grid-nogutter surface-0 text-800"
+      >
+        <div className=" logo-login col-12 md:col-6 overflow-hidden">
+          <img
+            src={Logo}
+            alt="logo-sistema"
+            className="md:ml-auto block md:h-full"
+            style={{
+              width: "100%",
+              height: "100%",
+              backgroundColor: "whitesmoke",
+              clipPath: "polygon(25% 0, 100% 0%, 100% 100%, 0 100%)",
+            }}
+          />
         </div>
-        <h4 style={{  fontSize:'20px' , margin:'15px', color : '#FFF'}}>  <Typing speed={100}  startDelay={10} >Utilize sua conta uniplus para acesso ao sistema</Typing> </h4>
-        <form onSubmit={login}>
-        <div>
-        <InputText autoFocus
-          type="text"
-          value={usuario}
-          style={{ width: "100%", margin:'5px' }}
-          placeholder="Código"
-          onChange={(e) => setUsuario(e.target.value)}
-        />
+        <div className="fundo col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
+          <section>
+            <div className="form-login">
+              <div></div>
+              <h4 style={{ fontSize: "20px", margin: "15px", color: "#FFF" }}>
+                {" "}
+                <Typing speed={100} startDelay={10}>
+                  Utilize sua conta uniplus para acesso ao sistema
+                </Typing>{" "}
+              </h4>
+              <form onSubmit={login}>
+                <div>
+                  <InputText
+                    autoFocus
+                    type="text"
+                    value={usuario}
+                    style={{ width: "100%", margin: "5px" }}
+                    placeholder="Código"
+                    onChange={(e) => setUsuario(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <InputText
+                    type="password"
+                    value={senha}
+                    style={{ width: "100%", margin: "5px" }}
+                    placeholder="Senha"
+                    onChange={(e) => setSenha(e.target.value)}
+                  />
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <Button
+                    loading={loading}
+                    disabled={loading}
+                    type="submit"
+                    className=" botao-login"
+                    label={loading ? "Autenticando ... " : "Acessar"}
+                  ></Button>
+                </div>
+              </form>
+            </div>
+          </section>
         </div>
-        <div>
-        <InputText  
-          type="password"
-          value={senha}
-          style={{ width: "100%", margin : '5px' }}
-          placeholder="Senha"
-          onChange={(e) => setSenha(e.target.value)}
-        />
-        </div>
-       <div style={{textAlign:"center"}}>
-        <input type="submit" className="botao-login" value="Acessar"  ></input> 
-        </div>
-        </form>
-        </div>
-      
-         
-        </section>
-    </div>
-    <div className=" logo-login col-12 md:col-6 overflow-hidden">
-    <img src={Logo} alt="logo-sistema"   className="md:ml-auto block md:h-full" style={{ width : '100vh', backgroundColor:"whitesmoke", clipPath: 'polygon(8% 0, 100% 0%, 100% 100%, 0 100%)' }} />
-    </div>
-</div>
-        
-        
-      
+      </div>
     </>
   );
 };

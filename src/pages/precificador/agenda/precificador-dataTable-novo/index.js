@@ -23,6 +23,7 @@ import api from "../../../../services/axios";
 import moment from "moment";
 import "moment/locale/pt-br";
 
+
 const PrecificadorAgenda = () => {
   moment.locale("pt-br");
   //  const navigate = useNavigate();
@@ -296,6 +297,7 @@ const PrecificadorAgenda = () => {
   const priceEditor = (options) => {
     return (
       <InputNumber
+      placeholder="R$"
         value={options.value}
         onValueChange={(e) => options.editorCallback(e.value)}
         //   mode="currency"
@@ -323,7 +325,7 @@ const PrecificadorAgenda = () => {
       .catch((error) => {});
   };
 
-  const onRowEditComplete = (e) => {
+   async function onRowEditComplete(e) {
     let _products2 = [...produtos];
 
     let { newData, index } = e;
@@ -338,26 +340,20 @@ const PrecificadorAgenda = () => {
       intFamilia = parseInt(_products2[index].idfamilia);
     }
 
-    api
+    await api
       .put(
-        `/api_precificacao/produtos/precificar/agenda/${
-          _products2[index].idproduto
-        }/${intFamilia}/${_products2[index].idnotafiscal}/${
-          _products2[index].precoagendado
-        }/${moment(agendar).format("YYYY-MM-DD")}/`,
+        `/api_precificacao/produtos/precificar/agenda/${_products2[index].idproduto}/${intFamilia}/${_products2[index].idnotafiscal}/${_products2[index].precoagendado}/${moment(agendar).format("YYYY-MM-DD")}/`,
         { headers: headers }
       )
       .then((response) => {
         buscarProdutos();
-        console.log(response);
+        //  console.log(response);
         toast.current.show({
           severity: "success",
           summary: "Sucesso",
           detail: ` ${_products2[index].descricao} agendado para o dia ${moment(
             agendar
-          ).format("DD/MM/YYYY (dddd) ")} no valor de R$ ${
-            _products2[index].precoagendado
-          }  `,
+          ).format("DD/MM/YYYY (dddd) ")} no valor de R$ ${_products2[index].precoagendado}  `,
         });
       })
       .catch((error) => {
@@ -371,7 +367,7 @@ const PrecificadorAgenda = () => {
         }
         buscarProdutos();
       });
-  };
+  }
 
   const renderHeader = () => {
     return (
@@ -459,7 +455,7 @@ const PrecificadorAgenda = () => {
     return i;
   };
 
-  const buscarProdutos = () => {
+   async function buscarProdutos() {
     pegarTokenLocalStorage();
 
     usarTabelaFormacaoPreecoProduto();
@@ -486,7 +482,7 @@ const PrecificadorAgenda = () => {
 
           setLoading(true);
 
-          api
+          await api
 
             .get(
               `/api_precificacao/produtos/precificar/agendar/${dataI}/${dataF}/${filialId}`,
@@ -523,7 +519,7 @@ const PrecificadorAgenda = () => {
         }
       }
     }
-  };
+  }
   const botaovoltar = (
     <React.Fragment>
       <Button
@@ -557,7 +553,7 @@ const PrecificadorAgenda = () => {
           color: "#FFF",
         }}
       >
-        <div className="p-inputgroup">
+        <div style={{margin:'15px'}} className="p-inputgroup">
           <span className="p-inputgroup-addon">Agendar para</span>
           <Calendar
             dateFormat="dd/mm/yy"
@@ -670,6 +666,11 @@ const PrecificadorAgenda = () => {
           <div className="datatable-templating-demo p-fluid">
             <Tooltip target=".export-buttons>button" position="bottom" />
 
+         
+
+            {window.innerWidth > 1125 ? (
+            <>
+            
             <DataTable
              
               style={{
@@ -680,7 +681,7 @@ const PrecificadorAgenda = () => {
                 fontSize: "14px",
                 textAlign: "center",
               }}
-              breakpoint="960px"
+              breakpoint="1125px"
               loading={loading}
               stripedRows
               value={produtos}
@@ -791,6 +792,130 @@ const PrecificadorAgenda = () => {
                 bodyStyle={{ textAlign: "center" }}
               ></Column>
             </DataTable>
+            
+            </>) : (
+            <>
+             
+            <DataTable
+             
+              style={{
+                height: "99vh",
+                width: "99vw",
+              
+              }}
+              breakpoint="1125px"
+              loading={loading}
+              stripedRows
+              value={produtos}
+           //   selectionMode="single"
+              //   reorderableColumns
+              editMode="row"
+              dataKey="idproduto"
+              onRowEditComplete={onRowEditComplete}
+           //   scrollDirection="vertical"
+           //   scrollable
+           //   scrollHeight="flex"
+              globalFilterFields={[
+                "descricao",
+                "ean",
+                "numeronotafiscal",
+                "razaosocial",
+              ]}
+              filters={filters2}
+              size="normal"
+              responsiveLayout="stack"
+              emptyMessage="Nenhum produto encontrado para precificação"
+              showGridlines
+              header={headerDataTable}
+              rowGroupMode="subheader"
+              groupRowsBy={agrupamento}
+              //  sortOrder={1}
+              rowGroupHeaderTemplate={headerTemplate}
+       //       resizableColumns
+              // columnResizeMode="expand"
+              expandableRowGroups
+              expandedRows={expandedRows}
+              onRowToggle={(e) => setExpandedRows(e.data)}
+            >
+              <Column
+                header={<> Código </>}
+                field={EanOrCodigo}
+                style={{textAlign : 'center'}}
+              ></Column>
+
+              <Column
+                field="descricao"
+                header="Produto"
+                body={familiaIcone}
+                bodyStyle={{ textAlign: "center" }}
+              ></Column>
+              <Column
+                field={precoCustoTemplate}
+                header="Custo"
+                body={precoCustoTemplate}
+                bodyStyle={{ textAlign: "center" }}
+              ></Column>
+
+              <Column
+                field={margemAtual}
+                header={<> <div> Preço Atual <hr/> </div> <br/> <div> Margem % </div> <br/> <div> Lucro </div> </>}
+                body={margemAtual}
+               
+              ></Column>
+            
+
+              <Column
+                field={margem}
+                header={<> <div> Preço Agendado <hr/> </div> <br/> <div> Margem % </div> <br/> <div> Lucro </div> </>}
+                body={margem}
+               
+              ></Column>
+
+            <Column
+                style={{ fontWeight: "600", fontSize: "14px" }}
+                field={sugestaoVenda}
+                header={<> <div> Sugestão <hr/> </div> <br/> <div> Markup % </div> <br/> <div> Venda </div> </>}
+                body={sugestaoVenda}
+               
+              ></Column>
+
+              <Column
+                field={precoAtualTemplate}
+                header={<> <div> Preço Atual <hr/> </div> <br/> <div> Markup % </div> <br/> <div> Venda </div> </>}
+                style={{ fontWeight: "600" }}
+              
+                body={precoAtualTemplate}
+              ></Column>
+
+              <Column
+                field="precoagendado"
+                header={<> <div> Preço Agendado <hr/> </div> <br/> <div> Markup % </div> <br/> <div> Venda </div> </>}
+                style={{ fontWeight: "600" }}
+                editor={(options) => priceEditor(options)}
+                body={precoAgendoTemplate}
+               
+              ></Column>
+
+              <Column
+                field={status}
+                header="Status"
+                style={{ fontWeight: "600" }}
+                bodyStyle={{
+                  textAlign: "center",
+                }}
+              ></Column>
+
+              <Column
+                header="Editar"
+                rowEditor
+                headerStyle={{ width: "10%", minWidth: "8rem" }}
+                bodyStyle={{ textAlign: "center" }}
+              ></Column>
+            </DataTable>
+            
+            </>) }
+
+            
           </div>
         </>
       )}

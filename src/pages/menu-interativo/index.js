@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import api from "../../services/axios";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {  faStore,  faTags } from "@fortawesome/free-solid-svg-icons";
+
+
 import "./menu-interativo.css";
 
 import Typing from "react-typing-animation";
@@ -63,25 +67,30 @@ const MenuInterativo = () => {
   return (
     <>
       <div className="menu-interativo">
+      
+      <div  className="menu-categoria">
+      
         <Typing speed={100} startDelay={10}>
           <div className="texto-menu-interativo">
             <em>{greetingMessage()}</em> <h1>{nome}</h1>
             <em>o que você deseja fazer hoje ? </em>{" "}
           </div>
         </Typing>
-      </div>
+        </div>
+
       <div className="menu-categoria">
-        {" "}
+     
+        <FontAwesomeIcon icon={faTags} size="2x" />
         <h1>Precificar</h1>
         <div className="opcoes-menu">
           <Button
-            label="Agendar precificação"
+            label="Agendar"
             icon="pi pi-calendar"
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/precificar-agendar")}
           />
           <Button
-            label="Executar precificação"
+            label="Executar"
             icon="pi pi-sync"
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/precificar-executar")}
@@ -90,15 +99,17 @@ const MenuInterativo = () => {
       </div>
       <div className="menu-categoria">
         {" "}
+        <FontAwesomeIcon icon={faStore}  size="2x" />
         <h1>Vendas</h1>
         <div className="opcoes-menu">
           <Button
-            label="Relatório de Vendas do PDV"
+            label="PDV"
             icon="pi pi-shopping-cart"
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/vendas")}
           />
         </div>
+      </div>
       </div>
     </>
   );

@@ -34,7 +34,7 @@ const Menu = () => {
       icon: "pi pi-shopping-cart",
       items: [
         {
-          label: "Vendas por meio de pagamento",
+          label: "PDV",
           icon: "pi pi-shopping-bag",
           command: () => navigate("/vendas"),
         }

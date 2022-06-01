@@ -2,7 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 
-
+//import "primereact/resources/themes/md-light-deeppurple/theme.css"
+//theme 2
 import "primereact/resources/themes/lara-light-teal/theme.css"; //theme
 import "primereact/resources/primereact.min.css"; //core css
 import "primeicons/primeicons.css"; //icons

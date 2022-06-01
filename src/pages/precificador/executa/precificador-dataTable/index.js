@@ -146,41 +146,62 @@ const PrecificadorExecuta = () => {
 
     return (
       <>
-        <div style={{ textAlign: "center" }}>
-          {rsmargemformatada} <br />
-          {margemformatada}
-        </div>
+        {margem > 0 ? (
+          <>
+            <div style={{ color: "green" }}>
+              {rsmargemformatada} <br />
+              <bold>Lucro de</bold> {margemformatada}
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ color: "red" }}>
+              {rsmargemformatada} <br />
+              <bold>Prejuizo de</bold> {margemformatada}
+            </div>
+          </>
+        )}
       </>
     );
   };
 
-  const RSmargemSugerida = (rowData) => {
+  const margemAtual = (rowData) => {
+    //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
+    let margem =
+      ((rowData.precoAtual - rowData.precocusto) / rowData.precoAtual) * 100;
+
     // Margem em valor monetário: Preço de venda - Preço de compra
+    let rsmargem = rowData.precoAtual - rowData.precocusto;
 
-    let sugestao =
-      (rowData.precocusto * rowData.percentualmarkup) / 100 +
-      rowData.precocusto;
+    let margemformatada = Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(rsmargem);
 
-    let RSmargem = sugestao - rowData.precocusto;
-
-    let margemSugerida = ((sugestao - rowData.precocusto) / sugestao) * 100;
-
-    let mgsf =
+    let rsmargemformatada =
       Intl.NumberFormat("pt-BR", {
         style: "decimal",
         currency: "BRL",
         maximumSignificantDigits: "4",
-      }).format(margemSugerida) + " %";
-
-    let rsmsf = Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(RSmargem);
+      }).format(margem) + " %";
 
     return (
       <>
-        {mgsf} <br />
-        {rsmsf}
+        {margem > 0 ? (
+          <>
+            <div style={{ color: "green" }}>
+              {rsmargemformatada} <br />
+              <bold>Lucro de</bold> {margemformatada}
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ color: "red" }}>
+              {rsmargemformatada} <br />
+              <bold>Prejuizo de</bold> {margemformatada}
+            </div>
+          </>
+        )}
       </>
     );
   };
@@ -210,8 +231,23 @@ const PrecificadorExecuta = () => {
 
     return (
       <>
-        {markupFormatado} <br />
-        {precoagendadoFormatado}
+        {rowData.precoagendado > rowData.precocusto ? (
+          <>
+            <div style={{ color: "green" }}>
+              {markupFormatado} <br />
+              Agendado a <br/>
+              {precoagendadoFormatado}
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ color: "red" }}>
+              {markupFormatado} <br />
+              Agendado a <br/>
+              {precoagendadoFormatado}
+            </div>
+          </>
+        )}
       </>
     );
   };
@@ -232,10 +268,11 @@ const PrecificadorExecuta = () => {
       currency: "BRL",
     }).format(rowData.precoAtual);
 
-    return rowData.precoAtual === rowData.precoagendado ? (
+    return rowData.precoAtual === rowData.precoagendado && rowData.precoAtual > rowData.precocusto  ? (
       <>
         <div
           style={{
+            fontSize: "17",
             display: "flex",
             flexDirection: "column",
             rowGap: "1px",
@@ -244,7 +281,7 @@ const PrecificadorExecuta = () => {
           }}
         >
           <div> {markupFormatado} </div>
-
+          Vendendo atualmente a 
           <div> {precoAtualFormatado}</div>
         </div>
       </>
@@ -252,6 +289,7 @@ const PrecificadorExecuta = () => {
       <>
         <div
           style={{
+            fontSize: "17",
             color: "#f69c22",
             margin: "5px",
             display: "flex",
@@ -260,6 +298,7 @@ const PrecificadorExecuta = () => {
           }}
         >
           <div> {markupFormatado} </div>
+         <i>  Vendendo atualmente a </i>
           <div> {precoAtualFormatado}</div>
         </div>
       </>
@@ -286,20 +325,21 @@ const PrecificadorExecuta = () => {
 
     return (
       <>
-        <div>
-          <div>{mkf}</div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "2px",
-            }}
-          >
-            {sf}
-          </div>
-        </div>
+        {sugestao > rowData.precocusto ? (
+          <>
+            <div style={{ fontSize: "14", color: "green" }}>
+             <div>{mkf}</div>
+              Sugestão de venda a   <div>{sf}</div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: "14", color: "red" }}>
+              <div>{mkf}</div>
+         <s>Sugestão de venda a </s> <div>{sf}</div>
+            </div>
+          </>
+        )}
       </>
     );
   };
@@ -309,27 +349,47 @@ const PrecificadorExecuta = () => {
       <>
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            rowGap: "1px",
+          
             color: "#0F9D58",
+         
           }}
         >
           <Tag
-            value="Preço Ok"
+            value="Preço atual igual ao agendado"
             icon="pi pi-check-square"
             severity="success"
           ></Tag>
+          <br/>
+            {rowData.precoAtual < rowData.precocusto  ||  rowData.precoagendado < rowData.precocusto ? (
+            <>
+            <Tag style={{margin:'1rem'}}
+            value="Preço abaixo do custo "
+            icon="pi pi-exclamation-circle"
+            severity="danger"
+          ></Tag>
+            </>
+          ) :(<></>)}
         </div>
       </>
     ) : (
       <>
-        <div style={{ color: "#f69c22" }}>
+        <div style={{ color: "#f69c22"  }}>
           <Tag
-            value="Checar preço "
+            value="Preço agendado 
+            diverge do atual "
             icon="pi pi-exclamation-circle"
             severity="warning"
           ></Tag>
+          <br/>
+          {rowData.precoAtual < rowData.precocusto  ||  rowData.precoagendado < rowData.precocusto ? (
+            <>
+            <Tag style={{margin:'1rem'}}
+            value="Preço abaixo do custo "
+            icon="pi pi-exclamation-circle"
+            severity="danger"
+          ></Tag>
+            </>
+          ) :(<></>)}
         </div>
       </>
     );
@@ -338,7 +398,7 @@ const PrecificadorExecuta = () => {
   const priceEditor = (options) => {
     return (
       <InputNumber
-      placeholder="R$"
+        placeholder="R$"
         value={options.value}
         onValueChange={(e) => options.editorCallback(e.value)}
         //   mode="currency"
@@ -822,12 +882,10 @@ const PrecificadorExecuta = () => {
                       field={margem}
                       header={
                         <>
-                          {" "}
                           <div>
-                            {" "}
-                            Agendado <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
+                            Preço Agendado <hr />
+                          </div>
+                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>
                         </>
                       }
                       body={margem}
@@ -837,7 +895,23 @@ const PrecificadorExecuta = () => {
                     ></Column>
 
                     <Column
-                      style={{ fontWeight: "600", fontSize: "14px" }}
+                      field={margemAtual}
+                      header={
+                        <>
+                          <div>
+                            Preço Atual <hr />
+                          </div>
+                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>
+                        </>
+                      }
+                      body={margemAtual}
+                      bodyStyle={{
+                        textAlign: "center",
+                      }}
+                    ></Column>
+
+                    <Column
+                      style={{ fontSize: "14px" }}
                       field={sugestaoVenda}
                       header={
                         <>
@@ -866,7 +940,7 @@ const PrecificadorExecuta = () => {
                         </>
                       }
                       body={precoAgendadoTemplate}
-                      style={{ fontWeight: "600" }}
+                      style={{ fontSize: "15", fontWeight: "600" }}
                       editor={(options) => priceEditor(options)}
                       bodyStyle={{
                         textAlign: "center",
@@ -911,7 +985,6 @@ const PrecificadorExecuta = () => {
                 </>
               ) : (
                 <>
-                  
                   <DataTable
                     style={{
                       height: "99vh",
@@ -980,6 +1053,22 @@ const PrecificadorExecuta = () => {
                     ></Column>
 
                     <Column
+                      field={margemAtual}
+                      header={
+                        <>
+                          <div>
+                            Preço Atual <hr />
+                          </div>
+                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>
+                        </>
+                      }
+                      body={margemAtual}
+                      bodyStyle={{
+                        textAlign: "center",
+                      }}
+                    ></Column>
+
+                    <Column
                       style={{ fontWeight: "600", fontSize: "14px" }}
                       field={sugestaoVenda}
                       header={
@@ -1024,14 +1113,14 @@ const PrecificadorExecuta = () => {
                           <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
                         </>
                       }
-                      style={{ fontWeight: "600" }}
+                      style={{ fontSize:'17', fontWeight: "600" }}
                       body={precoAtualTemplate}
                     ></Column>
 
                     <Column
                       field={status}
-                      header="Status"
-                      style={{ fontWeight: "600" }}
+                    
+                      style={{ textAlign : 'center', fontWeight: "600" }}
                     ></Column>
 
                     <Column

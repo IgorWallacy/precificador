@@ -119,7 +119,7 @@ const Login = () => {
 
   return (
     <>
-      <Toast ref={toast} position="top-center" />
+      <Toast ref={toast} position="bottom-center" />
 
       <div
         style={{ marginTop: "10rem" }}

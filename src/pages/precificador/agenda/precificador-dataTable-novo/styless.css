@@ -1,7 +1,7 @@
 .datatable-templating-demo {
 
     display: flex;
-    background-color: beige;
+    background-color: #F5F5F5;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -43,7 +43,7 @@
 
 
 .datatable-templating-demo .p-datatable-tbody{
- background-color: beige;
+ background-color: #F5F5F5;
  
 
 }

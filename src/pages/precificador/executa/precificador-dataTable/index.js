@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import "./styless.css";
+
+
 import Header from "../../../../components/header";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -150,14 +152,14 @@ const PrecificadorExecuta = () => {
           <>
             <div style={{ color: "green" }}>
               {rsmargemformatada} <br />
-              <bold>Lucro de</bold> {margemformatada}
+              <b>Lucro de</b> {margemformatada} <br/> no preço agendado
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
               {rsmargemformatada} <br />
-              <bold>Prejuizo de</bold> {margemformatada}
+              <b>Prejuizo de</b> {margemformatada}<br/> no preço agendado
             </div>
           </>
         )}
@@ -191,14 +193,14 @@ const PrecificadorExecuta = () => {
           <>
             <div style={{ color: "green" }}>
               {rsmargemformatada} <br />
-              <bold>Lucro de</bold> {margemformatada}
+              <b>Lucro de</b> {margemformatada}<br/> no preço atual
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
               {rsmargemformatada} <br />
-              <bold>Prejuizo de</bold> {margemformatada}
+              <b>Prejuizo de</b> {margemformatada}<br/> no preço atual
             </div>
           </>
         )}
@@ -207,10 +209,11 @@ const PrecificadorExecuta = () => {
   };
 
   const precoCustoTemplate = (rowData) => {
-    return new Intl.NumberFormat("pt-BR", {
+    let custo =  Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(rowData.precocusto);
+    return <> <font color="red"> Custo de {custo}</font></>
   };
 
   const precoAgendadoTemplate = (rowData) => {
@@ -234,17 +237,17 @@ const PrecificadorExecuta = () => {
         {rowData.precoagendado > rowData.precocusto ? (
           <>
             <div style={{ color: "green" }}>
-              {markupFormatado} <br />
+              {markupFormatado} de Markup <br />
               Agendado a <br/>
-              {precoagendadoFormatado}
+             <font size="5"> {precoagendadoFormatado} </font>
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
-              {markupFormatado} <br />
+              {markupFormatado} de Markup <br />
               Agendado a <br/>
-              {precoagendadoFormatado}
+              <font size="5"> {precoagendadoFormatado} </font>
             </div>
           </>
         )}
@@ -280,9 +283,9 @@ const PrecificadorExecuta = () => {
             margin: "5px",
           }}
         >
-          <div> {markupFormatado} </div>
+          <div> {markupFormatado}  de Markup </div>
           Vendendo atualmente a 
-          <div> {precoAtualFormatado}</div>
+          <div> <font size="5"> {precoAtualFormatado} </font> </div>
         </div>
       </>
     ) : (
@@ -297,9 +300,9 @@ const PrecificadorExecuta = () => {
             rowGap: "1px",
           }}
         >
-          <div> {markupFormatado} </div>
+          <div> {markupFormatado} de Markup </div>
          <i>  Vendendo atualmente a </i>
-          <div> {precoAtualFormatado}</div>
+          <div> <font size="5"> {precoAtualFormatado} </font> </div>
         </div>
       </>
     );
@@ -490,7 +493,21 @@ const PrecificadorExecuta = () => {
 
   const EanOrCodigo = (rowData) => {
     if (rowData.ean) {
-      return rowData.ean;
+      return (
+      <>
+      <div>{rowData.ean} </div>
+          <div>
+            <img
+              style={{ width: "100px" ,height : '100px', margin: "5px" , borderRadius : '25px', padding : '5px' }}
+              src={`http://www.eanpictures.com.br:9000/api/gtin/${rowData.ean}`}
+              onError={(e) =>
+                (e.target.src =
+                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+              }
+              alt={rowData.ean}
+            />
+          </div>
+      </> )
     } else {
       return rowData.codigo;
     }
@@ -818,183 +835,17 @@ const PrecificadorExecuta = () => {
             <div className="datatable-templating-demo p-fluid">
               <Tooltip target=".export-buttons>button" position="bottom" />
 
-              {window.innerWidth > 1125 ? (
-                <>
+             
                   <DataTable
                     style={{
                       height: "99vh",
-                      width: "99vw",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      fontSize: "14px",
-                      textAlign: "center",
-                    }}
-                    breakpoint="960px"
-                    loading={loading}
-                    stripedRows
-                    value={produtos}
-                    selectionMode="single"
-                    //   reorderableColumns
-                    editMode="row"
-                    dataKey="idproduto"
-                    onRowEditComplete={onRowEditComplete}
-                    scrollDirection="vertical"
-                    scrollable
-                    scrollHeight="flex"
-                    globalFilterFields={[
-                      "descricao",
-                      "ean",
-                      "numeronotafiscal",
-                      "razaosocial",
-                    ]}
-                    filters={filters2}
-                    size="large"
-                    responsiveLayout="stack"
-                    emptyMessage="Nenhum produto encontrado para precificação"
-                    showGridlines
-                    header={headerDataTable}
-                    rowGroupMode="subheader"
-                    groupRowsBy={agrupamento}
-                    //  sortOrder={1}
-                    rowGroupHeaderTemplate={headerTemplate}
-                    resizableColumns
-                    // columnResizeMode="expand"
-                    expandableRowGroups
-                    expandedRows={expandedRows}
-                    onRowToggle={(e) => setExpandedRows(e.data)}
-                  >
-                    <Column header="Código " field={EanOrCodigo}></Column>
-
-                    <Column
-                      field="descricao"
-                      header="Produto"
-                      body={familiaIcone}
-                      bodyStyle={{ textAlign: "center" }}
-                    ></Column>
-                    <Column
-                      field={precoCustoTemplate}
-                      header="Custo"
-                      body={precoCustoTemplate}
-                      bodyStyle={{ textAlign: "center" }}
-                    ></Column>
-
-                    <Column
-                      field={margem}
-                      header={
-                        <>
-                          <div>
-                            Preço Agendado <hr />
-                          </div>
-                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>
-                        </>
-                      }
-                      body={margem}
-                      bodyStyle={{
-                        textAlign: "center",
-                      }}
-                    ></Column>
-
-                    <Column
-                      field={margemAtual}
-                      header={
-                        <>
-                          <div>
-                            Preço Atual <hr />
-                          </div>
-                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>
-                        </>
-                      }
-                      body={margemAtual}
-                      bodyStyle={{
-                        textAlign: "center",
-                      }}
-                    ></Column>
-
-                    <Column
-                      style={{ fontSize: "14px" }}
-                      field={sugestaoVenda}
-                      header={
-                        <>
-                          {" "}
-                          <div>
-                            {" "}
-                            Sugestão <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                        </>
-                      }
-                      body={sugestaoVenda}
-                      bodyStyle={{ textAlign: "center" }}
-                    ></Column>
-
-                    <Column
-                      field="precoagendado"
-                      header={
-                        <>
-                          {" "}
-                          <div>
-                            {" "}
-                            Preço Agendado <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                        </>
-                      }
-                      body={precoAgendadoTemplate}
-                      style={{ fontSize: "15", fontWeight: "600" }}
-                      editor={(options) => priceEditor(options)}
-                      bodyStyle={{
-                        textAlign: "center",
-                      }}
-                    ></Column>
-
-                    <Column
-                      field={precoAtualTemplate}
-                      header={
-                        <>
-                          {" "}
-                          <div>
-                            {" "}
-                            Preço Atual <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                        </>
-                      }
-                      style={{ fontWeight: "600" }}
-                      bodyStyle={{
-                        textAlign: "center",
-                      }}
-                      body={precoAtualTemplate}
-                    ></Column>
-
-                    <Column
-                      field={status}
-                      header="Status"
-                      style={{ fontWeight: "600" }}
-                      bodyStyle={{
-                        textAlign: "center",
-                      }}
-                    ></Column>
-
-                    <Column
-                      header="Editar"
-                      rowEditor
-                      headerStyle={{ width: "10%", minWidth: "8rem" }}
-                      bodyStyle={{ textAlign: "center" }}
-                    ></Column>
-                  </DataTable>
-                </>
-              ) : (
-                <>
-                  <DataTable
-                    style={{
-                      height: "99vh",
-                      width: "99vw",
+                      width: "100%",
                     }}
                     breakpoint="1125px"
                     loading={loading}
                     stripedRows
                     value={produtos}
-                    //    selectionMode="single"
+                        selectionMode="single"
                     //   reorderableColumns
                     editMode="row"
                     dataKey="idproduto"
@@ -1124,14 +975,14 @@ const PrecificadorExecuta = () => {
                     ></Column>
 
                     <Column
-                      header="Editar"
+                      header="Atualizar e Confirmar"
                       rowEditor
+                    
                       headerStyle={{ width: "10%", minWidth: "8rem" }}
                       bodyStyle={{ textAlign: "center" }}
                     ></Column>
                   </DataTable>
-                </>
-              )}
+               
             </div>
           </div>
         </>

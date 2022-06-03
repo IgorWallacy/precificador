@@ -84,13 +84,13 @@ const MenuInterativo = () => {
         <h1>Precificar</h1>
         <div className="opcoes-menu">
           <Button
-            label="Agendar"
+            label="Agendar remarcação"
             icon="pi pi-calendar"
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/precificar-agendar")}
           />
           <Button
-            label="Executar"
+            label="Iniciar remarcação "
             icon="pi pi-sync"
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/precificar-executar")}

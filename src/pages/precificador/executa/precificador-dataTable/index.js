@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 
 import "./styless.css";
 
-
 import Header from "../../../../components/header";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -26,6 +25,10 @@ import api from "../../../../services/axios";
 //import { useNavigate } from "react-router-dom";
 
 import moment from "moment";
+
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const PrecificadorExecuta = () => {
   //  const navigate = useNavigate();
@@ -152,14 +155,15 @@ const PrecificadorExecuta = () => {
           <>
             <div style={{ color: "green" }}>
               {rsmargemformatada} <br />
-              <b>Lucro de</b> {margemformatada} <br/> no preço agendado
+              <b>Lucro de</b> {margemformatada} <br /> no preço agendado
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
               {rsmargemformatada} <br />
-              <b>Prejuizo de</b> {margemformatada}<br/> no preço agendado
+              <b>Prejuizo de</b> {margemformatada}
+              <br /> no preço agendado
             </div>
           </>
         )}
@@ -193,14 +197,16 @@ const PrecificadorExecuta = () => {
           <>
             <div style={{ color: "green" }}>
               {rsmargemformatada} <br />
-              <b>Lucro de</b> {margemformatada}<br/> no preço atual
+              <b>Lucro de</b> {margemformatada}
+              <br /> no preço atual
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
               {rsmargemformatada} <br />
-              <b>Prejuizo de</b> {margemformatada}<br/> no preço atual
+              <b>Prejuizo de</b> {margemformatada}
+              <br /> no preço atual
             </div>
           </>
         )}
@@ -209,11 +215,16 @@ const PrecificadorExecuta = () => {
   };
 
   const precoCustoTemplate = (rowData) => {
-    let custo =  Intl.NumberFormat("pt-BR", {
+    let custo = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(rowData.precocusto);
-    return <> <font color="red"> Custo de {custo}</font></>
+    return (
+      <>
+        {" "}
+        <font color="red"> Custo de {custo}</font>
+      </>
+    );
   };
 
   const precoAgendadoTemplate = (rowData) => {
@@ -238,15 +249,15 @@ const PrecificadorExecuta = () => {
           <>
             <div style={{ color: "green" }}>
               {markupFormatado} de Markup <br />
-              Agendado a <br/>
-             <font size="5"> {precoagendadoFormatado} </font>
+              Agendado a <br />
+              <font size="5"> {precoagendadoFormatado} </font>
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
               {markupFormatado} de Markup <br />
-              Agendado a <br/>
+              Agendado a <br />
               <font size="5"> {precoagendadoFormatado} </font>
             </div>
           </>
@@ -271,7 +282,8 @@ const PrecificadorExecuta = () => {
       currency: "BRL",
     }).format(rowData.precoAtual);
 
-    return rowData.precoAtual === rowData.precoagendado && rowData.precoAtual > rowData.precocusto  ? (
+    return rowData.precoAtual === rowData.precoagendado &&
+      rowData.precoAtual > rowData.precocusto ? (
       <>
         <div
           style={{
@@ -283,9 +295,12 @@ const PrecificadorExecuta = () => {
             margin: "5px",
           }}
         >
-          <div> {markupFormatado}  de Markup </div>
-          Vendendo atualmente a 
-          <div> <font size="5"> {precoAtualFormatado} </font> </div>
+          <div> {markupFormatado} de Markup </div>
+          Vendendo atualmente a
+          <div>
+            {" "}
+            <font size="5"> {precoAtualFormatado} </font>{" "}
+          </div>
         </div>
       </>
     ) : (
@@ -301,8 +316,11 @@ const PrecificadorExecuta = () => {
           }}
         >
           <div> {markupFormatado} de Markup </div>
-         <i>  Vendendo atualmente a </i>
-          <div> <font size="5"> {precoAtualFormatado} </font> </div>
+          <i> Vendendo atualmente a </i>
+          <div>
+            {" "}
+            <font size="5"> {precoAtualFormatado} </font>{" "}
+          </div>
         </div>
       </>
     );
@@ -331,15 +349,15 @@ const PrecificadorExecuta = () => {
         {sugestao > rowData.precocusto ? (
           <>
             <div style={{ fontSize: "14", color: "green" }}>
-             <div>{mkf}</div>
-              Sugestão de venda a   <div>{sf}</div>
+              <div>{mkf}</div>
+              Sugestão de venda a <div>{sf}</div>
             </div>
           </>
         ) : (
           <>
             <div style={{ fontSize: "14", color: "red" }}>
               <div>{mkf}</div>
-         <s>Sugestão de venda a </s> <div>{sf}</div>
+              <s>Sugestão de venda a </s> <div>{sf}</div>
             </div>
           </>
         )}
@@ -352,9 +370,7 @@ const PrecificadorExecuta = () => {
       <>
         <div
           style={{
-          
             color: "#0F9D58",
-         
           }}
         >
           <Tag
@@ -362,37 +378,45 @@ const PrecificadorExecuta = () => {
             icon="pi pi-check-square"
             severity="success"
           ></Tag>
-          <br/>
-            {rowData.precoAtual < rowData.precocusto  ||  rowData.precoagendado < rowData.precocusto ? (
+          <br />
+          {rowData.precoAtual < rowData.precocusto ||
+          rowData.precoagendado < rowData.precocusto ? (
             <>
-            <Tag style={{margin:'1rem'}}
-            value="Preço abaixo do custo "
-            icon="pi pi-exclamation-circle"
-            severity="danger"
-          ></Tag>
+              <Tag
+                style={{ margin: "1rem" }}
+                value="Preço abaixo do custo "
+                icon="pi pi-exclamation-circle"
+                severity="danger"
+              ></Tag>
             </>
-          ) :(<></>)}
+          ) : (
+            <></>
+          )}
         </div>
       </>
     ) : (
       <>
-        <div style={{ color: "#f69c22"  }}>
+        <div style={{ color: "#f69c22" }}>
           <Tag
             value="Preço agendado 
             diverge do atual "
             icon="pi pi-exclamation-circle"
             severity="warning"
           ></Tag>
-          <br/>
-          {rowData.precoAtual < rowData.precocusto  ||  rowData.precoagendado < rowData.precocusto ? (
+          <br />
+          {rowData.precoAtual < rowData.precocusto ||
+          rowData.precoagendado < rowData.precocusto ? (
             <>
-            <Tag style={{margin:'1rem'}}
-            value="Preço abaixo do custo "
-            icon="pi pi-exclamation-circle"
-            severity="danger"
-          ></Tag>
+              <Tag
+                style={{ margin: "1rem" }}
+                value="Preço abaixo do custo "
+                icon="pi pi-exclamation-circle"
+                severity="danger"
+              ></Tag>
             </>
-          ) :(<></>)}
+          ) : (
+            <></>
+          )}
         </div>
       </>
     );
@@ -494,11 +518,17 @@ const PrecificadorExecuta = () => {
   const EanOrCodigo = (rowData) => {
     if (rowData.ean) {
       return (
-      <>
-      <div>{rowData.ean} </div>
+        <>
+          <div>{rowData.ean} </div>
           <div>
             <img
-              style={{ width: "100px" ,height : '100px', margin: "5px" , borderRadius : '25px', padding : '5px' }}
+              style={{
+                width: "100px",
+                height: "100px",
+                margin: "5px",
+                borderRadius: "25px",
+                padding: "5px",
+              }}
               src={`http://www.eanpictures.com.br:9000/api/gtin/${rowData.ean}`}
               onError={(e) =>
                 (e.target.src =
@@ -507,7 +537,8 @@ const PrecificadorExecuta = () => {
               alt={rowData.ean}
             />
           </div>
-      </> )
+        </>
+      );
     } else {
       return rowData.codigo;
     }
@@ -547,6 +578,128 @@ const PrecificadorExecuta = () => {
         </div>
       </React.Fragment>
     );
+  };
+
+  const imprimePDFPrecosAgendados = () => {
+    var dd = {
+      //   pageSize: {width : 1001 , height : 200},
+      pageOrientation: "landscape",
+
+      styles: {
+        ean: {
+          bold: true,
+          //   fontSize : 50
+        },
+        descricao: {
+          alignment: "left",
+          bold: true,
+          //   fontSize : 40,
+        },
+        preco: {
+          alignment: "right",
+          bold: true,
+          //  fontSize : 85,
+        },
+      },
+
+      content: produtos.map(function (item) {
+        return {
+          layout: "lightHorizontalLines", // optional
+          lineHeight: 1,
+
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            headerRows: 0,
+            widths: [100, 100, 200, "*"],
+
+            body: [
+                 ['', '', '', ''],
+
+              [
+                { text: moment(item.dataagendada).format("DD/MM/YYYY") },
+                { text: item.ean ? item.ean : item.codigo, style: "ean" },
+                { text: item.descricao.substring(0, 45), style: "descricao" },
+                {
+                  text:
+                    "R$ " +
+                    Intl.NumberFormat("pt-BR", {
+                      style: "decimal",
+                      currency: "BRL",
+                      minimumFractionDigits: "2",
+                      maximumFractionDigits: "2",
+                    }).format(item.precoagendado),
+                  style: "preco",
+                },
+              ],
+            ],
+          },
+        };
+      }),
+    };
+
+    pdfMake.createPdf(dd).open();
+  };
+
+  const imprimeEtiquetaPrecosAgendados = () => {
+    var dd = {
+      pageSize: { width: 1001, height: 200 },
+      pageOrientation: "landscape",
+
+      styles: {
+        ean: {
+          bold: true,
+          fontSize: 50,
+        },
+        descricao: {
+          alignment: "left",
+          bold: true,
+          fontSize: 40,
+        },
+        preco: {
+          alignment: "right",
+          bold: true,
+          fontSize: 85,
+        },
+      },
+
+      content: produtos.map(function (item) {
+        return {
+          layout: "noBorders", // optional
+          lineHeight: 1,
+
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            headerRows: 0,
+            widths: [15, 500, "*"],
+
+            body: [
+              //   ['', '', ''],
+
+              [
+                //    { text: item.ean ? item.ean : item.codigo, style : 'ean'},
+                { text: moment(new Date()).format("DDMMY") },
+                { text: item.descricao.substring(0, 45), style: "descricao" },
+                {
+                  text:
+                    "R$ " +
+                    Intl.NumberFormat("pt-BR", {
+                      style: "decimal",
+                      currency: "BRL",
+                      minimumFractionDigits: "2",
+                      maximumFractionDigits: "2",
+                    }).format(item.precoagendado),
+                  style: "preco",
+                },
+              ],
+            ],
+          },
+        };
+      }),
+    };
+
+    pdfMake.createPdf(dd).open();
   };
 
   const familiaIcone = (rowData) => {
@@ -663,6 +816,24 @@ const PrecificadorExecuta = () => {
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-refresh"
         className=" p-button-rounded p-button-success p-button-sm"
+      />
+
+      <Button
+        onClick={() => imprimeEtiquetaPrecosAgendados()}
+        tooltip="Imprimir etiqueta dos preços agendados "
+        tooltipOptions={{ position: "bottom" }}
+        icon="pi pi-print"
+        style={{ margin: "10px" }}
+        className=" p-button-rounded p-button-segundary p-button-sm"
+      />
+
+      <Button
+        onClick={() => imprimePDFPrecosAgendados()}
+        tooltip="Imprimir relatório dos preços agendados "
+        tooltipOptions={{ position: "bottom" }}
+        icon="pi pi-file-pdf"
+        style={{ margin: "5px" }}
+        className=" p-button-rounded p-button-info p-button-sm"
       />
     </React.Fragment>
   );
@@ -835,154 +1006,150 @@ const PrecificadorExecuta = () => {
             <div className="datatable-templating-demo p-fluid">
               <Tooltip target=".export-buttons>button" position="bottom" />
 
-             
-                  <DataTable
-                    style={{
-                      height: "99vh",
-                      width: "100%",
-                    }}
-                    breakpoint="1125px"
-                    loading={loading}
-                    stripedRows
-                    value={produtos}
-                        selectionMode="single"
-                    //   reorderableColumns
-                    editMode="row"
-                    dataKey="idproduto"
-                    onRowEditComplete={onRowEditComplete}
-                    //    scrollDirection="vertical"
-                    //    scrollable
-                    //    scrollHeight="flex"
-                    globalFilterFields={[
-                      "descricao",
-                      "ean",
-                      "numeronotafiscal",
-                      "razaosocial",
-                    ]}
-                    filters={filters2}
-                    size="normal"
-                    responsiveLayout="stack"
-                    emptyMessage="Nenhum produto encontrado para precificação"
-                    showGridlines
-                    header={headerDataTable}
-                    rowGroupMode="subheader"
-                    groupRowsBy={agrupamento}
-                    //  sortOrder={1}
-                    rowGroupHeaderTemplate={headerTemplate}
-                    // resizableColumns
-                    // columnResizeMode="expand"
-                    expandableRowGroups
-                    expandedRows={expandedRows}
-                    onRowToggle={(e) => setExpandedRows(e.data)}
-                  >
-                    <Column header="Código " field={EanOrCodigo}></Column>
+              <DataTable
+                style={{
+                  height: "99vh",
+                  width: "100%",
+                }}
+                breakpoint="1125px"
+                loading={loading}
+                stripedRows
+                value={produtos}
+                selectionMode="single"
+                //   reorderableColumns
+                editMode="row"
+                dataKey="idproduto"
+                onRowEditComplete={onRowEditComplete}
+                //    scrollDirection="vertical"
+                //    scrollable
+                //    scrollHeight="flex"
+                globalFilterFields={[
+                  "descricao",
+                  "ean",
+                  "numeronotafiscal",
+                  "razaosocial",
+                ]}
+                filters={filters2}
+                size="normal"
+                responsiveLayout="stack"
+                emptyMessage="Nenhum produto encontrado para precificação"
+                showGridlines
+                header={headerDataTable}
+                rowGroupMode="subheader"
+                groupRowsBy={agrupamento}
+                //  sortOrder={1}
+                rowGroupHeaderTemplate={headerTemplate}
+                // resizableColumns
+                // columnResizeMode="expand"
+                expandableRowGroups
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+              >
+                <Column header="Código " field={EanOrCodigo}></Column>
 
-                    <Column
-                      field="descricao"
-                      header="Produto"
-                      body={familiaIcone}
-                    ></Column>
-                    <Column
-                      field={precoCustoTemplate}
-                      header="Custo"
-                      body={precoCustoTemplate}
-                    ></Column>
+                <Column
+                  field="descricao"
+                  header="Produto"
+                  body={familiaIcone}
+                ></Column>
+                <Column
+                  field={precoCustoTemplate}
+                  header="Custo"
+                  body={precoCustoTemplate}
+                ></Column>
 
-                    <Column
-                      field={margem}
-                      header={
-                        <>
-                          {" "}
-                          <div>
-                            {" "}
-                            Agendado <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
-                        </>
-                      }
-                      body={margem}
-                    ></Column>
+                <Column
+                  field={margem}
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Agendado <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
+                    </>
+                  }
+                  body={margem}
+                ></Column>
 
-                    <Column
-                      field={margemAtual}
-                      header={
-                        <>
-                          <div>
-                            Preço Atual <hr />
-                          </div>
-                          <br /> <div> Margem % </div> <br /> <div> Lucro </div>
-                        </>
-                      }
-                      body={margemAtual}
-                      bodyStyle={{
-                        textAlign: "center",
-                      }}
-                    ></Column>
+                <Column
+                  field={margemAtual}
+                  header={
+                    <>
+                      <div>
+                        Preço Atual <hr />
+                      </div>
+                      <br /> <div> Margem % </div> <br /> <div> Lucro </div>
+                    </>
+                  }
+                  body={margemAtual}
+                  bodyStyle={{
+                    textAlign: "center",
+                  }}
+                ></Column>
 
-                    <Column
-                      style={{ fontWeight: "600", fontSize: "14px" }}
-                      field={sugestaoVenda}
-                      header={
-                        <>
-                          {" "}
-                          <div>
-                            {" "}
-                            Sugestão <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                        </>
-                      }
-                      body={sugestaoVenda}
-                    ></Column>
+                <Column
+                  style={{ fontWeight: "600", fontSize: "14px" }}
+                  field={sugestaoVenda}
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Sugestão <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  body={sugestaoVenda}
+                ></Column>
 
-                    <Column
-                      field="precoagendado"
-                      header={
-                        <>
-                          {" "}
-                          <div>
-                            {" "}
-                            Preço Agendado <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                        </>
-                      }
-                      body={precoAgendadoTemplate}
-                      style={{ fontWeight: "600" }}
-                      editor={(options) => priceEditor(options)}
-                    ></Column>
+                <Column
+                  field="precoagendado"
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Preço Agendado <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  body={precoAgendadoTemplate}
+                  style={{ fontWeight: "600" }}
+                  editor={(options) => priceEditor(options)}
+                ></Column>
 
-                    <Column
-                      field={precoAtualTemplate}
-                      header={
-                        <>
-                          {" "}
-                          <div>
-                            {" "}
-                            Preço Atual <hr />{" "}
-                          </div>{" "}
-                          <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                        </>
-                      }
-                      style={{ fontSize:'17', fontWeight: "600" }}
-                      body={precoAtualTemplate}
-                    ></Column>
+                <Column
+                  field={precoAtualTemplate}
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Preço Atual <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  style={{ fontSize: "17", fontWeight: "600" }}
+                  body={precoAtualTemplate}
+                ></Column>
 
-                    <Column
-                      field={status}
-                    
-                      style={{ textAlign : 'center', fontWeight: "600" }}
-                    ></Column>
+                <Column
+                  field={status}
+                  style={{ textAlign: "center", fontWeight: "600" }}
+                ></Column>
 
-                    <Column
-                      header="Atualizar e Confirmar"
-                      rowEditor
-                    
-                      headerStyle={{ width: "10%", minWidth: "8rem" }}
-                      bodyStyle={{ textAlign: "center" }}
-                    ></Column>
-                  </DataTable>
-               
+                <Column
+                  header="Atualizar e Confirmar"
+                  rowEditor
+                  headerStyle={{ width: "10%", minWidth: "8rem" }}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
+              </DataTable>
             </div>
           </div>
         </>

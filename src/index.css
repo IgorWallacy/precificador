@@ -9,6 +9,7 @@
   font-family: 'Roboto Flex', 'Montserrat', sans-serif;
   font-size : '14px';
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
 }
 
 
@@ -44,8 +45,10 @@
   right: 0;
   overflow: auto;
   background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-
+  
 }
+
+
 
 .container-flex {
   display: flex;
@@ -61,6 +64,14 @@
 
 }
 
+
+.btn-topo {
+  position: fixed;
+  top:10px;
+  right:10px;
+  overflow: visible;
+  z-index: 4;
+}
 
 
 
@@ -156,6 +167,24 @@
 }
 
 
+@keyframes mudar_cor_background {
 
+  0% {
+    background-position: 0% 0%;
+
+  } 
+  50% {
+
+    background-position: 50% 75%;
+
+  }
+  100%{
+
+    background-position: 25% 100%;
+  }
+
+  
+  
+}
 
 

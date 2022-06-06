@@ -15,8 +15,8 @@ import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 import { Tag } from "primereact/tag";
-
 import api from "../../../../services/axios";
+
 
 import moment from "moment";
 import "moment/locale/pt-br";
@@ -45,9 +45,13 @@ const PrecificadorAgenda = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
+
+   
+
   useEffect(() => {
     pegarTokenLocalStorage();
     usarTabelaFormacaoPreecoProduto();
+    
     // eslint-disable-next-line
   }, []);
 
@@ -408,7 +412,9 @@ const PrecificadorAgenda = () => {
   const priceEditor = (options) => {
     return (
       <InputNumber
-        placeholder="R$"
+        prefix="R$ "
+       placeholder="Preço agendado"
+      
         value={options.value}
         onValueChange={(e) => options.editorCallback(e.value)}
         //   mode="currency"
@@ -703,7 +709,7 @@ const PrecificadorAgenda = () => {
       return (
         <>
           <div>
-            <h4>Filial</h4>
+            <h4>Loja</h4>
           </div>
           <Dropdown
             showClear
@@ -711,8 +717,8 @@ const PrecificadorAgenda = () => {
             value={filiaisSelect}
             options={quantidadeFilial}
             optionLabel="razaosocial"
-            placeholder="Selecione uma filial "
-            emptyMessage="Nenhuma filial encontrada."
+            placeholder="Selecione uma loja "
+            emptyMessage="Nenhuma loja encontrada."
             dropdownIcon="pi pi-chevron-down"
           />
         </>
@@ -722,9 +728,12 @@ const PrecificadorAgenda = () => {
     }
   };
 
+
+
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
+      
 
       {produtos.length < 1 ? (
         <>
@@ -734,9 +743,10 @@ const PrecificadorAgenda = () => {
                 <h5>Período</h5>
               </div>
               <Calendar
+               selectOtherMonths	
                 required
                 showIcon
-                placeholder="Informe a data inicial"
+                placeholder="Data inicial para pesquisa de notas fiscais"
                 dateFormat="dd/mm/yy "
                 viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
                 hideOnDateTimeSelect
@@ -749,14 +759,15 @@ const PrecificadorAgenda = () => {
               />
             </div>
             <div className="form-precificador-input">
-              <div>
+              <div >
                 <h5>até</h5>
               </div>
 
               <Calendar
+                selectOtherMonths	
                 required
                 showIcon
-                placeholder="Informe a data final"
+                placeholder="Data final para pesquisa de notas fiscais"
                 dateFormat="dd/mm/yy"
                 hideOnDateTimeSelect
                 value={dataFinal}
@@ -765,6 +776,7 @@ const PrecificadorAgenda = () => {
                 locale="pt-BR"
                 showTime
                 showSeconds
+                position = "bottom"
               />
             </div>
 
@@ -790,10 +802,15 @@ const PrecificadorAgenda = () => {
             left={botaovoltar}
             right={botaoatualizar}
           />
-
+         
+      
+          
+        
+         
           <div className="datatable-templating-demo p-fluid">
             <Tooltip target=".export-buttons>button" position="bottom" />
-
+             
+             
           
                 <DataTable
                   style={{
@@ -947,8 +964,11 @@ const PrecificadorAgenda = () => {
                     bodyStyle={{ textAlign: "center" }}
                   ></Column>
                 </DataTable>
+
+                
           
           </div>
+        
         </>
       )}
     </>

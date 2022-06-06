@@ -21,6 +21,8 @@ import { Tag } from "primereact/tag";
 
 import Typing from "react-typing-animation";
 
+import { FcPaid } from "react-icons/fc";
+
 import api from "../../../../services/axios";
 //import { useNavigate } from "react-router-dom";
 
@@ -425,7 +427,8 @@ const PrecificadorExecuta = () => {
   const priceEditor = (options) => {
     return (
       <InputNumber
-        placeholder="R$"
+        prefix="R$ "
+        placeholder="Confirme ou altere o preço"
         value={options.value}
         onValueChange={(e) => options.editorCallback(e.value)}
         //   mode="currency"
@@ -581,11 +584,23 @@ const PrecificadorExecuta = () => {
   };
 
   const imprimePDFPrecosAgendados = () => {
+    
     var dd = {
       //   pageSize: {width : 1001 , height : 200},
-      pageOrientation: "landscape",
+      pageOrientation: "portrait",
+      
+          header : {
+            columns: [ {text : "Relatório de preços agendados" , style : "header"} ]
+          },
 
       styles: {
+        
+        header : {
+         fontSize : 14,
+         alignment : 'center',
+         marginTop: 5
+        },
+
         ean: {
           bold: true,
           //   fontSize : 50
@@ -603,6 +618,7 @@ const PrecificadorExecuta = () => {
       },
 
       content: produtos.map(function (item) {
+        
         return {
           layout: "lightHorizontalLines", // optional
           lineHeight: 1,
@@ -885,8 +901,8 @@ const PrecificadorExecuta = () => {
             value={filiaisSelect}
             options={quantidadeFilial}
             optionLabel="razaosocial"
-            placeholder="Selecione uma filial "
-            emptyMessage="Nenhuma filial encontrada."
+            placeholder="Selecione uma loja "
+            emptyMessage="Nenhuma loja encontrada."
             dropdownIcon="pi pi-chevron-down"
           />
         </>
@@ -901,7 +917,7 @@ const PrecificadorExecuta = () => {
       return (
         <>
           <h5 style={{ margin: "10px" }}>
-            Replicar os preços para todas as filiais ?
+            Replicar os preços para todas as lojas ?
           </h5>
           <SelectButton
             value={replicarPreco}
@@ -924,14 +940,17 @@ const PrecificadorExecuta = () => {
       </div>
 
       <div className="agenda-label">
-        <i className="pi pi-sync" style={{ fontSize: "2em" }}></i>
+       
+        <FcPaid color="#FFFF" size={50} />
         <Typing>
-          <h1> Pesquisar agendamentos </h1>
+          <h1> Pesquisar agendamentos de preços  </h1>
           <Typing.Delay ms={1000} />
 
           <h4>Atualizar os preços de venda</h4>
         </Typing>
+       
       </div>
+     
 
       {produtos.length < 1 ? (
         <>
@@ -942,9 +961,10 @@ const PrecificadorExecuta = () => {
                   <h5>Período</h5>
                 </div>
                 <Calendar
+                  selectOtherMonths	
                   required
                   showIcon
-                  placeholder="Informe a data inicial do agendamento"
+                  placeholder="Data inicial do agendamento"
                   dateFormat="dd/mm/yy "
                   viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
                   hideOnDateTimeSelect
@@ -962,9 +982,10 @@ const PrecificadorExecuta = () => {
                 </div>
 
                 <Calendar
+                  selectOtherMonths	
                   required
                   showIcon
-                  placeholder="Informe a data final do agendamento"
+                  placeholder="Data final do agendamento"
                   dateFormat="dd/mm/yy"
                   hideOnDateTimeSelect
                   value={dataFinal}

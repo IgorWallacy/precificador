@@ -113,8 +113,9 @@ const Header = () => {
                 className="p-button-rounded p-button-danger ml-2"
               ></Button>
               </div>
-
-              <div>  <Menu /> </div>
+              
+              <div 
+              style={{  width :"100%"}}>  <Menu /> </div>
 
             
             </>
@@ -129,16 +130,17 @@ const Header = () => {
       </div>
 
       <div className="botao-menu">
-        <Toolbar style={{border : 'none'}}
-          left={
+       
             <Button
               className=" p-button-sm p-button-rounded p-button-primary"
               icon="pi pi-align-justify"
               onClick={() => setVisibleLeft(true)}
             />
-          }
-        />
+          
+        
       </div>
+
+     
     </>
   );
 };

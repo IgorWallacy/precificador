@@ -46,11 +46,14 @@ const Menu = () => {
 
   return (
     <>
+     
       <PanelMenu
         className="menu-left"
         model={items}
-        style={{ width: "100vh" }}
+        style={{ width: "100%"  }}
+
       />
+      
     </>
   );
 };

@@ -1,0 +1,53 @@
+
+
+.container-fornecedor {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    color: #FFF;
+    border: 1px solid #FFF;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 25px;
+
+}
+
+
+.fornecedor-input {
+    display: flex;
+    flex-direction: column;
+    margin: 30px;
+  
+    justify-content: space-around;
+}
+
+.lista-itens {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 5px;
+    padding: 5px;
+}
+
+.botao-add-colado{
+    position: fixed;
+    top: 500px;
+    left: 1px;
+    border-radius: 50px;
+    z-index: 4;
+}
+
+.tabela {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 20px;
+    padding: 5px;
+}
+
+

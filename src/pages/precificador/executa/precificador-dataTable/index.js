@@ -635,7 +635,7 @@ const PrecificadorExecuta = () => {
               [
                 { text: moment(item.dataagendada).format("DD/MM/YYYY") },
                 { text: item.ean ? item.ean : item.codigo, style: "ean" },
-                { text: item.descricao.substring(0, 45), style: "descricao" },
+                { text: item.descricao.substring(0, 35), style: "descricao" },
                 {
                   text:
                     "R$ " +

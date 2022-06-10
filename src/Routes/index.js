@@ -5,7 +5,7 @@ import Login from "../pages/login";
 
 
 import PrecificadorExecuta from '../pages/precificador/executa/precificador-dataTable'
-
+import AnaliseFornecedor from "../pages/compras/analise/fornecedor";
 
 
 import Context from "../contexts";
@@ -36,6 +36,7 @@ export default function Router() {
           <Route path="precificar-agendar" element={<App />} />
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
           <Route path="vendas" element={<VendasDataTableComponent />} />
+          <Route path="compras/analise/fornecedor" element={<AnaliseFornecedor />} />
          
         </Route>
       </Routes>

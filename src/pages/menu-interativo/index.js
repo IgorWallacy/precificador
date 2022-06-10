@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../services/axios";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  faStore,  faTags } from "@fortawesome/free-solid-svg-icons";
+import {  faStore,  faTags, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 
 
 import "./menu-interativo.css";
@@ -68,7 +68,7 @@ const MenuInterativo = () => {
     <>
       <div className="menu-interativo">
       
-      <div  className="menu-categoria">
+      <div style={{width : '100%'}}  className="menu-categoria">
       
         <Typing speed={100} startDelay={10}>
           <div className="texto-menu-interativo">
@@ -107,6 +107,21 @@ const MenuInterativo = () => {
             icon="pi pi-shopping-cart"
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/vendas")}
+          />
+        </div>
+      </div>
+
+
+      <div className="menu-categoria">
+        {" "}
+        <FontAwesomeIcon icon={faUserGroup}  size="2x" />
+        <h1>Compras</h1>
+        <div className="opcoes-menu">
+          <Button
+            label="Fornecedor"
+            icon="pi pi-users"
+            className="p-button-rounded p-button-help p-button-lg"
+            onClick={() => navigate("/compras/analise/fornecedor")}
           />
         </div>
       </div>

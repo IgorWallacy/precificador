@@ -1,7 +1,7 @@
 import { addLocale } from "primereact/api";
 
 
-const calendarioPtBR = () => {
+const calendario = () => {
 
     addLocale("pt-BR", {
         firstDayOfWeek: 0,
@@ -50,4 +50,4 @@ const calendarioPtBR = () => {
 
 }
 
-export default calendarioPtBR
+export default calendario

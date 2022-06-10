@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./styles.css";
 
 import { Dropdown } from "primereact/dropdown";
@@ -11,6 +11,11 @@ import { Column } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
 import { Rating } from "primereact/rating";
 import { Sidebar } from "primereact/sidebar";
+import {Toast} from 'primereact/toast'
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
+
 
 import { FaGift } from "react-icons/fa";
 
@@ -78,6 +83,22 @@ export default function AnaliseFornecedor() {
   const [pedidos, setPedidos] = useState([""]);
 
   const [visibleLeft, setVisibleLeft] = useState(false);
+  const [displayDialog, setDisplayDialog] = useState(false);
+
+  const [produto , setProduto] = useState("");
+  const [quantidade, setQuantidade] = useState(0)
+  const [preco,setPreco] = useState(0)
+
+  const toast = useRef(null);
+
+  let emptyProduct = {
+    id: null,
+    nome: '',
+    ean: null,
+    preco: 0,
+    quantidade: 0,
+   
+};
 
   const getFornecedores = () => {
     setLoading(true);
@@ -86,6 +107,7 @@ export default function AnaliseFornecedor() {
       .get(`/api/entidade/fornecedores/`)
       .then((r) => {
         setFornecedores(r.data);
+
       })
       .catch((error) => {
         console.log(error);
@@ -346,15 +368,28 @@ export default function AnaliseFornecedor() {
     );
   };
 
+  
+  const openNew = (produto) => {
+   // setProduto(emptyProduct)
+   setDisplayDialog(true)
+    setProduto({...produto})
+   
+}
+
   const botaoAddTemplate = (rowdata) => {
+   
+  //  setProduto({...rowdata})
+ 
     return (
       <>
+
         <Button
         style={{ margin: "5px" }}
         className="p-button-rounded"
           label="+"
           icon="pi pi-shopping-bag"
-          onClick={() => adicionarProduto(rowdata)}
+        //  onClick={() => adicionarProduto(rowdata)}
+         onClick={ () => openNew(rowdata) }
         />
 
        
@@ -362,11 +397,17 @@ export default function AnaliseFornecedor() {
     );
   };
 
+  const hideDialog = () => {
+   // setSubmitted(false);
+    setDisplayDialog(false);
+}
+
   const adicionarProduto = (rowData) => {
     setPedidos((oldArray) => [
       ...oldArray,
       { produto: rowData.produto, codigo: rowData.ean },
     ]);
+    toast.current.show({severity:'success', summary: 'Sucesso', detail: `${rowData.produto} adicionado a lista de pedidos` , life: 3000});
   };
 
   useEffect(() => {
@@ -377,6 +418,48 @@ export default function AnaliseFornecedor() {
   return (
     <>
       <Header />
+
+      <Dialog header="Adicionar produto a lista de compras" visible={displayDialog} onHide={hideDialog} style={{ width: '50vw' }} >
+      
+      <div style={{display:'flex', flexDirection:'column', alignItems : 'center' , justifyContent : 'center'}}>
+           {produto?.ean}
+           <br/>
+            <img
+              style={{
+                width: "100px",
+                height: "100px",
+                margin: "5px",
+                borderRadius: "25px",
+                padding: "5px",
+              }}
+              src={`http://www.eanpictures.com.br:9000/api/gtin/${produto.ean}`}
+              onError={(e) =>
+                (e.target.src =
+                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+              }
+              alt={produto?.ean}
+            />
+          </div>
+      
+      <div className="field">
+      <label htmlFor="nome">Produto</label>
+      <InputText id="nome" style={{width : '50%'}} value={produto.produto} readOnly  required autoFocus  />
+      </div>
+      <div className="field">
+      <label htmlFor="quantidade">Quantidade</label>
+      <InputNumber style={{width : '50%'}}  id="quantidade" autoFocus size={50} value={quantidade} onChange={(e) => setQuantidade(e.target.value)}
+        required   />
+      </div>
+      <div className="field">
+      <label htmlFor="preco">Preço</label>
+      <InputNumber style={{width : '50%'}} mode="decimal" prefix="R$ " locale="pt-BR" minFractionDigits={2} maxFractionDigits={2}
+       id="preco" size={50} value={preco} onChange={(e) => setPreco(e.target.value)}
+        required   />
+      </div>
+      <div>
+        <Button icon="pi pi-plus" onClick={() => adicionarProduto(produto)} />
+      </div>
+      </Dialog>
 
       <Button
           
@@ -511,6 +594,7 @@ export default function AnaliseFornecedor() {
           />
         </div>
       </div>
+      <Toast ref={toast} />
       <div className="tabela">
         <DataTable
           selectionMode="single"

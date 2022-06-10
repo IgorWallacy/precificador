@@ -8,6 +8,7 @@ import "primereact/resources/themes/lara-light-teal/theme.css"; //theme
 import "primereact/resources/primereact.min.css"; //core css
 import "primeicons/primeicons.css"; //icons
 
+
 import { BrowserRouter } from "react-router-dom";
 
 import Router from './Routes'

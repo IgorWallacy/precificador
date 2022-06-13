@@ -42,6 +42,19 @@ const Menu = () => {
        
       ],
     },
+    {
+      label: "Compras",
+      icon: "pi pi-shopping-bag",
+      items: [
+        {
+          label: "Fornecedor",
+          icon: "pi pi-shopping-bag",
+          command: () => navigate("/compras/analise/fornecedor"),
+        }
+
+       
+      ],
+    },
   ];
 
   return (

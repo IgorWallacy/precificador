@@ -120,6 +120,7 @@ const MenuInterativo = () => {
           <Button
             label="Fornecedor"
             icon="pi pi-users"
+            
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/compras/analise/fornecedor")}
           />

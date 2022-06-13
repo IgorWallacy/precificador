@@ -45,7 +45,7 @@ const PrecificadorAgenda = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-
+  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products"
    
 
   useEffect(() => {
@@ -516,7 +516,7 @@ const PrecificadorAgenda = () => {
           <div>
             <img
               style={{ width: "100px" ,height : '100px', margin: "5px" , borderRadius : '25px', padding : '5px' }}
-              src={`http://www.eanpictures.com.br:9000/api/gtin/${rowData.ean}`}
+              src={`${eanUrl}/${rowData.ean}`}
               onError={(e) =>
                 (e.target.src =
                   "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")

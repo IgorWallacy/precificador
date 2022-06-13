@@ -57,6 +57,8 @@ const PrecificadorExecuta = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
+  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products"
+
   useEffect(() => {
     pegarTokenLocalStorage();
     usarTabelaFormacaoPreecoProduto();
@@ -532,7 +534,7 @@ const PrecificadorExecuta = () => {
                 borderRadius: "25px",
                 padding: "5px",
               }}
-              src={`http://www.eanpictures.com.br:9000/api/gtin/${rowData.ean}`}
+              src={`${eanUrl}/${rowData.ean}`}
               onError={(e) =>
                 (e.target.src =
                   "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
@@ -696,7 +698,7 @@ const PrecificadorExecuta = () => {
               [
                 //    { text: item.ean ? item.ean : item.codigo, style : 'ean'},
                 { text: moment(new Date()).format("DDMMY") },
-                { text: item.descricao.substring(0, 45), style: "descricao" },
+                { text: item.descricao.substring(0, 34), style: "descricao" },
                 {
                   text:
                     "R$ " +
@@ -1066,15 +1068,17 @@ const PrecificadorExecuta = () => {
                 expandedRows={expandedRows}
                 onRowToggle={(e) => setExpandedRows(e.data)}
               >
-                <Column header="Código " field={EanOrCodigo}></Column>
+                <Column   header="Código " field={EanOrCodigo}></Column>
 
                 <Column
                   field="descricao"
                   header="Produto"
+                  sortable
                   body={familiaIcone}
                 ></Column>
                 <Column
                   field={precoCustoTemplate}
+                  
                   header="Custo"
                   body={precoCustoTemplate}
                 ></Column>
@@ -1105,6 +1109,7 @@ const PrecificadorExecuta = () => {
                     </>
                   }
                   body={margemAtual}
+                  
                   bodyStyle={{
                     textAlign: "center",
                   }}
@@ -1113,6 +1118,7 @@ const PrecificadorExecuta = () => {
                 <Column
                   style={{ fontWeight: "600", fontSize: "14px" }}
                   field={sugestaoVenda}
+                  
                   header={
                     <>
                       {" "}
@@ -1128,6 +1134,7 @@ const PrecificadorExecuta = () => {
 
                 <Column
                   field="precoagendado"
+                  
                   header={
                     <>
                       {" "}
@@ -1145,6 +1152,7 @@ const PrecificadorExecuta = () => {
 
                 <Column
                   field={precoAtualTemplate}
+                  
                   header={
                     <>
                       {" "}
@@ -1160,6 +1168,7 @@ const PrecificadorExecuta = () => {
                 ></Column>
 
                 <Column
+                
                   field={status}
                   style={{ textAlign: "center", fontWeight: "600" }}
                 ></Column>

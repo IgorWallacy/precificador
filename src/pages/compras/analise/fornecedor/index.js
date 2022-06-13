@@ -11,11 +11,11 @@ import { Column } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
 import { Rating } from "primereact/rating";
 import { Sidebar } from "primereact/sidebar";
-import {Toast} from 'primereact/toast'
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
-
+import { Toast } from "primereact/toast";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
+import { InputNumber } from "primereact/inputnumber";
+import { Toolbar } from "primereact/toolbar";
 
 import { FaGift } from "react-icons/fa";
 
@@ -74,32 +74,33 @@ export default function AnaliseFornecedor() {
   const [dataFinalCompra, setDataFinalCompra] = useState("");
   const [dataInicialVenda, setDataInicialVenda] = useState("");
   const [dataFinalVenda, setDataFinalVenda] = useState("");
-  const [fornecedor, setFornecedor] = useState();
+  const [fornecedor, setFornecedor] = useState(null);
   const [fornecedores, setFornecedores] = useState([""]);
-  const [filial, setFilial] = useState(1);
+  const [filial, setFilial] = useState(null);
   const [lojas, setLojas] = useState([""]);
 
   const [produtos, setProdutos] = useState([""]);
-  const [pedidos, setPedidos] = useState([""]);
+  const [pedidos, setPedidos] = useState([]);
 
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [displayDialog, setDisplayDialog] = useState(false);
 
-  const [produto , setProduto] = useState("");
-  const [quantidade, setQuantidade] = useState(0)
-  const [preco,setPreco] = useState(0)
+  const [produto, setProduto] = useState(['']);
+  const [quantidade, setQuantidade] = useState(0);
+  const [preco, setPreco] = useState(0);
+
+  const [condicaoPagamento , setCondicaoPagamento] = useState()
+  const [condicoesPagamento, setCondicoesPagamento] = useState([])
+  const [prazoEntrega, setPrazoEntrega] = useState()
 
   const toast = useRef(null);
+  const [deleteProductDialog, setDeleteProductDialog] = useState(false);
 
-  let emptyProduct = {
-    id: null,
-    nome: '',
-    ean: null,
-    preco: 0,
-    quantidade: 0,
-   
-};
+  const [produtoDeleteSelecionado , setProdutoDeleteSelecionado] = useState('')
+  
+  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products"
 
+ 
   const getFornecedores = () => {
     setLoading(true);
 
@@ -107,15 +108,25 @@ export default function AnaliseFornecedor() {
       .get(`/api/entidade/fornecedores/`)
       .then((r) => {
         setFornecedores(r.data);
-
       })
       .catch((error) => {
-        console.log(error);
+         toast.current.show({severity: 'error', summary: 'Erro', detail: {error} });;
       })
       .finally(() => {
         setLoading(false);
       });
   };
+
+  const getCondficaoPagamento = () => {
+
+    setLoading(true)
+
+    api.get("/api/condicaopagamento/todas").then((r) => {
+      setCondicoesPagamento(r.data)
+    }).catch((error) => {
+      toast.show({severity: 'error', summary: 'Erro', detail: error})
+    }).finally(setLoading(false))
+  }
 
   const getLojas = () => {
     setLoading(true);
@@ -125,7 +136,7 @@ export default function AnaliseFornecedor() {
         setLojas(r.data);
       })
       .catch((error) => {
-        console.log(error);
+         toast.current.show({severity: 'error', summary: 'Erro', detail: {error} });;
       })
       .finally(() => {
         setLoading(false);
@@ -134,6 +145,12 @@ export default function AnaliseFornecedor() {
 
   const analisar = () => {
     setLoading(true);
+
+    if(!dataInicialCompra || !dataFinalCompra || !dataInicialVenda || !dataFinalVenda || !filial) {
+
+      toast.current.show({ severity: 'warn' , summary : 'Aviso' ,detail  : 'Preencha todos os campos' })
+      setLoading(false)
+    } else{
 
     api
       .get(
@@ -147,14 +164,17 @@ export default function AnaliseFornecedor() {
       )
       .then((r) => {
         setProdutos(r.data);
-        console.log(r.data);
+      //  console.log(r.data)
+      
       })
       .catch((error) => {
-        console.log(error);
+      
+        toast.current.show({severity: 'error', summary: 'Erro', detail: {error} });
       })
       .finally(() => {
         setLoading(false);
       });
+    }
   };
 
   const total_comprado_template = (rowData) => {
@@ -204,12 +224,10 @@ export default function AnaliseFornecedor() {
     }).format(rowData.preco_medio_venda);
     return (
       <>
-        {" "}
+       
         <font color="green">
-          <h4>Análise de venda do dia </h4>{" "}
-          {moment(dataInicialVenda).format("DD-MM-YY")} até{" "}
-          {moment(dataFinalVenda).format("DD-MM-YY")} <br />
-          <u> Preço médio de venda</u>{" "}
+        
+          <u> Preço médio de venda</u>
         </font>{" "}
         <br />
         <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
@@ -316,7 +334,7 @@ export default function AnaliseFornecedor() {
                 borderRadius: "25px",
                 padding: "5px",
               }}
-              src={`http://www.eanpictures.com.br:9000/api/gtin/${rowData.ean}`}
+              src={`${eanUrl}/${rowData.ean}`}
               onError={(e) =>
                 (e.target.src =
                   "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
@@ -338,10 +356,7 @@ export default function AnaliseFornecedor() {
         rowData.cfop === "2910" ||
         rowData.cfop === "1910" ? (
           <>
-            <Tooltip
-              target=".cfop-button"
-              tooltipOptions={{ className: "purple-tooltip", position: "top" }}
-            />
+            
             <span
               className="cfop-button"
               data-pr-tooltip={rowData.cfop_descricao}
@@ -352,10 +367,7 @@ export default function AnaliseFornecedor() {
           </>
         ) : (
           <>
-            <Tooltip
-              target=".cfop-button"
-              tooltipOptions={{ className: "purple-tooltip", position: "top" }}
-            />
+           
             <span
               className="cfop-button"
               data-pr-tooltip={rowData.cfop_descricao}
@@ -368,119 +380,311 @@ export default function AnaliseFornecedor() {
     );
   };
 
-  
-  const openNew = (produto) => {
-   // setProduto(emptyProduct)
-   setDisplayDialog(true)
-    setProduto({...produto})
-   
+  const confirmDeleteProduct = (product) => {
+    setProduto(product);
+    setDeleteProductDialog(true);
 }
 
+
+
+
+  const openNew = (produto) => {
+    
+    setQuantidade(null)
+    setPreco(produto.custo_unitario)
+    setDisplayDialog(true);
+    setProduto({ ...produto });
+  };
+
   const botaoAddTemplate = (rowdata) => {
-   
-  //  setProduto({...rowdata})
- 
+    //  setProduto({...rowdata})
+
     return (
       <>
-
         <Button
-        style={{ margin: "5px" }}
-        className="p-button-rounded"
+          style={{ margin: "5px" }}
+          className="p-button-rounded"
           label="+"
           icon="pi pi-shopping-bag"
-        //  onClick={() => adicionarProduto(rowdata)}
-         onClick={ () => openNew(rowdata) }
+          //  onClick={() => adicionarProduto(rowdata)}
+          onClick={() => openNew(rowdata)}
         />
-
-       
       </>
     );
   };
 
   const hideDialog = () => {
-   // setSubmitted(false);
+    // setSubmitted(false);
     setDisplayDialog(false);
-}
+  };
 
   const adicionarProduto = (rowData) => {
+    if(!quantidade || !preco  ) {
+       toast.current.show({severity: 'warn', summary: 'Aviso' , detail : 'Infome o preço e quantidade para compra'})
+    } else {
     setPedidos((oldArray) => [
       ...oldArray,
-      { produto: rowData.produto, codigo: rowData.ean },
+      {
+        idproduto : rowData.idproduto,
+        produto: rowData.produto,
+        codigo: rowData.codigo,
+        ean: rowData.ean,
+        unidade_compra: rowData.unidade_compra,
+        embalagem: Intl.NumberFormat("pt-BR",{}).format(rowData.embalagem),
+        quantidade : quantidade,
+        preco : Intl.NumberFormat("pt-BR",{style : 'currency' , currency:'BRL', mode:"decimal" }).format(preco)
+      },
     ]);
-    toast.current.show({severity:'success', summary: 'Sucesso', detail: `${rowData.produto} adicionado a lista de pedidos` , life: 3000});
+    toast.current.show({
+      severity: "success",
+      summary: "Sucesso",
+      detail: `${rowData.produto} adicionado a lista de pedidos`,
+      life: 3000,
+    });
+    hideDialog();
+  }};
+
+  const deletarProduto = (rowData) => {
+        let _products = pedidos.filter(val => val.idproduto !== rowData.idproduto);
+      
+        setPedidos(_products);
+        setDeleteProductDialog(false);
+        
+        toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Produto deletado', life: 3000 });
+}
+
+  const rightContents = () => {
+    return (
+      <>
+        <Button
+          style={{ margin: "5px" }}
+          icon="pi pi-trash"
+          className="p-button p-button-danger p-button-rounded"
+          label="Esvaziar lista"
+          onClick={() => setPedidos([])}
+        />
+        <Button
+          style={{ margin: "5px" }}
+          icon="pi pi-save"
+          className="p-button p-button-success p-button-rounded"
+          label="Gravar Pedido"
+          disabled
+       //   onClick={() => setPedidos(null)}
+        />
+      </>
+    );
   };
+
+  const saldo_estoque_template = (rowdata) => {
+    let saldo = Intl.NumberFormat("pt-BR" , {} ).format(rowdata.saldo_estoque)
+    return (
+       
+      saldo > 0 ? <> <div style={{color:'green' , fontWeight : '800'}}> Estoque <br/>{saldo}</div></> : <> <div style={{color:'red', fontWeight : '800'}}> Estoque <br/>{saldo}</div></>
+    ) 
+    
+  }
+
+  const deleteProductDialogFooter = (
+    <React.Fragment>
+        <Button label="Não" icon="pi pi-times" className="p-button-text" onClick={() => hideDeleteProductDialog()} />
+        <Button label="Sim" icon="pi pi-check" className="p-button-text" onClick={() => deletarProduto()} />
+    </React.Fragment>
+);
+
+const hideDeleteProductDialog = () => {
+  setDeleteProductDialog(false);
+}
+
+const abrirDialogDeleteProduto = (rowdata) => {
+  
+  produtoDeleteSelecionado = rowdata.produto
+  setDeleteProductDialog(true)
+  
+
+ 
+
+}
 
   useEffect(() => {
     getFornecedores();
     getLojas();
+    getCondficaoPagamento()
   }, []);
 
   return (
     <>
       <Header />
 
-      <Dialog header="Adicionar produto a lista de compras" visible={displayDialog} onHide={hideDialog} style={{ width: '50vw' }} >
-      
-      <div style={{display:'flex', flexDirection:'column', alignItems : 'center' , justifyContent : 'center'}}>
-           {produto?.ean}
-           <br/>
-            <img
-              style={{
-                width: "100px",
-                height: "100px",
-                margin: "5px",
-                borderRadius: "25px",
-                padding: "5px",
-              }}
-              src={`http://www.eanpictures.com.br:9000/api/gtin/${produto.ean}`}
-              onError={(e) =>
-                (e.target.src =
-                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
-              }
-              alt={produto?.ean}
-            />
-          </div>
-      
-      <div className="field">
-      <label htmlFor="nome">Produto</label>
-      <InputText id="nome" style={{width : '50%'}} value={produto.produto} readOnly  required autoFocus  />
-      </div>
-      <div className="field">
-      <label htmlFor="quantidade">Quantidade</label>
-      <InputNumber style={{width : '50%'}}  id="quantidade" autoFocus size={50} value={quantidade} onChange={(e) => setQuantidade(e.target.value)}
-        required   />
-      </div>
-      <div className="field">
-      <label htmlFor="preco">Preço</label>
-      <InputNumber style={{width : '50%'}} mode="decimal" prefix="R$ " locale="pt-BR" minFractionDigits={2} maxFractionDigits={2}
-       id="preco" size={50} value={preco} onChange={(e) => setPreco(e.target.value)}
-        required   />
-      </div>
-      <div>
-        <Button icon="pi pi-plus" onClick={() => adicionarProduto(produto)} />
-      </div>
+      <Dialog
+        header="Adicionar produto a lista de compras"
+        modal={false}
+        visible={displayDialog}
+        onHide={hideDialog}
+        style={{ width: "100%" ,height : '60%' }}
+        maximizable 
+        resizable
+        
+        position="top-right"
+      >
+       <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          flexWrap : 'wrap',
+          justifyContent: "space-around",
+        }}
+       >
+       <div >
+         
+          
+          {produto?.ean ? produto.ean : produto.codigo} 
+          <br />
+          <img
+            style={{
+              width: "100px",
+              height: "100px",
+              margin: "5px",
+              borderRadius: "25px",
+              padding: "5px",
+            }}
+            src={`${eanUrl}/${produto.ean}`}
+            onError={(e) =>
+              (e.target.src =
+                "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+            }
+            alt={produto?.ean}
+          />
+        </div>
+
+        <div >
+          <label style={{ fontWeight: "800", width : '100%' }} htmlFor="nome">
+            Produto
+          </label>
+          <h1 style={{fontSize : '25px', width : '100%'}}>{produto.produto}</h1>
+        </div>
+        <br/>
+        <div  style={{
+             
+              margin: "5px",
+              borderRadius: "25px",
+              padding: "5px",
+            }}>
+          <label style={{ fontWeight: "800" , margin:'10px' }} htmlFor="quantidade">
+            Quantidade
+          </label>
+          <InputNumber
+            style={{ width: "100%", margin:'10px' }}
+            id="quantidade"
+            autoFocus
+          
+            value={quantidade}
+            onChange={(e) => setQuantidade(e.value)}
+            required
+          />
+        </div>
+
+        <div  style={{
+            
+              margin: "5px",
+              borderRadius: "25px",
+              padding: "5px",
+            }} >
+          <label style={{ fontWeight: "800" }} htmlFor="embalagem">
+            Embalagem
+          </label>
+          <h4>
+          {produto.unidade_compra} ( { Intl.NumberFormat("pt-BR", {}).format(produto.embalagem)} )  
+          </h4>
+        </div>
+
+
+        <div >
+          <label style={{ fontWeight: "800", margin:'10px' }} htmlFor="preco">
+            Preço
+          </label>
+          <InputNumber
+            style={{ width: "100%", margin:'10px' }}
+            mode="decimal"
+            prefix="R$ "
+            locale="pt-BR"
+            minFractionDigits={2}
+            maxFractionDigits={2}
+            id="preco"
+          
+            value={preco}
+            onChange={(e) => setPreco(e.value)}
+            required
+          />
+        
+        </div>
+        <div >
+          <Button style={{marginTop:'20px'}} className="p-button p-button-success p-button-rounded" label="Adicionar" icon="pi pi-plus" onClick={() => adicionarProduto(produto)} />
+        </div>
+        </div> 
       </Dialog>
 
       <Button
-          
-          icon="pi pi-shopping-cart"
-          onClick={() => setVisibleLeft(true)}
-          className="botao-add-colado mr-2"
-        />
+        icon="pi pi-shopping-cart"
+        onClick={() => setVisibleLeft(true)}
+        className="botao-add-colado mr-2"
+      />
 
       <Sidebar
-        style={{ width: "75%" }}
+        style={{ width: "100%" }}
         visible={visibleLeft}
         onHide={() => setVisibleLeft(false)}
       >
         <div className="lista-itens">
           <h4 style={{ color: "#FFF", margin: "15px" }}>Pedido de compra</h4>
-          <Button style={{margin:'5px'}} label="Limpar lista" onClick={() => setPedidos([""])} />
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignContent: "center",
+              justifyContent: "center",
+              color: "#FFF",
+            }}
+          >
+            <h4> Pedido para a loja</h4>
+            <h1> {filial?.nome}</h1> 
+            <h4> Fornecedor </h4> 
+            <h1> {fornecedor?.nome} </h1>
+            Prazo de entrega
+            <Calendar showIcon showButtonBar locale="pt-BR" dateFormat="dd/mm/yy" style={{width : '100%',  margin:"10px 0px"}}  value={prazoEntrega} onChange={(e) => setPrazoEntrega(e.value)} required />
+            Condição de Pagamento (dias)
+
+            <Dropdown filter value={condicaoPagamento} optionValue="prazos" options={condicoesPagamento} optionLabel="descricao"  onChange={(e) => setCondicaoPagamento(e.value)} placeholder="Selecione uma condição de pagamento"/>
+
+           
+            
+          </div>
+
+          <Toolbar style={{ margin: "20px" }} right={rightContents} />
+
           <div style={{ width: "100%" }}>
-            <DataTable value={pedidos}>
+            <DataTable
+              style={{
+                padding: "15px",
+                backgroundColor: "#FFF",
+                borderRadius: "25px",
+                border: "1px solid #FFF",
+              }}
+              value={pedidos}
+            >
               <Column field={EanOrCodigo} header="Código/Ean"></Column>
               <Column field="produto" header="Produto"></Column>
               <Column field="quantidade" header="Quantidade"></Column>
+              <Column field="unidade_compra" header="Embalagem"></Column>
+              <Column field="embalagem" header="Qtde(dentro da embalagem)"></Column>
+             
+              <Column field="preco" header="Preço"></Column>
+
+              <Column
+              //  body={() => abrirDialogDeleteProduto()}
+              
+              ></Column>
             </DataTable>
           </div>
         </div>
@@ -501,6 +705,7 @@ export default function AnaliseFornecedor() {
           <div className="fornecedor-input">
             <h4>Selecione um fornecedor para análise</h4>
             <Dropdown
+             required
               style={{ marginTop: "10px" }}
               placeholder="Selecione um fornecedor"
               value={fornecedor}
@@ -532,6 +737,9 @@ export default function AnaliseFornecedor() {
             </h4>
 
             <Calendar
+            showOnFocus={false}
+            showButtonBar
+             showIcon
               dateFormat="dd/mm/yy"
               locale="pt-BR"
               style={{ marginTop: "10px" }}
@@ -546,6 +754,9 @@ export default function AnaliseFornecedor() {
             </h4>
 
             <Calendar
+             showButtonBar
+            showOnFocus={false}
+            showIcon
               dateFormat="dd/mm/yy"
               locale="pt-BR"
               style={{ marginTop: "10px" }}
@@ -561,6 +772,10 @@ export default function AnaliseFornecedor() {
             </h4>
 
             <Calendar
+             showButtonBar
+             
+            showOnFocus={false}
+            showIcon
               dateFormat="dd/mm/yy"
               locale="pt-BR"
               style={{ marginTop: "10px" }}
@@ -575,6 +790,9 @@ export default function AnaliseFornecedor() {
             </h4>
 
             <Calendar
+             showButtonBar
+             showIcon
+             showOnFocus={false}
               dateFormat="dd/mm/yy"
               locale="pt-BR"
               style={{ marginTop: "10px" }}
@@ -594,7 +812,7 @@ export default function AnaliseFornecedor() {
           />
         </div>
       </div>
-      <Toast ref={toast} />
+      <Toast ref={toast} position="bottom-center" />
       <div className="tabela">
         <DataTable
           selectionMode="single"
@@ -629,6 +847,12 @@ export default function AnaliseFornecedor() {
           <Column body={botaoAddTemplate}></Column>
 
           <Column
+            field="saldo_estoque"
+            header="Saldo em Estoque"
+            body={saldo_estoque_template}
+          ></Column>
+
+          <Column
             field="rating"
             header="Classificação"
             body={giroTemplate}
@@ -659,6 +883,14 @@ export default function AnaliseFornecedor() {
           <Column field={total_template} header="Total vendido"></Column>
         </DataTable>
       </div>
+
+      <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirmação" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+                <div className="confirmation-content">
+                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
+                    {produto && <span>Deseja deletar <b>{produtoDeleteSelecionado.produto}</b>?</span>}
+                </div>
+            </Dialog>
+
     </>
   );
 }

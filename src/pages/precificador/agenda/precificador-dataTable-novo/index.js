@@ -15,8 +15,11 @@ import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 import { Tag } from "primereact/tag";
-import api from "../../../../services/axios";
+import { Dialog } from "primereact/dialog";
+import { ScrollTop } from "primereact/scrolltop";
+import { ScrollPanel } from "primereact/scrollpanel";
 
+import api from "../../../../services/axios";
 
 import moment from "moment";
 import "moment/locale/pt-br";
@@ -36,6 +39,12 @@ const PrecificadorAgenda = () => {
   const [agendar, setAgendar] = useState(new Date());
   const [replicarPreco, setReplicarPreco] = useState(0);
   const [expandedRows, setExpandedRows] = useState([]);
+  const [exibirDialogPesquisa, setExibirDialogPesquisa] = useState(false);
+  const [exibirdialogSugestao, setExibirDialogSugestao] = useState(false);
+  const [produtoEmExibicaoSugestaoDialog, setprodutoEmExibicaoSugestaoDialog] =
+    useState("");
+  const [novoPercentualMarkupMinimo, setNovoPercentualMarkupMinimo] =
+    useState(0);
 
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -45,13 +54,14 @@ const PrecificadorAgenda = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products"
-   
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 
   useEffect(() => {
     pegarTokenLocalStorage();
     usarTabelaFormacaoPreecoProduto();
-    
+
     // eslint-disable-next-line
   }, []);
 
@@ -100,9 +110,42 @@ const PrecificadorAgenda = () => {
     clear: " Limpar ",
   });
 
+  const atualizarmarkupminimo = () => {
+    setLoading(true);
+
+    api
+      .put(
+        `/api/produto/atualizarmarkupminimo/${produtoEmExibicaoSugestaoDialog.idproduto}/${produtoEmExibicaoSugestaoDialog.idfamilia}/${novoPercentualMarkupMinimo}`
+      )
+      .then((r) => {})
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: ` Erro ao atualizar  ... Erro : ${error}  `,
+        });
+      })
+      .finally(() => {
+        setExibirDialogSugestao(false);
+        setLoading(false);
+        setNovoPercentualMarkupMinimo(0);
+        buscarProdutos();
+      });
+  };
+
+  const abrirDialogSugestao = (rowData) => {
+    setExibirDialogSugestao(true);
+    setprodutoEmExibicaoSugestaoDialog(rowData);
+  };
+
   const pegarTokenLocalStorage = () => {
     let token = localStorage.getItem("access_token");
     let a = JSON.parse(token);
+
+    setUsuarioLogado(a.nome);
+
+    
+    
     var headers = {
       Authorization: "Bearer " + a.access_token,
       "Content-Type": "application/x-www-form-urlencoded",
@@ -148,20 +191,23 @@ const PrecificadorAgenda = () => {
         {rsmargem > 0 ? (
           <>
             <div style={{ color: "green" }}>
-            <i className="pi pi-calendar" style={{'fontSize': '1em'}}></i> <br/>
+              <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+              <br />
               {rsmargemformatada},<br />
               <b>Lucro de </b>
-              {margemformatada} <br/>
+              {margemformatada} <br />
               no preço agendado
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
-            <i className="pi pi-calendar" style={{'fontSize': '1em'}}></i> <br/>
-              {rsmargemformatada}<br />
+              <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+              <br />
+              {rsmargemformatada}
+              <br />
               <b>Prejuizo de </b>
-              {margemformatada} <br/>
+              {margemformatada} <br />
               no preço agendado
             </div>
           </>
@@ -195,20 +241,22 @@ const PrecificadorAgenda = () => {
         {rsmargem > 0 ? (
           <>
             <div style={{ color: "green" }}>
-            <i className="pi pi-tag" style={{'fontSize': '1em'}}></i>
-              <br/>
-              {rsmargemformatada}<br />
-              <b>Lucro </b>de {margemformatada} <br/>
+              <i className="pi pi-tag" style={{ fontSize: "1em" }}></i>
+              <br />
+              {rsmargemformatada}
+              <br />
+              <b>Lucro </b>de {margemformatada} <br />
               no preço atual
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
-            <i className="pi pi-tag" style={{'fontSize': '1em'}}></i>
-              <br/>
-              {rsmargemformatada}<br />
-              <b>Prejuizo </b>de {margemformatada} <br/>
+              <i className="pi pi-tag" style={{ fontSize: "1em" }}></i>
+              <br />
+              {rsmargemformatada}
+              <br />
+              <b>Prejuizo </b>de {margemformatada} <br />
               no preço atual
             </div>
           </>
@@ -218,11 +266,16 @@ const PrecificadorAgenda = () => {
   };
 
   const precoCustoTemplate = (rowData) => {
-   let custo =  Intl.NumberFormat("pt-BR", {
+    let custo = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(rowData.precocusto);
-    return <> <font color="red" >Custo de {custo } </font> </>
+    return (
+      <>
+        {" "}
+        <font color="red">Custo de {custo} </font>{" "}
+      </>
+    );
   };
 
   const precoAgendoTemplate = (rowData) => {
@@ -245,26 +298,23 @@ const PrecificadorAgenda = () => {
       <>
         {rowData.precoagendado > rowData.precocusto ? (
           <>
-            <div style={{ color: "green" }}> 
-            <i className="pi pi-calendar" style={{'fontSize': '1em'}}></i> <br/>
+            <div style={{ color: "green" }}>
+              <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+              <br />
               {markupFormatado} de markup <br />
-            <b>  Agendado a </b> <br />
-             <font size="5"> {precoAgendaFormatado} </font>
-              
+              <b> Agendado a </b> <br />
+              <font size="5"> {precoAgendaFormatado} </font>
             </div>
           </>
         ) : (
           <>
-          
             <div style={{ color: "red" }}>
-            
-            <i className="pi pi-calendar" style={{'fontSize': '1em'}}></i> <br/>
-              
-              {markupFormatado}  de markup <br />
-             <b> Agendado </b> a <br />
-             <font size="5"> {precoAgendaFormatado} </font>
+              <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+              <br />
+              {markupFormatado} de markup <br />
+              <b> Agendado </b> a <br />
+              <font size="5"> {precoAgendaFormatado} </font>
             </div>
-          
           </>
         )}
       </>
@@ -348,17 +398,28 @@ const PrecificadorAgenda = () => {
         {rowData.precoAtual > rowData.precocusto ? (
           <>
             <div style={{ color: "green" }}>
-            <i className="pi pi-tag" style={{'fontSize': '1em'}}></i>
-
+              <i className="pi pi-tag" style={{ fontSize: "1em" }}></i>
               <div> {markupFormatado} de markup </div>
-            <b>  Vendendo atualmente </b> a <div>  <font style={{marginTop: '5px'}} size="5">{precoAtualFormatado}</font></div>
+              <b> Vendendo atualmente </b> a{" "}
+              <div>
+                {" "}
+                <font style={{ marginTop: "5px" }} size="5">
+                  {precoAtualFormatado}
+                </font>
+              </div>
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
               <div> {markupFormatado} </div>
-             <b> Vendendo atualmente </b> a <div>  <font style={{marginTop: '5px'}} size="5">{precoAtualFormatado}</font></div>
+              <b> Vendendo atualmente </b> a{" "}
+              <div>
+                {" "}
+                <font style={{ marginTop: "5px" }} size="5">
+                  {precoAtualFormatado}
+                </font>
+              </div>
             </div>
           </>
         )}
@@ -390,11 +451,19 @@ const PrecificadorAgenda = () => {
           <>
             <div style={{ color: "green" }}>
               {mkf} de markup <br />
-            <b> <i> Sugestão de venda </i> </b> a <br />
-            {sf} 
-                
-
+              <b>
+                {" "}
+                <i> Sugestão de venda </i>{" "}
+              </b>{" "}
+              a <br />
+              {sf}
             </div>
+            <Button
+              onClick={() => abrirDialogSugestao(rowData)}
+              style={{ margin: "1rem" }}
+              icon="pi pi-table"
+              className="p-button p-button-sm p-button-rounded"
+            />
           </>
         ) : (
           <>
@@ -403,6 +472,12 @@ const PrecificadorAgenda = () => {
               <del> Sugestão de venda a </del> <br />
               {sf}
             </div>
+            <Button
+              onClick={() => abrirDialogSugestao(rowData)}
+              style={{ margin: "1rem" }}
+              icon="pi pi-table"
+              className="p-button p-button-sm p-button-rounded"
+            />
           </>
         )}
       </>
@@ -412,9 +487,9 @@ const PrecificadorAgenda = () => {
   const priceEditor = (options) => {
     return (
       <InputNumber
+        autoFocus
         prefix="R$ "
-       placeholder="Preço agendado"
-      
+        placeholder="Preço agendado"
         value={options.value}
         onValueChange={(e) => options.editorCallback(e.value)}
         //   mode="currency"
@@ -455,18 +530,23 @@ const PrecificadorAgenda = () => {
       intFamilia = parseInt(_products2[index].idfamilia);
     }
 
+    let usuarioFormatado = usuarioLogado.replace("/", "" )
+                           usuarioFormatado.replace(" \ " , " " )
+
+  
+
     await api
       .put(
         `/api_precificacao/produtos/precificar/agenda/${
           _products2[index].idproduto
         }/${intFamilia}/${_products2[index].idnotafiscal}/${
           _products2[index].precoagendado
-        }/${moment(agendar).format("YYYY-MM-DD")}/`,
+        }/${moment(agendar).format("YYYY-MM-DD")}/${usuarioFormatado}`,
         { headers: headers }
       )
       .then((response) => {
         buscarProdutos();
-        //  console.log(response);
+         
         toast.current.show({
           severity: "success",
           summary: "Sucesso",
@@ -493,6 +573,25 @@ const PrecificadorAgenda = () => {
   const renderHeader = () => {
     return (
       <>
+        <Dialog
+          header="Pesquisa Global"
+          visible={exibirDialogPesquisa}
+          position="bottom"
+          modal={false}
+          onHide={() => setExibirDialogPesquisa(false)}
+        >
+          <div className="pesquisa-rapida">
+            <span className="p-input-icon-left">
+              <i className="pi pi-search" />
+              <InputText
+                value={globalFilterValue2}
+                onChange={onGlobalFilterChange2}
+                placeholder="Produtos, Fornecedores, Notas"
+              />
+            </span>
+          </div>
+        </Dialog>
+
         <div className="pesquisa-rapida">
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
@@ -511,11 +610,16 @@ const PrecificadorAgenda = () => {
     if (rowData.ean) {
       return (
         <>
-          
           <div>{rowData.ean} </div>
           <div>
             <img
-              style={{ width: "100px" ,height : '100px', margin: "5px" , borderRadius : '25px', padding : '5px' }}
+              style={{
+                width: "100px",
+                height: "100px",
+                margin: "5px",
+                borderRadius: "25px",
+                padding: "5px",
+              }}
               src={`${eanUrl}/${rowData.ean}`}
               onError={(e) =>
                 (e.target.src =
@@ -573,6 +677,7 @@ const PrecificadorAgenda = () => {
             style={{ width: "1rem", margin: "5px" }}
             icon="pi pi-users"
           />
+          <br />
         </React.Fragment>
       );
     } else {
@@ -580,6 +685,7 @@ const PrecificadorAgenda = () => {
         <React.Fragment>
           {" "}
           <h5>{rowData.descricao}</h5>
+          <br />
         </React.Fragment>
       );
     }
@@ -657,6 +763,7 @@ const PrecificadorAgenda = () => {
       }
     }
   }
+
   const botaovoltar = (
     <React.Fragment>
       <Button
@@ -674,8 +781,16 @@ const PrecificadorAgenda = () => {
         onClick={() => buscarProdutos()}
         tooltip="Atualizar"
         tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-refresh"
-        className=" p-button-rounded p-button-success p-button-sm"
+        icon={loading ? "pi pi-spin pi-spinner" : "pi pi-refresh"}
+        className=" botao-flutuante-atualizar p-button-rounded p-button-success p-button-sm"
+      />
+
+      <Button
+        onClick={() => setExibirDialogPesquisa(true)}
+        tooltip="Abrir pesquisa rápida"
+        tooltipOptions={{ position: "bottom" }}
+        icon="pi pi-search"
+        className="botao-flutuante-pesquisar p-button-rounded p-button-primary p-button-sm"
       />
     </React.Fragment>
   );
@@ -728,12 +843,9 @@ const PrecificadorAgenda = () => {
     }
   };
 
-
-
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
-      
 
       {produtos.length < 1 ? (
         <>
@@ -743,7 +855,7 @@ const PrecificadorAgenda = () => {
                 <h5>Período</h5>
               </div>
               <Calendar
-               selectOtherMonths	
+                selectOtherMonths
                 required
                 showIcon
                 placeholder="Data inicial para pesquisa de notas fiscais"
@@ -759,12 +871,12 @@ const PrecificadorAgenda = () => {
               />
             </div>
             <div className="form-precificador-input">
-              <div >
+              <div>
                 <h5>até</h5>
               </div>
 
               <Calendar
-                selectOtherMonths	
+                selectOtherMonths
                 required
                 showIcon
                 placeholder="Data final para pesquisa de notas fiscais"
@@ -776,7 +888,7 @@ const PrecificadorAgenda = () => {
                 locale="pt-BR"
                 showTime
                 showSeconds
-                position = "bottom"
+                position="bottom"
               />
             </div>
 
@@ -802,76 +914,206 @@ const PrecificadorAgenda = () => {
             left={botaovoltar}
             right={botaoatualizar}
           />
-         
-      
-          
-        
-         
+
           <div className="datatable-templating-demo p-fluid">
             <Tooltip target=".export-buttons>button" position="bottom" />
-             
-             
-          
-                <DataTable
-                  style={{
-                    height: "99vh",
-                    width: "100%",
-                  }}
-                  breakpoint="968px"
-                  loading={loading}
-                  //     stripedRows
-                  value={produtos}
-                     selectionMode="single"
-                  //   reorderableColumns
-                  editMode="row"
-                  dataKey="idproduto"
-                  onRowEditComplete={onRowEditComplete}
-                 
-                  //   scrollDirection="vertical"
-                  //   scrollable
-                  //   scrollHeight="flex"
-                  globalFilterFields={[
-                    "descricao",
-                    "ean",
-                    "numeronotafiscal",
-                    "razaosocial",
-                  ]}
-                  filters={filters2}
-                  size="normal"
-                  responsiveLayout="stack"
-                  emptyMessage="Nenhum produto encontrado para precificação"
-                  showGridlines
-                  header={headerDataTable}
-                  rowGroupMode="subheader"
-                  groupRowsBy={agrupamento}
-                  //  sortOrder={1}
-                  rowGroupHeaderTemplate={headerTemplate}
-                  //       resizableColumns
-                  // columnResizeMode="expand"
-                  expandableRowGroups
-                  expandedRows={expandedRows}
-                  onRowToggle={(e) => setExpandedRows(e.data)}
-                >
-                  <Column
-                    header={<> Código </>}
-                    field={EanOrCodigo}
-                    style={{ textAlign: "center" }}
-                  ></Column>
+            <ScrollPanel
+              style={{
+                height: "99vh",
+                width: "100%",
+              }}
+            >
+              <DataTable
+                style={{
+                  height: "99vh",
+                  width: "100%",
+                }}
+                breakpoint="968px"
+                loading={loading}
+                //     stripedRows
+                value={produtos}
+                selectionMode="single"
+                //   reorderableColumns
+                editMode="row"
+                dataKey="idproduto"
+                onRowEditComplete={onRowEditComplete}
+                //   scrollDirection="vertical"
+                //   scrollable
+                //   scrollHeight="flex"
+                globalFilterFields={[
+                  "descricao",
+                  "ean",
+                  "numeronotafiscal",
+                  "razaosocial",
+                ]}
+                filters={filters2}
+                size="normal"
+                responsiveLayout="stack"
+                emptyMessage="Nenhum produto encontrado para precificação"
+                showGridlines
+                header={headerDataTable}
+                rowGroupMode="subheader"
+                groupRowsBy={agrupamento}
+                //  sortOrder={1}
+                rowGroupHeaderTemplate={headerTemplate}
+                //       resizableColumns
+                // columnResizeMode="expand"
+                expandableRowGroups
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+              >
+                <Column
+                  header={<> Código </>}
+                  field={EanOrCodigo}
+                  style={{ textAlign: "center" }}
+                ></Column>
 
-                  <Column
-                    field="descricao"
-                    header="Produto"
-                    body={familiaIcone}
-                    bodyStyle={{ textAlign: "center" }}
-                  ></Column>
-                  <Column
-                    field={precoCustoTemplate}
-                    header="Custo"
-                    body={precoCustoTemplate}
-                    bodyStyle={{ textAlign: "center" }}
-                  ></Column>
+                <Column
+                  field="descricao"
+                  sortable
+                  header="Produto"
+                  body={familiaIcone}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
+                <Column
+                  field={precoCustoTemplate}
+                  header="Custo"
+                  body={precoCustoTemplate}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
 
-                  <Column
+                <Column
+                  field={margem}
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Preço Agendado <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
+                    </>
+                  }
+                  body={margem}
+                ></Column>
+
+                <Column
+                  style={{ fontSize: "16px" }}
+                  field={sugestaoVenda}
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Sugestão <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  body={sugestaoVenda}
+                ></Column>
+
+                <Column
+                  field={precoAtualTemplate}
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Preço Atual <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  style={{}}
+                  body={precoAtualTemplate}
+                ></Column>
+
+                <Column
+                  field="precoagendado"
+                  header={
+                    <>
+                      {" "}
+                      <div>
+                        {" "}
+                        Preço Agendado <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  style={{}}
+                  editor={(options) => priceEditor(options)}
+                  body={precoAgendoTemplate}
+                ></Column>
+
+                <Column field={status} style={{ textAlign: "center" }}></Column>
+
+                <Column
+                  header="Atualizar"
+                  rowEditor
+                  headerStyle={{ width: "10%", minWidth: "8rem" }}
+                  bodyStyle={{ textAlign: "center" }}
+                ></Column>
+              </DataTable>
+              <ScrollTop
+                tooltip="Voltar ao topo"
+                className="botao-flutuante"
+                target="parent"
+                icon="pi pi-arrow-up"
+              />
+            </ScrollPanel>
+          </div>
+
+          <Dialog
+            modal={false}
+            position="bottom"
+            visible={exibirdialogSugestao}
+            onHide={() => setExibirDialogSugestao(false)}
+          >
+            <div className="dialog-sugestao">
+              <div>
+                <h4>{produtoEmExibicaoSugestaoDialog.descricao}</h4>
+              </div>
+
+              <div>Percentual de markup mínimo atual</div>
+
+              <h4> {produtoEmExibicaoSugestaoDialog.percentualmarkup} % </h4>
+
+              <div>
+                <b>Novo percentual de markup mínimo </b>
+              </div>
+
+              <div>
+                <InputNumber
+                  value={novoPercentualMarkupMinimo}
+                  mode="decimal"
+                  minFractionDigits={2}
+                  maxFracionDigits={2}
+                  onChange={(e) => setNovoPercentualMarkupMinimo(e.value)}
+                  size={2}
+                  autoFocus
+                  style={{ margin: "1rem" }}
+                />{" "}
+                %
+                <Button
+                  onClick={() => atualizarmarkupminimo()}
+                  style={{ margin: "1rem" }}
+                  label="Atualizar"
+                  className="p-button p-buttun-sucess p-button-rounded"
+                />
+              </div>
+            </div>
+          </Dialog>
+        </>
+      )}
+    </>
+  );
+};
+
+export default PrecificadorAgenda;
+
+/* COLUNA DE LUCRO NO PRECO ATUAL
+  <Column
                     field={margemAtual}
                     header={
                       <>
@@ -885,94 +1127,4 @@ const PrecificadorAgenda = () => {
                     }
                     body={margemAtual}
                   ></Column>
-
-                  <Column
-                    field={margem}
-                    header={
-                      <>
-                        {" "}
-                        <div>
-                          {" "}
-                          Preço Agendado <hr />{" "}
-                        </div>{" "}
-                        <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
-                      </>
-                    }
-                    body={margem}
-                  ></Column>
-
-                  <Column
-                    style={{  fontSize: "16px" }}
-                    field={sugestaoVenda}
-                    header={
-                      <>
-                        {" "}
-                        <div>
-                          {" "}
-                          Sugestão <hr />{" "}
-                        </div>{" "}
-                        <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                      </>
-                    }
-                    body={sugestaoVenda}
-                  ></Column>
-
-                  <Column
-                    field={precoAtualTemplate}
-                    header={
-                      <>
-                        {" "}
-                        <div>
-                          {" "}
-                          Preço Atual <hr />{" "}
-                        </div>{" "}
-                        <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                      </>
-                    }
-                    style={{  }}
-                    body={precoAtualTemplate}
-                  ></Column>
-
-                  <Column
-                    field="precoagendado"
-                    header={
-                      <>
-                        {" "}
-                        <div>
-                          {" "}
-                          Preço Agendado <hr />{" "}
-                        </div>{" "}
-                        <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                      </>
-                    }
-                    style={{ }}
-                    editor={(options) => priceEditor(options)}
-                    body={precoAgendoTemplate}
-                  ></Column>
-
-                  <Column
-                    field={status}
-                  
-                    style={{ textAlign : 'center' }}
-                  
-                  ></Column>
-
-                  <Column
-                    header="Atualizar"
-                    rowEditor
-                    headerStyle={{ width: "10%", minWidth: "8rem" }}
-                    bodyStyle={{ textAlign: "center" }}
-                  ></Column>
-                </DataTable>
-
-                
-          
-          </div>
-        
-        </>
-      )}
-    </>
-  );
-};
-
-export default PrecificadorAgenda;
+  */

@@ -14,28 +14,6 @@
 
 
 
-/* Works on Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color:  #FFF;
-}
-
-/* Works on Chrome, Edge, and Safari */
-*::-webkit-scrollbar {
-  width: 5px;
-}
-
-*::-webkit-scrollbar-track {
-  background: #FFF;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: #F5F5F5;
-  border-radius: 20px;
-  border: 3px solid #F5F5F5;
-}
-
-
 
 .fullscreen {
   position: fixed;

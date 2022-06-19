@@ -99,6 +99,7 @@ export default function AnaliseFornecedor() {
   const [produtoDeleteSelecionado , setProdutoDeleteSelecionado] = useState('')
   
   let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products"
+  let totalVenda = 0
 
  
   const getFornecedores = () => {
@@ -189,7 +190,7 @@ export default function AnaliseFornecedor() {
           {" "}
           <u> Total comprado </u> <br />
         </font>
-        <font style={{ fontSize: "20px", color: "red", fontWeight: "800" }}>
+        <font style={{ fontSize: "15px", color: "red", fontWeight: "800" }}>
           {" "}
           {total}{" "}
         </font>
@@ -209,7 +210,7 @@ export default function AnaliseFornecedor() {
           {" "}
           <u>Custo unitário </u> <br />
         </font>{" "}
-        <font style={{ fontSize: "20px", color: "red", fontWeight: "800" }}>
+        <font style={{ fontSize: "15px", color: "red", fontWeight: "800" }}>
           {" "}
           {valor_unitario}
         </font>{" "}
@@ -217,25 +218,7 @@ export default function AnaliseFornecedor() {
     );
   };
 
-  const preco_media_venda_template = (rowData) => {
-    let preco_medio_venda = Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(rowData.preco_medio_venda);
-    return (
-      <>
-       
-        <font color="green">
-        
-          <u> Preço médio de venda</u>
-        </font>{" "}
-        <br />
-        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
-          {preco_medio_venda}{" "}
-        </font>{" "}
-      </>
-    );
-  };
+  
 
   const quantidade_comprada_template = (rowData) => {
     let embalagem = Intl.NumberFormat("pt-BR", {
@@ -248,50 +231,16 @@ export default function AnaliseFornecedor() {
           {" "}
           <u>Comprou </u> <br />
         </font>
-        <font color="red" style={{ fontSize: "25px", fontWeight: "800" }}>
+        <font color="red" style={{ fontSize: "15px", fontWeight: "800" }}>
           {rowData.quantidade_comprada} {rowData.unidade_compra} ({embalagem})
         </font>
       </>
     );
   };
 
-  const quantidade_vendida_template = (rowData) => {
-    let quantidade_vendida = Intl.NumberFormat("pt-BR", {
-      style: "decimal",
-    }).format(rowData.quantidade_vendida);
-    return (
-      <>
-        {" "}
-        <font color="green">
-          {" "}
-          <u>Vendeu </u> <br />
-        </font>
-        <font color="green" style={{ fontSize: "25px", fontWeight: "800" }}>
-          {rowData.quantidade_vendida ? quantidade_vendida : 0}{" "}
-          {rowData.unidade_venda}
-        </font>
-      </>
-    );
-  };
+  
 
-  const total_template = (rowData) => {
-    let total = rowData.quantidade_vendida * rowData.preco_medio_venda;
-    let totalF = Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(total);
-    return (
-      <>
-        <font color="green">
-          <u> Total vendido </u> <br />
-        </font>
-        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
-          {" "}
-          {totalF}{" "}
-        </font>
-      </>
-    );
-  };
+  
 
   const data_inclusao_template = (rowData) => {
     return (
@@ -394,6 +343,7 @@ export default function AnaliseFornecedor() {
     setPreco(produto.custo_unitario)
     setDisplayDialog(true);
     setProduto({ ...produto });
+    
   };
 
   const botaoAddTemplate = (rowdata) => {
@@ -429,6 +379,8 @@ export default function AnaliseFornecedor() {
         produto: rowData.produto,
         codigo: rowData.codigo,
         ean: rowData.ean,
+        quantidade_venda : rowData.quantidade_vendida,
+        
         unidade_compra: rowData.unidade_compra,
         embalagem: Intl.NumberFormat("pt-BR",{}).format(rowData.embalagem),
         quantidade : quantidade,
@@ -511,8 +463,11 @@ const abrirDialogDeleteProduto = (rowdata) => {
     getCondficaoPagamento()
   }, []);
 
+
   return (
+        
     <>
+   
       <Header />
 
       <Dialog
@@ -561,7 +516,7 @@ const abrirDialogDeleteProduto = (rowdata) => {
           <label style={{ fontWeight: "800", width : '100%' }} htmlFor="nome">
             Produto
           </label>
-          <h1 style={{fontSize : '25px', width : '100%'}}>{produto.produto}</h1>
+          <h1 style={{fontSize : '15px', width : '100%'}}>{produto.produto}</h1>
         </div>
         <br/>
         <div  style={{
@@ -571,7 +526,7 @@ const abrirDialogDeleteProduto = (rowdata) => {
               padding: "5px",
             }}>
           <label style={{ fontWeight: "800" , margin:'10px' }} htmlFor="quantidade">
-            Quantidade
+            Quantidade para compra
           </label>
           <InputNumber
             style={{ width: "100%", margin:'10px' }}
@@ -601,7 +556,7 @@ const abrirDialogDeleteProduto = (rowdata) => {
 
         <div >
           <label style={{ fontWeight: "800", margin:'10px' }} htmlFor="preco">
-            Preço
+            Preço para compra
           </label>
           <InputNumber
             style={{ width: "100%", margin:'10px' }}
@@ -618,6 +573,39 @@ const abrirDialogDeleteProduto = (rowdata) => {
           />
         
         </div>
+        
+        <div>
+          <h4>Quantidade vendida</h4>
+         { 
+          Intl.NumberFormat("pt-BR", {
+            style: "decimal",
+         
+          }).format(
+         
+         produto.quantidade_vendida) } {produto.unidade_venda}
+        </div>
+
+        <div>
+          <h4>Preço de venda médio</h4>
+          {
+           Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(
+          produto.preco_medio_venda)}
+        </div>
+
+        <div>
+          
+          <h4>Total da venda</h4>
+          {  
+              Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(produto.preco_medio_venda * produto.quantidade_vendida)
+          }
+        </div>
+        
         <div >
           <Button style={{marginTop:'20px'}} className="p-button p-button-success p-button-rounded" label="Adicionar" icon="pi pi-plus" onClick={() => adicionarProduto(produto)} />
         </div>
@@ -873,14 +861,6 @@ const abrirDialogDeleteProduto = (rowdata) => {
             header="Total comprado"
           ></Column>
 
-          <Column field={preco_media_venda_template}></Column>
-
-          <Column
-            field={quantidade_vendida_template}
-            header="Qtde venda"
-          ></Column>
-
-          <Column field={total_template} header="Total vendido"></Column>
         </DataTable>
       </div>
 

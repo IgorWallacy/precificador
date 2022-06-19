@@ -28,7 +28,7 @@
 .headerTemplateDataTable {
     display: flex;
     flex : 1;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
@@ -49,7 +49,26 @@
 
 }
 
-
+.botao-flutuante {
+    position: fixed;
+    z-index: 4;
+    bottom: 7px;
+    right: 130px;
+    margin: 0px 20px
+}
+.botao-flutuante-atualizar {
+    position: fixed;
+    z-index: 4;
+    bottom: 7px;
+    right: 30px;
+   
+}
+.botao-flutuante-pesquisar {
+    position: fixed;
+    z-index: 4;
+    bottom: 7px;
+    right: 90px;
+}
 
 
 
@@ -64,6 +83,14 @@
     margin: 20px;
 }
 
+.dialog-sugestao{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+   
 
+}
 
 

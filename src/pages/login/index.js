@@ -34,7 +34,7 @@ const Login = () => {
 
   var params = {
     client: "angular",
-    username: usuario,
+    username: usuario?.toUpperCase(),
     password: senha,
     grant_type: "password",
   };

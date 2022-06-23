@@ -31,10 +31,11 @@
 .container-flex {
   display: flex;
   justify-content: center;
-   align-content: center;
+  align-content: center;
   flex-direction: column;
   border: 1px solid #FFF;
-  border-radius: 50px;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px ;
   flex-wrap: wrap;
   margin-top: 50px;
 

@@ -8,7 +8,7 @@ import Header from "../../../../components/header";
 import { addLocale } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Tooltip } from "primereact/tooltip";
+//import { Tooltip } from "primereact/tooltip";
 import { Rating } from "primereact/rating";
 import { Sidebar } from "primereact/sidebar";
 import { Toast } from "primereact/toast";
@@ -16,6 +16,12 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Toolbar } from "primereact/toolbar";
+import { FilterMatchMode } from "primereact/api";
+import { Ripple } from "primereact/ripple";
+import { classNames } from "primereact/utils";
+import { Badge } from "primereact/badge";
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
 
 import { FaGift } from "react-icons/fa";
 
@@ -65,43 +71,84 @@ export default function AnaliseFornecedor() {
       "Nov",
       "Dez",
     ],
-    today: " Agora ",
+    today: " Hoje ",
     clear: " Limpar ",
   });
-
+  const [globalFilterValue2, setGlobalFilterValue2] = useState("");
+  const [globalFilterValue3, setGlobalFilterValue3] = useState("");
   const [loading, setLoading] = useState(false);
-  const [dataInicialCompra, setDataInicialCompra] = useState("");
-  const [dataFinalCompra, setDataFinalCompra] = useState("");
-  const [dataInicialVenda, setDataInicialVenda] = useState("");
-  const [dataFinalVenda, setDataFinalVenda] = useState("");
+  const [dataInicialCompra, setDataInicialCompra] = useState();
+  const [dataFinalCompra, setDataFinalCompra] = useState();
+  const [dataInicialVenda, setDataInicialVenda] = useState(new Date());
+  const [diasVenda, setDiasVenda] = useState(90);
+  const [dataFinalVenda, setDataFinalVenda] = useState();
   const [fornecedor, setFornecedor] = useState(null);
   const [fornecedores, setFornecedores] = useState([""]);
   const [filial, setFilial] = useState(null);
   const [lojas, setLojas] = useState([""]);
 
-  const [produtos, setProdutos] = useState([""]);
+  const [produtos, setProdutos] = useState([]);
   const [pedidos, setPedidos] = useState([]);
 
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [displayDialog, setDisplayDialog] = useState(false);
 
-  const [produto, setProduto] = useState(['']);
+  const [produto, setProduto] = useState([""]);
   const [quantidade, setQuantidade] = useState(0);
   const [preco, setPreco] = useState(0);
 
-  const [condicaoPagamento , setCondicaoPagamento] = useState()
-  const [condicoesPagamento, setCondicoesPagamento] = useState([])
-  const [prazoEntrega, setPrazoEntrega] = useState()
+  const [condicaoPagamento, setCondicaoPagamento] = useState();
+  const [condicoesPagamento, setCondicoesPagamento] = useState([]);
+  const [prazoEntrega, setPrazoEntrega] = useState();
 
   const toast = useRef(null);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
 
-  const [produtoDeleteSelecionado , setProdutoDeleteSelecionado] = useState('')
-  
-  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products"
-  let totalVenda = 0
+  const [produtoDeleteSelecionado, setProdutoDeleteSelecionado] = useState("");
 
- 
+  const [dialogDuplicatas, setDialogDuplicatas] = useState(false);
+  const [duplicatas, setDuplicatas] = useState([]);
+
+  const [filters2, setFilters2] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    produto: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    codigo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    numeronfultcompra: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
+
+  const [filters3, setFilters3] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    idfilial: { value: null, matchMode: FilterMatchMode.EQUALS },
+  });
+
+  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
+
+  const getDuplicatas = () => {
+   
+
+    
+
+    
+
+    api
+      .get(`/api/documentos/apagar/hoje/${filial?filial.codigo:0}`)
+      .then((r) => {
+        setDuplicatas(r.data);
+        // console.log(r.data)
+      })
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${error}`,
+        });
+      })
+      .finally(() => {
+       
+      });
+  };
+
   const getFornecedores = () => {
     setLoading(true);
 
@@ -111,7 +158,11 @@ export default function AnaliseFornecedor() {
         setFornecedores(r.data);
       })
       .catch((error) => {
-         toast.current.show({severity: 'error', summary: 'Erro', detail: {error} });;
+        toast.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${error}`,
+        });
       })
       .finally(() => {
         setLoading(false);
@@ -119,15 +170,18 @@ export default function AnaliseFornecedor() {
   };
 
   const getCondficaoPagamento = () => {
+    setLoading(true);
 
-    setLoading(true)
-
-    api.get("/api/condicaopagamento/todas").then((r) => {
-      setCondicoesPagamento(r.data)
-    }).catch((error) => {
-      toast.show({severity: 'error', summary: 'Erro', detail: error})
-    }).finally(setLoading(false))
-  }
+    api
+      .get("/api/condicaopagamento/todas")
+      .then((r) => {
+        setCondicoesPagamento(r.data);
+      })
+      .catch((error) => {
+        toast.show({ severity: "error", summary: "Erro", detail: `${error}` });
+      })
+      .finally(setLoading(false));
+  };
 
   const getLojas = () => {
     setLoading(true);
@@ -137,7 +191,11 @@ export default function AnaliseFornecedor() {
         setLojas(r.data);
       })
       .catch((error) => {
-         toast.current.show({severity: 'error', summary: 'Erro', detail: {error} });;
+        toast.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${error}`,
+        });
       })
       .finally(() => {
         setLoading(false);
@@ -146,79 +204,104 @@ export default function AnaliseFornecedor() {
 
   const analisar = () => {
     setLoading(true);
+    
 
-    if(!dataInicialCompra || !dataFinalCompra || !dataInicialVenda || !dataFinalVenda || !filial) {
+  
 
-      toast.current.show({ severity: 'warn' , summary : 'Aviso' ,detail  : 'Preencha todos os campos' })
-      setLoading(false)
-    } else{
+    setDataFinalVenda(new Date());
 
-    api
-      .get(
-        `/api_react/compras/produtos/${moment(dataInicialCompra).format(
-          "YYYY-MM-DD"
-        )}/${moment(dataFinalCompra).format("YYYY-MM-DD")}/${fornecedor.id}/${
-          filial.codigo
-        }/${moment(dataInicialVenda).format("YYYY-MM-DD")}/${moment(
-          dataFinalVenda
-        ).format("YYYY-MM-DD")}`
-      )
-      .then((r) => {
-        setProdutos(r.data);
-      //  console.log(r.data)
-      
-      })
-      .catch((error) => {
-      
-        toast.current.show({severity: 'error', summary: 'Erro', detail: {error} });
-      })
-      .finally(() => {
-        setLoading(false);
+    if (
+      !dataInicialCompra ||
+      !dataFinalCompra ||
+      //  !dataInicialVenda ||
+      //  !dataFinalVenda ||
+      !diasVenda ||
+      !filial
+    ) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: "Preencha todos os campos",
       });
+      setLoading(false);
+    } else {
+      api
+        .get(
+          `/api_react/compras/produtos/${moment(dataInicialCompra).format(
+            "YYYY-MM-DD"
+          )}/${moment(dataFinalCompra).format("YYYY-MM-DD")}/${fornecedor.id}/${
+            filial.codigo
+          }/${moment(moment.now()).subtract(diasVenda, "days").format("YYYY-MM-DD")}/${moment(
+            dataFinalVenda
+          ).format("YYYY-MM-DD")}`
+        )
+        .then((r) => {
+          setProdutos(r.data);
+         // console.log(r.data);
+        })
+        .catch((error) => {
+          toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: `${error}`,
+          });
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   };
 
   const total_comprado_template = (rowData) => {
+    let total_comprado =
+      rowData.ultimoprecocompra * rowData.quantidade_comprada;
     let total = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(rowData.total_comprado);
+    }).format(total_comprado);
     return (
       <>
-        {" "}
         <font color="red">
-          {" "}
-          <u> Total comprado </u> <br />
+          Total comprado <br />
         </font>
-        <font style={{ fontSize: "15px", color: "red", fontWeight: "800" }}>
-          {" "}
-          {total}{" "}
+        <font style={{ fontSize: "1rem", color: "red", fontWeight: "800" }}>
+          {total}
         </font>
       </>
     );
   };
-
+  const preco_media_venda_template = (rowData) => {
+    let preco_medio_venda = Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(rowData.preco_medio_venda);
+    return (
+      <>
+        <font color="green">Preço médio de venda</font> <br />
+        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
+          {preco_medio_venda}{" "}
+        </font>{" "}
+      </>
+    );
+  };
   const valor_unitario_template = (rowData) => {
     let valor_unitario = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(rowData.custo_unitario);
+    }).format(rowData.ultimoprecocompra);
     return (
       <>
         {" "}
         <font color="red">
           {" "}
-          <u>Custo unitário </u> <br />
-        </font>{" "}
-        <font style={{ fontSize: "15px", color: "red", fontWeight: "800" }}>
-          {" "}
-          {valor_unitario}
+          Custo última compra <br />
+        </font>
+        <font style={{ fontSize: "1rem", color: "red", fontWeight: "800" }}>
+          <h4>{valor_unitario}</h4>
         </font>{" "}
       </>
     );
   };
-
-  
 
   const quantidade_comprada_template = (rowData) => {
     let embalagem = Intl.NumberFormat("pt-BR", {
@@ -229,28 +312,68 @@ export default function AnaliseFornecedor() {
         {" "}
         <font color="red">
           {" "}
-          <u>Comprou </u> <br />
+          Comprou <br />
         </font>
-        <font color="red" style={{ fontSize: "15px", fontWeight: "800" }}>
-          {rowData.quantidade_comprada} {rowData.unidade_compra} ({embalagem})
+        <font color="red" style={{ fontWeight: "800" }}>
+          {rowData.quantidade_comprada ? rowData.quantidade_comprada : 0}{" "}
+          {rowData.unidade_venda} <br />
+          Embalagem <br />{" "}
+          {Intl.NumberFormat("pt-BR", {
+            maximumFractionDigits: 1,
+            maximumSignificantDigits: 1,
+          }).format(rowData.quantidade_comprada / rowData.embalagem)}{" "}
+          {rowData.unidade_compra} ( {embalagem} )
+        </font>
+      </>
+    );
+  };
+  const quantidade_vendida_template = (rowData) => {
+    let quantidade_vendida = Intl.NumberFormat("pt-BR", {
+      style: "decimal",
+    }).format(rowData.quantidade_vendida);
+    return (
+      <>
+        {" "}
+        <font color="green">
+          {" "}
+          Vendeu <br />
+        </font>
+        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
+          {rowData.quantidade_vendida ? quantidade_vendida : 0}{" "}
+          {rowData.unidade_venda}
         </font>
       </>
     );
   };
 
-  
-
-  
-
+  const total_template = (rowData) => {
+    let total = rowData.quantidade_vendida * rowData.preco_medio_venda;
+    let totalF = Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(total);
+    return (
+      <>
+        <font color="green">
+          Total vendido <br />
+        </font>
+        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
+          {" "}
+          {totalF}{" "}
+        </font>
+      </>
+    );
+  };
   const data_inclusao_template = (rowData) => {
     return (
       <>
-        {" "}
         <div>
-          {" "}
-          <h4>Chegou dia </h4>
-        </div>{" "}
-        {moment(rowData.data_inclusao).format("DD/MM/yyyy")}{" "}
+          <h4>Nota fiscal última compra </h4>
+          Nº {rowData.numeronfultcompra}
+          <br />
+          Chegou dia{" "}
+          {moment(rowData.data_inclusao).format("DD/MM/YYYY HH:mm:ss")}
+        </div>
       </>
     );
   };
@@ -258,7 +381,11 @@ export default function AnaliseFornecedor() {
   const giroTemplate = (rowData) => {
     let totalEstrelas =
       (rowData.quantidade_vendida /
-        (rowData.quantidade_comprada * rowData.embalagem)) *
+        (rowData.quantidade_comprada
+          ? rowData.quantidade_comprada
+          : 0 * rowData.embalagem
+          ? rowData.embalagem
+          : 0)) *
       5;
 
     return (
@@ -305,7 +432,6 @@ export default function AnaliseFornecedor() {
         rowData.cfop === "2910" ||
         rowData.cfop === "1910" ? (
           <>
-            
             <span
               className="cfop-button"
               data-pr-tooltip={rowData.cfop_descricao}
@@ -316,7 +442,6 @@ export default function AnaliseFornecedor() {
           </>
         ) : (
           <>
-           
             <span
               className="cfop-button"
               data-pr-tooltip={rowData.cfop_descricao}
@@ -332,18 +457,13 @@ export default function AnaliseFornecedor() {
   const confirmDeleteProduct = (product) => {
     setProduto(product);
     setDeleteProductDialog(true);
-}
-
-
-
+  };
 
   const openNew = (produto) => {
-    
-    setQuantidade(null)
-    setPreco(produto.custo_unitario)
+    setQuantidade(null);
+    setPreco(produto.ultimoprecocompra);
     setDisplayDialog(true);
     setProduto({ ...produto });
-    
   };
 
   const botaoAddTemplate = (rowdata) => {
@@ -369,41 +489,57 @@ export default function AnaliseFornecedor() {
   };
 
   const adicionarProduto = (rowData) => {
-    if(!quantidade || !preco  ) {
-       toast.current.show({severity: 'warn', summary: 'Aviso' , detail : 'Infome o preço e quantidade para compra'})
+    if (!quantidade || !preco) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: "Infome o preço e quantidade para compra",
+      });
     } else {
-    setPedidos((oldArray) => [
-      ...oldArray,
-      {
-        idproduto : rowData.idproduto,
-        produto: rowData.produto,
-        codigo: rowData.codigo,
-        ean: rowData.ean,
-        quantidade_venda : rowData.quantidade_vendida,
-        
-        unidade_compra: rowData.unidade_compra,
-        embalagem: Intl.NumberFormat("pt-BR",{}).format(rowData.embalagem),
-        quantidade : quantidade,
-        preco : Intl.NumberFormat("pt-BR",{style : 'currency' , currency:'BRL', mode:"decimal" }).format(preco)
-      },
-    ]);
+      setPedidos((oldArray) => [
+        ...oldArray,
+        {
+          idproduto: rowData.idproduto,
+          produto: rowData.produto,
+          codigo: rowData.codigo,
+          ean: rowData.ean,
+          quantidade_venda: rowData.quantidade_vendida,
+
+          unidade_compra: rowData.unidade_compra,
+          embalagem: Intl.NumberFormat("pt-BR", {}).format(rowData.embalagem),
+          quantidade: quantidade,
+          preco: Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+            mode: "decimal",
+          }).format(preco),
+        },
+      ]);
+      toast.current.show({
+        severity: "success",
+        summary: "Sucesso",
+        detail: `${rowData.produto} adicionado a lista de pedidos`,
+        life: 3000,
+      });
+      hideDialog();
+    }
+  };
+
+  const deletarProduto = (rowData) => {
+    let _products = pedidos.filter(
+      (val) => val.idproduto !== rowData.idproduto
+    );
+
+    setPedidos(_products);
+    setDeleteProductDialog(false);
+
     toast.current.show({
       severity: "success",
       summary: "Sucesso",
-      detail: `${rowData.produto} adicionado a lista de pedidos`,
+      detail: "Produto deletado",
       life: 3000,
     });
-    hideDialog();
-  }};
-
-  const deletarProduto = (rowData) => {
-        let _products = pedidos.filter(val => val.idproduto !== rowData.idproduto);
-      
-        setPedidos(_products);
-        setDeleteProductDialog(false);
-        
-        toast.current.show({ severity: 'success', summary: 'Sucesso', detail: 'Produto deletado', life: 3000 });
-}
+  };
 
   const rightContents = () => {
     return (
@@ -421,53 +557,328 @@ export default function AnaliseFornecedor() {
           className="p-button p-button-success p-button-rounded"
           label="Gravar Pedido"
           disabled
-       //   onClick={() => setPedidos(null)}
+          //   onClick={() => setPedidos(null)}
         />
       </>
     );
   };
 
   const saldo_estoque_template = (rowdata) => {
-    let saldo = Intl.NumberFormat("pt-BR" , {} ).format(rowdata.saldo_estoque)
-    return (
-       
-      saldo > 0 ? <> <div style={{color:'green' , fontWeight : '800'}}> Estoque <br/>{saldo}</div></> : <> <div style={{color:'red', fontWeight : '800'}}> Estoque <br/>{saldo}</div></>
-    ) 
-    
-  }
+    let saldo = Intl.NumberFormat("pt-BR", {}).format(rowdata.saldo_estoque);
+    return saldo > 0 ? (
+      <>
+        {" "}
+        <div style={{ color: "green", fontWeight: "800" }}>
+          {" "}
+          Estoque <br />
+          {saldo}
+        </div>
+      </>
+    ) : (
+      <>
+        {" "}
+        <div style={{ color: "red", fontWeight: "800" }}>
+          {" "}
+          Estoque <br />
+          {saldo}
+        </div>
+      </>
+    );
+  };
 
   const deleteProductDialogFooter = (
     <React.Fragment>
-        <Button label="Não" icon="pi pi-times" className="p-button-text" onClick={() => hideDeleteProductDialog()} />
-        <Button label="Sim" icon="pi pi-check" className="p-button-text" onClick={() => deletarProduto()} />
+      <Button
+        label="Não"
+        icon="pi pi-times"
+        className="p-button-text"
+        onClick={() => hideDeleteProductDialog()}
+      />
+      <Button
+        label="Sim"
+        icon="pi pi-check"
+        className="p-button-text"
+        onClick={() => deletarProduto()}
+      />
     </React.Fragment>
-);
+  );
 
-const hideDeleteProductDialog = () => {
-  setDeleteProductDialog(false);
-}
+  const headerDataTable = () => renderHeader();
 
-const abrirDialogDeleteProduto = (rowdata) => {
+  const onGlobalFilterChange2 = (e) => {
+    const value = e.target.value;
+    let _filters2 = { ...filters2 };
+    _filters2["global"].value = value;
+
+    setFilters2(_filters2);
+    setGlobalFilterValue2(value);
+  };
+
+  const onGlobalFilterChange3 = (e) => {
+    const value = e.target.value;
+    let _filters2 = { ...filters2 };
+    _filters2["global"].value = value;
+
+    setFilters3(_filters2);
+    setGlobalFilterValue3(value);
+  };
+
+  const renderHeader = () => {
+    return (
+      <>
+        <Dialog
+          header="Pesquisa global"
+          //    visible={exibirDialogPesquisa}
+          position="bottom"
+          modal={false}
+          //    onHide={() => setExibirDialogPesquisa(false)}
+        >
+          <div className="pesquisa-rapida">
+            <span className="p-input-icon-left">
+              <i className="pi pi-search" />
+              <InputText
+                autoFocus
+                value={globalFilterValue2}
+                onChange={onGlobalFilterChange2}
+                placeholder="Produtos, Fornecedores, Notas"
+              />
+            </span>
+          </div>
+        </Dialog>
+
+        <div className="pesquisa-rapida">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue2}
+              onChange={onGlobalFilterChange2}
+              placeholder="Pesquisa "
+            />
+          </span>
+        </div>
+      </>
+    );
+  };
+
+  const renderHeader2 = () => {
+    return (
+      <>
+        <div className="pesquisa-rapida">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue3}
+              onChange={onGlobalFilterChange3}
+              placeholder="Pesquisa "
+            />
+          </span>
+        </div>
+      </>
+    );
+  };
+
+  const hideDeleteProductDialog = () => {
+    setDeleteProductDialog(false);
+  };
+
+  const itemTemplate = (option) => {
+    return (
+      <>
+        <div>
+          {" "}
+          <i className="pi pi-users"></i> {option.codigo} - {option.nome}{" "}
+        </div>
+      </>
+    );
+  };
+
+  const template1 = {
+    layout:
+      "PrevPageLink PageLinks NextPageLink RowsPerPageDropdown CurrentPageReport",
+    PrevPageLink: (options) => {
+      return (
+        <button
+          type="button"
+          className={options.className}
+          onClick={options.onClick}
+          disabled={options.disabled}
+        >
+          <span className="p-3">Anterior</span>
+          <Ripple />
+        </button>
+      );
+    },
+    NextPageLink: (options) => {
+      return (
+        <button
+          type="button"
+          className={options.className}
+          onClick={options.onClick}
+          disabled={options.disabled}
+        >
+          <span className="p-3">Próximo</span>
+          <Ripple />
+        </button>
+      );
+    },
+    PageLinks: (options) => {
+      if (
+        (options.view.startPage === options.page &&
+          options.view.startPage !== 0) ||
+        (options.view.endPage === options.page &&
+          options.page + 1 !== options.totalPages)
+      ) {
+        const className = classNames(options.className, { "p-disabled": true });
+
+        return (
+          <span className={className} style={{ userSelect: "none" }}>
+            ...
+          </span>
+        );
+      }
+
+      return (
+        <button
+          type="button"
+          className={options.className}
+          onClick={options.onClick}
+        >
+          {options.page + 1}
+          <Ripple />
+        </button>
+      );
+    },
+    RowsPerPageDropdown: (options) => {
+      const dropdownOptions = [
+        { label: 3, value: 3 },
+        { label: 5, value: 5 },
+        { label: 10, value: 10 },
+        { label: 15, value: 15 },
+        { label: 20, value: 20 },
+        { label: 50, value: 50 },
+        { label: "Todos", value: options.totalRecords },
+      ];
+
+      return (
+        <Dropdown
+          value={options.value}
+          options={dropdownOptions}
+          onChange={options.onChange}
+        />
+      );
+    },
+  };
+
+  let footerGroup = (
+    <ColumnGroup>
+      <Row>
+        <Column
+          footer="Total:"
+          colSpan={5}
+          footerStyle={{ textAlign: "right" }}
+        />
+        <Column colSpan={2} footer={() => totalizarDuplicata()} />
+      </Row>
+    </ColumnGroup>
+  );
+
+  let footerGroupAnalise = (
+    <ColumnGroup>
+      <Row>
+        <Column
+          style={{ color: "red" }}
+          footer="Total comprado "
+          colSpan={8}
+          footerStyle={{ textAlign: "right" }}
+        />
+        <Column
+          style={{ color: "red" }}
+          footer={() => totalizarAnaliseTotalComprado()}
+        />
+
+        <Column
+          style={{ color: "green" }}
+          footer="Total vendido "
+          footerStyle={{ textAlign: "right" }}
+        />
+        <Column
+          style={{ color: "green" }}
+          colSpan={2}
+          footer={() => totalizarAnaliseTotalVendido()}
+        />
+      </Row>
+      <Row></Row>
+    </ColumnGroup>
+  );
+
+  const totalizarAnaliseTotalComprado = () => {
+    let tc = 0;
+
+    for (let p of produtos) {
+      tc += p.quantidade_comprada * p.ultimoprecocompra;
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(tc);
+  };
+
+  const totalizarAnaliseTotalVendido = () => {
+    let tv = 0;
+
+    for (let p of produtos) {
+      tv += p.quantidade_vendida * p.preco_medio_venda;
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(tv);
+  };
+
+  const totalizarDuplicata = () => {
+    let t = 0;
+    for (let d of duplicatas) {
+      t += d.valor;
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(t);
+  };
+
   
-  produtoDeleteSelecionado = rowdata.produto
-  setDeleteProductDialog(true)
-  
 
- 
+  const valor_duplicata_template = (rowData) => {
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(rowData.valor);
+  };
 
-}
+  const status_duplicate_template = (rowData) => {
+    return (
+      <>
+        {rowData.status === "A" ? (
+          <Badge value="Aberto" severity="warning"></Badge>
+        ) : (
+          <Badge value="Pago" severity="success"></Badge>
+        )}
+      </>
+    );
+  };
 
   useEffect(() => {
     getFornecedores();
     getLojas();
-    getCondficaoPagamento()
+    getCondficaoPagamento();
+    getDuplicatas();
   }, []);
 
-
   return (
-        
     <>
-   
       <Header />
 
       <Dialog
@@ -475,148 +886,144 @@ const abrirDialogDeleteProduto = (rowdata) => {
         modal={false}
         visible={displayDialog}
         onHide={hideDialog}
-        style={{ width: "100%" ,height : '60%' }}
-        maximizable 
+        style={{ width: "100%", height: "60%" }}
+        maximizable
         resizable
-        
         position="top-right"
       >
-       <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          flexWrap : 'wrap',
-          justifyContent: "space-around",
-        }}
-       >
-       <div >
-         
-          
-          {produto?.ean ? produto.ean : produto.codigo} 
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: "space-around",
+          }}
+        >
+          <div>
+            {produto?.ean ? produto.ean : produto.codigo}
+            <br />
+            <img
+              style={{
+                width: "100px",
+                height: "100px",
+                margin: "5px",
+                borderRadius: "25px",
+                padding: "5px",
+              }}
+              src={`${eanUrl}/${produto.ean}`}
+              onError={(e) =>
+                (e.target.src =
+                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+              }
+              alt={produto?.ean}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontWeight: "800", width: "100%" }} htmlFor="nome">
+              Produto
+            </label>
+            <h1 style={{ fontSize: "1rem", width: "100%" }}>
+              {produto.produto}
+            </h1>
+          </div>
           <br />
-          <img
+          <div
             style={{
-              width: "100px",
-              height: "100px",
               margin: "5px",
               borderRadius: "25px",
               padding: "5px",
             }}
-            src={`${eanUrl}/${produto.ean}`}
-            onError={(e) =>
-              (e.target.src =
-                "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
-            }
-            alt={produto?.ean}
-          />
-        </div>
+          >
+            <label
+              style={{ fontWeight: "800", margin: "10px" }}
+              htmlFor="quantidade"
+            >
+              Quantidade para compra
+            </label>
+            <InputNumber
+              style={{ width: "100%", margin: "10px" }}
+              id="quantidade"
+              autoFocus
+              value={quantidade}
+              onChange={(e) => setQuantidade(e.value)}
+              required
+            />
+          </div>
 
-        <div >
-          <label style={{ fontWeight: "800", width : '100%' }} htmlFor="nome">
-            Produto
-          </label>
-          <h1 style={{fontSize : '15px', width : '100%'}}>{produto.produto}</h1>
-        </div>
-        <br/>
-        <div  style={{
-             
+          <div
+            style={{
               margin: "5px",
               borderRadius: "25px",
               padding: "5px",
-            }}>
-          <label style={{ fontWeight: "800" , margin:'10px' }} htmlFor="quantidade">
-            Quantidade para compra
-          </label>
-          <InputNumber
-            style={{ width: "100%", margin:'10px' }}
-            id="quantidade"
-            autoFocus
-          
-            value={quantidade}
-            onChange={(e) => setQuantidade(e.value)}
-            required
-          />
-        </div>
+            }}
+          >
+            <label style={{ fontWeight: "800" }} htmlFor="embalagem">
+              Embalagem
+            </label>
+            <h4>
+              {produto.unidade_compra}
+              {Intl.NumberFormat("pt-BR", {}).format(produto.embalagem)} )
+            </h4>
+          </div>
 
-        <div  style={{
-            
-              margin: "5px",
-              borderRadius: "25px",
-              padding: "5px",
-            }} >
-          <label style={{ fontWeight: "800" }} htmlFor="embalagem">
-            Embalagem
-          </label>
-          <h4>
-          {produto.unidade_compra} ( { Intl.NumberFormat("pt-BR", {}).format(produto.embalagem)} )  
-          </h4>
-        </div>
+          <div>
+            <label
+              style={{ fontWeight: "800", margin: "10px" }}
+              htmlFor="preco"
+            >
+              Preço para compra
+            </label>
+            <InputNumber
+              style={{ width: "100%", margin: "10px" }}
+              mode="decimal"
+              prefix="R$ "
+              locale="pt-BR"
+              minFractionDigits={2}
+              maxFractionDigits={2}
+              id="preco"
+              value={preco}
+              onChange={(e) => setPreco(e.value)}
+              required
+            />
+          </div>
 
+          <div>
+            <h4>Quantidade vendida</h4>
+            {Intl.NumberFormat("pt-BR", {
+              style: "decimal",
+            }).format(produto.quantidade_vendida)}{" "}
+            {produto.unidade_venda}
+          </div>
 
-        <div >
-          <label style={{ fontWeight: "800", margin:'10px' }} htmlFor="preco">
-            Preço para compra
-          </label>
-          <InputNumber
-            style={{ width: "100%", margin:'10px' }}
-            mode="decimal"
-            prefix="R$ "
-            locale="pt-BR"
-            minFractionDigits={2}
-            maxFractionDigits={2}
-            id="preco"
-          
-            value={preco}
-            onChange={(e) => setPreco(e.value)}
-            required
-          />
-        
-        </div>
-        
-        <div>
-          <h4>Quantidade vendida</h4>
-         { 
-          Intl.NumberFormat("pt-BR", {
-            style: "decimal",
-         
-          }).format(
-         
-         produto.quantidade_vendida) } {produto.unidade_venda}
-        </div>
+          <div>
+            <h4>Preço de venda médio</h4>
+            {Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }).format(produto.preco_medio_venda)}
+          </div>
 
-        <div>
-          <h4>Preço de venda médio</h4>
-          {
-           Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }).format(
-          produto.preco_medio_venda)}
-        </div>
+          <div>
+            <h4>Total da venda</h4>
+            {Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }).format(produto.preco_medio_venda * produto.quantidade_vendida)}
+          </div>
 
-        <div>
-          
-          <h4>Total da venda</h4>
-          {  
-              Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(produto.preco_medio_venda * produto.quantidade_vendida)
-          }
+          <div>
+            <Button
+              style={{ marginTop: "20px" }}
+              className="p-button p-button-success p-button-rounded"
+              label="Adicionar"
+              icon="pi pi-plus"
+              onClick={() => adicionarProduto(produto)}
+            />
+          </div>
         </div>
-        
-        <div >
-          <Button style={{marginTop:'20px'}} className="p-button p-button-success p-button-rounded" label="Adicionar" icon="pi pi-plus" onClick={() => adicionarProduto(produto)} />
-        </div>
-        </div> 
       </Dialog>
-
-      <Button
-        icon="pi pi-shopping-cart"
-        onClick={() => setVisibleLeft(true)}
-        className="botao-add-colado mr-2"
-      />
 
       <Sidebar
         style={{ width: "100%" }}
@@ -624,7 +1031,7 @@ const abrirDialogDeleteProduto = (rowdata) => {
         onHide={() => setVisibleLeft(false)}
       >
         <div className="lista-itens">
-          <h4 style={{ color: "#FFF", margin: "15px" }}>Pedido de compra</h4>
+          <h4 style={{ color: "#FFF", margin: "1rem" }}>Pedido de compra</h4>
 
           <div
             style={{
@@ -636,17 +1043,30 @@ const abrirDialogDeleteProduto = (rowdata) => {
             }}
           >
             <h4> Pedido para a loja</h4>
-            <h1> {filial?.nome}</h1> 
-            <h4> Fornecedor </h4> 
+            <h1> {filial?.nome}</h1>
+            <h4> Fornecedor </h4>
             <h1> {fornecedor?.nome} </h1>
             Prazo de entrega
-            <Calendar showIcon showButtonBar locale="pt-BR" dateFormat="dd/mm/yy" style={{width : '100%',  margin:"10px 0px"}}  value={prazoEntrega} onChange={(e) => setPrazoEntrega(e.value)} required />
+            <Calendar
+              showIcon
+              showButtonBar
+              locale="pt-BR"
+              dateFormat="dd/mm/yy"
+              style={{ width: "100%", margin: "10px 0px" }}
+              value={prazoEntrega}
+              onChange={(e) => setPrazoEntrega(e.value)}
+              required
+            />
             Condição de Pagamento (dias)
-
-            <Dropdown filter value={condicaoPagamento} optionValue="prazos" options={condicoesPagamento} optionLabel="descricao"  onChange={(e) => setCondicaoPagamento(e.value)} placeholder="Selecione uma condição de pagamento"/>
-
-           
-            
+            <Dropdown
+              filter
+              value={condicaoPagamento}
+              optionValue="prazos"
+              options={condicoesPagamento}
+              optionLabel="descricao"
+              onChange={(e) => setCondicaoPagamento(e.value)}
+              placeholder="Selecione uma condição de pagamento"
+            />
           </div>
 
           <Toolbar style={{ margin: "20px" }} right={rightContents} />
@@ -654,7 +1074,7 @@ const abrirDialogDeleteProduto = (rowdata) => {
           <div style={{ width: "100%" }}>
             <DataTable
               style={{
-                padding: "15px",
+                padding: "1rem",
                 backgroundColor: "#FFF",
                 borderRadius: "25px",
                 border: "1px solid #FFF",
@@ -665,13 +1085,15 @@ const abrirDialogDeleteProduto = (rowdata) => {
               <Column field="produto" header="Produto"></Column>
               <Column field="quantidade" header="Quantidade"></Column>
               <Column field="unidade_compra" header="Embalagem"></Column>
-              <Column field="embalagem" header="Qtde(dentro da embalagem)"></Column>
-             
+              <Column
+                field="embalagem"
+                header="Qtde(dentro da embalagem)"
+              ></Column>
+
               <Column field="preco" header="Preço"></Column>
 
               <Column
               //  body={() => abrirDialogDeleteProduto()}
-              
               ></Column>
             </DataTable>
           </div>
@@ -693,15 +1115,16 @@ const abrirDialogDeleteProduto = (rowdata) => {
           <div className="fornecedor-input">
             <h4>Selecione um fornecedor para análise</h4>
             <Dropdown
-             required
+              required
               style={{ marginTop: "10px" }}
               placeholder="Selecione um fornecedor"
               value={fornecedor}
               options={fornecedores}
               optionLabel="nome"
+              itemTemplate={itemTemplate}
               filter
               showClear
-              filterBy="nome"
+              filterBy="nome,codigo"
               onChange={(e) => setFornecedor(e.target.value)}
             />
           </div>
@@ -715,6 +1138,7 @@ const abrirDialogDeleteProduto = (rowdata) => {
               onChange={(e) => setFilial(e.target.value)}
               options={lojas}
               optionLabel="nome"
+              showClear
             />
           </div>
         </div>
@@ -725,9 +1149,9 @@ const abrirDialogDeleteProduto = (rowdata) => {
             </h4>
 
             <Calendar
-            showOnFocus={false}
-            showButtonBar
-             showIcon
+              showOnFocus={false}
+              showButtonBar
+              showIcon
               dateFormat="dd/mm/yy"
               locale="pt-BR"
               style={{ marginTop: "10px" }}
@@ -742,9 +1166,9 @@ const abrirDialogDeleteProduto = (rowdata) => {
             </h4>
 
             <Calendar
-             showButtonBar
-            showOnFocus={false}
-            showIcon
+              showButtonBar
+              showOnFocus={false}
+              showIcon
               dateFormat="dd/mm/yy"
               locale="pt-BR"
               style={{ marginTop: "10px" }}
@@ -756,39 +1180,19 @@ const abrirDialogDeleteProduto = (rowdata) => {
         <div>
           <div className="fornecedor-input">
             <h4 style={{ color: "green" }}>
-              Informe o período inicial para análise de venda
+              Informe a quantidade de dias para análise de vendas
             </h4>
 
-            <Calendar
-             showButtonBar
-             
-            showOnFocus={false}
-            showIcon
-              dateFormat="dd/mm/yy"
-              locale="pt-BR"
-              style={{ marginTop: "10px" }}
-              onChange={(e) => setDataInicialVenda(e.target.value)}
-              value={dataInicialVenda}
-            ></Calendar>
-          </div>
-
-          <div className="fornecedor-input">
-            <h4 style={{ color: "green" }}>
-              Informe o período final para análise de venda
-            </h4>
-
-            <Calendar
-             showButtonBar
-             showIcon
-             showOnFocus={false}
-              dateFormat="dd/mm/yy"
-              locale="pt-BR"
-              style={{ marginTop: "10px" }}
-              onChange={(e) => setDataFinalVenda(e.target.value)}
-              value={dataFinalVenda}
-            ></Calendar>
+            <InputNumber
+              showButtons
+              style={{ marginTop: "10px", width: "40%" }}
+              onChange={(e) => setDiasVenda(e.value)}
+              value={diasVenda}
+              placeholder="Informe a quantidade de dias para análise"
+            ></InputNumber>
           </div>
         </div>
+
         <div>
           <Button
             loading={loading}
@@ -799,78 +1203,166 @@ const abrirDialogDeleteProduto = (rowdata) => {
             onClick={analisar}
           />
         </div>
+
+        <div>
+          <Button
+            icon="pi pi-chart-line"
+            onClick={() => setDialogDuplicatas(true)}
+            style={{ marginTop: "30px", marginLeft: "30px" }}
+            className="p-button p-button-info p-button-rounded "
+            label="Duplicatas hoje"
+          />
+        </div>
       </div>
       <Toast ref={toast} position="bottom-center" />
-      <div className="tabela">
+
+      <DataTable
+        style={{
+          width: "100%",
+        }}
+        rows={3}
+        paginator
+        footerColumnGroup={footerGroupAnalise}
+        paginatorTemplate={template1}
+        footer={"Existem " + produtos.length + " produto(s) para análise"}
+        breakpoint="968px"
+        loading={loading}
+        //     stripedRows
+        value={produtos}
+        selectionMode="single"
+        //   reorderableColumns
+        editMode="row"
+        dataKey="idproduto"
+        //   scrollDirection="vertical"
+        //   scrollable
+        //   scrollHeight="flex"
+
+        filters={filters2}
+        size="small"
+        responsiveLayout="stack"
+        emptyMessage="Nenhum produto encontrado para análise"
+        showGridlines
+        header={headerDataTable}
+        rowGroupMode="subheader"
+        sortOrder={1}
+        // resizableColumns
+        columnResizeMode="fit"
+        globalFilterFields={["codigo", "ean", "numeronfultcompra", "produto"]}
+      >
+        <Column
+          field={data_inclusao_template}
+          header="Data de entrada"
+        ></Column>
+
+        <Column field={EanOrCodigo} header="Código"></Column>
+
+        <Column field="produto" header="Produto"></Column>
+
+        <Column field={cfop_template} header="CFOP"></Column>
+
+        <Column
+          field="saldo_estoque"
+          header="Saldo em Estoque"
+          body={saldo_estoque_template}
+        ></Column>
+
+        <Column
+          field="rating"
+          header="Classificação"
+          body={giroTemplate}
+        ></Column>
+
+        <Column
+          field={valor_unitario_template}
+          header="Custo unitário"
+        ></Column>
+
+        <Column field={quantidade_comprada_template} header="Compra"></Column>
+
+        <Column
+          field={total_comprado_template}
+          header="Total comprado"
+        ></Column>
+
+        <Column field={preco_media_venda_template}></Column>
+
+        <Column
+          field={quantidade_vendida_template}
+          header="Qtde venda"
+        ></Column>
+
+        <Column field={total_template} header="Total vendido"></Column>
+      </DataTable>
+
+      <Dialog
+        visible={deleteProductDialog}
+        style={{ width: "450px" }}
+        header="Confirmação"
+        modal
+        footer={deleteProductDialogFooter}
+        onHide={hideDeleteProductDialog}
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle mr-3"
+            style={{ fontSize: "2rem" }}
+          />
+          {produto && (
+            <span>
+              Deseja deletar <b>{produtoDeleteSelecionado.produto}</b>?
+            </span>
+          )}
+        </div>
+      </Dialog>
+
+      <Dialog
+        visible={dialogDuplicatas}
+        header="Documentos vencendo hoje"
+        modal={false}
+        position="top"
+        onHide={() => setDialogDuplicatas(false)}
+      >
+       
+
+        <div className="fornecedor-input">
+            <h4>Selecione uma loja</h4>
+            <Dropdown
+              style={{ marginTop: "10px" }}
+              placeholder="Selecione uma loja"
+              value={filial}
+              onChange={(e) => setFilial(e.target.value)}
+              options={lojas}
+              optionLabel="nome"
+              showClear
+            />
+          </div>
+
+          <div style={{width : '15%' , display:'flex' , alignItems : 'center', justifyContent : 'center'}} className="card">
+          <Button icon="pi pi-search" label="Filtrar" onClick={() => getDuplicatas()} />
+        </div>
+
         <DataTable
-          selectionMode="single"
-          loading={loading}
-          value={produtos}
-          style={{
-            width: "100%",
-            borderRadius: "20px",
-            border: "20px solid #FFF",
-            alignItems: "center",
-          }}
-          emptyMessage="Sem dados "
-          responsiveLayout="stack"
-          breakpoint="960px"
-          rowGroupMode="subheader"
-          groupRowsBy="produto"
-          sortMode="single"
-          sortField="produto"
-          sortOrder={1}
+          emptyMessage="Nenhum documento encontrado! 🥳"
+          filterDisplay="row"
+          filters={filters3}
+          dataKey="id"
+          header={renderHeader2}
+        //  loading={loading}
+          stripedRows
+          value={duplicatas}
+          footerColumnGroup={footerGroup}
+          responsiveLayout="scroll"
         >
-          <Column
-            field={data_inclusao_template}
-            header="Data de entrada"
-          ></Column>
+          <Column field="idfilial" sortable header="Loja"></Column>
+          <Column field="documento" sortable header="Documento"></Column>
 
-          <Column field={EanOrCodigo} header="Código"></Column>
-
-          <Column field="produto" header="Produto"></Column>
-
-          <Column field={cfop_template} header="CFOP"></Column>
-
-          <Column body={botaoAddTemplate}></Column>
-
-          <Column
-            field="saldo_estoque"
-            header="Saldo em Estoque"
-            body={saldo_estoque_template}
-          ></Column>
-
-          <Column
-            field="rating"
-            header="Classificação"
-            body={giroTemplate}
-          ></Column>
-
-          <Column
-            field={valor_unitario_template}
-            header="Custo unitário"
-          ></Column>
-
-          <Column
-            field={quantidade_comprada_template}
-            header="Qtde compra"
-          ></Column>
-
-          <Column
-            field={total_comprado_template}
-            header="Total comprado"
-          ></Column>
-
+          <Column field="nomeentidade" sortable header="Fornecedor"></Column>
+          <Column field="observacao" header="Origem"></Column>
+          <Column field="tipodocumento" sortable header="Tipo"></Column>
+          <Column field={valor_duplicata_template} header="Valor"></Column>
+          <Column field={status_duplicate_template} header="Status"></Column>
         </DataTable>
-      </div>
-
-      <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirmação" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
-                <div className="confirmation-content">
-                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
-                    {produto && <span>Deseja deletar <b>{produtoDeleteSelecionado.produto}</b>?</span>}
-                </div>
-            </Dialog>
-
+      </Dialog>
     </>
   );
 }

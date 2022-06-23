@@ -47,7 +47,7 @@ const PrecificadorExecuta = () => {
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
   const [replicarPreco, setReplicarPreco] = useState(0);
-  const [expandedRows, setExpandedRows] = useState(null);
+  //const [expandedRows, setExpandedRows] = useState(null);
   const replicarPrecoOpcoes = [
     { label: "Sim", value: 1 },
     { label: "Não", value: 0 },
@@ -60,9 +60,7 @@ const PrecificadorExecuta = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageInputTooltip, setPageInputTooltip] = useState('Press \'Enter\' key to go to this page.');
-  const [first1, setFirst1] = useState(0);
+  
 
   let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 

@@ -1107,6 +1107,7 @@ const PrecificadorExecuta = () => {
                   height: "99vh",
                   width: "100%",
                 }}
+                footer={"Existem " + produtos.length + " produto(s) para análise"}
                 breakpoint="1125px"
                 loading={loading}
                 stripedRows

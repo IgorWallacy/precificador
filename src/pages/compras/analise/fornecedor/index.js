@@ -1256,18 +1256,20 @@ export default function AnaliseFornecedor() {
 
         <Column field={EanOrCodigo} header="Código"></Column>
 
-        <Column field="produto" header="Produto"></Column>
+        <Column field="produto" sortable header="Produto"></Column>
 
         <Column field={cfop_template} header="CFOP"></Column>
 
         <Column
           field="saldo_estoque"
+          sortable
           header="Saldo em Estoque"
           body={saldo_estoque_template}
         ></Column>
 
         <Column
           field="rating"
+          sortable
           header="Classificação"
           body={giroTemplate}
         ></Column>
@@ -1338,7 +1340,7 @@ export default function AnaliseFornecedor() {
           </div>
 
           <div style={{width : '15%' , display:'flex' , alignItems : 'center', justifyContent : 'center'}} className="card">
-          <Button icon="pi pi-search" label="Filtrar" onClick={() => getDuplicatas()} />
+          <Button  className="p-button p-button-info p-button-rounded " icon="pi pi-search" label="Filtrar" onClick={() => getDuplicatas()} />
         </div>
 
         <DataTable

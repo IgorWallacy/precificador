@@ -108,7 +108,14 @@ const MenuInterativo = () => {
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/vendas")}
           />
+             <Button
+            label="Futura"
+            icon="pi pi-wallet"
+            className="p-button-rounded p-button-help p-button-lg"
+            onClick={() => navigate("/vendas/futura")}
+          />
         </div>
+       
       </div>
 
 

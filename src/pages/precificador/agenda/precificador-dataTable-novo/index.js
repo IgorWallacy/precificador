@@ -1046,6 +1046,7 @@ const PrecificadorAgenda = () => {
             <DataTable
               breakpoint="968px"
               loading={loading}
+              footer={"Existem " + produtos.length + " produto(s) para análise"}
               //     stripedRows
               value={produtos}
               selectionMode="single"

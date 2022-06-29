@@ -62,7 +62,8 @@ const PrecificadorExecuta = () => {
 
   
 
-  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
+  //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
+  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin"
 
   useEffect(() => {
     pegarTokenLocalStorage();
@@ -625,7 +626,7 @@ const PrecificadorExecuta = () => {
         },
       },
 
-      content: produtos.map(function (item) {
+      content: produtos.map(function (item, i) {
         return {
           layout: "lightHorizontalLines", // optional
           lineHeight: 1,
@@ -634,12 +635,13 @@ const PrecificadorExecuta = () => {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 0,
-            widths: [60, 90, 100, 70, 70, "*"],
+            widths: [25,65,60, 100, 70, 70, "*"],
 
             body: [
-              ["", "", "", "","", ""],
+              ["","", "", "", "","", ""],
 
               [
+                { text :  i+1 },
                 { text: moment(item.dataagendada).format("DD/MM/YY") },
                 { text: item.ean ? item.ean : item.codigo, style: "ean" },
                 { text: item.descricao.substring(0, 35), style: "descricao" },
@@ -921,7 +923,7 @@ const PrecificadorExecuta = () => {
       return (
         <>
           <div>
-            <h4>Filial</h4>
+            <h4>Loja</h4>
           </div>
           <Dropdown
             showClear

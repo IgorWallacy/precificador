@@ -10,10 +10,10 @@ const Main = () => {
         
         <div className="agenda-label">
         <FcCalendar size={50}/>
-          <Typing >
+          <Typing speed={50} >
             
            <h1> Pesquisar notas fiscais de entrada </h1>
-           <Typing.Delay ms={1000}  />
+           <Typing.Delay speed={50} startDelay={10}  />
             
            <h4>Agendar os preços de venda</h4>
          

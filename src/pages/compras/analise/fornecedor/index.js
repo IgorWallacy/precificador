@@ -1269,7 +1269,7 @@ export default function AnaliseFornecedor() {
 
         <Column
           field="rating"
-          sortable
+         
           header="Classificação"
           body={giroTemplate}
         ></Column>
@@ -1279,7 +1279,7 @@ export default function AnaliseFornecedor() {
           header="Custo unitário"
         ></Column>
 
-        <Column field={quantidade_comprada_template} header="Compra"></Column>
+        <Column  field={quantidade_comprada_template} header="Compra"></Column>
 
         <Column
           field={total_comprado_template}
@@ -1344,6 +1344,7 @@ export default function AnaliseFornecedor() {
         </div>
 
         <DataTable
+          breakpoint="968px"
           emptyMessage="Nenhum documento encontrado! 🥳"
           filterDisplay="row"
           filters={filters3}
@@ -1353,7 +1354,7 @@ export default function AnaliseFornecedor() {
           stripedRows
           value={duplicatas}
           footerColumnGroup={footerGroup}
-          responsiveLayout="scroll"
+          responsiveLayout="stack"
         >
           <Column field="idfilial" sortable header="Loja"></Column>
           <Column field="documento" sortable header="Documento"></Column>

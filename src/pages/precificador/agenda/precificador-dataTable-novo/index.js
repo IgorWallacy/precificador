@@ -17,7 +17,7 @@ import { addLocale } from "primereact/api";
 import { Tag } from "primereact/tag";
 import { Dialog } from "primereact/dialog";
 import { ScrollTop } from "primereact/scrolltop";
-import { ScrollPanel } from "primereact/scrollpanel";
+//import { ScrollPanel } from "primereact/scrollpanel";
 
 import api from "../../../../services/axios";
 
@@ -56,7 +56,9 @@ const PrecificadorAgenda = () => {
 
   const [usuarioLogado, setUsuarioLogado] = useState(null);
 
-  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
+  //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
+
+  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
   useEffect(() => {
     pegarTokenLocalStorage();
@@ -113,13 +115,13 @@ const PrecificadorAgenda = () => {
   const atualizarmarkupminimo = () => {
     setLoading(true);
 
-    let idfamilia = produtoEmExibicaoSugestaoDialog.idfamilia
-      ? produtoEmExibicaoSugestaoDialog.idfamilia
-      : 0;
+    
 
     api
       .put(
-        `/api/produto/atualizarmarkupminimo/${produtoEmExibicaoSugestaoDialog.idproduto}/${idfamilia}/${novoPercentualMarkupMinimo}`
+        `/api/produto/atualizarmarkupminimo/${produtoEmExibicaoSugestaoDialog.idproduto}/${produtoEmExibicaoSugestaoDialog.idfamilia
+          ? produtoEmExibicaoSugestaoDialog.idfamilia
+          : 0}/${novoPercentualMarkupMinimo}`
       )
       .then((r) => {})
       .catch((error) => {
@@ -217,7 +219,7 @@ const PrecificadorAgenda = () => {
       </>
     );
   };
-
+/*
   const margemAtual = (rowData) => {
     //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
     let margem =
@@ -266,6 +268,7 @@ const PrecificadorAgenda = () => {
       </>
     );
   };
+  */
 
   const precoCustoTemplate = (rowData) => {
     let custo = Intl.NumberFormat("pt-BR", {
@@ -656,7 +659,7 @@ const PrecificadorAgenda = () => {
     return (
       <>
         <Dialog
-          header="Pesquisa Global"
+          header="Pesquisa global"
           visible={exibirDialogPesquisa}
           position="bottom"
           modal={false}
@@ -984,7 +987,7 @@ const PrecificadorAgenda = () => {
           <div className="form-precificador-btn">
             <Button
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
-              label={loading ? "Pesquisando ..." : " Pesquisar "}
+              label={loading ? " Pesquisando ..." : " Pesquisar "}
               disabled={loading}
               className="p-button-rounded p-button-success p-button-md"
               onClick={() => buscarProdutos()}
@@ -1034,6 +1037,7 @@ const PrecificadorAgenda = () => {
                   onClick={() => atualizarmarkupminimo()}
                   style={{ margin: "1rem" }}
                   label="Atualizar"
+                  icon="pi pi-refresh"
                   className="p-button p-buttun-sucess p-button-rounded"
                 />
               </div>

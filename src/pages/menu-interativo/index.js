@@ -3,8 +3,13 @@ import React, { useEffect, useState } from "react";
 import api from "../../services/axios";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  faStore,  faTags, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import {
+  faStore,
+  faTags,
+  faUserGroup,
+} from "@fortawesome/free-solid-svg-icons";
 
+import ImagemDestque from "../../assets/img/undraw_select_option_re_u4qn.svg";
 
 import "./menu-interativo.css";
 
@@ -67,73 +72,67 @@ const MenuInterativo = () => {
   return (
     <>
       <div className="menu-interativo">
-      
-      <div style={{width : '100%'}}  className="menu-categoria">
-      
-        <Typing speed={50} startDelay={10}>
-          <div className="texto-menu-interativo">
-            <em>{greetingMessage()}</em> <h1>{nome}</h1>
-            <em>o que você deseja fazer hoje ? </em>{" "}
+        <div style={{ width: "100%" }} className="menu-categoria">
+          <Typing speed={50} startDelay={10}>
+            <div className="texto-menu-interativo">
+              <img src={ImagemDestque} style={{ width: "25%" }} />
+              <em>{greetingMessage()}</em> <h1>{nome}</h1>
+              <em>o que você deseja fazer hoje ? </em>{" "}
+            </div>
+          </Typing>
+        </div>
+
+        <div className="menu-categoria">
+          <FontAwesomeIcon icon={faTags} size="2x" />
+          <h1>Precificar</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="Agendar remarcação"
+              icon="pi pi-calendar"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/precificar-agendar")}
+            />
+            <Button
+              label="Iniciar remarcação "
+              icon="pi pi-sync"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/precificar-executar")}
+            />
           </div>
-        </Typing>
+        </div>
+        <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faStore} size="2x" />
+          <h1>Vendas</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="PDV"
+              icon="pi pi-shopping-cart"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/vendas")}
+            />
+          </div>
         </div>
 
-      <div className="menu-categoria">
-     
-        <FontAwesomeIcon icon={faTags} size="2x" />
-        <h1>Precificar</h1>
-        <div className="opcoes-menu">
-          <Button
-            label="Agendar remarcação"
-            icon="pi pi-calendar"
-            className="p-button-rounded p-button-help p-button-lg"
-            onClick={() => navigate("/precificar-agendar")}
-          />
-          <Button
-            label="Iniciar remarcação "
-            icon="pi pi-sync"
-            className="p-button-rounded p-button-help p-button-lg"
-            onClick={() => navigate("/precificar-executar")}
-          />
-        </div>
-      </div>
-      <div className="menu-categoria">
-        {" "}
-        <FontAwesomeIcon icon={faStore}  size="2x" />
-        <h1>Vendas</h1>
-        <div className="opcoes-menu">
-          <Button
-            label="PDV"
-            icon="pi pi-shopping-cart"
-            className="p-button-rounded p-button-help p-button-lg"
-            onClick={() => navigate("/vendas")}
-          />
-          
-        </div>
-       
-      </div>
-
-
-      <div className="menu-categoria">
-        {" "}
-        <FontAwesomeIcon icon={faUserGroup}  size="2x" />
-        <h1>Compras</h1>
-        <div className="opcoes-menu">
-          <Button
-            label="Fornecedor"
-            icon="pi pi-users"
-            
-            className="p-button-rounded p-button-help p-button-lg"
-            onClick={() => navigate("/compras/analise/fornecedor")}
-          />
-          { /*   <Button
+        <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faUserGroup} size="2x" />
+          <h1>Compras</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="Fornecedor"
+              icon="pi pi-users"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/compras/analise/fornecedor")}
+            />
+            {/*   <Button
             label="Futura"
             icon="pi pi-wallet"
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/vendas/futura")}
   /> */}
+          </div>
         </div>
-      </div>
       </div>
     </>
   );

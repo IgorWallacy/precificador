@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import "./styless.css";
+import ImagemDestque from "../../../../assets/img/undraw_transfer_money_re_6o1h.svg";
 
 import Header from "../../../../components/header";
 import { DataTable } from "primereact/datatable";
@@ -18,9 +19,8 @@ import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 import { SelectButton } from "primereact/selectbutton";
 import { Tag } from "primereact/tag";
-import { Ripple } from 'primereact/ripple';
-import { classNames } from 'primereact/utils';
-
+import { Ripple } from "primereact/ripple";
+import { classNames } from "primereact/utils";
 
 import Typing from "react-typing-animation";
 
@@ -60,10 +60,8 @@ const PrecificadorExecuta = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  
-
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
-  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin"
+  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
   useEffect(() => {
     pegarTokenLocalStorage();
@@ -435,8 +433,7 @@ const PrecificadorExecuta = () => {
   const priceEditor = (options) => {
     return (
       <InputNumber
-       autoFocus
-      
+        autoFocus
         prefix="R$ "
         placeholder="Confirme ou altere o preço de venda"
         value={options.value}
@@ -594,7 +591,7 @@ const PrecificadorExecuta = () => {
   };
 
   const imprimePDFPrecosAgendados = () => {
-   // console.log(produtos)
+    // console.log(produtos)
     var dd = {
       //   pageSize: {width : 1001 , height : 200},
       pageOrientation: "portrait",
@@ -635,17 +632,17 @@ const PrecificadorExecuta = () => {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 0,
-            widths: [25,65,60, 100, 70, 70, "*"],
+            widths: [25, 65, 60, 100, 70, 70, "*"],
 
             body: [
-              ["","", "", "", "","", ""],
+              ["", "", "", "", "", "", ""],
 
               [
-                { text :  i+1 },
+                { text: i + 1 },
                 { text: moment(item.dataagendada).format("DD/MM/YY") },
                 { text: item.ean ? item.ean : item.codigo, style: "ean" },
                 { text: item.descricao.substring(0, 35), style: "descricao" },
-             
+
                 {
                   text:
                     "Agendado a R$ " +
@@ -668,7 +665,10 @@ const PrecificadorExecuta = () => {
                     }).format(item.precoAtual),
                   style: "preco",
                 },
-                { text: item.usuarioAgendado?.substring(0, 35), style :"descricao"},
+                {
+                  text: item.usuarioAgendado?.substring(0, 35),
+                  style: "descricao",
+                },
               ],
             ],
           },
@@ -689,8 +689,8 @@ const PrecificadorExecuta = () => {
           bold: true,
           fontSize: 50,
         },
-        data : {
-        fontSize : 15
+        data: {
+          fontSize: 15,
         },
         descricao: {
           alignment: "left",
@@ -708,7 +708,6 @@ const PrecificadorExecuta = () => {
         return {
           layout: "noBorders", // optional
           lineHeight: 1,
-         
 
           table: {
             // headers are automatically repeated if the table spans over multiple pages
@@ -721,7 +720,7 @@ const PrecificadorExecuta = () => {
 
               [
                 //    { text: item.ean ? item.ean : item.codigo, style : 'ean'},
-                { text:   moment(new Date()).format("DD MM YY"), style : "data" },
+                { text: moment(new Date()).format("DD MM YY"), style: "data" },
                 { text: item.descricao.substring(0, 34), style: "descricao" },
                 {
                   text:
@@ -811,7 +810,7 @@ const PrecificadorExecuta = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-            //     console.log(response.data);
+              //     console.log(response.data);
               setLoading(false);
 
               if (response.data.length === 0) {
@@ -877,12 +876,8 @@ const PrecificadorExecuta = () => {
         style={{ margin: "5px" }}
         className=" p-button-rounded p-button-info p-button-sm"
       />
-
-     
     </React.Fragment>
   );
-
- 
 
   const botaoatualizar =
     quantidadeFilial.length > 1 ? (
@@ -962,54 +957,81 @@ const PrecificadorExecuta = () => {
   };
 
   const template1 = {
-    layout: 'PrevPageLink PageLinks NextPageLink RowsPerPageDropdown CurrentPageReport',
-    'PrevPageLink': (options) => {
+    layout:
+      "PrevPageLink PageLinks NextPageLink RowsPerPageDropdown CurrentPageReport",
+    PrevPageLink: (options) => {
+      return (
+        <button
+          type="button"
+          className={options.className}
+          onClick={options.onClick}
+          disabled={options.disabled}
+        >
+          <span className="p-3">Anterior</span>
+          <Ripple />
+        </button>
+      );
+    },
+    NextPageLink: (options) => {
+      return (
+        <button
+          type="button"
+          className={options.className}
+          onClick={options.onClick}
+          disabled={options.disabled}
+        >
+          <span className="p-3">Próximo</span>
+          <Ripple />
+        </button>
+      );
+    },
+    PageLinks: (options) => {
+      if (
+        (options.view.startPage === options.page &&
+          options.view.startPage !== 0) ||
+        (options.view.endPage === options.page &&
+          options.page + 1 !== options.totalPages)
+      ) {
+        const className = classNames(options.className, { "p-disabled": true });
+
         return (
-            <button type="button" className={options.className} onClick={options.onClick} disabled={options.disabled}>
-                <span className="p-3">Anterior</span>
-                <Ripple />
-            </button>
-        )
+          <span className={className} style={{ userSelect: "none" }}>
+            ...
+          </span>
+        );
+      }
+
+      return (
+        <button
+          type="button"
+          className={options.className}
+          onClick={options.onClick}
+        >
+          {options.page + 1}
+          <Ripple />
+        </button>
+      );
     },
-    'NextPageLink': (options) => {
-        return (
-            <button type="button" className={options.className} onClick={options.onClick} disabled={options.disabled}>
-                <span className="p-3">Próximo</span>
-                <Ripple />
-            </button>
-        )
+    RowsPerPageDropdown: (options) => {
+      const dropdownOptions = [
+        { label: 3, value: 3 },
+        { label: 5, value: 5 },
+        { label: 10, value: 10 },
+        { label: 15, value: 15 },
+        { label: 20, value: 20 },
+        { label: 50, value: 50 },
+        { label: "Todos", value: options.totalRecords },
+      ];
+
+      return (
+        <Dropdown
+          value={options.value}
+          options={dropdownOptions}
+          onChange={options.onChange}
+        />
+      );
     },
-    'PageLinks': (options) => {
-        if ((options.view.startPage === options.page && options.view.startPage !== 0) || (options.view.endPage === options.page && options.page + 1 !== options.totalPages)) {
-            const className = classNames(options.className, { 'p-disabled': true });
-
-            return <span className={className} style={{ userSelect: 'none' }}>...</span>;
-        }
-
-        return (
-            <button type="button" className={options.className} onClick={options.onClick}>
-                {options.page + 1}
-                <Ripple />
-            </button>
-        )
-    },
-    'RowsPerPageDropdown': (options) => {
-        const dropdownOptions = [
-            { label: 3, value: 3 },
-            { label: 5, value: 5 },
-            { label: 10, value: 10 },
-            { label: 15, value: 15 },
-            { label: 20, value: 20 },
-            { label: 50, value: 50 },
-            { label: 'Todos', value: options.totalRecords }
-        ];
-
-        return <Dropdown value={options.value} options={dropdownOptions} onChange={options.onChange} />;
-    },
-   
-};
-
-
+  };
 
   return (
     <>
@@ -1020,13 +1042,20 @@ const PrecificadorExecuta = () => {
       </div>
 
       <div className="agenda-label">
-        <FcPaid color="#FFFF" size={50} />
-        <Typing>
+        <Typing speed={50}>
           <h1> Pesquisar agendamentos de preços </h1>
-          <Typing.Delay ms={1000} />
 
-          <h4>Atualizar os preços de venda</h4>
+          <h4
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            Atualizar os preços de venda
+          </h4>
         </Typing>
+        <img style={{ width: "250px" }} src={ImagemDestque} />
       </div>
 
       {produtos.length < 1 ? (
@@ -1109,7 +1138,9 @@ const PrecificadorExecuta = () => {
                   height: "99vh",
                   width: "100%",
                 }}
-                footer={"Existem " + produtos.length + " produto(s) para análise"}
+                footer={
+                  "Existem " + produtos.length + " produto(s) para análise"
+                }
                 breakpoint="1125px"
                 loading={loading}
                 stripedRows
@@ -1132,20 +1163,20 @@ const PrecificadorExecuta = () => {
                 size="normal"
                 responsiveLayout="stack"
                 emptyMessage="Nenhum produto encontrado para precificação"
-               showGridlines
+                showGridlines
                 header={headerDataTable}
-             //   rowGroupMode="subheader"
-            //    groupRowsBy={agrupamento}
+                //   rowGroupMode="subheader"
+                //    groupRowsBy={agrupamento}
                 paginator
                 rows={3}
                 paginatorTemplate={template1}
                 //  sortOrder={1}
-           //     rowGroupHeaderTemplate={headerTemplate}
+                //     rowGroupHeaderTemplate={headerTemplate}
                 // resizableColumns
                 // columnResizeMode="expand"
-              //  expandableRowGroups
-              //  expandedRows={expandedRows}
-             //   onRowToggle={(e) => setExpandedRows(e.data)}
+                //  expandableRowGroups
+                //  expandedRows={expandedRows}
+                //   onRowToggle={(e) => setExpandedRows(e.data)}
               >
                 <Column header="Código " field={EanOrCodigo}></Column>
 
@@ -1241,17 +1272,16 @@ const PrecificadorExecuta = () => {
                   body={precoAtualTemplate}
                 ></Column>
 
-                  <Column
+                <Column
                   header="Agendado por"
                   field="usuarioAgendado"
                   style={{ textAlign: "center", fontWeight: "600" }}
                 ></Column>
-                
+
                 <Column
                   field={status}
                   style={{ textAlign: "center", fontWeight: "600" }}
                 ></Column>
-
 
                 <Column
                   header="Atualizar e Confirmar"

@@ -1,32 +1,35 @@
-import PrecificadorAgenda from '../../pages/precificador/agenda/precificador-dataTable-novo'
-import Typing from 'react-typing-animation';
+import PrecificadorAgenda from "../../pages/precificador/agenda/precificador-dataTable-novo";
+import Typing from "react-typing-animation";
 import { FcCalendar } from "react-icons/fc";
+import DestaqueImg from "../../assets/img/undraw_projections_re_ulc6.svg";
 
-import './styles.css';
+import "./styles.css";
 
 const Main = () => {
-    return ( 
-        <>
-        
-        <div className="agenda-label">
-        <FcCalendar size={50}/>
-          <Typing speed={50} >
-            
-           <h1> Pesquisar notas fiscais de entrada </h1>
-           <Typing.Delay speed={50} startDelay={10}  />
-            
-           <h4>Agendar os preços de venda</h4>
-         
-           </Typing>
-           </div>
-       
-           <div className="container-flex">
-        
-        <PrecificadorAgenda />
-        </div>
+  return (
+    <>
+      <div className="agenda-label">
+        <Typing speed={50}>
+          <h1> Pesquisar notas fiscais de entrada </h1>
 
-        </>
-     );
-}
- 
+          <h4
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            Agendar os preços de venda
+          </h4>
+        </Typing>
+        <img style={{ width: "250px" }} src={DestaqueImg} />
+      </div>
+
+      <div className="container-flex">
+        <PrecificadorAgenda />
+      </div>
+    </>
+  );
+};
+
 export default Main;

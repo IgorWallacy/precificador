@@ -1,4 +1,5 @@
 import "./index.css";
+import ImagemDestque from "../../assets/img/undraw_login_re_4vu2.svg";
 
 import React, { useState, useContext, useRef } from "react";
 
@@ -134,17 +135,17 @@ const Login = () => {
               width: "100%",
               height: "100%",
               backgroundColor: "whitesmoke",
-              clipPath: "polygon(25% 0, 100% 0%, 100% 100%, 0 100%)",
+              clipPath: "polygon(0% 0, 100% 35%, 100% 100%, 0 88%)",
             }}
           />
         </div>
         <div className="fundo col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
           <section>
             <div className="form-login">
+              <img style={{ width: "250px" }} src={ImagemDestque} />
               <div></div>
               <h4 style={{ fontSize: "20px", margin: "15px", color: "#FFF" }}>
-                {" "}
-                <Typing speed={100} startDelay={10}>
+                <Typing speed={50}>
                   Utilize sua conta uniplus para acesso ao sistema
                 </Typing>{" "}
               </h4>

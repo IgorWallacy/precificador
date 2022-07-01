@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { faCalendarWeek, faCashRegister, faStore } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendarWeek,
+  faCashRegister,
+  faStore,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import './index.css'
+import "./index.css";
 
-import Header from '../../../components/header'
+import ImagemDestque from "../../../assets/img/undraw_data_reports_706v.svg";
 
-import api from '../../../services/axios'
+import Header from "../../../components/header";
+
+import api from "../../../services/axios";
 
 import { addLocale } from "primereact/api";
-
 
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
@@ -21,7 +26,6 @@ import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
 
 import { Skeleton } from "primereact/skeleton";
-
 
 function VendasDataTableComponent() {
   const [loja, setLoja] = useState(0);
@@ -39,16 +43,13 @@ function VendasDataTableComponent() {
   const [totalGeralNfce, setTotalGeralNfce] = useState(0);
   const [totalGeralECF, setTotalGeralECF] = useState(0);
 
-
-
-
   const toast = useRef(null);
 
   const dt = useRef(null);
 
   function clearFields() {
     setVendas(null);
-    setLoja(0)
+    setLoja(0);
 
     setPdv({ pdv: "0" });
 
@@ -57,17 +58,14 @@ function VendasDataTableComponent() {
     setTotalGeral(0);
   }
 
-
-
   const getVendasTotal = () => {
     setLoading(true);
     setVendas(null);
     setTotalGeralNfce(0);
     setTotalGeralECF(0);
     setTotalGeral(0);
-  
 
-    if ( !dataInicial || !dataFinal) {
+    if (!dataInicial || !dataFinal) {
       toast.current.show({
         severity: "warn",
         summary: "Aviso",
@@ -87,10 +85,10 @@ function VendasDataTableComponent() {
     let dateI = new Date(dataInicial).toISOString().split("T")[0];
     let dateF = new Date(dataFinal).toISOString().split("T")[0];
 
-    let codigo = loja?.codigo
+    let codigo = loja?.codigo;
 
-    if(!loja) {
-       codigo = 0
+    if (!loja) {
+      codigo = 0;
     }
 
     await api
@@ -99,7 +97,7 @@ function VendasDataTableComponent() {
         setPdvSelectItems(response.data);
       })
       .catch((err) => {
-        setLoading(false)
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -116,7 +114,7 @@ function VendasDataTableComponent() {
         setFiliais(response.data);
       })
       .catch((err) => {
-        setLoading(false)
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -134,22 +132,20 @@ function VendasDataTableComponent() {
       setPdv({ pdv: "0" });
     }
 
-    let codigo = loja?.codigo
+    let codigo = loja?.codigo;
 
-    if(!loja) {
-       codigo = 0
+    if (!loja) {
+      codigo = 0;
     }
 
     await api
-      .get(
-        `/api_vga/vendas/total/${codigo}/${dateI}/${dateF}/${pdv.pdv}`
-      )
+      .get(`/api_vga/vendas/total/${codigo}/${dateI}/${dateF}/${pdv.pdv}`)
       .then((response) => {
         setVendas(response.data);
         setLoading(false);
       })
       .catch((err) => {
-        setLoading(false)
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -167,21 +163,19 @@ function VendasDataTableComponent() {
       setPdv({ pdv: "0" });
     }
 
-    let codigo = loja?.codigo
+    let codigo = loja?.codigo;
 
-    if(!loja) {
-       codigo = 0
+    if (!loja) {
+      codigo = 0;
     }
 
     await api
-      .get(
-        `/api_vga/vendas/nfce/${codigo}/${dateI}/${dateF}/${pdv.pdv}`
-      )
+      .get(`/api_vga/vendas/nfce/${codigo}/${dateI}/${dateF}/${pdv.pdv}`)
       .then((response) => {
         setVendasNfce(response.data);
       })
       .catch((err) => {
-        setLoading(false)
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -199,21 +193,19 @@ function VendasDataTableComponent() {
       setPdv({ pdv: "0" });
     }
 
-    let codigo = loja?.codigo
+    let codigo = loja?.codigo;
 
-    if(!loja) {
-       codigo = 0
+    if (!loja) {
+      codigo = 0;
     }
 
     await api
-      .get(
-        `/api_vga/vendas/ecf/${codigo}/${dateI}/${dateF}/${pdv.pdv}`
-      )
+      .get(`/api_vga/vendas/ecf/${codigo}/${dateI}/${dateF}/${pdv.pdv}`)
       .then((r) => {
         setVendasECF(r.data);
       })
       .catch((err) => {
-        setLoading(false)
+        setLoading(false);
         toast.current.show({
           severity: "error",
           summary: "Error Message",
@@ -276,7 +268,6 @@ function VendasDataTableComponent() {
           currency: "BRL",
         }).format(totalGeralNfce);
         setTotalGeralNfce(totalGeralNfceF);
-       
       }
     }
 
@@ -298,7 +289,6 @@ function VendasDataTableComponent() {
         }).format(totalGeralECF);
 
         setTotalGeralECF(totalGeralECFF);
-      
       }
     }
 
@@ -313,7 +303,7 @@ function VendasDataTableComponent() {
                     Forma de Pagamento
                   </span>
                   <div className="text-900 font-medium text-xl">
-                   <strong>  {data.nomefinalizador.toUpperCase()} </strong> 
+                    <strong> {data.nomefinalizador.toUpperCase()} </strong>
                   </div>
                 </div>
                 <div
@@ -330,7 +320,7 @@ function VendasDataTableComponent() {
               <div className="flex justify-content-between mb-3">
                 <div>
                   <span className="block text-500 font-medium mb-3">
-                   NFCE-e
+                    NFCE-e
                   </span>
                   <div className="text-900 font-medium text-xl">
                     {totalnfceF}
@@ -349,9 +339,7 @@ function VendasDataTableComponent() {
             <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
               <div className="flex justify-content-between mb-3">
                 <div>
-                  <span className="block text-500 font-medium mb-3">
-                     ECF
-                  </span>
+                  <span className="block text-500 font-medium mb-3">ECF</span>
                   <div className="text-900 font-medium text-xl">
                     {totalecfF}
                   </div>
@@ -371,7 +359,13 @@ function VendasDataTableComponent() {
               <div className="flex justify-content-between mb-3">
                 <div>
                   <span className="block text-800 font-medium mb-3">
-                   <h2> <strong> TOTAL {data.nomefinalizador.toUpperCase()} </strong>  </h2>
+                    <h2>
+                      {" "}
+                      <strong>
+                        {" "}
+                        TOTAL {data.nomefinalizador.toUpperCase()}{" "}
+                      </strong>{" "}
+                    </h2>
                   </span>
                   <div className="text-900 font-medium text-xl">{totalF}</div>
                 </div>
@@ -390,12 +384,8 @@ function VendasDataTableComponent() {
     );
   };
 
-
-
   useEffect(() => {
-  
     setLoading(false);
-    
 
     setPdv({ pdv: "0" });
 
@@ -407,11 +397,7 @@ function VendasDataTableComponent() {
     setVendas(null);
     setVendasECF(null);
     getFiliais();
-    
-   
-   
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
 
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -460,214 +446,208 @@ function VendasDataTableComponent() {
 
   const itemTemplateStore = (option) => {
     return (
-        <div className="flex align-items-center">
-           <FontAwesomeIcon style={{margin:'1rem'}} icon={faStore} />
-          
-            <div> {option.codigo} - {option.nome.substring(0,15)}</div>
-        </div>
-    );
-}
-
-const selectedStore = (option) => {
-  return (
       <div className="flex align-items-center">
-         <FontAwesomeIcon style={{margin:'1rem'}} icon={faStore} />
-        
-          <div> {option?.codigo} - {option?.nome.substring(0,15)}</div>
-      </div>
-  );
-}
+        <FontAwesomeIcon style={{ margin: "1rem" }} icon={faStore} />
 
-const selectedTemplatePDV = (option, props) => {
-  if (option) {
+        <div>
+          {" "}
+          {option.codigo} - {option.nome.substring(0, 15)}
+        </div>
+      </div>
+    );
+  };
+
+  const selectedStore = (option) => {
+    return (
+      <div className="flex align-items-center">
+        <FontAwesomeIcon style={{ margin: "1rem" }} icon={faStore} />
+
+        <div>
+          {" "}
+          {option?.codigo} - {option?.nome.substring(0, 15)}
+        </div>
+      </div>
+    );
+  };
+
+  const selectedTemplatePDV = (option, props) => {
+    if (option) {
       return (
         <div className="flex align-items-center">
-        <FontAwesomeIcon  style={{margin:'1rem'}} icon={faCashRegister} />
-         PDV  
-         <div>{option.pdv}</div>
-     </div>
-      );
-  }}
-
-const itemTemplateCashier = (option) => {
-  return (
-      <div className="flex align-items-center">
-         <FontAwesomeIcon  style={{margin:'1rem'}} icon={faCashRegister} />
-          PDV  
+          <FontAwesomeIcon style={{ margin: "1rem" }} icon={faCashRegister} />
+          PDV
           <div>{option.pdv}</div>
-      </div>
-  );
-}
+        </div>
+      );
+    }
+  };
 
+  const itemTemplateCashier = (option) => {
+    return (
+      <div className="flex align-items-center">
+        <FontAwesomeIcon style={{ margin: "1rem" }} icon={faCashRegister} />
+        PDV
+        <div>{option.pdv}</div>
+      </div>
+    );
+  };
 
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
 
-      <Header/>
-     
-      <div className="container">
-      <div className=" cards-info">
-        <div className="field">
-        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faCalendarWeek} />
-          <Calendar
-          locale="pt-BR"
-           showIcon
-           showButtonBar
-            id="dateI"
-            dateFormat="dd/mm/yy"
-            className="input-calendar"
-            placeholder="Informe o período inicial "
-            value={dataInicial}
-            onChange={(e) => setDataInicial(e.target.value)}
-          ></Calendar>
-        </div>
+      <Header />
 
-        <div className="field">
-        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faCalendarWeek} />
-          <Calendar
-          showIcon
-          locale="pt-BR"
-          showButtonBar
-            id="dateF"
-            dateFormat="dd/mm/yy"
-            className="input-calendar"
-            value={dataFinal}
-            placeholder="Informe o período final "
-            onChange={(e) => setDataFinal(e.target.value)}
-          ></Calendar>
-        </div>
+      <div className="container-venda">
+        <img style={{ width: "50%" }} src={ImagemDestque} />
+        <div className="cards-info">
+          <div className="field">
+            <Calendar
+              locale="pt-BR"
+              showIcon
+              showButtonBar
+              id="dateI"
+              dateFormat="dd/mm/yy"
+              className="input-calendar"
+              placeholder="Informe o período inicial "
+              value={dataInicial}
+              onChange={(e) => setDataInicial(e.target.value)}
+            ></Calendar>
+          </div>
 
-        <div className="field">
-        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faStore} />
-          <Dropdown
-           
-           itemTemplate={itemTemplateStore} 
-            style={{ marginRight: "5px" }}
-            value={loja}
-            valueTemplate={selectedStore}
-            options={filiais}
-            optionLabel="nome"
-            onChange={(e) => setLoja(e.target.value)}
-            placeholder="Selecione uma loja "
-          />
-        </div>
-        <div className="field">
-        <FontAwesomeIcon size="2x" style={{margin:'1rem', color:'#14b8a6'}} icon={faCashRegister} /> 
-          <Dropdown
-            itemTemplate={itemTemplateCashier} 
-            valueTemplate={selectedTemplatePDV}
-          
-            value={pdv}
-            options={pdvSelectItems}
-            optionLabel="pdv"
-            onChange={(e) => setPdv(e.target.value)}
-            placeholder="Selecione um PDV"
-          />
-        </div>
-     
-      <div className="buttons">
-        <Button
-          icon={ loading ? 'pi pi-spin pi-spinner' : 'pi pi-search'}
-          onClick={() => getVendasTotal()}
-          className="p-button-rounded p-button-success"
-          style={{ margin: "5px" }}
-          aria-label="Search"
-          label={loading ? 'Pesquisando...' : 'Pesquisar'}
-          disabled={loading}
-        />
+          <div className="field">
+            <Calendar
+              showIcon
+              locale="pt-BR"
+              showButtonBar
+              id="dateF"
+              dateFormat="dd/mm/yy"
+              className="input-calendar"
+              value={dataFinal}
+              placeholder="Informe o período final "
+              onChange={(e) => setDataFinal(e.target.value)}
+            ></Calendar>
+          </div>
 
-        <Button
-          onClick={clearFields}
-          icon="pi pi-times"
-          style={{ margin: "5px" }}
-          className="p-button-rounded p-button-danger"
-          aria-label="Cancel"
-          label="Limpar"
-        />
-      </div>
-</div>
+          <div className="field">
+            <Dropdown
+              itemTemplate={itemTemplateStore}
+              style={{ marginRight: "5px" }}
+              value={loja}
+              valueTemplate={selectedStore}
+              options={filiais}
+              optionLabel="nome"
+              onChange={(e) => setLoja(e.target.value)}
+              placeholder="Selecione uma loja "
+            />
+          </div>
+          <div className="field">
+            <Dropdown
+              itemTemplate={itemTemplateCashier}
+              valueTemplate={selectedTemplatePDV}
+              value={pdv}
+              options={pdvSelectItems}
+              optionLabel="pdv"
+              onChange={(e) => setPdv(e.target.value)}
+              placeholder="Selecione um PDV"
+            />
+          </div>
+
+          <div className="buttons">
+            <Button
+              icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
+              onClick={() => getVendasTotal()}
+              className="p-button-rounded p-button-success"
+              style={{ margin: "5px" }}
+              aria-label="Search"
+              label={loading ? "Pesquisando..." : "Pesquisar"}
+              disabled={loading}
+            />
+
+            <Button
+              onClick={clearFields}
+              icon="pi pi-times"
+              style={{ margin: "5px" }}
+              className="p-button-rounded p-button-danger"
+              aria-label="Cancel"
+              label="Limpar"
+            />
+          </div>
+        </div>
       </div>
 
-     
-      <div >
-       
-          <div className=" cards-info">
-            <div className="col-12 md:col-6 lg:col-3 justify-content-end">
-              <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
-                <div className="flex justify-content-between mb-3">
-                  <div>
-                    <span className="block text-500 font-medium mb-3">
-                      Total Geral NFCE-e
-                    </span>
-                    <div className="text-900 font-medium text-xl">
-                  <h1>    {totalGeralNfce  } </h1>
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex align-items-center justify-content-center bg-blue-100 border-round"
-                    style={{ width: "2.5rem", height: "2.5rem" }}
-                  >
-                    <i className="pi pi-cloud text-blue-500 text-xl"></i>
+      <div>
+        <div className=" cards-info">
+          <div className="col-12 md:col-6 lg:col-3 justify-content-end">
+            <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
+              <div className="flex justify-content-between mb-3">
+                <div>
+                  <span className="block text-500 font-medium mb-3">
+                    Total Geral NFCE-e
+                  </span>
+                  <div className="text-900 font-medium text-xl">
+                    <h1> {totalGeralNfce} </h1>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="col-12 md:col-6 lg:col-3 justify-content-end">
-              <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
-                <div className="flex justify-content-between mb-3">
-                  <div>
-                    <span className="block text-500 font-medium mb-3">
-                      Total Geral ECF
-                    </span>
-                    <div className="text-900 font-medium text-xl">
-                   <h1> {totalGeralECF } </h1>
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex align-items-center justify-content-center bg-green-100 border-round"
-                    style={{ width: "2.5rem", height: "2.5rem" }}
-                  >
-                    <i className="pi pi-dollar text-green-500 text-xl"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-12 md:col-6 lg:col-3 justify-content-end">
-              <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
-                <div className="flex justify-content-between mb-3">
-                  <div>
-                    <span className="block text-500 font-medium mb-3">
-                      Total Geral
-                    </span>
-                    <div className="text-900 font-medium text-xl">
-                   <h1>   {totalGeral  } </h1>
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex align-items-center justify-content-center bg-green-100 border-round"
-                    style={{ width: "2.5rem", height: "2.5rem" }}
-                  >
-                    <i className="pi pi-wallet text-green-500 text-xl"></i>
-                  </div>
+                <div
+                  className="flex align-items-center justify-content-center bg-blue-100 border-round"
+                  style={{ width: "2.5rem", height: "2.5rem" }}
+                >
+                  <i className="pi pi-cloud text-blue-500 text-xl"></i>
                 </div>
               </div>
             </div>
           </div>
 
-        
+          <div className="col-12 md:col-6 lg:col-3 justify-content-end">
+            <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
+              <div className="flex justify-content-between mb-3">
+                <div>
+                  <span className="block text-500 font-medium mb-3">
+                    Total Geral ECF
+                  </span>
+                  <div className="text-900 font-medium text-xl">
+                    <h1> {totalGeralECF} </h1>
+                  </div>
+                </div>
 
-       
-          <div className="card">
+                <div
+                  className="flex align-items-center justify-content-center bg-green-100 border-round"
+                  style={{ width: "2.5rem", height: "2.5rem" }}
+                >
+                  <i className="pi pi-dollar text-green-500 text-xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        
-          <DataTable 
-            emptyMessage={<Skeleton   />}
+          <div className="col-12 md:col-6 lg:col-3 justify-content-end">
+            <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
+              <div className="flex justify-content-between mb-3">
+                <div>
+                  <span className="block text-500 font-medium mb-3">
+                    Total Geral
+                  </span>
+                  <div className="text-900 font-medium text-xl">
+                    <h1> {totalGeral} </h1>
+                  </div>
+                </div>
+
+                <div
+                  className="flex align-items-center justify-content-center bg-green-100 border-round"
+                  style={{ width: "2.5rem", height: "2.5rem" }}
+                >
+                  <i className="pi pi-wallet text-green-500 text-xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <DataTable
+            emptyMessage={<Skeleton />}
             ref={dt}
             dataKey="id"
             value={vendas}
@@ -683,8 +663,7 @@ const itemTemplateCashier = (option) => {
             rowGroupHeaderTemplate={headerTemplate}
             loading={loading}
           ></DataTable>
-         </div>
-        
+        </div>
       </div>
     </>
   );

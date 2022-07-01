@@ -115,13 +115,15 @@ const PrecificadorAgenda = () => {
   const atualizarmarkupminimo = () => {
     setLoading(true);
 
-    
-
     api
       .put(
-        `/api/produto/atualizarmarkupminimo/${produtoEmExibicaoSugestaoDialog.idproduto}/${produtoEmExibicaoSugestaoDialog.idfamilia
-          ? produtoEmExibicaoSugestaoDialog.idfamilia
-          : 0}/${novoPercentualMarkupMinimo}`
+        `/api/produto/atualizarmarkupminimo/${
+          produtoEmExibicaoSugestaoDialog.idproduto
+        }/${
+          produtoEmExibicaoSugestaoDialog.idfamilia
+            ? produtoEmExibicaoSugestaoDialog.idfamilia
+            : 0
+        }/${novoPercentualMarkupMinimo}`
       )
       .then((r) => {})
       .catch((error) => {
@@ -219,7 +221,7 @@ const PrecificadorAgenda = () => {
       </>
     );
   };
-/*
+  /*
   const margemAtual = (rowData) => {
     //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
     let margem =
@@ -444,7 +446,6 @@ const PrecificadorAgenda = () => {
                     <del> {precoAtualFormatado}</del>
 
                     <h6>
-                     
                       {rowData.precopromocionalfamilia
                         ? markupPromocaoFamiliaFormatado
                         : markupPromocaoFormatado}
@@ -483,7 +484,6 @@ const PrecificadorAgenda = () => {
                     <del> {precoAtualFormatado}</del>
 
                     <h6>
-                     
                       {rowData.precopromocionalfamilia
                         ? markupPromocaoFamiliaFormatado
                         : markupPromocaoFormatado}
@@ -821,7 +821,7 @@ const PrecificadorAgenda = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-            //  console.log(response.data);
+              //  console.log(response.data);
 
               setLoading(false);
 

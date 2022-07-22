@@ -1,16 +1,25 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
 body {
-    font-family: var(--font-family);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+	font-family: var(--font-family);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.status-api {
+	display: flex;
+	justify-content: flex-end;
+	align-items: space-around;
+	padding: 25px;
+	flex-wrap: wrap;
+
 }
 
 .botao-login {
 	border-radius: 20px;
 	border: 1px solid #f4917f;
 	background-image: linear-gradient(to left bottom, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-    margin: 10px;
+	margin: 10px;
 	color: #FFFFFF;
 	font-size: 12px;
 	font-weight: bold;
@@ -48,7 +57,7 @@ body {
 	flex-direction: column;
 	justify-content: center;
 	flex-direction: column;
-	color : #DDD;
+	color: #DDD;
 }
 
 
@@ -63,7 +72,7 @@ body {
 .fundo {
 
 	background-color: #8ea3e3;
-	
+
 
 }
 
@@ -75,63 +84,93 @@ body {
 
 @-webkit-keyframes pulse {
 	0% {
-	  -webkit-transform: scale(1);
+		-webkit-transform: scale(1);
 	}
-	25% {
-	  -webkit-transform: scale(1.1);
-	}
-	50% {
-	  -webkit-transform: scale(0.95);
-	}
-	100% {
-	  -webkit-transform: scale(1);
-	}
-  }
-  @-moz-keyframes pulse {
-	0% {
-	  -moz-transform: scale(1);
-	}
-	25% {
-	  -moz-transform: scale(1.1);
-	}
-	50% {
-	  -moz-transform: scale(1);
-	}
-	100% {
-	  -moz-transform: scale(1);
-	}
-  }
-  @-ms-keyframes pulse {
-	0% {
-	  -ms-transform: scale(1);
-	}
-	25% {
-	  -ms-transform: scale(1.1);
-	}
-	50% {
-	  -ms-transform: scale(1);
-	}
-	100% {
-	  -ms-transform: scale(1);
-	}
-  }
-  @-o-keyframes pulse {
-	
-	0% { -o-transform: scale(1); }
-	25% { -o-transform: scale(1.1); }
-	50% { -o-transform: scale(1); }
-	100% { -o-transform: scale(1); } 
-  }
-  @keyframes pulse { 
-	0% {transform: scale(1);}
-	50% {transform: scale(1.1);}
-	100% {transform: scale(1);}
-  }
 
-  .logo-login {
-	  width: 70%;
-	
-	 
-  }
+	25% {
+		-webkit-transform: scale(1.1);
+	}
 
- 
+	50% {
+		-webkit-transform: scale(0.95);
+	}
+
+	100% {
+		-webkit-transform: scale(1);
+	}
+}
+
+@-moz-keyframes pulse {
+	0% {
+		-moz-transform: scale(1);
+	}
+
+	25% {
+		-moz-transform: scale(1.1);
+	}
+
+	50% {
+		-moz-transform: scale(1);
+	}
+
+	100% {
+		-moz-transform: scale(1);
+	}
+}
+
+@-ms-keyframes pulse {
+	0% {
+		-ms-transform: scale(1);
+	}
+
+	25% {
+		-ms-transform: scale(1.1);
+	}
+
+	50% {
+		-ms-transform: scale(1);
+	}
+
+	100% {
+		-ms-transform: scale(1);
+	}
+}
+
+@-o-keyframes pulse {
+
+	0% {
+		-o-transform: scale(1);
+	}
+
+	25% {
+		-o-transform: scale(1.1);
+	}
+
+	50% {
+		-o-transform: scale(1);
+	}
+
+	100% {
+		-o-transform: scale(1);
+	}
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.1);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
+.logo-login {
+	width: 70%;
+
+
+}

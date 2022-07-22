@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 
 import api from "../../services/axios";
 
+import Footer from "../../components/footer";
+import Header from "../../components/header";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStore,
@@ -71,6 +74,8 @@ const MenuInterativo = () => {
 
   return (
     <>
+      <Header />
+      <Footer />
       <div className="menu-interativo">
         <div style={{ width: "100%" }} className="menu-categoria">
           <Typing speed={50} startDelay={10}>

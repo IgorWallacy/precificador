@@ -1,5 +1,3 @@
-
-
 .container-fornecedor {
 
     display: flex;
@@ -17,17 +15,17 @@
 .datatable-templating-demo {
 
     display: flex;
-  
+
     flex-direction: row;
     justify-content: stretch;
     align-items: stretch;
     flex-wrap: wrap;
     background-color: transparent;
     width: 100%;
-   
-   
+
+
     border: 1px solid #FFF;
-   
+
 
 }
 
@@ -38,7 +36,7 @@
     display: flex;
     flex-direction: column;
     margin: 30px;
-  
+
     justify-content: space-around;
 }
 
@@ -52,7 +50,14 @@
     padding: 5px;
 }
 
-.botao-add-colado{
+.img-fornecedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.botao-add-colado {
     position: fixed;
     top: 500px;
     left: 1px;
@@ -77,5 +82,3 @@
     padding: 5px;
     flex-wrap: wrap;
 }
-
-

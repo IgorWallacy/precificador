@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./styles.css";
-
+import ImagemDestque from "../../../../assets/img/compras-fornecedor.svg";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import Header from "../../../../components/header";
+import Footer from "../../../../components/footer";
 import { addLocale } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -79,7 +80,7 @@ export default function AnaliseFornecedor() {
   const [loading, setLoading] = useState(false);
   const [dataInicialCompra, setDataInicialCompra] = useState();
   const [dataFinalCompra, setDataFinalCompra] = useState();
-  const [dataInicialVenda, setDataInicialVenda] = useState(new Date());
+  // const [dataInicialVenda, setDataInicialVenda] = useState(new Date());
   const [diasVenda, setDiasVenda] = useState(90);
   const [dataFinalVenda, setDataFinalVenda] = useState();
   const [fornecedor, setFornecedor] = useState(null);
@@ -109,6 +110,10 @@ export default function AnaliseFornecedor() {
   const [dialogDuplicatas, setDialogDuplicatas] = useState(false);
   const [duplicatas, setDuplicatas] = useState([]);
 
+  const [tempoDiasPedido, setTempoDiasPedido] = useState(0);
+  const [tempoDiasEntrega, settempoDiasEntrega] = useState(0);
+  const [margemErroDiasEntrega, setMargemErroDiasEntrega] = useState(0);
+
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -125,14 +130,8 @@ export default function AnaliseFornecedor() {
   let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 
   const getDuplicatas = () => {
-   
-
-    
-
-    
-
     api
-      .get(`/api/documentos/apagar/hoje/${filial?filial.codigo:0}`)
+      .get(`/api/documentos/apagar/hoje/${filial ? filial.codigo : 0}`)
       .then((r) => {
         setDuplicatas(r.data);
         // console.log(r.data)
@@ -144,9 +143,7 @@ export default function AnaliseFornecedor() {
           detail: `${error}`,
         });
       })
-      .finally(() => {
-       
-      });
+      .finally(() => {});
   };
 
   const getFornecedores = () => {
@@ -204,9 +201,6 @@ export default function AnaliseFornecedor() {
 
   const analisar = () => {
     setLoading(true);
-    
-
-  
 
     setDataFinalVenda(new Date());
 
@@ -231,13 +225,15 @@ export default function AnaliseFornecedor() {
             "YYYY-MM-DD"
           )}/${moment(dataFinalCompra).format("YYYY-MM-DD")}/${fornecedor.id}/${
             filial.codigo
-          }/${moment(moment.now()).subtract(diasVenda, "days").format("YYYY-MM-DD")}/${moment(
-            dataFinalVenda
-          ).format("YYYY-MM-DD")}`
+          }/${moment(moment.now())
+            .subtract(diasVenda, "days")
+            .format("YYYY-MM-DD")}/${moment(dataFinalVenda).format(
+            "YYYY-MM-DD"
+          )}`
         )
         .then((r) => {
           setProdutos(r.data);
-         // console.log(r.data);
+          // console.log(r.data);
         })
         .catch((error) => {
           toast.current.show({
@@ -250,6 +246,40 @@ export default function AnaliseFornecedor() {
           setLoading(false);
         });
     }
+  };
+
+  const venda_diaria_template = (rowData) => {
+    let total = rowData.quantidade_vendida * rowData.preco_medio_venda;
+    let venda_diaria = total / diasVenda;
+    let totalF = Intl.NumberFormat("pt-BR", {
+      style: "decimal",
+    }).format(venda_diaria);
+
+    return (
+      <>
+        <h4 style={{ color: "green" }}>Quantidade média de venda</h4> <br />{" "}
+        <h4 style={{ color: "green" }}> {totalF} </h4>
+      </>
+    );
+  };
+
+  const sugestao_quantidade_compra = (rowData) => {
+    let total = rowData.quantidade_vendida * rowData.preco_medio_venda;
+    let venda_diaria = total / diasVenda;
+
+    let qtdeAComprar =
+      venda_diaria *
+      (tempoDiasPedido + tempoDiasEntrega + margemErroDiasEntrega);
+
+    let totalF = Intl.NumberFormat("pt-BR", {
+      style: "decimal",
+    }).format(qtdeAComprar);
+
+    return (
+      <>
+        <h4> Quantidade sugerida para compra </h4> <br /> {totalF}
+      </>
+    );
   };
 
   const total_comprado_template = (rowData) => {
@@ -803,7 +833,7 @@ export default function AnaliseFornecedor() {
         />
         <Column
           style={{ color: "green" }}
-          colSpan={2}
+          colSpan={4}
           footer={() => totalizarAnaliseTotalVendido()}
         />
       </Row>
@@ -849,8 +879,6 @@ export default function AnaliseFornecedor() {
     }).format(t);
   };
 
-  
-
   const valor_duplicata_template = (rowData) => {
     return Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -880,7 +908,10 @@ export default function AnaliseFornecedor() {
   return (
     <>
       <Header />
-
+      <Footer />
+      <div className="img-fornecedor">
+        <img src={ImagemDestque} style={{ width: "445px" }} />
+      </div>
       <Dialog
         header="Adicionar produto a lista de compras"
         modal={false}
@@ -1194,6 +1225,45 @@ export default function AnaliseFornecedor() {
         </div>
 
         <div>
+          <div className="fornecedor-input">
+            <h4 style={{ color: "green" }}>Informe o tempo do pedido (Dias)</h4>
+
+            <InputNumber
+              showButtons
+              style={{ marginTop: "10px", width: "40%" }}
+              onChange={(e) => setTempoDiasPedido(e.value)}
+              value={tempoDiasPedido}
+            ></InputNumber>
+          </div>
+
+          <div className="fornecedor-input">
+            <h4 style={{ color: "green" }}>
+              Informe o tempo de entrega (Dias)
+            </h4>
+
+            <InputNumber
+              showButtons
+              style={{ marginTop: "10px", width: "40%" }}
+              onChange={(e) => settempoDiasEntrega(e.value)}
+              value={tempoDiasEntrega}
+            ></InputNumber>
+          </div>
+
+          <div className="fornecedor-input">
+            <h4 style={{ color: "green" }}>
+              Informe a margem de erro para tempo de entrega (Dias)
+            </h4>
+
+            <InputNumber
+              showButtons
+              style={{ marginTop: "10px", width: "40%" }}
+              onChange={(e) => setMargemErroDiasEntrega(e.value)}
+              value={margemErroDiasEntrega}
+            ></InputNumber>
+          </div>
+        </div>
+
+        <div>
           <Button
             loading={loading}
             style={{ marginTop: "30px" }}
@@ -1203,7 +1273,6 @@ export default function AnaliseFornecedor() {
             onClick={analisar}
           />
         </div>
-
         <div>
           <Button
             icon="pi pi-chart-line"
@@ -1269,9 +1338,13 @@ export default function AnaliseFornecedor() {
 
         <Column
           field="rating"
-         
           header="Classificação"
           body={giroTemplate}
+        ></Column>
+
+        <Column
+          field={sugestao_quantidade_compra}
+          header="Sugestão qtde compra"
         ></Column>
 
         <Column
@@ -1279,7 +1352,7 @@ export default function AnaliseFornecedor() {
           header="Custo unitário"
         ></Column>
 
-        <Column  field={quantidade_comprada_template} header="Compra"></Column>
+        <Column field={quantidade_comprada_template} header="Compra"></Column>
 
         <Column
           field={total_comprado_template}
@@ -1291,6 +1364,11 @@ export default function AnaliseFornecedor() {
         <Column
           field={quantidade_vendida_template}
           header="Qtde venda"
+        ></Column>
+
+        <Column
+          field={venda_diaria_template}
+          header="Qtde venda diária"
         ></Column>
 
         <Column field={total_template} header="Total vendido"></Column>
@@ -1324,23 +1402,34 @@ export default function AnaliseFornecedor() {
         position="top"
         onHide={() => setDialogDuplicatas(false)}
       >
-       
-
         <div className="fornecedor-input">
-            <h4>Selecione uma loja</h4>
-            <Dropdown
-              style={{ marginTop: "10px" }}
-              placeholder="Selecione uma loja"
-              value={filial}
-              onChange={(e) => setFilial(e.target.value)}
-              options={lojas}
-              optionLabel="nome"
-              showClear
-            />
-          </div>
+          <h4>Selecione uma loja</h4>
+          <Dropdown
+            style={{ marginTop: "10px" }}
+            placeholder="Selecione uma loja"
+            value={filial}
+            onChange={(e) => setFilial(e.target.value)}
+            options={lojas}
+            optionLabel="nome"
+            showClear
+          />
+        </div>
 
-          <div style={{width : '15%' , display:'flex' , alignItems : 'center', justifyContent : 'center'}} className="card">
-          <Button  className="p-button p-button-info p-button-rounded " icon="pi pi-search" label="Filtrar" onClick={() => getDuplicatas()} />
+        <div
+          style={{
+            width: "15%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          className="card"
+        >
+          <Button
+            className="p-button p-button-info p-button-rounded "
+            icon="pi pi-search"
+            label="Filtrar"
+            onClick={() => getDuplicatas()}
+          />
         </div>
 
         <DataTable
@@ -1350,7 +1439,7 @@ export default function AnaliseFornecedor() {
           filters={filters3}
           dataKey="id"
           header={renderHeader2}
-        //  loading={loading}
+          //  loading={loading}
           stripedRows
           value={duplicatas}
           footerColumnGroup={footerGroup}

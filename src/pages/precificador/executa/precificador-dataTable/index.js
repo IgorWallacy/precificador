@@ -4,6 +4,7 @@ import "./styless.css";
 import ImagemDestque from "../../../../assets/img/undraw_transfer_money_re_6o1h.svg";
 
 import Header from "../../../../components/header";
+import Footer from "../../../../components/footer";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
@@ -23,8 +24,6 @@ import { Ripple } from "primereact/ripple";
 import { classNames } from "primereact/utils";
 
 import Typing from "react-typing-animation";
-
-import { FcPaid } from "react-icons/fc";
 
 import api from "../../../../services/axios";
 //import { useNavigate } from "react-router-dom";
@@ -1039,6 +1038,7 @@ const PrecificadorExecuta = () => {
 
       <div className="header">
         <Header />
+        <Footer />
       </div>
 
       <div className="agenda-label">

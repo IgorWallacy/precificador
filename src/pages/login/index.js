@@ -1,7 +1,7 @@
 import "./index.css";
 import ImagemDestque from "../../assets/img/undraw_login_re_4vu2.svg";
 
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -16,6 +16,7 @@ import axios from "axios";
 import Logo from "../../assets/img/logo_duca.png";
 
 import Typing from "react-typing-animation";
+import { Badge } from "primereact/badge";
 
 import "primeflex/primeflex.css";
 
@@ -25,6 +26,8 @@ const Login = () => {
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [statusApi, setStatusApi] = useState(null);
 
   const isLogado = useContext(Context);
 
@@ -58,6 +61,17 @@ const Login = () => {
     params: params,
   });
 
+  const getStatus = () => {
+    api
+      .get("/actuator/health")
+      .then((r) => {
+        setStatusApi(r.data.status);
+      })
+      .catch((error) => {
+        setStatusApi("Offline");
+      });
+  };
+
   async function login(e) {
     e.preventDefault();
     isLogado.setLogado(false);
@@ -80,7 +94,7 @@ const Login = () => {
         setLoading(false);
         isLogado.setLogado(false);
         localStorage.clear();
-
+        getStatus();
         toast.current.show({
           severity: "error",
           summary: "Erro",
@@ -118,10 +132,13 @@ const Login = () => {
       });
   }
 
+  useEffect(() => {
+    getStatus();
+  }, []);
+
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
-
       <div
         style={{ marginTop: "10rem" }}
         className="grid grid-nogutter surface-0 text-800"
@@ -182,6 +199,16 @@ const Login = () => {
             </div>
           </section>
         </div>
+      </div>
+      <div className="status-api">
+        <Badge
+          severity={statusApi === "UP" ? "success" : "danger"}
+          value={
+            statusApi === "UP"
+              ? "Sistema online"
+              : "Sistema Offline, Informe ao administrador"
+          }
+        ></Badge>
       </div>
     </>
   );

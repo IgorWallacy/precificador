@@ -7,6 +7,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import Footer from "../../../components/footer";
+
 import "./index.css";
 
 import ImagemDestque from "../../../assets/img/undraw_data_reports_706v.svg";
@@ -665,6 +667,7 @@ function VendasDataTableComponent() {
           ></DataTable>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

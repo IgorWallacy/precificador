@@ -95,8 +95,9 @@ export default function AnaliseFornecedor() {
   const [displayDialog, setDisplayDialog] = useState(false);
 
   const [produto, setProduto] = useState([""]);
-  const [quantidade, setQuantidade] = useState(0);
-  const [preco, setPreco] = useState(0);
+  const [quantidade1, setQuantidade1] = useState(null);
+  const [quantidade2, setQuantidade2] = useState(null);
+  const [preco, setPreco] = useState(null);
 
   const [condicaoPagamento, setCondicaoPagamento] = useState();
   const [condicoesPagamento, setCondicoesPagamento] = useState([]);
@@ -257,7 +258,7 @@ export default function AnaliseFornecedor() {
 
     return (
       <>
-        <h4 style={{ color: "green" }}>Quantidade média de venda</h4> <br />{" "}
+        <h4 style={{ color: "green" }}>Venda diária</h4> <br />{" "}
         <h4 style={{ color: "green" }}> {totalF} </h4>
       </>
     );
@@ -277,7 +278,10 @@ export default function AnaliseFornecedor() {
 
     return (
       <>
-        <h4> Quantidade sugerida para compra </h4> <br /> {totalF}
+        <h4 style={{ color: "red" }}>
+          Quantidade média sugerida para compra (UN)
+        </h4>
+        <br /> <h4 style={{ color: "red" }}> {totalF} </h4>
       </>
     );
   };
@@ -308,7 +312,7 @@ export default function AnaliseFornecedor() {
     return (
       <>
         <font color="green">Preço médio de venda</font> <br />
-        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
+        <font color="green" style={{ fontSize: "1rem", fontWeight: "800" }}>
           {preco_medio_venda}{" "}
         </font>{" "}
       </>
@@ -368,7 +372,7 @@ export default function AnaliseFornecedor() {
           {" "}
           Vendeu <br />
         </font>
-        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
+        <font color="green" style={{ fontSize: "1rem", fontWeight: "800" }}>
           {rowData.quantidade_vendida ? quantidade_vendida : 0}{" "}
           {rowData.unidade_venda}
         </font>
@@ -387,7 +391,7 @@ export default function AnaliseFornecedor() {
         <font color="green">
           Total vendido <br />
         </font>
-        <font color="green" style={{ fontSize: "20px", fontWeight: "800" }}>
+        <font color="green" style={{ fontSize: "1rem", fontWeight: "800" }}>
           {" "}
           {totalF}{" "}
         </font>
@@ -490,7 +494,8 @@ export default function AnaliseFornecedor() {
   };
 
   const openNew = (produto) => {
-    setQuantidade(null);
+    setQuantidade1(null);
+    setQuantidade2(null);
     setPreco(produto.ultimoprecocompra);
     setDisplayDialog(true);
     setProduto({ ...produto });
@@ -503,8 +508,7 @@ export default function AnaliseFornecedor() {
       <>
         <Button
           style={{ margin: "5px" }}
-          className="p-button-rounded"
-          label="+"
+          className="p-button-rounded p-button-sm"
           icon="pi pi-shopping-bag"
           //  onClick={() => adicionarProduto(rowdata)}
           onClick={() => openNew(rowdata)}
@@ -519,17 +523,18 @@ export default function AnaliseFornecedor() {
   };
 
   const adicionarProduto = (rowData) => {
-    if (!quantidade || !preco) {
+    if (!quantidade1 || !preco) {
       toast.current.show({
         severity: "warn",
         summary: "Aviso",
         detail: "Infome o preço e quantidade para compra",
       });
     } else {
+      //  console.log(rowData);
       setPedidos((oldArray) => [
         ...oldArray,
         {
-          idproduto: rowData.idproduto,
+          idproduto: rowData.id,
           produto: rowData.produto,
           codigo: rowData.codigo,
           ean: rowData.ean,
@@ -537,7 +542,8 @@ export default function AnaliseFornecedor() {
 
           unidade_compra: rowData.unidade_compra,
           embalagem: Intl.NumberFormat("pt-BR", {}).format(rowData.embalagem),
-          quantidade: quantidade,
+          quantidade1: quantidade1,
+          quantidade2: quantidade2,
           preco: Intl.NumberFormat("pt-BR", {
             style: "currency",
             currency: "BRL",
@@ -545,6 +551,7 @@ export default function AnaliseFornecedor() {
           }).format(preco),
         },
       ]);
+      //   console.log(produto);
       toast.current.show({
         severity: "success",
         summary: "Sucesso",
@@ -586,11 +593,14 @@ export default function AnaliseFornecedor() {
           icon="pi pi-save"
           className="p-button p-button-success p-button-rounded"
           label="Gravar Pedido"
-          disabled
-          //   onClick={() => setPedidos(null)}
+          onClick={() => garavrPedido()}
         />
       </>
     );
+  };
+
+  const garavrPedido = () => {
+    console.log(pedidos);
   };
 
   const saldo_estoque_template = (rowdata) => {
@@ -818,7 +828,7 @@ export default function AnaliseFornecedor() {
         <Column
           style={{ color: "red" }}
           footer="Total comprado "
-          colSpan={8}
+          colSpan={9}
           footerStyle={{ textAlign: "right" }}
         />
         <Column
@@ -833,7 +843,7 @@ export default function AnaliseFornecedor() {
         />
         <Column
           style={{ color: "green" }}
-          colSpan={4}
+          colSpan={6}
           footer={() => totalizarAnaliseTotalVendido()}
         />
       </Row>
@@ -909,8 +919,13 @@ export default function AnaliseFornecedor() {
     <>
       <Header />
       <Footer />
+      <Button
+        icon="pi pi-shopping-cart"
+        className="botao-add-colado"
+        onClick={() => setVisibleLeft(true)}
+      />
       <div className="img-fornecedor">
-        <img src={ImagemDestque} style={{ width: "445px" }} />
+        <img src={ImagemDestque} style={{ width: "400px" }} />
       </div>
       <Dialog
         header="Adicionar produto a lista de compras"
@@ -955,7 +970,7 @@ export default function AnaliseFornecedor() {
             <label style={{ fontWeight: "800", width: "100%" }} htmlFor="nome">
               Produto
             </label>
-            <h1 style={{ fontSize: "1rem", width: "100%" }}>
+            <h1 style={{ fontSize: "14px", width: "100%" }}>
               {produto.produto}
             </h1>
           </div>
@@ -967,20 +982,27 @@ export default function AnaliseFornecedor() {
               padding: "5px",
             }}
           >
-            <label
-              style={{ fontWeight: "800", margin: "10px" }}
-              htmlFor="quantidade"
-            >
-              Quantidade para compra
-            </label>
-            <InputNumber
-              style={{ width: "100%", margin: "10px" }}
-              id="quantidade"
-              autoFocus
-              value={quantidade}
-              onChange={(e) => setQuantidade(e.value)}
-              required
-            />
+            <div>
+              Quantidade para a loja 1
+              <InputNumber
+                style={{ width: "100%", margin: "10px" }}
+                id="quantidade1"
+                autoFocus
+                value={quantidade1}
+                onChange={(e) => setQuantidade1(e.value)}
+                required
+              />
+            </div>
+
+            <div>
+              Quantidade para a loja 2
+              <InputNumber
+                style={{ width: "100%", margin: "10px" }}
+                id="quantidade2"
+                value={quantidade2}
+                onChange={(e) => setQuantidade2(e.value)}
+              />
+            </div>
           </div>
 
           <div
@@ -1047,7 +1069,7 @@ export default function AnaliseFornecedor() {
           <div>
             <Button
               style={{ marginTop: "20px" }}
-              className="p-button p-button-success p-button-rounded"
+              className="p-button p-button-success p-button-rounded p-button-sm"
               label="Adicionar"
               icon="pi pi-plus"
               onClick={() => adicionarProduto(produto)}
@@ -1105,16 +1127,18 @@ export default function AnaliseFornecedor() {
           <div style={{ width: "100%" }}>
             <DataTable
               style={{
-                padding: "1rem",
+                padding: "10px",
                 backgroundColor: "#FFF",
                 borderRadius: "25px",
                 border: "1px solid #FFF",
               }}
               value={pedidos}
             >
+              <Column field="produtoid" header="id"></Column>
               <Column field={EanOrCodigo} header="Código/Ean"></Column>
               <Column field="produto" header="Produto"></Column>
-              <Column field="quantidade" header="Quantidade"></Column>
+              <Column field="quantidade1" header="Quantidade loja 1"></Column>
+              <Column field="quantidade2" header="Quantidade loja 2"></Column>
               <Column field="unidade_compra" header="Embalagem"></Column>
               <Column
                 field="embalagem"
@@ -1330,6 +1354,11 @@ export default function AnaliseFornecedor() {
         <Column field={cfop_template} header="CFOP"></Column>
 
         <Column
+          field={botaoAddTemplate}
+          header="Adicionar ao carrinho"
+        ></Column>
+
+        <Column
           field="saldo_estoque"
           sortable
           header="Saldo em Estoque"
@@ -1385,7 +1414,7 @@ export default function AnaliseFornecedor() {
         <div className="confirmation-content">
           <i
             className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
+            style={{ fontSize: "14px" }}
           />
           {produto && (
             <span>

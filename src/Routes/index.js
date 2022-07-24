@@ -3,20 +3,17 @@ import { Routes, Route } from "react-router-dom";
 import App from "../App";
 import Login from "../pages/login";
 
-
-import PrecificadorExecuta from '../pages/precificador/executa/precificador-dataTable'
+import PrecificadorExecuta from "../pages/precificador/executa/precificador-dataTable";
 import AnaliseFornecedor from "../pages/compras/analise/fornecedor";
-
 
 import Context from "../contexts";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import MenuInterativo from "../pages/menu-interativo";
 import VendasDataTableComponent from "../pages/vendas/data-table-vendas-por-finalizador";
-import VendaFutura from "../pages/vendas/data-table-venda-futura";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
-  const [usuarioLogado, setUsuarioLogado] = useState(); 
+  const [usuarioLogado, setUsuarioLogado] = useState();
 
   const PrivateRoutes = () => {
     const location = useLocation();
@@ -29,17 +26,21 @@ export default function Router() {
   };
 
   return (
-    <Context.Provider value={{ logado, setLogado , usuarioLogado, setUsuarioLogado }}>
+    <Context.Provider
+      value={{ logado, setLogado, usuarioLogado, setUsuarioLogado }}
+    >
       <Routes>
         <Route path="/" element={<Login />} />
-          <Route path="/"  element={<PrivateRoutes />}>
+        <Route path="/" element={<PrivateRoutes />}>
           <Route path="menu" element={<MenuInterativo />} />
           <Route path="precificar-agendar" element={<App />} />
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
           <Route path="vendas" element={<VendasDataTableComponent />} />
-          <Route path="vendas/futura" element={<VendaFutura />} />
-          <Route path="compras/analise/fornecedor" element={<AnaliseFornecedor />} />
-         
+
+          <Route
+            path="compras/analise/fornecedor"
+            element={<AnaliseFornecedor />}
+          />
         </Route>
       </Routes>
     </Context.Provider>

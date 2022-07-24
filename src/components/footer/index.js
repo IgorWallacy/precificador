@@ -6,7 +6,7 @@ import api from "../../services/axios";
 import React, { useState, useEffect } from "react";
 
 const Footer = () => {
-  const [statusApi, setStatusApi] = useState(null);
+  const [statusApi, setStatusApi] = useState("");
 
   const getStatus = () => {
     api
@@ -31,8 +31,8 @@ const Footer = () => {
             severity={statusApi === "UP" ? "success" : "danger"}
             value={
               statusApi === "UP"
-                ? "Sistema online"
-                : "Sistema Offline, Informe ao administrador"
+                ? "Sistema Online : " + statusApi
+                : "Sistema " + statusApi
             }
           ></Badge>
         </div>

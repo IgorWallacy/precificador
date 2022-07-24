@@ -499,9 +499,10 @@ function VendasDataTableComponent() {
       <Toast ref={toast} position="bottom-center" />
 
       <Header />
+      <Footer />
 
       <div className="container-venda">
-        <img style={{ width: "50%" }} src={ImagemDestque} />
+        <img style={{ width: "400px" }} src={ImagemDestque} />
         <div className="cards-info">
           <div className="field">
             <Calendar
@@ -667,7 +668,6 @@ function VendasDataTableComponent() {
           ></DataTable>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

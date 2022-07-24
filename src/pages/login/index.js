@@ -205,8 +205,8 @@ const Login = () => {
           severity={statusApi === "UP" ? "success" : "danger"}
           value={
             statusApi === "UP"
-              ? "Sistema online"
-              : "Sistema Offline, Informe ao administrador"
+              ? "Sistema online: " + statusApi
+              : "Sistema " + statusApi
           }
         ></Badge>
       </div>

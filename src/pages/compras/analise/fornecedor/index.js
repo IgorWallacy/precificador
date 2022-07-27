@@ -104,6 +104,7 @@ export default function AnaliseFornecedor() {
   const [prazoEntrega, setPrazoEntrega] = useState();
 
   const toast = useRef(null);
+  const toast2 = useRef(null);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
 
   const [produtoDeleteSelecionado, setProdutoDeleteSelecionado] = useState("");
@@ -114,6 +115,10 @@ export default function AnaliseFornecedor() {
   const [tempoDiasPedido, setTempoDiasPedido] = useState(0);
   const [tempoDiasEntrega, settempoDiasEntrega] = useState(0);
   const [margemErroDiasEntrega, setMargemErroDiasEntrega] = useState(0);
+
+  const [pedido, setPedido] = useState(false);
+
+  const [idPedido, setIdPedido] = useState(null);
 
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -431,10 +436,10 @@ export default function AnaliseFornecedor() {
   };
 
   const EanOrCodigo = (rowData) => {
-    if (rowData.ean) {
+    if (rowData?.idproduto?.ean) {
       return (
         <>
-          <div>{rowData.ean} </div>
+          <div>{rowData?.idproduto?.ean} </div>
           <div>
             <img
               style={{
@@ -444,18 +449,18 @@ export default function AnaliseFornecedor() {
                 borderRadius: "25px",
                 padding: "5px",
               }}
-              src={`${eanUrl}/${rowData.ean}`}
+              src={`${eanUrl}/${rowData?.idproduto?.ean}`}
               onError={(e) =>
                 (e.target.src =
                   "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
               }
-              alt={rowData.ean}
+              alt={rowData?.idproduto?.ean}
             />
           </div>
         </>
       );
     } else {
-      return rowData.codigo;
+      return rowData?.idproduto?.codigo;
     }
   };
 
@@ -506,13 +511,30 @@ export default function AnaliseFornecedor() {
 
     return (
       <>
-        <Button
-          style={{ margin: "5px" }}
-          className="p-button-rounded p-button-sm"
-          icon="pi pi-shopping-bag"
-          //  onClick={() => adicionarProduto(rowdata)}
-          onClick={() => openNew(rowdata)}
-        />
+        {idPedido ? (
+          <>
+            <Button
+              disabled={idPedido ? false : true}
+              style={{ margin: "5px" }}
+              label={idPedido ? "" : "Crie um pedido para habilitar"}
+              className="p-button-rounded p-button-sm"
+              icon="pi pi-shopping-bag"
+              //  onClick={() => adicionarProduto(rowdata)}
+              onClick={() => openNew(rowdata)}
+            />
+          </>
+        ) : (
+          <>
+            <Button
+              style={{ margin: "5px" }}
+              label={"Novo pedido"}
+              className="p-button-rounded p-button-sm"
+              icon="pi pi-shopping-bag"
+              //  onClick={() => adicionarProduto(rowdata)}
+              onClick={() => setVisibleLeft(true)}
+            />
+          </>
+        )}
       </>
     );
   };
@@ -530,35 +552,65 @@ export default function AnaliseFornecedor() {
         detail: "Infome o preço e quantidade para compra",
       });
     } else {
-      //  console.log(rowData);
-      setPedidos((oldArray) => [
-        ...oldArray,
-        {
-          idproduto: rowData.id,
-          produto: rowData.produto,
-          codigo: rowData.codigo,
-          ean: rowData.ean,
-          quantidade_venda: rowData.quantidade_vendida,
-
-          unidade_compra: rowData.unidade_compra,
+      // console.log(rowData.id);
+      api
+        .post(`/api/pedido/compra/salvar/${idPedido}`, {
+          idpedido: { id: idPedido },
+          idproduto: { id: rowData.id },
+          quantidadeVenda: rowData.quantidade_vendida,
+          unidadeCompra: rowData.unidade_compra,
           embalagem: Intl.NumberFormat("pt-BR", {}).format(rowData.embalagem),
           quantidade1: quantidade1,
           quantidade2: quantidade2,
-          preco: Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-            mode: "decimal",
-          }).format(preco),
-        },
-      ]);
-      //   console.log(produto);
-      toast.current.show({
-        severity: "success",
-        summary: "Sucesso",
-        detail: `${rowData.produto} adicionado a lista de pedidos`,
-        life: 3000,
-      });
-      hideDialog();
+          preco: preco,
+        })
+        .then((r) => {
+          getItensPedido();
+          //    console.log(r.data);
+          /*  setPedidos((oldArray) => [
+            ...oldArray,
+            {
+              idproduto: rowData.id,
+              produto: rowData.produto,
+              codigo: rowData.codigo,
+              ean: rowData.ean,
+              quantidade_venda: rowData.quantidade_vendida,
+
+              unidade_compra: rowData.unidade_compra,
+              embalagem: Intl.NumberFormat("pt-BR", {}).format(
+                rowData.embalagem
+              ),
+              quantidade1: quantidade1,
+              quantidade2: quantidade2,
+              preco: Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+                mode: "decimal",
+              }).format(preco),
+            },
+          ]);
+          //   console.log(produto);
+*/
+          toast.current.show({
+            severity: "success",
+            summary: "Sucesso",
+            detail: `Produto ${rowData.produto} adicionado a lista `,
+            life: 3000,
+          });
+        })
+        .catch((error) => {
+          toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: `${error.data}`,
+            life: 3000,
+          });
+        })
+        .finally((f) => {
+          hideDialog();
+        });
+
+      //  console.log(rowData);
     }
   };
 
@@ -578,29 +630,147 @@ export default function AnaliseFornecedor() {
     });
   };
 
-  const rightContents = () => {
+  const criarNovoPedido = () => {
+    setIdPedido(null);
+    setVisibleLeft(false);
+    setPedidos([]);
+    setCondicaoPagamento(null);
+    setFornecedor(null);
+    setFilial(null);
+    setProdutos([]);
+    setPrazoEntrega(null);
+    toast.current.show({
+      severity: "success",
+      summary: "Sucesso",
+      detail: "Pedido finalizado",
+      life: 3000,
+    });
+  };
+
+  const leftContents = () => {
     return (
       <>
         <Button
+          disabled={idPedido ? false : true}
+          style={{ margin: "5px" }}
+          icon="pi pi-cloud-upload"
+          className="p-button p-button-success p-button-rounded"
+          label="Finalizar"
+          onClick={() => criarNovoPedido()}
+        />
+      </>
+    );
+  };
+
+  const rightContents = () => {
+    return (
+      <>
+        {/*  <Button
           style={{ margin: "5px" }}
           icon="pi pi-trash"
           className="p-button p-button-danger p-button-rounded"
           label="Esvaziar lista"
           onClick={() => setPedidos([])}
         />
-        <Button
-          style={{ margin: "5px" }}
-          icon="pi pi-save"
-          className="p-button p-button-success p-button-rounded"
-          label="Gravar Pedido"
-          onClick={() => garavrPedido()}
-        />
+    */}
+
+        {idPedido ? (
+          <>
+            <Button
+              style={{ margin: "5px" }}
+              icon="pi pi-arrow-left"
+              className="p-button p-button-info p-button-rounded"
+              label={
+                `Pedido número ` +
+                idPedido +
+                ` salvo com sucesso! Clique aqui para voltar a análise de compra `
+              }
+              onClick={() => setVisibleLeft(false)}
+            />
+          </>
+        ) : (
+          <>
+            <Button
+              disabled={idPedido ? true : false}
+              style={{ margin: "5px" }}
+              icon="pi pi-save"
+              className="p-button p-button-success p-button-rounded"
+              label={
+                idPedido
+                  ? `Pedido número ` +
+                    idPedido +
+                    ` criado, adicione os itens a lista do pedido`
+                  : "Gravar pedido"
+              }
+              onClick={() => gravarPedido()}
+            />
+          </>
+        )}
       </>
     );
   };
 
-  const garavrPedido = () => {
-    console.log(pedidos);
+  const getItensPedido = () => {
+    api
+      .get(`/api/pedido/compra/itens/pedidoId/${idPedido}`)
+      .then((r) => {
+        // console.log(r.data);
+        setPedidos(r.data);
+      })
+      .catch((error) => {
+        // console.log(error.data);
+
+        toast.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${error.data}`,
+          life: 3000,
+        });
+      })
+      .finally((f) => {});
+  };
+
+  const gravarPedido = () => {
+    //  let pedido = JSON.stringify(fornecedorPedido);
+    if (
+      fornecedor === null ||
+      condicaoPagamento === null ||
+      prazoEntrega === null
+    ) {
+      toast2.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: `Informe o fornecedor, condição de pagamento e prazo para entrega `,
+        life: 3000,
+      });
+    } else {
+      api
+        .post(`/api/pedido/compra/salvar`, {
+          id: "",
+          fornecedor: fornecedor,
+          condicaoPagamento: condicaoPagamento,
+          prazoEntrega: prazoEntrega,
+        })
+        .then((r) => {
+          //   console.log(r.data);
+          toast.current.show({
+            severity: "success",
+            summary: "Sucesso",
+            detail: `Pedido ${r.data.id} criado, adicione os itens ao seu pedido `,
+            life: 3000,
+          });
+          setIdPedido(r.data.id);
+          setVisibleLeft(false);
+        })
+        .catch((error) => {
+          toast2.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: `Erro ao criar o pedido ${error} `,
+            life: 3000,
+          });
+        });
+    }
   };
 
   const saldo_estoque_template = (rowdata) => {
@@ -715,6 +885,11 @@ export default function AnaliseFornecedor() {
         </div>
       </>
     );
+  };
+
+  const novoPedido = () => {
+    setVisibleLeft(true);
+    setPedido(true);
   };
 
   const hideDeleteProductDialog = () => {
@@ -864,6 +1039,13 @@ export default function AnaliseFornecedor() {
     }).format(tc);
   };
 
+  const precoPedido = (rowData) => {
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(rowData.preco);
+  };
+
   const totalizarAnaliseTotalVendido = () => {
     let tv = 0;
 
@@ -983,7 +1165,7 @@ export default function AnaliseFornecedor() {
             }}
           >
             <div>
-              Quantidade para a loja 1
+              Quantidade para {lojas[0]?.nome}
               <InputNumber
                 style={{ width: "100%", margin: "10px" }}
                 id="quantidade1"
@@ -995,7 +1177,7 @@ export default function AnaliseFornecedor() {
             </div>
 
             <div>
-              Quantidade para a loja 2
+              Quantidade para {lojas[1]?.nome}
               <InputNumber
                 style={{ width: "100%", margin: "10px" }}
                 id="quantidade2"
@@ -1083,6 +1265,7 @@ export default function AnaliseFornecedor() {
         visible={visibleLeft}
         onHide={() => setVisibleLeft(false)}
       >
+        <Toast ref={toast2} position="bottom-center" />
         <div className="lista-itens">
           <h4 style={{ color: "#FFF", margin: "1rem" }}>Pedido de compra</h4>
 
@@ -1095,8 +1278,10 @@ export default function AnaliseFornecedor() {
               color: "#FFF",
             }}
           >
-            <h4> Pedido para a loja</h4>
-            <h1> {filial?.nome}</h1>
+            <h4> Pedido para a(s) loja(s) </h4>
+            <h1>
+              {lojas[0]?.nome} <br /> {lojas[1]?.nome}
+            </h1>
             <h4> Fornecedor </h4>
             <h1> {fornecedor?.nome} </h1>
             Prazo de entrega
@@ -1122,7 +1307,11 @@ export default function AnaliseFornecedor() {
             />
           </div>
 
-          <Toolbar style={{ margin: "20px" }} right={rightContents} />
+          <Toolbar
+            style={{ margin: "20px" }}
+            right={leftContents}
+            left={rightContents}
+          />
 
           <div style={{ width: "100%" }}>
             <DataTable
@@ -1134,18 +1323,24 @@ export default function AnaliseFornecedor() {
               }}
               value={pedidos}
             >
-              <Column field="produtoid" header="id"></Column>
+              <Column field="idpedido.id" header="N° do pedido"></Column>
               <Column field={EanOrCodigo} header="Código/Ean"></Column>
-              <Column field="produto" header="Produto"></Column>
-              <Column field="quantidade1" header="Quantidade loja 1"></Column>
-              <Column field="quantidade2" header="Quantidade loja 2"></Column>
-              <Column field="unidade_compra" header="Embalagem"></Column>
+              <Column field="idproduto.nome" header="Produto"></Column>
+              <Column
+                field="quantidade1"
+                header={`Quantidade para ${lojas[0]?.nome}`}
+              ></Column>
+              <Column
+                field="quantidade2"
+                header={`Quantidade para ${lojas[1]?.nome}`}
+              ></Column>
+              <Column field="unidadeCompra" header="Embalagem"></Column>
               <Column
                 field="embalagem"
-                header="Qtde(dentro da embalagem)"
+                header="Quantidade (dentro da embalagem)"
               ></Column>
 
-              <Column field="preco" header="Preço"></Column>
+              <Column field={precoPedido} header="Preço"></Column>
 
               <Column
               //  body={() => abrirDialogDeleteProduto()}
@@ -1154,6 +1349,20 @@ export default function AnaliseFornecedor() {
           </div>
         </div>
       </Sidebar>
+
+      <div>
+        <Button
+          icon="pi pi-box"
+          onClick={() => novoPedido()}
+          style={{ marginTop: "30px", marginLeft: "30px" }}
+          className="p-button p-button-secondary p-button-rounded "
+          label={
+            idPedido
+              ? `Visualizar lista de pedido n°   ${idPedido} `
+              : "Criar novo pedido"
+          }
+        />
+      </div>
 
       <div className="container-fornecedor">
         <h1
@@ -1166,10 +1375,12 @@ export default function AnaliseFornecedor() {
         >
           Análise de compras
         </h1>
+
         <div>
           <div className="fornecedor-input">
             <h4>Selecione um fornecedor para análise</h4>
             <Dropdown
+              disabled={idPedido ? true : false}
               required
               style={{ marginTop: "10px" }}
               placeholder="Selecione um fornecedor"
@@ -1353,10 +1564,7 @@ export default function AnaliseFornecedor() {
 
         <Column field={cfop_template} header="CFOP"></Column>
 
-        <Column
-          field={botaoAddTemplate}
-          header="Adicionar ao carrinho"
-        ></Column>
+        <Column field={botaoAddTemplate} header="Adicionar a lista "></Column>
 
         <Column
           field="saldo_estoque"

@@ -75,7 +75,7 @@ const MenuInterativo = () => {
   return (
     <>
       <Header />
-      <Footer />
+
       <div className="menu-interativo">
         <div style={{ width: "100%" }} className="menu-categoria">
           <Typing speed={50} startDelay={10}>

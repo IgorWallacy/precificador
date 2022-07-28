@@ -30,6 +30,10 @@ import moment from "moment";
 
 import api from "../../../../services/axios";
 
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 export default function AnaliseFornecedor() {
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -673,18 +677,13 @@ export default function AnaliseFornecedor() {
           onClick={() => setPedidos([])}
         />
     */}
-
         {idPedido ? (
           <>
             <Button
               style={{ margin: "5px" }}
               icon="pi pi-arrow-left"
               className="p-button p-button-info p-button-rounded"
-              label={
-                `Pedido número ` +
-                idPedido +
-                ` salvo com sucesso! Clique aqui para voltar a análise de compra `
-              }
+              label={` Voltar `}
               onClick={() => setVisibleLeft(false)}
             />
           </>
@@ -706,8 +705,108 @@ export default function AnaliseFornecedor() {
             />
           </>
         )}
+        <Button
+          disabled={pedidos[0]?.id ? false : true}
+          label="Imprimir pedido"
+          style={{ margin: "5px" }}
+          icon="pi pi-print"
+          className="p-button p-button-warning p-button-rounded"
+          onClick={() => imprimirPedido()}
+        />
       </>
     );
+  };
+
+  const imprimirPedido = () => {
+    //  console.log(pedidos);
+    var dd = {
+      styles: {
+        header: {
+          fontSize: 10,
+          alignment: "center",
+          marginTop: 5,
+        },
+      },
+      //   pageSize: {width : 1001 , height : 200},
+      pageSize: "EXECUTIVE",
+      fontSize: 10,
+      // by default we use portrait, you can change it to landscape if you wish
+      pageOrientation: "landscape",
+      header: [
+        {
+          text: `Pedido de compra N° ${idPedido} - Fornecedor : ${
+            fornecedor.nome
+          } -
+        Condição de pagamento : ${condicaoPagamento} dia(s) - Prazo para entrega : ${moment(
+            prazoEntrega
+          ).format("DD/MM/YY")}  - Pedido para a(s) loja(s) ${
+            lojas[0]?.nome
+          } e ${lojas[1]?.nome}
+`,
+          style: "header",
+        },
+      ],
+
+      content: pedidos.map(function (item, i) {
+        return {
+          layout: "lightHorizontalLines", // optional
+          lineHeight: 1,
+          fontSize: 8,
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            headerRows: 1,
+            widths: [25, 150, 150, 100, 100, 50, "*"],
+
+            body: [
+              ["", "", "", "", "", ""],
+
+              [
+                { text: i + 1 },
+
+                {
+                  text: item.idproduto.ean
+                    ? item.idproduto.ean
+                    : item.idproduto.codigo,
+                  style: "ean",
+                },
+                {
+                  text: item.idproduto.nome.substring(0, 35),
+                  style: "descricao",
+                },
+
+                {
+                  text:
+                    "Preço Unitário R$ " +
+                    Intl.NumberFormat("pt-BR", {
+                      style: "decimal",
+                      currency: "BRL",
+                      minimumFractionDigits: "2",
+                      maximumFractionDigits: "2",
+                    }).format(item.preco),
+                  style: "preco",
+                },
+
+                {
+                  text:
+                    item.quantidade1 +
+                    ` ${item.unidadeCompra} (${item.embalagem})` +
+                    ` para ${lojas[0]?.nome} `,
+                },
+                {
+                  text:
+                    item?.quantidade2 +
+                    ` ${item.unidadeCompra} (${item.embalagem})` +
+                    ` para ${lojas[1]?.nome} `,
+                },
+              ],
+            ],
+          },
+        };
+      }),
+    };
+
+    pdfMake.createPdf(dd).open();
   };
 
   const getItensPedido = () => {
@@ -1179,6 +1278,7 @@ export default function AnaliseFornecedor() {
             <div>
               Quantidade para {lojas[1]?.nome}
               <InputNumber
+                disabled={lojas[1]?.nome ? false : true}
                 style={{ width: "100%", margin: "10px" }}
                 id="quantidade2"
                 value={quantidade2}
@@ -1321,7 +1421,9 @@ export default function AnaliseFornecedor() {
                 borderRadius: "25px",
                 border: "1px solid #FFF",
               }}
+              footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras`}
               value={pedidos}
+              emptyMessage="Nenhum produto adicionado a lista"
             >
               <Column field="idpedido.id" header="N° do pedido"></Column>
               <Column field={EanOrCodigo} header="Código/Ean"></Column>
@@ -1332,7 +1434,9 @@ export default function AnaliseFornecedor() {
               ></Column>
               <Column
                 field="quantidade2"
-                header={`Quantidade para ${lojas[1]?.nome}`}
+                header={`${
+                  lojas[1]?.nome ? "Quantidade para " + lojas[1]?.nome : ""
+                }`}
               ></Column>
               <Column field="unidadeCompra" header="Embalagem"></Column>
               <Column
@@ -1461,7 +1565,9 @@ export default function AnaliseFornecedor() {
 
         <div>
           <div className="fornecedor-input">
-            <h4 style={{ color: "green" }}>Informe o tempo do pedido (Dias)</h4>
+            <h4 style={{ color: "green" }}>
+              Informe o tempo do pedido em dias
+            </h4>
 
             <InputNumber
               showButtons
@@ -1473,7 +1579,7 @@ export default function AnaliseFornecedor() {
 
           <div className="fornecedor-input">
             <h4 style={{ color: "green" }}>
-              Informe o tempo de entrega (Dias)
+              Informe o tempo de entrega em dias
             </h4>
 
             <InputNumber
@@ -1486,7 +1592,7 @@ export default function AnaliseFornecedor() {
 
           <div className="fornecedor-input">
             <h4 style={{ color: "green" }}>
-              Informe a margem de erro para tempo de entrega (Dias)
+              Informe a margem de erro para tempo de entrega em dias
             </h4>
 
             <InputNumber
@@ -1564,7 +1670,10 @@ export default function AnaliseFornecedor() {
 
         <Column field={cfop_template} header="CFOP"></Column>
 
-        <Column field={botaoAddTemplate} header="Adicionar a lista "></Column>
+        <Column
+          field={botaoAddTemplate}
+          header={idPedido ? "Adicionar" : "Novo pedido "}
+        ></Column>
 
         <Column
           field="saldo_estoque"
@@ -1581,7 +1690,7 @@ export default function AnaliseFornecedor() {
 
         <Column
           field={sugestao_quantidade_compra}
-          header="Sugestão qtde compra"
+          header="Sugestão quantidade de compra"
         ></Column>
 
         <Column

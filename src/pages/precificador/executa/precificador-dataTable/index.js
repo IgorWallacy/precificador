@@ -23,6 +23,8 @@ import { Tag } from "primereact/tag";
 import { Ripple } from "primereact/ripple";
 import { classNames } from "primereact/utils";
 
+import Barcode from "react-barcode";
+
 import Typing from "react-typing-animation";
 
 import api from "../../../../services/axios";
@@ -58,7 +60,7 @@ const PrecificadorExecuta = () => {
     razaosocial: { value: null, matchMode: FilterMatchMode.CONTAINS },
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
-
+  const barcodeRef = React.useRef(null);
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
@@ -591,6 +593,7 @@ const PrecificadorExecuta = () => {
 
   const imprimePDFPrecosAgendados = () => {
     // console.log(produtos)
+
     var dd = {
       //   pageSize: {width : 1001 , height : 200},
       pageOrientation: "portrait",
@@ -601,23 +604,26 @@ const PrecificadorExecuta = () => {
 
       styles: {
         header: {
-          fontSize: 14,
+          fontSize: 20,
           alignment: "center",
           marginTop: 5,
         },
 
         ean: {
           bold: true,
+          fontSize: 10,
           //   fontSize : 50
         },
         descricao: {
           alignment: "left",
           bold: true,
+          fontSize: 10,
           //   fontSize : 40,
         },
         preco: {
           alignment: "right",
           bold: true,
+          fontSize: 10,
           //  fontSize : 85,
         },
       },
@@ -638,7 +644,10 @@ const PrecificadorExecuta = () => {
 
               [
                 { text: i + 1 },
-                { text: moment(item.dataagendada).format("DD/MM/YY") },
+                {
+                  text: moment(item.dataagendada).format("DD/MM/YY"),
+                  style: "ean",
+                },
                 { text: item.ean ? item.ean : item.codigo, style: "ean" },
                 { text: item.descricao.substring(0, 35), style: "descricao" },
 
@@ -680,7 +689,7 @@ const PrecificadorExecuta = () => {
 
   const imprimeEtiquetaPrecosAgendados = () => {
     var dd = {
-      pageSize: { width: 1001, height: 200 },
+      pageSize: { width: 1111, height: 200 },
       pageOrientation: "landscape",
 
       styles: {
@@ -688,18 +697,23 @@ const PrecificadorExecuta = () => {
           bold: true,
           fontSize: 50,
         },
+        bar: {
+          bold: true,
+          fontSize: 10,
+          alignment: "center",
+        },
         data: {
           fontSize: 15,
         },
         descricao: {
           alignment: "left",
           bold: true,
-          fontSize: 45,
+          fontSize: 30,
         },
         preco: {
-          alignment: "right",
+          alignment: "center",
           bold: true,
-          fontSize: 85,
+          fontSize: 70,
         },
       },
 
@@ -712,15 +726,21 @@ const PrecificadorExecuta = () => {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 0,
-            widths: [10, 510, "*"],
+            widths: [10, 150, 510, "*"],
 
             body: [
               //   ['', '', ''],
 
               [
-                //    { text: item.ean ? item.ean : item.codigo, style : 'ean'},
                 { text: moment(new Date()).format("DD MM YY"), style: "data" },
-                { text: item.descricao.substring(0, 34), style: "descricao" },
+
+                {
+                  text: item.ean ? item.ean : item.codigo,
+                  style: { fontSize: 15 },
+                },
+                //    { qr: item.ean ? item.ean : item.codigo },
+
+                { text: item.descricao.substring(0, 50), style: "descricao" },
                 {
                   text:
                     "R$ " +

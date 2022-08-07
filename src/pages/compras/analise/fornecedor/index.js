@@ -1206,7 +1206,7 @@ export default function AnaliseFornecedor() {
         onClick={() => setVisibleLeft(true)}
       />
       <div className="img-fornecedor">
-        <img src={ImagemDestque} style={{ width: "400px" }} />
+        <img src={ImagemDestque} style={{ width: "250px" }} />
       </div>
       <Dialog
         header="Adicionar produto a lista de compras"

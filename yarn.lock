@@ -6169,6 +6169,11 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
+jsbarcode@^3.11.3, jsbarcode@^3.8.0:
+  version "3.11.5"
+  resolved "https://registry.yarnpkg.com/jsbarcode/-/jsbarcode-3.11.5.tgz#390b3efd0271f35b9d68c7b8af6e972445969014"
+  integrity sha512-zv3KsH51zD00I/LrFzFSM6dst7rDn0vIMzaiZFL7qusTjPZiPtxg3zxetp0RR7obmjTw4f6NyGgbdkBCgZUIrA==
+
 jsdom@^16.6.0:
   version "16.7.0"
   resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-16.7.0.tgz#918ae71965424b197c819f8183a754e18977b710"
@@ -6658,6 +6663,13 @@ neo-async@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
+
+next-barcode@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/next-barcode/-/next-barcode-1.4.0.tgz#e62dcc31fae05585bad1d9e52af94d674e3c48a2"
+  integrity sha512-Sfbs/ToYPkAUQ4AgMEpRUZhCM0BXXMUF49JhquRir8YyC7KDfTGEpbF3Vu5v3JJx8aManG2k9LOVhMU9kbg11w==
+  dependencies:
+    jsbarcode "^3.11.3"
 
 next-tick@^1.1.0:
   version "1.1.0"
@@ -7692,10 +7704,10 @@ primeicons@^5.0.0:
   resolved "https://registry.yarnpkg.com/primeicons/-/primeicons-5.0.0.tgz#73a0b6028a77c58a9eeb331ad13aaf085e8451ee"
   integrity sha512-heygWF0X5HFI1otlZE62pp6ye7sZ8om78J9au2BRkg8O7Y8AHTZ9qKMRzchZUHLe8zUAvdi6hZzzm9XxgwIExw==
 
-primereact@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/primereact/-/primereact-8.2.0.tgz#22652183640822402447e72e190cbb451f16c659"
-  integrity sha512-VfxTPndyF9YBTQHQvBy95rCnNsCaoMeyrDS8DsbB1ar4fonPi+TVchaR+4f+mRQkaUaldSpHE/VOSaFdMX8Maw==
+primereact@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/primereact/-/primereact-8.3.0.tgz#78c00a043a4629e135f66f975021414ea3913c46"
+  integrity sha512-Y/8hlTnKsmgbTLlw6LWwMoA78rDMdA2PUcrJqm7wHgBUVxSPQ8l4f3JkbpVKVqESb5nuay9l+0BE4dx1zSBTAg==
   dependencies:
     "@types/react-transition-group" "^4.4.1"
     react-transition-group "^4.4.1"
@@ -7838,6 +7850,21 @@ react-app-polyfill@^3.0.0:
     raf "^3.4.1"
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
+
+react-barcode@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/react-barcode/-/react-barcode-1.4.2.tgz#13b349895161c4e0605a4267abcf759895d66e1a"
+  integrity sha512-n/PdHOP/3y7XfD9lnotA+vzqLRuOjzUA7gFsjVKArXR0j3HznB7Seq537HCukPDfZWLVeiNiIBgxVqlrmxN1TA==
+  dependencies:
+    jsbarcode "^3.8.0"
+    prop-types "^15.6.2"
+
+react-barcodes@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-barcodes/-/react-barcodes-1.2.0.tgz#3daf1d5180426a31b2c3b9cc1b64a1ff01e9fe9f"
+  integrity sha512-OAJMVnbZP1EqNG8YT7E5sCN8G+ke7rMvHOicCvwHfbAh5+IMCXVuT2b0t6/B1GJjVO1HHkXudqB+wow0IiiTig==
+  dependencies:
+    jsbarcode "^3.11.3"
 
 react-component-countdown-timer@^0.1.8:
   version "0.1.8"

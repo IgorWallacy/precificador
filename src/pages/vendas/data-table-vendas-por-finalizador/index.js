@@ -502,7 +502,7 @@ function VendasDataTableComponent() {
       <Footer />
 
       <div className="container-venda">
-        <img style={{ width: "400px" }} src={ImagemDestque} />
+        <img style={{ width: "250px" }} src={ImagemDestque} />
         <div className="cards-info">
           <div className="field">
             <Calendar

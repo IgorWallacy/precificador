@@ -30,9 +30,7 @@ const Footer = () => {
           <Badge
             severity={statusApi === "UP" ? "success" : "danger"}
             value={
-              statusApi === "UP"
-                ? "Sistema Online : " + statusApi
-                : "Sistema " + statusApi
+              statusApi === "UP" ? "Sistema Online " : "Sistema " + statusApi
             }
           ></Badge>
         </div>

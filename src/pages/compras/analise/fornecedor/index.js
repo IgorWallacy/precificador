@@ -352,19 +352,18 @@ export default function AnaliseFornecedor() {
     }).format(rowData.embalagem);
     return (
       <>
-        {" "}
         <font color="red">
-          {" "}
           Comprou <br />
         </font>
         <font color="red" style={{ fontWeight: "800" }}>
-          {rowData.quantidade_comprada ? rowData.quantidade_comprada : 0}{" "}
-          {rowData.unidade_venda} <br />
-          Embalagem <br />{" "}
-          {Intl.NumberFormat("pt-BR", {
+          {rowData.quantidade_comprada ? rowData.quantidade_comprada : 0}
+          {rowData.unidade_venda}
+          <br />
+          Embalagem <br />
+          {/* {Intl.NumberFormat("pt-BR", {
             maximumFractionDigits: 1,
             maximumSignificantDigits: 1,
-          }).format(rowData.quantidade_comprada / rowData.embalagem)}{" "}
+          }).format(rowData.quantidade_comprada / rowData.embalagem)} */}
           {rowData.unidade_compra} ( {embalagem} )
         </font>
       </>
@@ -440,10 +439,11 @@ export default function AnaliseFornecedor() {
   };
 
   const EanOrCodigo = (rowData) => {
-    if (rowData?.idproduto?.ean) {
+    //console.log(rowData);
+    if (rowData?.ean) {
       return (
         <>
-          <div>{rowData?.idproduto?.ean} </div>
+          <div>{rowData?.ean} </div>
           <div>
             <img
               style={{
@@ -453,18 +453,48 @@ export default function AnaliseFornecedor() {
                 borderRadius: "25px",
                 padding: "5px",
               }}
-              src={`${eanUrl}/${rowData?.idproduto?.ean}`}
+              src={`${eanUrl}/${rowData?.ean}`}
               onError={(e) =>
                 (e.target.src =
                   "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
               }
-              alt={rowData?.idproduto?.ean}
+              alt={rowData?.ean}
             />
           </div>
         </>
       );
     } else {
-      return rowData?.idproduto?.codigo;
+      return rowData?.codigo;
+    }
+  };
+
+  const EanOrCodigoPedido = (rowData) => {
+    //console.log(rowData);
+    if (rowData.idproduto.ean) {
+      return (
+        <>
+          <div>{rowData.idproduto.ean} </div>
+          <div>
+            <img
+              style={{
+                width: "100px",
+                height: "100px",
+                margin: "5px",
+                borderRadius: "25px",
+                padding: "5px",
+              }}
+              src={`${eanUrl}/${rowData.idproduto.ean}`}
+              onError={(e) =>
+                (e.target.src =
+                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+              }
+              alt={rowData.idproduto.ean}
+            />
+          </div>
+        </>
+      );
+    } else {
+      return rowData.idproduto.codigo;
     }
   };
 
@@ -756,10 +786,10 @@ export default function AnaliseFornecedor() {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 1,
-            widths: [25, 150, 150, 100, 100, 50, "*"],
+            widths: [25, 150, 150, 100, 100, 50, 50, "*"],
 
             body: [
-              ["", "", "", "", "", ""],
+              ["", "", "", "", "", "", ""],
 
               [
                 { text: i + 1 },
@@ -798,6 +828,17 @@ export default function AnaliseFornecedor() {
                     item?.quantidade2 +
                     ` ${item.unidadeCompra} (${item.embalagem})` +
                     ` para ${lojas[1]?.nome} `,
+                },
+
+                {
+                  text:
+                    "Total " +
+                    Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(
+                      item.preco * (item.quantidade1 + item.quantidade2)
+                    ),
                 },
               ],
             ],
@@ -1006,6 +1047,15 @@ export default function AnaliseFornecedor() {
     );
   };
 
+  const precoPedidoLinhaTotal = (rowData) => {
+    let total = rowData.preco * (rowData.quantidade1 + rowData.quantidade2);
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(total);
+  };
+
   const template1 = {
     layout:
       "PrevPageLink PageLinks NextPageLink RowsPerPageDropdown CurrentPageReport",
@@ -1143,6 +1193,44 @@ export default function AnaliseFornecedor() {
       style: "currency",
       currency: "BRL",
     }).format(rowData.preco);
+  };
+
+  const deletarProdutoPedido = (rowData) => {
+    console.log(rowData);
+    api
+      .delete(`/api/pedido/compra/deletar/${rowData.id}`)
+      .then((r) => {
+        toast2.current.show({
+          severity: "success",
+          summary: "Sucesso",
+          detail: `Produto ${rowData.idproduto.nome} deletado com sucesso !`,
+          life: 3000,
+        });
+      })
+      .catch((e) => {
+        toast2.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${e}`,
+          life: 3000,
+        });
+      })
+      .finally(() => {
+        getItensPedido();
+      });
+  };
+
+  const deletarItemPedido = (rowData) => {
+    return (
+      <>
+        <Button
+          label="Excluir"
+          icon="pi pi-trash"
+          className="p-button-rounded p-button-danger"
+          onClick={() => deletarProdutoPedido(rowData)}
+        />
+      </>
+    );
   };
 
   const totalizarAnaliseTotalVendido = () => {
@@ -1298,7 +1386,7 @@ export default function AnaliseFornecedor() {
               Embalagem
             </label>
             <h4>
-              {produto.unidade_compra}
+              {produto.unidade_compra}({" "}
               {Intl.NumberFormat("pt-BR", {}).format(produto.embalagem)} )
             </h4>
           </div>
@@ -1426,7 +1514,7 @@ export default function AnaliseFornecedor() {
               emptyMessage="Nenhum produto adicionado a lista"
             >
               <Column field="idpedido.id" header="N° do pedido"></Column>
-              <Column field={EanOrCodigo} header="Código/Ean"></Column>
+              <Column field={EanOrCodigoPedido} header="Código/Ean"></Column>
               <Column field="idproduto.nome" header="Produto"></Column>
               <Column
                 field="quantidade1"
@@ -1444,7 +1532,14 @@ export default function AnaliseFornecedor() {
                 header="Quantidade (dentro da embalagem)"
               ></Column>
 
-              <Column field={precoPedido} header="Preço"></Column>
+              <Column field={precoPedido} header="Preço unitário "></Column>
+
+              <Column
+                field={precoPedidoLinhaTotal}
+                header="Preço Total "
+              ></Column>
+
+              <Column header="Deletar item" field={deletarItemPedido}></Column>
 
               <Column
               //  body={() => abrirDialogDeleteProduto()}

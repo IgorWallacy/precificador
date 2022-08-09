@@ -20,7 +20,9 @@ const Footer = () => {
   };
 
   useEffect(() => {
-    getStatus();
+    setInterval(() => {
+      getStatus();
+    }, 1000);
   }, []);
 
   return (
@@ -29,9 +31,7 @@ const Footer = () => {
         <div className="status-api">
           <Badge
             severity={statusApi === "UP" ? "success" : "danger"}
-            value={
-              statusApi === "UP" ? "Sistema Online " : "Sistema " + statusApi
-            }
+            value={statusApi === "UP" ? "API Online " : "API Offline"}
           ></Badge>
         </div>
       </div>

@@ -133,12 +133,20 @@ const Login = () => {
   }
 
   useEffect(() => {
-    getStatus();
+    setInterval(() => {
+      getStatus();
+    }, 1000);
   }, []);
 
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
+      <div className="status-api">
+        <Badge
+          severity={statusApi === "UP" ? "success" : "danger"}
+          value={statusApi === "UP" ? "API Online " : "API Offline"}
+        ></Badge>
+      </div>
       <div
         style={{ marginTop: "10rem" }}
         className="grid grid-nogutter surface-0 text-800"
@@ -199,16 +207,6 @@ const Login = () => {
             </div>
           </section>
         </div>
-      </div>
-      <div className="status-api">
-        <Badge
-          severity={statusApi === "UP" ? "success" : "danger"}
-          value={
-            statusApi === "UP"
-              ? "Sistema online: " + statusApi
-              : "Sistema " + statusApi
-          }
-        ></Badge>
       </div>
     </>
   );

@@ -6,10 +6,10 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-  
+
     width: 100%;
     padding: 25px 0px;
-   
+
 
 }
 
@@ -17,9 +17,9 @@
 
 .p-toolbar {
     width: 100%;
-    background-color:  #6951;
-    
-    
+    background-color: #6951;
+
+
 }
 
 
@@ -27,12 +27,12 @@
 
 .headerTemplateDataTable {
     display: flex;
-    flex : 1;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     width: 100%;
-   
+
 
 }
 
@@ -43,9 +43,9 @@
 
 
 
-.datatable-templating-demo .p-datatable-tbody{
- background-color: #F5F5F5;
- 
+.datatable-templating-demo .p-datatable-tbody {
+    background-color: #F5F5F5;
+
 
 }
 
@@ -56,18 +56,27 @@
     right: 130px;
     margin: 0px 20px
 }
+
 .botao-flutuante-atualizar {
     position: fixed;
     z-index: 4;
     bottom: 7px;
     right: 30px;
-   
+
 }
+
 .botao-flutuante-pesquisar {
     position: fixed;
     z-index: 4;
     bottom: 7px;
     right: 90px;
+}
+
+.botao-flutuante-up-down {
+    position: fixed;
+    z-index: 4;
+    bottom: 7px;
+    right: 150px;
 }
 
 
@@ -76,20 +85,19 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    gap : 10px;
+    gap: 10px;
     align-content: center;
     align-items: center;
     color: #FFF;
     margin: 20px;
 }
 
-.dialog-sugestao{
+.dialog-sugestao {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     flex-direction: column;
-   
+
 
 }
-

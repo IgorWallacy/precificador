@@ -163,14 +163,15 @@ const PrecificadorExecuta = () => {
         {margem > 0 ? (
           <>
             <div style={{ color: "green" }}>
-              {rsmargemformatada} <br />
+              {rsmargemformatada} de markdown
+              <br />
               <b>Lucro de</b> {margemformatada} <br /> no preço agendado
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
-              {rsmargemformatada} <br />
+              {rsmargemformatada} de markdown <br />
               <b>Prejuizo de</b> {margemformatada}
               <br /> no preço agendado
             </div>
@@ -205,7 +206,7 @@ const PrecificadorExecuta = () => {
         {margem > 0 ? (
           <>
             <div style={{ color: "green" }}>
-              {rsmargemformatada} <br />
+              {rsmargemformatada} de markdown <br />
               <b>Lucro de</b> {margemformatada}
               <br /> no preço atual
             </div>
@@ -213,7 +214,8 @@ const PrecificadorExecuta = () => {
         ) : (
           <>
             <div style={{ color: "red" }}>
-              {rsmargemformatada} <br />
+              {rsmargemformatada} de markdown
+              <br />
               <b>Prejuizo de</b> {margemformatada}
               <br /> no preço atual
             </div>
@@ -353,19 +355,32 @@ const PrecificadorExecuta = () => {
         currency: "BRL",
       }).format(percentualmarkupSugerido) + " %";
 
+    /********* */
+
+    let margem = ((sugestao - rowData.precocusto) / sugestao) * 100;
+
+    let margemformatada =
+      Intl.NumberFormat("pt-BR", {
+        style: "decimal",
+        // currency: "BRL",
+        maximumSignificantDigits: "4",
+      }).format(margem) + " %";
+
     return (
       <>
         {sugestao > rowData.precocusto ? (
           <>
             <div style={{ fontSize: "14", color: "green" }}>
-              <div>{mkf}</div>
+              <div>{mkf} de markup</div>
+              <div> {margemformatada} de markdown</div>
               Sugestão de venda a <div>{sf}</div>
             </div>
           </>
         ) : (
           <>
             <div style={{ fontSize: "14", color: "red" }}>
-              <div>{mkf}</div>
+              <div>{mkf} de markup</div>
+              <div> {margemformatada} de markdown</div>
               <s>Sugestão de venda a </s> <div>{sf}</div>
             </div>
           </>
@@ -564,33 +579,6 @@ const PrecificadorExecuta = () => {
     setGlobalFilterValue2(value);
   };
 
-  const headerTemplate = (data) => {
-    return (
-      <React.Fragment>
-        <div className="headerTemplateDataTable">
-          <Avatar icon="pi pi-user" shape="circle" />
-
-          <span className="image-text"> Fornecedor : {data.razaosocial} </span>
-          <span className="image-text">
-            Nota fiscal : {data.numeronotafiscal}
-          </span>
-          <span className="image-text">
-            Filial de entrada : {data.nomeFilial}
-          </span>
-          <span className="image-text">
-            Data de inclusão :{" "}
-            {moment(data.entradasaida).format("DD/MM/yyyy - HH:mm")}
-          </span>
-
-          <span className="image-text">
-            Agendado para :{" "}
-            {moment(data.dataagendada).format("DD/MM/yyyy - ( dddd )")}
-          </span>
-        </div>
-      </React.Fragment>
-    );
-  };
-
   const imprimePDFPrecosAgendados = () => {
     // console.log(produtos)
 
@@ -699,7 +687,7 @@ const PrecificadorExecuta = () => {
         },
         bar: {
           bold: true,
-          fontSize: 10,
+          fontSize: 50,
           alignment: "center",
         },
         data: {
@@ -708,7 +696,7 @@ const PrecificadorExecuta = () => {
         descricao: {
           alignment: "left",
           bold: true,
-          fontSize: 30,
+          fontSize: 39,
         },
         preco: {
           alignment: "center",
@@ -736,11 +724,11 @@ const PrecificadorExecuta = () => {
 
                 {
                   text: item.ean ? item.ean : item.codigo,
-                  style: { fontSize: 15 },
+                  style: { fontSize: 20 },
                 },
                 //    { qr: item.ean ? item.ean : item.codigo },
 
-                { text: item.descricao.substring(0, 50), style: "descricao" },
+                { text: item.descricao.substring(0, 39), style: "descricao" },
                 {
                   text:
                     "R$ " +

@@ -11,7 +11,7 @@ import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Toast } from "primereact/toast";
 import { FilterMatchMode } from "primereact/api";
-import { Avatar } from "primereact/avatar";
+
 import { Tooltip } from "primereact/tooltip";
 import { Dropdown } from "primereact/dropdown";
 import { Toolbar } from "primereact/toolbar";
@@ -22,8 +22,6 @@ import { SelectButton } from "primereact/selectbutton";
 import { Tag } from "primereact/tag";
 import { Ripple } from "primereact/ripple";
 import { classNames } from "primereact/utils";
-
-import Barcode from "react-barcode";
 
 import Typing from "react-typing-animation";
 
@@ -48,6 +46,7 @@ const PrecificadorExecuta = () => {
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
   const [replicarPreco, setReplicarPreco] = useState(0);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   //const [expandedRows, setExpandedRows] = useState(null);
   const replicarPrecoOpcoes = [
     { label: "Sim", value: 1 },
@@ -60,7 +59,7 @@ const PrecificadorExecuta = () => {
     razaosocial: { value: null, matchMode: FilterMatchMode.CONTAINS },
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
-  const barcodeRef = React.useRef(null);
+
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
@@ -491,6 +490,8 @@ const PrecificadorExecuta = () => {
 
     pegarTokenLocalStorage();
 
+    setProdutoSelecionado(null);
+
     let intFamilia = 0;
 
     if (_products2[index].idfamilia != null) {
@@ -893,7 +894,7 @@ const PrecificadorExecuta = () => {
           style={{
             display: "flex",
             justifyContent: "center",
-            flexDirection: "column",
+            flexDirection: "row",
           }}
         >
           {replicarPreco ? (
@@ -908,16 +909,32 @@ const PrecificadorExecuta = () => {
           ) : (
             <Tag
               className="mr-2"
+              style={{ margin: "10px" }}
               icon="pi pi-times"
               rounded
               severity="danger"
               value="Não replicar a atualização de preços para todas as filiais"
             ></Tag>
           )}
+          <Button
+            label="Confirmar e atualizar produtos selecionados"
+            icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
+            disabled={!produtoSelecionado || !produtoSelecionado.length}
+            className="p-button-rounded p-button-success"
+            onClick={() => atualizarProdutosSelecionados()}
+          />
         </div>
       </React.Fragment>
     ) : (
-      <></>
+      <>
+        <Button
+          label="Confirmar e atualizar produtos selecionados"
+          icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
+          disabled={!produtoSelecionado || !produtoSelecionado.length}
+          className="p-button-rounded p-button-success"
+          onClick={() => atualizarProdutosSelecionados()}
+        />
+      </>
     );
 
   const MostraListaFilial = () => {
@@ -942,6 +959,37 @@ const PrecificadorExecuta = () => {
     } else {
       return <></>;
     }
+  };
+
+  const atualizarProdutosSelecionados = () => {
+    let _products = produtos.filter((val) => produtoSelecionado.includes(val));
+
+    _products.forEach((element) => {
+      let intFamilia = 0;
+
+      if (element.idfamilia != null) {
+        intFamilia = parseInt(element.idfamilia);
+      }
+
+      api
+        .put(
+          `/api_precificacao/produtos/precificar/${element.idproduto}/${intFamilia}/${element.precoagendado}/${element.idfilial}/${replicarPreco}`,
+          { headers: headers }
+        )
+        .then((r) => {})
+        .catch((e) => {
+          toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: ` ${e.data}  `,
+          });
+        })
+        .finally((f) => {
+          buscarProdutos();
+          setProdutoSelecionado(null);
+          _products = null;
+        });
+    });
   };
 
   const MostraSelectReplicarPrecoFilial = () => {
@@ -1153,7 +1201,6 @@ const PrecificadorExecuta = () => {
                 loading={loading}
                 stripedRows
                 value={produtos}
-                selectionMode="single"
                 //   reorderableColumns
                 editMode="row"
                 dataKey="idproduto"
@@ -1185,7 +1232,14 @@ const PrecificadorExecuta = () => {
                 //  expandableRowGroups
                 //  expandedRows={expandedRows}
                 //   onRowToggle={(e) => setExpandedRows(e.data)}
+                selection={produtoSelecionado}
+                onSelectionChange={(e) => setProdutoSelecionado(e.value)}
               >
+                <Column
+                  selectionMode="multiple"
+                  headerStyle={{ width: "3rem" }}
+                  exportable={false}
+                ></Column>
                 <Column header="Código " field={EanOrCodigo}></Column>
 
                 <Column
@@ -1287,6 +1341,7 @@ const PrecificadorExecuta = () => {
                 ></Column>
 
                 <Column
+                  header="Status"
                   field={status}
                   style={{ textAlign: "center", fontWeight: "600" }}
                 ></Column>

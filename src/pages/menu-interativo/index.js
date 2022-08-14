@@ -80,7 +80,7 @@ const MenuInterativo = () => {
         <div style={{ width: "100%" }} className="menu-categoria">
           <Typing speed={50} startDelay={10}>
             <div className="texto-menu-interativo">
-              <img src={ImagemDestque} style={{ width: "25%" }} />
+              <img src={ImagemDestque} style={{ width: "450px" }} />
               <em>{greetingMessage()}</em> <h1>{nome}</h1>
               <em>o que você deseja fazer hoje ? </em>{" "}
             </div>
@@ -92,13 +92,13 @@ const MenuInterativo = () => {
           <h1>Precificar</h1>
           <div className="opcoes-menu">
             <Button
-              label="Agendar remarcação"
+              label="Agendar preços"
               icon="pi pi-calendar"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/precificar-agendar")}
             />
             <Button
-              label="Iniciar remarcação "
+              label="Conferir e atualizar preços"
               icon="pi pi-sync"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/precificar-executar")}

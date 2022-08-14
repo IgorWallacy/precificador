@@ -26,6 +26,7 @@
     "react-component-countdown-timer": "^0.1.8",
     "react-dom": "^18.1.0",
     "react-icons": "^4.4.0",
+    "react-jsbarcode": "^0.2.4",
     "react-router-dom": "6",
     "react-scripts": "5.0.1",
     "react-typing-animation": "^1.6.2",

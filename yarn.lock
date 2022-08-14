@@ -6169,7 +6169,7 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-jsbarcode@^3.11.3, jsbarcode@^3.8.0:
+jsbarcode@^3.11.3, jsbarcode@^3.11.5, jsbarcode@^3.8.0:
   version "3.11.5"
   resolved "https://registry.yarnpkg.com/jsbarcode/-/jsbarcode-3.11.5.tgz#390b3efd0271f35b9d68c7b8af6e972445969014"
   integrity sha512-zv3KsH51zD00I/LrFzFSM6dst7rDn0vIMzaiZFL7qusTjPZiPtxg3zxetp0RR7obmjTw4f6NyGgbdkBCgZUIrA==
@@ -7933,6 +7933,13 @@ react-is@^18.0.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
+
+react-jsbarcode@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/react-jsbarcode/-/react-jsbarcode-0.2.4.tgz#4038cd39b3e62140a10737060754e5d35632a5ad"
+  integrity sha512-KJdtYVPsGEmKv+90el1qEYq3ZFMZdn4iDY/Q891IqbY57G9D25Jxp6VfW2NBQo1YWJL6tmK2D8D7Vl94yybLwg==
+  dependencies:
+    jsbarcode "^3.11.5"
 
 react-refresh@^0.11.0:
   version "0.11.0"

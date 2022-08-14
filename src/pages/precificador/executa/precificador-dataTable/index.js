@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./styless.css";
 import ImagemDestque from "../../../../assets/img/undraw_transfer_money_re_6o1h.svg";
 
+import { SelectButton } from "primereact/selectbutton";
 import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
 import { DataTable } from "primereact/datatable";
@@ -18,7 +19,9 @@ import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
-import { SelectButton } from "primereact/selectbutton";
+
+import JsBarcode from "jsbarcode/bin/JsBarcode";
+
 import { Tag } from "primereact/tag";
 import { Ripple } from "primereact/ripple";
 import { classNames } from "primereact/utils";
@@ -59,6 +62,8 @@ const PrecificadorExecuta = () => {
     razaosocial: { value: null, matchMode: FilterMatchMode.CONTAINS },
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
+
+  const [layoutDatable, setLayoutDatable] = useState(true);
 
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
@@ -676,33 +681,31 @@ const PrecificadorExecuta = () => {
     pdfMake.createPdf(dd).open();
   };
 
+  const textToBase64Barcode = (text) => {
+    var canvas = document.createElement("canvas");
+    JsBarcode(canvas, text, { format: "CODE39" });
+    return canvas.toDataURL("image/png");
+  };
+
   const imprimeEtiquetaPrecosAgendados = () => {
     var dd = {
-      pageSize: { width: 1111, height: 200 },
+      pageSize: { width: 2100, height: 245 },
       pageOrientation: "landscape",
 
       styles: {
-        ean: {
-          bold: true,
-          fontSize: 50,
-        },
-        bar: {
-          bold: true,
-          fontSize: 50,
-          alignment: "center",
-        },
         data: {
-          fontSize: 15,
+          fontSize: 17,
+          bold: true,
         },
         descricao: {
-          alignment: "left",
+          alignment: "center",
           bold: true,
-          fontSize: 39,
+          fontSize: 65,
         },
         preco: {
           alignment: "center",
           bold: true,
-          fontSize: 70,
+          fontSize: 100,
         },
       },
 
@@ -715,7 +718,7 @@ const PrecificadorExecuta = () => {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 0,
-            widths: [10, 150, 510, "*"],
+            widths: [10, 750, 800, "*"],
 
             body: [
               //   ['', '', ''],
@@ -724,15 +727,14 @@ const PrecificadorExecuta = () => {
                 { text: moment(new Date()).format("DD MM YY"), style: "data" },
 
                 {
-                  text: item.ean ? item.ean : item.codigo,
-                  style: { fontSize: 20 },
+                  image: textToBase64Barcode(item.ean ? item.ean : item.codigo),
                 },
                 //    { qr: item.ean ? item.ean : item.codigo },
 
-                { text: item.descricao.substring(0, 39), style: "descricao" },
+                { text: item.descricao.substring(0, 34), style: "descricao" },
                 {
                   text:
-                    "R$ " +
+                    " R$ " +
                     Intl.NumberFormat("pt-BR", {
                       style: "decimal",
                       currency: "BRL",
@@ -884,6 +886,20 @@ const PrecificadorExecuta = () => {
         style={{ margin: "5px" }}
         className=" p-button-rounded p-button-info p-button-sm"
       />
+
+      {window.innerWidth <= 1390 ? (
+        <SelectButton
+          value={layoutDatable}
+          options={[
+            { name: "Layout 1", value: true },
+            { name: "Layout 2", value: false },
+          ]}
+          optionLabel="name"
+          onChange={(e) => setLayoutDatable(e.value)}
+        />
+      ) : (
+        <></>
+      )}
     </React.Fragment>
   );
 
@@ -1091,12 +1107,10 @@ const PrecificadorExecuta = () => {
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
-
       <div className="header">
         <Header />
         <Footer />
       </div>
-
       <div className="agenda-label">
         <Typing speed={50}>
           <h1> Pesquisar agendamentos de preços </h1>
@@ -1190,14 +1204,12 @@ const PrecificadorExecuta = () => {
               <Tooltip target=".export-buttons>button" position="bottom" />
 
               <DataTable
-                style={{
-                  height: "99vh",
-                  width: "100%",
-                }}
+                responsiveLayout={layoutDatable ? "stack" : "scroll"}
+                breakpoint="1390px"
+                style={{ width: "100%" }}
                 footer={
                   "Existem " + produtos.length + " produto(s) para análise"
                 }
-                breakpoint="1125px"
                 loading={loading}
                 stripedRows
                 value={produtos}
@@ -1216,7 +1228,6 @@ const PrecificadorExecuta = () => {
                 ]}
                 filters={filters2}
                 size="normal"
-                responsiveLayout="stack"
                 emptyMessage="Nenhum produto encontrado para precificação"
                 showGridlines
                 header={headerDataTable}

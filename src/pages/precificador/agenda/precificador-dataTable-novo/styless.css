@@ -72,11 +72,18 @@
     right: 90px;
 }
 
+.botao-flutuante-menu {
+    position: fixed;
+    z-index: 4;
+    bottom: 7px;
+    right: 145px;
+}
+
 .botao-flutuante-up-down {
     position: fixed;
     z-index: 4;
     bottom: 7px;
-    right: 150px;
+    left: 5px;
 }
 
 

@@ -31,6 +31,7 @@ const PrecificadorAgenda = () => {
   const navigate = useNavigate();
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const toast = useRef(null);
+  const toast2 = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
   const [headers, setHeaders] = useState();
   const [produtos, setProdutos] = useState([]);
@@ -52,10 +53,10 @@ const PrecificadorAgenda = () => {
     setprodutoEmExibicaoSugestaoMarDownDialog,
   ] = useState("");
   const [novoPercentualMarkupMinimo, setNovoPercentualMarkupMinimo] =
-    useState(0);
+    useState(null);
 
   const [novoPercentualMarkDownMinimo, setNovoPercentualMarkDownMinimo] =
-    useState(0);
+    useState(null);
 
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -131,61 +132,78 @@ const PrecificadorAgenda = () => {
   });
 
   const atualizarmarkupminimo = () => {
-    setLoading(true);
+    if (novoPercentualMarkupMinimo) {
+      setLoading(true);
 
-    api
-      .put(
-        `/api/produto/atualizarmarkupminimo/${
-          produtoEmExibicaoSugestaoDialog.idproduto
-        }/${
-          produtoEmExibicaoSugestaoDialog.idfamilia
-            ? produtoEmExibicaoSugestaoDialog.idfamilia
-            : 0
-        }/${novoPercentualMarkupMinimo}`
-      )
-      .then((r) => {})
-      .catch((error) => {
-        toast.current.show({
-          severity: "error",
-          summary: "Erro",
-          detail: ` Erro ao atualizar  ... Erro : ${error}  `,
+      api
+        .put(
+          `/api/produto/atualizarmarkupminimo/${
+            produtoEmExibicaoSugestaoDialog.idproduto
+          }/${
+            produtoEmExibicaoSugestaoDialog.idfamilia
+              ? produtoEmExibicaoSugestaoDialog.idfamilia
+              : 0
+          }/${novoPercentualMarkupMinimo}`
+        )
+        .then((r) => {})
+        .catch((error) => {
+          toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: ` Erro ao atualizar  ... Erro : ${error}  `,
+          });
+        })
+        .finally(() => {
+          setExibirDialogSugestao(false);
+          setLoading(false);
+          setNovoPercentualMarkupMinimo(null);
+          buscarProdutos();
         });
-      })
-      .finally(() => {
-        setExibirDialogSugestao(false);
-        setLoading(false);
-        setNovoPercentualMarkupMinimo(0);
-        buscarProdutos();
+    } else {
+      toast2.current.show({
+        severity: "warn",
+        summary: "Aviso",
+
+        detail: ` Informe o novo percentual de markup mínimo `,
       });
+    }
   };
 
   const atualizarmarkdownminimo = () => {
-    setLoading(true);
+    if (novoPercentualMarkDownMinimo) {
+      setLoading(true);
 
-    api
-      .put(
-        `/api/produto/atualizarmarkdownminimo/${
-          produtoEmExibicaoSugestaoDialogMarDownDialog.idproduto
-        }/${
-          produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
-            ? produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
-            : 0
-        }/${novoPercentualMarkDownMinimo}`
-      )
-      .then((r) => {})
-      .catch((error) => {
-        toast.current.show({
-          severity: "error",
-          summary: "Erro",
-          detail: ` Erro ao atualizar  ... Erro : ${error}  `,
+      api
+        .put(
+          `/api/produto/atualizarmarkdownminimo/${
+            produtoEmExibicaoSugestaoDialogMarDownDialog.idproduto
+          }/${
+            produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
+              ? produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
+              : 0
+          }/${novoPercentualMarkDownMinimo}`
+        )
+        .then((r) => {})
+        .catch((error) => {
+          toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: ` Erro ao atualizar  ... Erro : ${error}  `,
+          });
+        })
+        .finally(() => {
+          setExibirDialogSugestaoMarDown(false);
+          setLoading(false);
+          setNovoPercentualMarkDownMinimo(null);
+          buscarProdutos();
         });
-      })
-      .finally(() => {
-        setExibirDialogSugestaoMarDown(false);
-        setLoading(false);
-        setNovoPercentualMarkDownMinimo(0);
-        buscarProdutos();
+    } else {
+      toast2.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: `Informe o novo percentual de markdown mínimo`,
       });
+    }
   };
 
   const abrirDialogSugestao = (rowData) => {
@@ -774,7 +792,6 @@ const PrecificadorAgenda = () => {
 
     return (
       <InputNumber
-        autoFocus
         prefix="R$ "
         placeholder={`Sugestão ${sf}`}
         value={options.value}
@@ -1240,6 +1257,7 @@ const PrecificadorAgenda = () => {
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
+      <Toast ref={toast2} position="center" />
 
       {produtos.length < 1 ? (
         <>
@@ -1336,7 +1354,6 @@ const PrecificadorAgenda = () => {
                   minFractionDigits={2}
                   maxFracionDigits={2}
                   onChange={(e) => setNovoPercentualMarkupMinimo(e.value)}
-                  size={2}
                   autoFocus
                   style={{ margin: "1rem" }}
                 />{" "}
@@ -1386,7 +1403,6 @@ const PrecificadorAgenda = () => {
                   minFractionDigits={2}
                   maxFracionDigits={2}
                   onChange={(e) => setNovoPercentualMarkDownMinimo(e.value)}
-                  size={2}
                   autoFocus
                   style={{ margin: "1rem" }}
                 />

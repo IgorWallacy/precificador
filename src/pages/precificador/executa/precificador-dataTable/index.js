@@ -63,7 +63,7 @@ const PrecificadorExecuta = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  const [layoutDatable, setLayoutDatable] = useState(true);
+  const [layoutDatable, setLayoutDatable] = useState(false);
 
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
@@ -697,8 +697,13 @@ const PrecificadorExecuta = () => {
           fontSize: 17,
           bold: true,
         },
-        descricao: {
+        ean: {
+          fontSize: 65,
           alignment: "center",
+          bold: true,
+        },
+        descricao: {
+          alignment: "left",
           bold: true,
           fontSize: 65,
         },
@@ -728,6 +733,7 @@ const PrecificadorExecuta = () => {
 
                 {
                   image: textToBase64Barcode(item.ean ? item.ean : item.codigo),
+                  style: "ean",
                 },
                 //    { qr: item.ean ? item.ean : item.codigo },
 

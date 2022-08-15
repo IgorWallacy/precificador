@@ -80,7 +80,7 @@ const MenuInterativo = () => {
         <div style={{ width: "100%" }} className="menu-categoria">
           <Typing speed={50} startDelay={10}>
             <div className="texto-menu-interativo">
-              <img src={ImagemDestque} style={{ width: "450px" }} />
+              <img src={ImagemDestque} style={{ width: "150px" }} />
               <em>{greetingMessage()}</em> <h1>{nome}</h1>
               <em>o que você deseja fazer hoje ? </em>{" "}
             </div>

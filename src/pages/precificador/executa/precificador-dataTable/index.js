@@ -714,7 +714,7 @@ const PrecificadorExecuta = () => {
           descricao: {
             alignment: "left",
             bold: true,
-            fontSize: 54,
+            fontSize: 48,
           },
           preco: {
             alignment: "left",
@@ -757,7 +757,7 @@ const PrecificadorExecuta = () => {
 
                   {
                     text: "\n\n" + item.descricao.substring(0, 50),
-                    margin: [-1130, 30],
+                    margin: [-1140, 30],
                     style: "descricao",
                   },
 
@@ -805,24 +805,28 @@ const PrecificadorExecuta = () => {
 
         styles: {
           data: {
-            fontSize: 25,
+            fontSize: 30,
             bold: true,
           },
-          eanTexto: { fontSize: 25, bold: true },
+          eanTexto: {
+            fontSize: 25,
+            bold: true,
+            alignment: "center",
+          },
           ean: {
-            fontSize: 100,
-            alignment: "left",
+            fontSize: 25,
+            alignment: "center",
             bold: true,
           },
           descricao: {
             alignment: "left",
             bold: true,
-            fontSize: 54,
+            fontSize: 40,
           },
           preco: {
             alignment: "left",
             bold: true,
-            fontSize: 85,
+            fontSize: 75,
           },
         },
 
@@ -835,32 +839,24 @@ const PrecificadorExecuta = () => {
               // headers are automatically repeated if the table spans over multiple pages
               // you can declare how many rows should be treated as headers
               headerRows: 0,
-              widths: [1000, 100, 100, 100, 50, "*"],
+              widths: [200, 500, 400, 200, 300, 0],
 
               body: [
                 //   ['', '', ''],
 
                 [
                   {
-                    image: textToBase64Barcode(
-                      item.ean ? item.ean : item.codigo
-                    ),
-                    margin: [-30, -40],
-                    style: "ean",
-                  },
-
-                  {
                     text: item.ean
-                      ? "\n\n\n" + "Cód.Barras " + item.ean
-                      : "\n\n\n" + "Código " + item.codigo,
+                      ? "\n\n\n\n\n" + "Cód.Barras " + item.ean
+                      : "\n\n\n\n\n" + "Código " + item.codigo,
                     style: "eanTexto",
-                    margin: [-750, 0],
+                    margin: [-55, 0],
                   },
                   //    { qr: item.ean ? item.ean : item.codigo },
 
                   {
                     text: "\n\n" + item.descricao.substring(0, 50),
-                    margin: [-1130, 30],
+                    margin: [0, -110],
                     style: "descricao",
                   },
 
@@ -873,7 +869,7 @@ const PrecificadorExecuta = () => {
                         minimumFractionDigits: "2",
                         maximumFractionDigits: "2",
                       }).format(item.precoagendado),
-                    margin: [-650, -150],
+                    margin: [-150, 0],
                     style: "preco",
                   },
                   {
@@ -881,7 +877,16 @@ const PrecificadorExecuta = () => {
                       "Impresso em \n " +
                       moment(new Date()).format("DD/MM/YYYY"),
                     style: "data",
-                    margin: [-950, 10],
+                    margin: [-350, 0],
+                  },
+                  {
+                    image: textToBase64Barcode(
+                      item.ean ? item.ean : item.codigo
+                    ),
+                    width: 225,
+                    height: 150,
+                    margin: [1400, 0],
+                    style: "ean",
                   },
                 ],
               ],
@@ -1117,19 +1122,18 @@ const PrecificadorExecuta = () => {
   }
 
   const selecionarEtiqueta = (e) => {
-    // console.log(e);
-    switch (e.value) {
+    switch (e) {
       case 1:
         imprimeEtiquetaPrecosAgendadosModelo1();
-        setEtiquetaSelecionada(e?.value);
+        setEtiquetaSelecionada(e);
         break;
       case 2:
         imprimeEtiquetaPrecosAgendados();
-        setEtiquetaSelecionada(e?.value);
+        setEtiquetaSelecionada(e);
         break;
       case 3:
         imprimeEtiquetaPrecosAgendadosQRCode();
-        setEtiquetaSelecionada(e?.value);
+        setEtiquetaSelecionada(e);
         break;
       default:
         break;
@@ -1182,11 +1186,11 @@ const PrecificadorExecuta = () => {
         value={etiquetaSelecionada}
         options={[
           {
-            name: "Etiqueta 101x31 - Preço centralizaado Barras",
+            name: "Etiqueta 101x31 - Preço centralizado, cod.Barras",
             value: 1,
           },
           {
-            name: "Etiqueta 101x31 - Preço a direita Barras",
+            name: "Etiqueta 101x31 - Quebra linha, preço a direita, cod.Barras",
             value: 2,
           },
           {
@@ -1194,16 +1198,16 @@ const PrecificadorExecuta = () => {
             value: 3,
           },
         ]}
-        onChange={(e) => selecionarEtiqueta(e)}
+        onChange={(e) => selecionarEtiqueta(e.value)}
         optionLabel="name"
         placeholder="Selecione um modelo de etiqueta"
       />
       <Button
-        tooltip="Limpar etiqueta selecionada "
+        tooltip="Imprimir etiqueta selecionada "
         tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-times-circle"
-        className="p-button-rounded p-button-danger"
-        onClick={() => setEtiquetaSelecionada(null)}
+        icon="pi pi-print"
+        className="p-button-rounded p-button-info"
+        onClick={() => selecionarEtiqueta(etiquetaSelecionada)}
       />
 
       {window.innerWidth <= 1390 ? (

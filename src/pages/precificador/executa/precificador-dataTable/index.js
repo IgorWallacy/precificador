@@ -40,6 +40,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 const PrecificadorExecuta = () => {
   //  const navigate = useNavigate();
   const [filiaisSelect, setFiliaisSelect] = useState(0);
+  const [etiquetaSelecionada, setEtiquetaSelecionada] = useState("");
   const toast = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
   const [headers, setHeaders] = useState();
@@ -683,80 +684,340 @@ const PrecificadorExecuta = () => {
 
   const textToBase64Barcode = (text) => {
     var canvas = document.createElement("canvas");
-    JsBarcode(canvas, text, { format: "CODE39" });
+    JsBarcode(canvas, text, {
+      format: "CODE128",
+      displayValue: false,
+      //  with: 2,
+      // height: 50,
+      // fontSize: 15,
+    });
     return canvas.toDataURL("image/png");
   };
 
-  const imprimeEtiquetaPrecosAgendados = () => {
-    var dd = {
-      pageSize: { width: 2100, height: 245 },
-      pageOrientation: "landscape",
+  const imprimeEtiquetaPrecosAgendadosModelo1 = () => {
+    if (produtoSelecionado?.length) {
+      var dd = {
+        pageSize: { width: 1010, height: 310 },
+        pageOrientation: "landscape",
 
-      styles: {
-        data: {
-          fontSize: 17,
-          bold: true,
-        },
-        ean: {
-          fontSize: 65,
-          alignment: "center",
-          bold: true,
-        },
-        descricao: {
-          alignment: "left",
-          bold: true,
-          fontSize: 65,
-        },
-        preco: {
-          alignment: "center",
-          bold: true,
-          fontSize: 100,
-        },
-      },
-
-      content: produtos.map(function (item) {
-        return {
-          layout: "noBorders", // optional
-          lineHeight: 1,
-
-          table: {
-            // headers are automatically repeated if the table spans over multiple pages
-            // you can declare how many rows should be treated as headers
-            headerRows: 0,
-            widths: [10, 750, 800, "*"],
-
-            body: [
-              //   ['', '', ''],
-
-              [
-                { text: moment(new Date()).format("DD MM YY"), style: "data" },
-
-                {
-                  image: textToBase64Barcode(item.ean ? item.ean : item.codigo),
-                  style: "ean",
-                },
-                //    { qr: item.ean ? item.ean : item.codigo },
-
-                { text: item.descricao.substring(0, 34), style: "descricao" },
-                {
-                  text:
-                    " R$ " +
-                    Intl.NumberFormat("pt-BR", {
-                      style: "decimal",
-                      currency: "BRL",
-                      minimumFractionDigits: "2",
-                      maximumFractionDigits: "2",
-                    }).format(item.precoagendado),
-                  style: "preco",
-                },
-              ],
-            ],
+        styles: {
+          data: {
+            fontSize: 25,
+            bold: true,
           },
-        };
-      }),
-    };
+          eanTexto: { fontSize: 25, bold: true },
+          ean: {
+            fontSize: 100,
+            alignment: "left",
+            bold: true,
+          },
+          descricao: {
+            alignment: "left",
+            bold: true,
+            fontSize: 54,
+          },
+          preco: {
+            alignment: "left",
+            bold: true,
+            fontSize: 85,
+          },
+        },
 
-    pdfMake.createPdf(dd).open();
+        content: produtoSelecionado.map(function (item) {
+          return {
+            layout: "noBorders", // optional
+            lineHeight: 1,
+
+            table: {
+              // headers are automatically repeated if the table spans over multiple pages
+              // you can declare how many rows should be treated as headers
+              headerRows: 0,
+              widths: [1000, 100, 100, 100, 50, "*"],
+
+              body: [
+                //   ['', '', ''],
+
+                [
+                  {
+                    image: textToBase64Barcode(
+                      item.ean ? item.ean : item.codigo
+                    ),
+                    margin: [-30, -40],
+                    style: "ean",
+                  },
+
+                  {
+                    text: item.ean
+                      ? "\n\n\n" + "Cód.Barras " + item.ean
+                      : "\n\n\n" + "Código " + item.codigo,
+                    style: "eanTexto",
+                    margin: [-370, 0],
+                  },
+                  //    { qr: item.ean ? item.ean : item.codigo },
+
+                  {
+                    text: "\n\n" + item.descricao.substring(0, 50),
+                    margin: [-1130, 30],
+                    style: "descricao",
+                  },
+
+                  {
+                    text:
+                      "\n R$ " +
+                      Intl.NumberFormat("pt-BR", {
+                        style: "decimal",
+                        currency: "BRL",
+                        minimumFractionDigits: "2",
+                        maximumFractionDigits: "2",
+                      }).format(item.precoagendado),
+                    margin: [-900, -145],
+                    style: "preco",
+                  },
+                  {
+                    text:
+                      "Impresso em \n " +
+                      moment(new Date()).format("DD/MM/YYYY"),
+                    style: "data",
+                    margin: [-540, 10],
+                  },
+                ],
+              ],
+            },
+          };
+        }),
+      };
+
+      pdfMake.createPdf(dd).open();
+    } else {
+      toast.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: `Selecione os produtos que deseja imprimir as etiquetas`,
+      });
+    }
+  };
+
+  const imprimeEtiquetaPrecosAgendados = () => {
+    if (produtoSelecionado?.length) {
+      var dd = {
+        pageSize: { width: 1010, height: 310 },
+        pageOrientation: "landscape",
+
+        styles: {
+          data: {
+            fontSize: 25,
+            bold: true,
+          },
+          eanTexto: { fontSize: 25, bold: true },
+          ean: {
+            fontSize: 100,
+            alignment: "left",
+            bold: true,
+          },
+          descricao: {
+            alignment: "left",
+            bold: true,
+            fontSize: 54,
+          },
+          preco: {
+            alignment: "left",
+            bold: true,
+            fontSize: 85,
+          },
+        },
+
+        content: produtoSelecionado.map(function (item) {
+          return {
+            layout: "noBorders", // optional
+            lineHeight: 1,
+
+            table: {
+              // headers are automatically repeated if the table spans over multiple pages
+              // you can declare how many rows should be treated as headers
+              headerRows: 0,
+              widths: [1000, 100, 100, 100, 50, "*"],
+
+              body: [
+                //   ['', '', ''],
+
+                [
+                  {
+                    image: textToBase64Barcode(
+                      item.ean ? item.ean : item.codigo
+                    ),
+                    margin: [-30, -40],
+                    style: "ean",
+                  },
+
+                  {
+                    text: item.ean
+                      ? "\n\n\n" + "Cód.Barras " + item.ean
+                      : "\n\n\n" + "Código " + item.codigo,
+                    style: "eanTexto",
+                    margin: [-750, 0],
+                  },
+                  //    { qr: item.ean ? item.ean : item.codigo },
+
+                  {
+                    text: "\n\n" + item.descricao.substring(0, 50),
+                    margin: [-1130, 30],
+                    style: "descricao",
+                  },
+
+                  {
+                    text:
+                      "\n R$ " +
+                      Intl.NumberFormat("pt-BR", {
+                        style: "decimal",
+                        currency: "BRL",
+                        minimumFractionDigits: "2",
+                        maximumFractionDigits: "2",
+                      }).format(item.precoagendado),
+                    margin: [-650, -150],
+                    style: "preco",
+                  },
+                  {
+                    text:
+                      "Impresso em \n " +
+                      moment(new Date()).format("DD/MM/YYYY"),
+                    style: "data",
+                    margin: [-950, 10],
+                  },
+                ],
+              ],
+            },
+          };
+        }),
+      };
+
+      pdfMake.createPdf(dd).open();
+    } else {
+      toast.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: `Selecione os produtos que deseja imprimir as etiquetas`,
+      });
+    }
+  };
+
+  const imprimeEtiquetaPrecosAgendadosQRCode = () => {
+    if (produtoSelecionado?.length) {
+      var dd = {
+        pageSize: { width: 1010, height: 310 },
+        pageOrientation: "landscape",
+
+        styles: {
+          data: {
+            fontSize: 25,
+            bold: true,
+          },
+          eanTexto: { fontSize: 25, bold: true },
+          ean: {
+            fontSize: 100,
+            alignment: "left",
+            bold: true,
+          },
+          descricao: {
+            alignment: "left",
+            bold: true,
+            fontSize: 40,
+          },
+          preco: {
+            alignment: "left",
+            bold: true,
+            fontSize: 85,
+          },
+        },
+
+        content: produtoSelecionado.map(function (item) {
+          return {
+            layout: "noBorders", // optional
+            lineHeight: 1,
+
+            table: {
+              // headers are automatically repeated if the table spans over multiple pages
+              // you can declare how many rows should be treated as headers
+              headerRows: 0,
+              widths: [1000, 100, 100, 100, 50, "*"],
+
+              body: [
+                //   ['', '', ''],
+
+                [
+                  {
+                    qr: item.ean
+                      ? window.location.protocol +
+                        "//" +
+                        window.location.hostname +
+                        ":" +
+                        window.location.port +
+                        "/consulta/" +
+                        item.ean
+                      : window.location.protocol +
+                        "//" +
+                        window.location.hostname +
+                        ":" +
+                        window.location.port +
+                        "/consulta/" +
+                        item.codigo,
+                    margin: [-30, 0],
+                    style: "ean",
+                  },
+                  /*     {
+                    image: textToBase64Barcode(
+                      item.ean ? item.ean : item.codigo
+                    ),
+                    margin: [-30, -40],
+                    style: "ean",
+                  }, */
+
+                  {
+                    text:
+                      "\n\n\nImpresso em \n " +
+                      moment(new Date()).format("DD/MM/YYYY"),
+                    style: "eanTexto",
+                    margin: [-750, 0],
+                  },
+                  //    { qr: item.ean ? item.ean : item.codigo },
+
+                  {
+                    text: item.descricao.substring(0, 50),
+                    margin: [-950, 0],
+                    style: "descricao",
+                  },
+
+                  {
+                    text:
+                      "\n R$ " +
+                      Intl.NumberFormat("pt-BR", {
+                        style: "decimal",
+                        currency: "BRL",
+                        minimumFractionDigits: "2",
+                        maximumFractionDigits: "2",
+                      }).format(item.precoagendado),
+                    margin: [-650, 0],
+                    style: "preco",
+                  },
+                  {
+                    text: "",
+                    style: "data",
+                    margin: [-950, 0],
+                  },
+                ],
+              ],
+            },
+          };
+        }),
+      };
+
+      pdfMake.createPdf(dd).open();
+    } else {
+      toast.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: `Selecione os produtos que deseja imprimir as etiquetas`,
+      });
+    }
   };
 
   const familiaIcone = (rowData) => {
@@ -854,6 +1115,27 @@ const PrecificadorExecuta = () => {
       }
     }
   }
+
+  const selecionarEtiqueta = (e) => {
+    // console.log(e);
+    switch (e.value) {
+      case 1:
+        imprimeEtiquetaPrecosAgendadosModelo1();
+        setEtiquetaSelecionada(e?.value);
+        break;
+      case 2:
+        imprimeEtiquetaPrecosAgendados();
+        setEtiquetaSelecionada(e?.value);
+        break;
+      case 3:
+        imprimeEtiquetaPrecosAgendadosQRCode();
+        setEtiquetaSelecionada(e?.value);
+        break;
+      default:
+        break;
+    }
+  };
+
   const botaovoltar = (
     <React.Fragment>
       <Button
@@ -874,15 +1156,17 @@ const PrecificadorExecuta = () => {
         icon="pi pi-refresh"
         className=" p-button-rounded p-button-success p-button-sm"
       />
-
+      {/*
       <Button
         onClick={() => imprimeEtiquetaPrecosAgendados()}
-        tooltip="Imprimir etiqueta dos preços agendados "
+        tooltip="Imprimir etiqueta dos preços agendados selecionados "
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-print"
         style={{ margin: "10px" }}
         className=" p-button-rounded p-button-segundary p-button-sm"
       />
+      
+      */}
 
       <Button
         onClick={() => imprimePDFPrecosAgendados()}
@@ -893,8 +1177,38 @@ const PrecificadorExecuta = () => {
         className=" p-button-rounded p-button-info p-button-sm"
       />
 
+      <Dropdown
+        style={{ margin: "10px" }}
+        value={etiquetaSelecionada}
+        options={[
+          {
+            name: "Etiqueta 101x31 - Preço centralizaado Barras",
+            value: 1,
+          },
+          {
+            name: "Etiqueta 101x31 - Preço a direita Barras",
+            value: 2,
+          },
+          {
+            name: "Etiqueta 101x31 - Preço a direita QRCODE",
+            value: 3,
+          },
+        ]}
+        onChange={(e) => selecionarEtiqueta(e)}
+        optionLabel="name"
+        placeholder="Selecione um modelo de etiqueta"
+      />
+      <Button
+        tooltip="Limpar etiqueta selecionada "
+        tooltipOptions={{ position: "bottom" }}
+        icon="pi pi-times-circle"
+        className="p-button-rounded p-button-danger"
+        onClick={() => setEtiquetaSelecionada(null)}
+      />
+
       {window.innerWidth <= 1390 ? (
         <SelectButton
+          style={{ margin: "10px" }}
           value={layoutDatable}
           options={[
             { name: "Layout 1", value: true },
@@ -939,6 +1253,7 @@ const PrecificadorExecuta = () => {
             ></Tag>
           )}
           <Button
+            style={{ margin: "10px" }}
             label="Confirmar e atualizar produtos selecionados"
             icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
             disabled={!produtoSelecionado || !produtoSelecionado.length}

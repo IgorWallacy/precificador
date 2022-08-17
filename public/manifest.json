@@ -1,6 +1,6 @@
 {
     "short_name": "Sistema JJ",
-    "name": "Criado com ReactJS",
+    "name": " - Sistema JJ - ",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -30,6 +30,6 @@
     ],
     "start_url": ".",
     "display": "standalone",
-    "theme_color": "#000000",
-    "background_color": "#ffffff"
+    "theme_color": "#FFFF",
+    "background_color": "#dcdcdc"
 }

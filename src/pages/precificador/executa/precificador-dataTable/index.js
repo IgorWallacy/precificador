@@ -811,7 +811,7 @@ const PrecificadorExecuta = () => {
           eanTexto: {
             fontSize: 25,
             bold: true,
-            alignment: "center",
+            alignment: "right",
           },
           ean: {
             fontSize: 25,
@@ -839,7 +839,7 @@ const PrecificadorExecuta = () => {
               // headers are automatically repeated if the table spans over multiple pages
               // you can declare how many rows should be treated as headers
               headerRows: 0,
-              widths: [200, 500, 400, 200, 300, 0],
+              widths: [235, 500, 400, 200, 300, 0],
 
               body: [
                 //   ['', '', ''],
@@ -847,8 +847,8 @@ const PrecificadorExecuta = () => {
                 [
                   {
                     text: item.ean
-                      ? "\n\n\n\n\n" + "Cód.Barras " + item.ean
-                      : "\n\n\n\n\n" + "Código " + item.codigo,
+                      ? "\n\n\n\n\n\n" + "Cód.Barras " + item.ean
+                      : "\n\n\n\n\n\n" + "Código " + item.codigo,
                     style: "eanTexto",
                     margin: [-55, 0],
                   },
@@ -856,7 +856,7 @@ const PrecificadorExecuta = () => {
 
                   {
                     text: "\n\n" + item.descricao.substring(0, 50),
-                    margin: [0, -110],
+                    margin: [0, -100],
                     style: "descricao",
                   },
 
@@ -877,7 +877,7 @@ const PrecificadorExecuta = () => {
                       "Impresso em \n " +
                       moment(new Date()).format("DD/MM/YYYY"),
                     style: "data",
-                    margin: [-350, 0],
+                    margin: [-380, 0],
                   },
                   {
                     image: textToBase64Barcode(

@@ -133,9 +133,10 @@ const Login = () => {
   }
 
   useEffect(() => {
+    getStatus();
     setInterval(() => {
       getStatus();
-    }, 1000);
+    }, 30000);
   }, []);
 
   return (

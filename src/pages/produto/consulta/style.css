@@ -1,0 +1,44 @@
+.btn-pesquisar-fixo {
+    position: fixed;
+    z-index: 4;
+    bottom: 7px;
+    right: 90px;
+}
+
+.btn-atualizar-fixo {
+    position: fixed;
+    z-index: 4;
+    bottom: 7px;
+    right: 25px;
+}
+
+.produto-card-selecionado {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+.produto-detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    border: 1 px solid #FFFF;
+    background-color: #F2f2f2;
+    width: 100%;
+}
+
+.input-produto {
+
+    margin: 10px
+}
+
+.btn-cosnultar {
+    display: flex;
+    justify-content: center;
+    margin: 2rem
+}

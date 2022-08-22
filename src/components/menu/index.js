@@ -3,14 +3,13 @@ import { PanelMenu } from "primereact/panelmenu";
 import { useNavigate } from "react-router-dom";
 
 const Menu = () => {
- const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const items = [
     {
       label: "Início",
       icon: "pi pi-fw pi-globe",
-      command: () => navigate("/menu")
-    
+      command: () => navigate("/menu"),
     },
     {
       label: "Precificação",
@@ -37,9 +36,18 @@ const Menu = () => {
           label: "PDV",
           icon: "pi pi-shopping-bag",
           command: () => navigate("/vendas"),
-        }
-
-       
+        },
+      ],
+    },
+    {
+      label: "Consultas",
+      icon: "pi pi-eye",
+      items: [
+        {
+          label: "Produtos",
+          icon: "pi pi-box",
+          command: () => navigate("/consulta"),
+        },
       ],
     },
     {
@@ -50,23 +58,18 @@ const Menu = () => {
           label: "Fornecedor",
           icon: "pi pi-shopping-bag",
           command: () => navigate("/compras/analise/fornecedor"),
-        }
-
-       
+        },
       ],
     },
   ];
 
   return (
     <>
-     
       <PanelMenu
         className="menu-left"
         model={items}
-        style={{ width: "100%"  }}
-
+        style={{ width: "100%" }}
       />
-      
     </>
   );
 };

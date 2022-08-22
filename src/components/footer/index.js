@@ -20,9 +20,11 @@ const Footer = () => {
   };
 
   useEffect(() => {
+    getStatus();
+
     setInterval(() => {
       getStatus();
-    }, 1000);
+    }, 10000);
   }, []);
 
   return (

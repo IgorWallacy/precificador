@@ -19,6 +19,7 @@ import "./menu-interativo.css";
 import Typing from "react-typing-animation";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
+import { faBellSlash, faEye } from "@fortawesome/free-regular-svg-icons";
 
 const MenuInterativo = () => {
   const [nome, setNome] = useState("");
@@ -120,7 +121,6 @@ const MenuInterativo = () => {
         </div>
 
         <div className="menu-categoria">
-          {" "}
           <FontAwesomeIcon icon={faUserGroup} size="2x" />
           <h1>Compras</h1>
           <div className="opcoes-menu">
@@ -136,6 +136,19 @@ const MenuInterativo = () => {
             className="p-button-rounded p-button-help p-button-lg"
             onClick={() => navigate("/vendas/futura")}
   /> */}
+          </div>
+        </div>
+
+        <div className="menu-categoria">
+          <FontAwesomeIcon icon={faEye} size="2x" />
+          <h1>Consultas</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="Produtos"
+              icon="pi pi-box"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/consulta")}
+            />
           </div>
         </div>
       </div>

@@ -1,3 +1,16 @@
+.produto-container {
+
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    padding: 1em;
+    margin: 1em;
+    border: 1px solid #FFF;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+}
+
 .btn-pesquisar-fixo {
     position: fixed;
     z-index: 4;
@@ -10,6 +23,25 @@
     z-index: 4;
     bottom: 7px;
     right: 25px;
+}
+
+.texto {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 1em;
+    color: #F2f2f2;
+}
+
+.panel-dias-venda-compra {
+    display: flex;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
 }
 
 .produto-card-selecionado {

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import { formataMoeda } from "../../../util";
+
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
@@ -10,7 +12,7 @@ import { FilterMatchMode } from "primereact/api";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-
+import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
@@ -29,6 +31,7 @@ const ConsultaProduto = () => {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
+  const [loading3, setLoading3] = useState(false);
   const toast = useRef(null);
   const [filtro, setFiltro] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -39,6 +42,10 @@ const ConsultaProduto = () => {
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(3);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [produtoSelecionadoDetalhado, setProdutoSelecionadoDetalhado] =
+    useState([]);
+  const [diasVendaFiltro, setDiasVendaFiltro] = useState(30);
+  const [diasCompraFiltro, setDiasCompraFiltro] = useState(90);
 
   useEffect(() => {
     pesquisarMultEmpresa();
@@ -75,6 +82,35 @@ const ConsultaProduto = () => {
       });
   };
 
+  const totalVendidoTemplate = (data) => {
+    return formataMoeda(data?.totalVendido);
+  };
+  const totalVendaLiquidaTemplate = (data) => {
+    return formataMoeda(
+      data?.totalVendido - data?.totalDesconto - data?.totalDevolucao
+    );
+  };
+
+  const totalDescontoTemplate = (data) => {
+    return formataMoeda(data?.totalDesconto);
+  };
+
+  const totalDevolucaoTemplate = (data) => {
+    return formataMoeda(data?.totalDevolucao);
+  };
+
+  const precoMedioVendaTemplate = (data) => {
+    return formataMoeda(data?.precoMedioVenda);
+  };
+
+  const custoMedioTemplate = (data) => {
+    return formataMoeda(data?.precoCusto);
+  };
+
+  const totalCompradoTemplate = (data) => {
+    return formataMoeda(data?.totalComprado);
+  };
+
   const precoVendaFormat = (rowData) => {
     let venda = new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -89,10 +125,7 @@ const ConsultaProduto = () => {
   };
 
   const precoCustoFormat = (rowData) => {
-    let custo = new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(rowData.precocusto);
+    let custo = formataMoeda(rowData?.precocusto);
     return (
       <>
         <div style={{ color: "red" }}>{custo}</div>
@@ -124,7 +157,6 @@ const ConsultaProduto = () => {
     if (data?.ean) {
       return (
         <>
-          <div>{data?.ean} </div>
           <div>
             <img
               style={{
@@ -244,6 +276,8 @@ const ConsultaProduto = () => {
 
   const produtoSelecionadoTemplate = (rowData) => {
     setLoading2(true);
+
+    setProdutoSelecionadoDetalhado([]);
     axios
       .get(`/api/produto/consulta/${rowData.data.id}`)
       .then((r) => {
@@ -255,6 +289,30 @@ const ConsultaProduto = () => {
       .finally((f) => {
         setLoading2(false);
       });
+  };
+
+  const consultaVendaProduto = (rowData) => {
+    let p = [rowData.data];
+
+    setLoading3(true);
+    setLoading2(true);
+    if (p) {
+      p.forEach((e) => {
+        axios
+          .get(
+            `/api/produto/bi/vendacompra/${e?.idproduto}/${e?.idfilial}/${diasVendaFiltro}/${diasCompraFiltro}`
+          )
+          .then((r) => {
+            setProdutoSelecionadoDetalhado(r.data);
+            //  console.log(produtoSelecionadoDetalhado);
+          })
+          .catch((error) => {})
+          .finally((f) => {
+            setLoading3(false);
+            setLoading2(false);
+          });
+      });
+    }
   };
 
   return (
@@ -303,92 +361,208 @@ const ConsultaProduto = () => {
             /> 
   </div> */}
 
-      <DataTable
-        globalFilterFields={["nome", "codigo", "ean"]}
-        filters={filtro}
-        filterDisplay="row"
-        paginator
-        paginatorTemplate={template2}
-        first={first2}
-        rows={rows2}
-        onPage={onCustomPage2}
-        paginatorClassName="justify-content-start"
-        emptyMessage="Nenhum produto encontrado"
-        loading={loading}
-        value={produtos}
-        selectionMode="single"
-        onRowSelect={produtoSelecionadoTemplate}
-        responsiveLayout="stack"
-        style={{ width: "100%" }}
-      >
-        <Column
-          header="Código"
-          field="codigo"
-          filter
-          filterPlaceholder="Pesquisar por código"
-        ></Column>
-        <Column
-          header="EAN"
-          field="ean"
-          filter
-          filterPlaceholder="Pesquisar por barras"
-        ></Column>
-        <Column
-          field="nome"
-          header="Produto"
-          bodyStyle={{ fontWeight: "800", textAlign: "left" }}
-          filter
-          filterPlaceholder="Pesquisar por nome"
-        ></Column>
-        <Column field="idUnidadeMedida.nome" header="UN" />
-      </DataTable>
-      <div className="produto-card-selecionado">
-        <Card
-          title={produtoSelecionado?.[0]?.produto}
-          style={{
-            width: "100%",
-            marginTop: "1px",
-            padding: "5px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignContent: "space-around",
-            }}
-          >
-            {eanOrCodigo(produtoSelecionado?.[0])}
-          </div>
+      <div className="produto-container">
+        <div className="texto">
+          <h1>Selecione um produto para mais detalhes</h1>
+        </div>
 
-          <div>
-            <DataTable
-              className="tabela-produtos mt-6"
-              responsiveLayout="stack"
-              selectionMode="single"
-              style={{ width: "100%" }}
-              emptyMessage="Nenhum produto encontrado"
-              loading={loading2}
-              value={produtoSelecionado}
-              dataKey="id"
-              rowGroupMode="subheader"
-              //  rowGroupHeaderTemplate={headerTemplate}
-              groupRowsBy="idproduto"
-            >
-              <Column header="Loja" field={filialTemplate} />
-              <Column header="Estoque" field={estoqueTemplate} />
-              <Column header="Última compra" field={dataUltimaCompraTemplate} />
-              <Column header="Origem do custo" field="custoalteradopor" />
-              <Column header="Último custo" field={ultimocustoTemplate} />
-              <Column header="Custo" field={precoCustoFormat} />
-              <Column header="Preço alterado" field={ultimoprecoTemplate} />
-              <Column header="Preço" field={precoVendaFormat} />
-              <Column header="Promoção" field={promocao} />
-            </DataTable>
-          </div>
-        </Card>
+        <DataTable
+          globalFilterFields={["nome", "codigo", "ean"]}
+          filters={filtro}
+          filterDisplay="row"
+          paginator
+          paginatorTemplate={template2}
+          first={first2}
+          rows={rows2}
+          onPage={onCustomPage2}
+          paginatorClassName="justify-content-start"
+          emptyMessage="Nenhum produto encontrado"
+          loading={loading}
+          disabled={loading2}
+          value={produtos}
+          selectionMode="single"
+          onRowSelect={produtoSelecionadoTemplate}
+          responsiveLayout="stack"
+          style={{ width: "100%" }}
+        >
+          <Column
+            header="Código"
+            field="codigo"
+            filter
+            filterPlaceholder="Pesquisar por código"
+          ></Column>
+          <Column
+            header="EAN"
+            field="ean"
+            filter
+            filterPlaceholder="Pesquisar por barras"
+          ></Column>
+          <Column
+            field="nome"
+            header="Produto"
+            bodyStyle={{ fontWeight: "800", textAlign: "left" }}
+            filter
+            filterPlaceholder="Pesquisar por nome"
+          ></Column>
+          <Column field="idUnidadeMedida.nome" header="UN" />
+        </DataTable>
+        {produtoSelecionado ? (
+          <>
+            <div className="produto-card-selecionado">
+              <Card
+                style={{
+                  width: "100%",
+                  marginTop: "1px",
+                  padding: "5px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <h1>{produtoSelecionado?.[0]?.produto}</h1>
+
+                  {eanOrCodigo(produtoSelecionado?.[0])}
+                  <div className="panel-dias-venda-compra">
+                    <h1 style={{ margin: "1px 1em" }}>Venda</h1>
+                    <div>
+                      <InputNumber
+                        inputId="horizontal"
+                        value={diasVendaFiltro}
+                        onValueChange={(e) =>
+                          setDiasVendaFiltro(e.target.value)
+                        }
+                        showButtons
+                        buttonLayout="horizontal"
+                        step={1}
+                        decrementButtonClassName="p-button-danger"
+                        incrementButtonClassName="p-button-success"
+                        incrementButtonIcon="pi pi-plus"
+                        decrementButtonIcon="pi pi-minus"
+                        placeholder="Dias"
+                      />
+                    </div>
+                    <h1 style={{ margin: "1px 1em" }}>Compra</h1>
+                    <div>
+                      <InputNumber
+                        inputId="horizontal"
+                        value={diasCompraFiltro}
+                        onValueChange={(e) =>
+                          setDiasCompraFiltro(e.target.value)
+                        }
+                        showButtons
+                        buttonLayout="horizontal"
+                        step={1}
+                        decrementButtonClassName="p-button-danger"
+                        incrementButtonClassName="p-button-success"
+                        incrementButtonIcon="pi pi-plus"
+                        decrementButtonIcon="pi pi-minus"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <DataTable
+                      className="tabela-produtos mt-6"
+                      responsiveLayout="stack"
+                      selectionMode="single"
+                      onRowSelect={consultaVendaProduto}
+                      style={{ width: "100%", margin: "10px" }}
+                      emptyMessage="Nenhum produto encontrado"
+                      loading={loading2}
+                      value={produtoSelecionado}
+                      dataKey="id"
+                      rowGroupMode="subheader"
+                      //  rowGroupHeaderTemplate={headerTemplate}
+                      groupRowsBy="idproduto"
+                    >
+                      <Column header="Loja" field={filialTemplate} />
+                      <Column header="Estoque" field={estoqueTemplate} />
+                      <Column
+                        header="Última compra"
+                        field={dataUltimaCompraTemplate}
+                      />
+                      <Column
+                        header="Origem do custo"
+                        field="custoalteradopor"
+                      />
+                      <Column
+                        header="Último custo"
+                        field={ultimocustoTemplate}
+                      />
+                      <Column header="Custo" field={precoCustoFormat} />
+                      <Column
+                        header="Preço alterado"
+                        field={ultimoprecoTemplate}
+                      />
+                      <Column header="Preço" field={precoVendaFormat} />
+                      <Column header="Promoção" field={promocao} />
+                    </DataTable>
+                  </div>
+
+                  <div>
+                    <DataTable
+                      value={produtoSelecionadoDetalhado}
+                      responsiveLayout="stack"
+                      emptyMessage="Nenhum produto selecionado"
+                      loading={loading3}
+                      style={{ margin: "10px" }}
+                    >
+                      <Column field="filial" header="Loja"></Column>
+                      <Column field="nome" header="Produto"></Column>
+
+                      <Column
+                        field="quantidadeComprada"
+                        header="Quantidade comprada"
+                      ></Column>
+                      <Column
+                        field={totalCompradoTemplate}
+                        header="Total compra"
+                      ></Column>
+                      <Column
+                        field="quantidadeVendida"
+                        header="Quantidade vendida"
+                      ></Column>
+                      <Column
+                        field="quantidadeDevolvida"
+                        header="Quantidade devolução"
+                      ></Column>
+                      <Column field={custoMedioTemplate} header="CMV"></Column>
+                      <Column
+                        header="Preço médio de venda"
+                        field={precoMedioVendaTemplate}
+                      ></Column>
+
+                      <Column
+                        header="Total descontos"
+                        field={totalDescontoTemplate}
+                      ></Column>
+                      <Column
+                        header="Total devolução"
+                        field={totalDevolucaoTemplate}
+                      ></Column>
+
+                      <Column
+                        header="Total venda bruta"
+                        field={totalVendidoTemplate}
+                      ></Column>
+                      <Column
+                        header="Total venda líquida"
+                        field={totalVendaLiquidaTemplate}
+                      ></Column>
+                    </DataTable>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </>
   );

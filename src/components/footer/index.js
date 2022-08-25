@@ -6,7 +6,7 @@ import api from "../../services/axios";
 import React, { useState, useEffect } from "react";
 
 const Footer = () => {
-  const [statusApi, setStatusApi] = useState("");
+  const [statusApi, setStatusApi] = useState("Online");
 
   const getStatus = () => {
     api
@@ -24,7 +24,7 @@ const Footer = () => {
 
     setInterval(() => {
       getStatus();
-    }, 10000);
+    }, 3000);
   }, []);
 
   return (

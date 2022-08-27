@@ -124,6 +124,8 @@ export default function AnaliseFornecedor() {
 
   const [idPedido, setIdPedido] = useState(null);
 
+  const [totalPedido, setTotalPedido] = useState(0);
+
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -288,7 +290,7 @@ export default function AnaliseFornecedor() {
     return (
       <>
         <h4 style={{ color: "red" }}>
-          Quantidade média sugerida para compra (UN)
+          Quantidade média sugerida para compra (TOTAL)
         </h4>
         <br /> <h4 style={{ color: "red" }}> {totalF} </h4>
       </>
@@ -298,6 +300,7 @@ export default function AnaliseFornecedor() {
   const total_comprado_template = (rowData) => {
     let total_comprado =
       rowData.ultimoprecocompra * rowData.quantidade_comprada;
+
     let total = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
@@ -353,13 +356,14 @@ export default function AnaliseFornecedor() {
     return (
       <>
         <font color="red">
-          Comprou <br />
+          Total Comprado <br />
         </font>
         <font color="red" style={{ fontWeight: "800" }}>
           {rowData.quantidade_comprada ? rowData.quantidade_comprada : 0}
           {rowData.unidade_venda}
           <br />
           Embalagem <br />
+          {rowData.quantidade_compra} -
           {/* {Intl.NumberFormat("pt-BR", {
             maximumFractionDigits: 1,
             maximumSignificantDigits: 1,
@@ -748,18 +752,19 @@ export default function AnaliseFornecedor() {
   };
 
   const imprimirPedido = () => {
-    //  console.log(pedidos);
+    //console.log(pedidos);
     var dd = {
       styles: {
         header: {
-          fontSize: 10,
-          alignment: "center",
+          fontSize: 12,
+          alignment: "left",
           marginTop: 5,
         },
       },
       //   pageSize: {width : 1001 , height : 200},
-      pageSize: "EXECUTIVE",
-      fontSize: 10,
+      pageSize: "A4",
+      pageMargins: [10, 50, 10, 25],
+      fontSize: 12,
       // by default we use portrait, you can change it to landscape if you wish
       pageOrientation: "landscape",
       header: [
@@ -771,22 +776,29 @@ export default function AnaliseFornecedor() {
             prazoEntrega
           ).format("DD/MM/YY")}  - Pedido para a(s) loja(s) ${
             lojas[0]?.nome
-          } e ${lojas[1]?.nome}
+          }  ${lojas?.length > 1 ? lojas[1]?.nome : ""}
 `,
           style: "header",
+          margin: [40, 10],
         },
       ],
+
+      footer: {
+        columns: [
+          { text: "Total do pedido " + totalPedido, alignment: "center" },
+        ],
+      },
 
       content: pedidos.map(function (item, i) {
         return {
           layout: "lightHorizontalLines", // optional
           lineHeight: 1,
-          fontSize: 8,
+          fontSize: 9,
           table: {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 1,
-            widths: [25, 150, 150, 100, 100, 50, 50, "*"],
+            widths: [5, 100, 100, 100, 150, 150, 50],
 
             body: [
               ["", "", "", "", "", "", ""],
@@ -819,15 +831,24 @@ export default function AnaliseFornecedor() {
 
                 {
                   text:
+                    `${lojas[0]?.nome.substring(0, 13)} ` +
+                    "Quantidade " +
                     item.quantidade1 +
-                    ` ${item.unidadeCompra} (${item.embalagem})` +
-                    ` para ${lojas[0]?.nome} `,
+                    ` ${item.unidadeCompra} ( Embalagem com ${
+                      item.embalagem == 0 ? 1 : item.embalagem
+                    })`,
                 },
+
                 {
                   text:
-                    item?.quantidade2 +
-                    ` ${item.unidadeCompra} (${item.embalagem})` +
-                    ` para ${lojas[1]?.nome} `,
+                    `${lojas[1] ? lojas[1]?.nome.substring(0, 13) : ""} ` +
+                    "Quantidade " +
+                    item.quantidade2
+                      ? item.quantidade2
+                      : "" +
+                        ` ${item.unidadeCompra} ( Embalagem com ${
+                          item.embalagem == 0 ? 1 : item.embalagem
+                        })`,
                 },
 
                 {
@@ -837,7 +858,9 @@ export default function AnaliseFornecedor() {
                       style: "currency",
                       currency: "BRL",
                     }).format(
-                      item.preco * (item.quantidade1 + item.quantidade2)
+                      item.preco *
+                        (item.quantidade1 + item.quantidade2) *
+                        (item.embalagem === 0 ? 1 : item.embalagem)
                     ),
                 },
               ],
@@ -1048,7 +1071,10 @@ export default function AnaliseFornecedor() {
   };
 
   const precoPedidoLinhaTotal = (rowData) => {
-    let total = rowData.preco * (rowData.quantidade1 + rowData.quantidade2);
+    let total =
+      rowData.preco *
+      (rowData.quantidade1 + rowData.quantidade2) *
+      rowData.embalagem;
 
     return Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -1132,6 +1158,19 @@ export default function AnaliseFornecedor() {
       );
     },
   };
+
+  let footerGroupPedido = (
+    <ColumnGroup>
+      <Row>
+        <Column
+          footer="Total:"
+          colSpan={5}
+          footerStyle={{ textAlign: "right" }}
+        />
+        <Column colSpan={2} footer={() => totalizarPedido()} />
+      </Row>
+    </ColumnGroup>
+  );
 
   let footerGroup = (
     <ColumnGroup>
@@ -1258,6 +1297,23 @@ export default function AnaliseFornecedor() {
     }).format(t);
   };
 
+  const totalizarPedido = () => {
+    let t = 0;
+    for (let p of pedidos) {
+      t +=
+        (p?.quantidade1 + p?.quantidade2) *
+        p?.preco *
+        (p.embalagem === 0 ? 1 : p.embalagem);
+    }
+
+    let tF = Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(t);
+    setTotalPedido(tF);
+    return tF;
+  };
+
   const valor_duplicata_template = (rowData) => {
     return Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -1344,13 +1400,7 @@ export default function AnaliseFornecedor() {
             </h1>
           </div>
           <br />
-          <div
-            style={{
-              margin: "5px",
-              borderRadius: "25px",
-              padding: "5px",
-            }}
-          >
+          <div>
             <div>
               Quantidade para {lojas[0]?.nome}
               <InputNumber
@@ -1362,17 +1412,22 @@ export default function AnaliseFornecedor() {
                 required
               />
             </div>
-
-            <div>
-              Quantidade para {lojas[1]?.nome}
-              <InputNumber
-                disabled={lojas[1]?.nome ? false : true}
-                style={{ width: "100%", margin: "10px" }}
-                id="quantidade2"
-                value={quantidade2}
-                onChange={(e) => setQuantidade2(e.value)}
-              />
-            </div>
+            {lojas[1]?.nome ? (
+              <>
+                <div>
+                  Quantidade para {lojas[1]?.nome}
+                  <InputNumber
+                    disabled={lojas[1]?.nome ? false : true}
+                    style={{ width: "100%", margin: "10px" }}
+                    id="quantidade2"
+                    value={quantidade2}
+                    onChange={(e) => setQuantidade2(e.value)}
+                  />
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
 
           <div
@@ -1386,7 +1441,7 @@ export default function AnaliseFornecedor() {
               Embalagem
             </label>
             <h4>
-              {produto.unidade_compra}({" "}
+              {produto.unidade_compra}
               {Intl.NumberFormat("pt-BR", {}).format(produto.embalagem)} )
             </h4>
           </div>
@@ -1396,7 +1451,7 @@ export default function AnaliseFornecedor() {
               style={{ fontWeight: "800", margin: "10px" }}
               htmlFor="preco"
             >
-              Preço para compra
+              Preço para compra (unitário)
             </label>
             <InputNumber
               style={{ width: "100%", margin: "10px" }}
@@ -1468,7 +1523,7 @@ export default function AnaliseFornecedor() {
           >
             <h4> Pedido para a(s) loja(s) </h4>
             <h1>
-              {lojas[0]?.nome} <br /> {lojas[1]?.nome}
+              {lojas[0]?.nome} <br /> {lojas?.length > 1 ? lojas[1]?.nome : ""}
             </h1>
             <h4> Fornecedor </h4>
             <h1> {fornecedor?.nome} </h1>
@@ -1510,6 +1565,7 @@ export default function AnaliseFornecedor() {
                 border: "1px solid #FFF",
               }}
               footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras`}
+              footerColumnGroup={footerGroupPedido}
               value={pedidos}
               emptyMessage="Nenhum produto adicionado a lista"
             >

@@ -19,13 +19,26 @@ import "./menu-interativo.css";
 import Typing from "react-typing-animation";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { faBellSlash, faEye } from "@fortawesome/free-regular-svg-icons";
+import { faEye } from "@fortawesome/free-regular-svg-icons";
 
 const MenuInterativo = () => {
   const [nome, setNome] = useState("");
   const [headers, setHeaders] = useState();
+  const [filial, setFilial] = useState(null);
 
   const navigate = useNavigate();
+
+  const getFilial = () => {
+    api
+      .get("/api/filial")
+      .then((r) => {
+        setFilial(r.data);
+      })
+      .catch((e) => {
+        // console.log(e);
+      })
+      .finally((f) => {});
+  };
 
   const pegarTokenLocalStorage = () => {
     let token = localStorage.getItem("access_token");
@@ -43,6 +56,7 @@ const MenuInterativo = () => {
         config.headers["Authorization"] = "bearer " + a.access_token;
         return config;
       },
+
       (error) => {
         Promise.reject(error);
       }
@@ -51,7 +65,7 @@ const MenuInterativo = () => {
 
   useEffect(() => {
     pegarTokenLocalStorage();
-
+    getFilial();
     let token = localStorage.getItem("access_token");
     let a = JSON.parse(token);
 
@@ -75,7 +89,7 @@ const MenuInterativo = () => {
 
   return (
     <>
-      <Header />
+      <Header filial={filial?.length} />
       <Footer />
       <div className="menu-interativo">
         <div style={{ width: "100%" }} className="menu-categoria">
@@ -138,19 +152,24 @@ const MenuInterativo = () => {
   /> */}
           </div>
         </div>
-
-        <div className="menu-categoria">
-          <FontAwesomeIcon icon={faEye} size="2x" />
-          <h1>Consultas</h1>
-          <div className="opcoes-menu">
-            <Button
-              label="Produtos"
-              icon="pi pi-box"
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/consulta")}
-            />
-          </div>
-        </div>
+        {filial?.length > 1 ? (
+          <>
+            <div className="menu-categoria">
+              <FontAwesomeIcon icon={faEye} size="2x" />
+              <h1>Consultas</h1>
+              <div className="opcoes-menu">
+                <Button
+                  label="Produtos"
+                  icon="pi pi-box"
+                  className="p-button-rounded p-button-help p-button-lg"
+                  onClick={() => navigate("/consulta")}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </>
   );

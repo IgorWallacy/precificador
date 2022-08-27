@@ -361,13 +361,13 @@ const ConsultaProduto = () => {
             /> 
   </div> */}
 
+      <div className="texto">
+        <h1>Selecione um produto para mais detalhes</h1>
+      </div>
       <div className="produto-container">
-        <div className="texto">
-          <h1>Selecione um produto para mais detalhes</h1>
-        </div>
-
         <DataTable
           globalFilterFields={["nome", "codigo", "ean"]}
+          className="tabela-produto"
           filters={filtro}
           filterDisplay="row"
           paginator
@@ -383,7 +383,10 @@ const ConsultaProduto = () => {
           selectionMode="single"
           onRowSelect={produtoSelecionadoTemplate}
           responsiveLayout="stack"
-          style={{ width: "100%" }}
+          breakpoint="1192px"
+          style={{
+            width: "100%",
+          }}
         >
           <Column
             header="Código"
@@ -406,158 +409,156 @@ const ConsultaProduto = () => {
           ></Column>
           <Column field="idUnidadeMedida.nome" header="UN" />
         </DataTable>
+        <Card style={{ display: "flex", justifyContent: "center" }}>
+          <h1>Total de {produtos?.length} Produtos</h1>
+        </Card>
+
         {produtoSelecionado ? (
           <>
             <div className="produto-card-selecionado">
-              <Card
-                style={{
-                  width: "100%",
-                  marginTop: "1px",
-                  padding: "5px",
-                }}
-              >
+              <div className="produto-selecionado">
+                <h1 style={{ marginTop: "10px" }}>
+                  {produtoSelecionado?.[0]?.produto}
+                </h1>
+
+                {eanOrCodigo(produtoSelecionado?.[0])}
+
+                <div className="panel-dias-venda-compra">
+                  <h1 style={{ margin: "1px 1em" }}>Venda</h1>
+                  <div>
+                    <InputNumber
+                      inputId="horizontal"
+                      value={diasVendaFiltro}
+                      onValueChange={(e) => setDiasVendaFiltro(e.target.value)}
+                      showButtons
+                      buttonLayout="horizontal"
+                      step={1}
+                      decrementButtonClassName="p-button-danger"
+                      incrementButtonClassName="p-button-success"
+                      incrementButtonIcon="pi pi-plus"
+                      decrementButtonIcon="pi pi-minus"
+                      placeholder="Dias"
+                    />
+                  </div>
+                  <h1 style={{ margin: "1px 1em" }}>Compra</h1>
+                  <div>
+                    <InputNumber
+                      inputId="horizontal"
+                      value={diasCompraFiltro}
+                      onValueChange={(e) => setDiasCompraFiltro(e.target.value)}
+                      showButtons
+                      buttonLayout="horizontal"
+                      step={1}
+                      decrementButtonClassName="p-button-danger"
+                      incrementButtonClassName="p-button-success"
+                      incrementButtonIcon="pi pi-plus"
+                      decrementButtonIcon="pi pi-minus"
+                    />
+                  </div>
+                </div>
                 <div
                   style={{
                     display: "flex",
+                    justifyContent: "center",
                     flexWrap: "wrap",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    gap: "5px",
                   }}
                 >
-                  <h1>{produtoSelecionado?.[0]?.produto}</h1>
-
-                  {eanOrCodigo(produtoSelecionado?.[0])}
-                  <div className="panel-dias-venda-compra">
-                    <h1 style={{ margin: "1px 1em" }}>Venda</h1>
-                    <div>
-                      <InputNumber
-                        inputId="horizontal"
-                        value={diasVendaFiltro}
-                        onValueChange={(e) =>
-                          setDiasVendaFiltro(e.target.value)
-                        }
-                        showButtons
-                        buttonLayout="horizontal"
-                        step={1}
-                        decrementButtonClassName="p-button-danger"
-                        incrementButtonClassName="p-button-success"
-                        incrementButtonIcon="pi pi-plus"
-                        decrementButtonIcon="pi pi-minus"
-                        placeholder="Dias"
-                      />
-                    </div>
-                    <h1 style={{ margin: "1px 1em" }}>Compra</h1>
-                    <div>
-                      <InputNumber
-                        inputId="horizontal"
-                        value={diasCompraFiltro}
-                        onValueChange={(e) =>
-                          setDiasCompraFiltro(e.target.value)
-                        }
-                        showButtons
-                        buttonLayout="horizontal"
-                        step={1}
-                        decrementButtonClassName="p-button-danger"
-                        incrementButtonClassName="p-button-success"
-                        incrementButtonIcon="pi pi-plus"
-                        decrementButtonIcon="pi pi-minus"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <DataTable
-                      className="tabela-produtos mt-6"
-                      responsiveLayout="stack"
-                      selectionMode="single"
-                      onRowSelect={consultaVendaProduto}
-                      style={{ width: "100%", margin: "10px" }}
-                      emptyMessage="Nenhum produto encontrado"
-                      loading={loading2}
-                      value={produtoSelecionado}
-                      dataKey="id"
-                      rowGroupMode="subheader"
-                      //  rowGroupHeaderTemplate={headerTemplate}
-                      groupRowsBy="idproduto"
-                    >
-                      <Column header="Loja" field={filialTemplate} />
-                      <Column header="Estoque" field={estoqueTemplate} />
-                      <Column
-                        header="Última compra"
-                        field={dataUltimaCompraTemplate}
-                      />
-                      <Column
-                        header="Origem do custo"
-                        field="custoalteradopor"
-                      />
-                      <Column
-                        header="Último custo"
-                        field={ultimocustoTemplate}
-                      />
-                      <Column header="Custo" field={precoCustoFormat} />
-                      <Column
-                        header="Preço alterado"
-                        field={ultimoprecoTemplate}
-                      />
-                      <Column header="Preço" field={precoVendaFormat} />
-                      <Column header="Promoção" field={promocao} />
-                    </DataTable>
-                  </div>
-
-                  <div>
-                    <DataTable
-                      value={produtoSelecionadoDetalhado}
-                      responsiveLayout="stack"
-                      emptyMessage="Nenhum produto selecionado"
-                      loading={loading3}
-                      style={{ margin: "10px" }}
-                    >
-                      <Column field="filial" header="Loja"></Column>
-                      <Column field="nome" header="Produto"></Column>
-
-                      <Column
-                        field="quantidadeComprada"
-                        header="Quantidade comprada"
-                      ></Column>
-                      <Column
-                        field={totalCompradoTemplate}
-                        header="Total compra"
-                      ></Column>
-                      <Column
-                        field="quantidadeVendida"
-                        header="Quantidade vendida"
-                      ></Column>
-                      <Column
-                        field="quantidadeDevolvida"
-                        header="Quantidade devolução"
-                      ></Column>
-                      <Column field={custoMedioTemplate} header="CMV"></Column>
-                      <Column
-                        header="Preço médio de venda"
-                        field={precoMedioVendaTemplate}
-                      ></Column>
-
-                      <Column
-                        header="Total descontos"
-                        field={totalDescontoTemplate}
-                      ></Column>
-                      <Column
-                        header="Total devolução"
-                        field={totalDevolucaoTemplate}
-                      ></Column>
-
-                      <Column
-                        header="Total venda bruta"
-                        field={totalVendidoTemplate}
-                      ></Column>
-                      <Column
-                        header="Total venda líquida"
-                        field={totalVendaLiquidaTemplate}
-                      ></Column>
-                    </DataTable>
-                  </div>
+                  <DataTable
+                    className="tabela-produto mt-6"
+                    responsiveLayout="stack"
+                    selectionMode="single"
+                    onRowSelect={consultaVendaProduto}
+                    style={{ width: "100%", marginLeft: "25px" }}
+                    emptyMessage="Nenhum produto encontrado"
+                    loading={loading2}
+                    value={produtoSelecionado}
+                    dataKey="id"
+                    rowGroupMode="subheader"
+                    //  rowGroupHeaderTemplate={headerTemplate}
+                    groupRowsBy="idproduto"
+                  >
+                    <Column header="Loja" field={filialTemplate} />
+                    <Column header="Estoque" field={estoqueTemplate} />
+                    <Column
+                      header="Última compra"
+                      field={dataUltimaCompraTemplate}
+                    />
+                    <Column header="Origem do custo" field="custoalteradopor" />
+                    <Column header="Último custo" field={ultimocustoTemplate} />
+                    <Column header="Custo" field={precoCustoFormat} />
+                    <Column
+                      header="Preço alterado"
+                      field={ultimoprecoTemplate}
+                    />
+                    <Column header="Preço" field={precoVendaFormat} />
+                    <Column header="Promoção" field={promocao} />
+                  </DataTable>
                 </div>
-              </Card>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    flexWrap: "wrap",
+                    gap: "5px",
+                    marginTop: "20px",
+                    width: "100%",
+                  }}
+                >
+                  <DataTable
+                    value={produtoSelecionadoDetalhado}
+                    responsiveLayout="stack"
+                    breakpoint="1192px"
+                    emptyMessage="Nenhum produto selecionado"
+                    loading={loading3}
+                    style={{ margin: "5px" }}
+                  >
+                    <Column field="filial" header="Loja"></Column>
+                    <Column field="nome" header="Produto"></Column>
+
+                    <Column
+                      field="quantidadeComprada"
+                      header="Quantidade comprada"
+                    ></Column>
+                    <Column
+                      field={totalCompradoTemplate}
+                      header="Total compra"
+                    ></Column>
+                    <Column
+                      field="quantidadeVendida"
+                      header="Quantidade vendida"
+                    ></Column>
+                    <Column
+                      field="quantidadeDevolvida"
+                      header="Quantidade devolução"
+                    ></Column>
+                    <Column field={custoMedioTemplate} header="CMV"></Column>
+                    <Column
+                      header="Preço médio de venda"
+                      field={precoMedioVendaTemplate}
+                    ></Column>
+
+                    <Column
+                      header="Total descontos"
+                      field={totalDescontoTemplate}
+                    ></Column>
+                    <Column
+                      header="Total devolução"
+                      field={totalDevolucaoTemplate}
+                    ></Column>
+
+                    <Column
+                      header="Total venda bruta"
+                      field={totalVendidoTemplate}
+                    ></Column>
+                    <Column
+                      header="Total venda líquida"
+                      field={totalVendaLiquidaTemplate}
+                    ></Column>
+                  </DataTable>
+                </div>
+              </div>
             </div>
           </>
         ) : (

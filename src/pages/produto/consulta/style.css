@@ -1,14 +1,33 @@
-.produto-container {
-
+.tabela-produto {
     display: flex;
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    padding: 1em;
-    margin: 1em;
+    gap: 5px;
+    flex-direction: column;
+
+    background-color: #FFFF;
+    padding: 20px;
     border: 1px solid #FFF;
     border-top-left-radius: 50px;
     border-top-right-radius: 50px;
+}
+
+
+.produto-container {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #FFF;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    background-color: #F2f2f2;
 }
 
 .btn-pesquisar-fixo {
@@ -32,13 +51,24 @@
     flex-direction: row;
     flex-wrap: wrap;
     margin: 1em;
+    width: 100%;
     color: #F2f2f2;
+}
+
+.produto-selecionado {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: center;
+    gap: 5px;
 }
 
 .panel-dias-venda-compra {
     display: flex;
-    justify-content: flex-start;
-    align-content: flex-start;
+    justify-content: center;
+    align-content: center;
+    gap: 5px;
     flex-wrap: wrap;
     flex-direction: row;
     width: 100%;

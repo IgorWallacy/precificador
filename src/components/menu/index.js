@@ -42,15 +42,15 @@ const Menu = (data) => {
       ],
     },
     {
-      label: "Consultas",
+      label: "Produtos",
 
-      icon: "pi pi-eye",
+      icon: "pi pi-box",
       items: [
         {
           disabled:
             filial.filial === 1 || filial === "undefined" ? true : false,
-          label: "Produtos",
-          icon: "pi pi-box",
+          label: "Consultar produtos",
+          icon: "pi pi-list",
           command: () => navigate("/consulta"),
         },
       ],
@@ -60,9 +60,15 @@ const Menu = (data) => {
       icon: "pi pi-shopping-bag",
       items: [
         {
-          label: "Fornecedor",
+          label: "Novo pedido",
           icon: "pi pi-shopping-bag",
           command: () => navigate("/compras/analise/fornecedor"),
+        },
+
+        {
+          label: "Consultar pedidos",
+          icon: "pi pi-list",
+          command: () => navigate("/compras/consulta"),
         },
       ],
     },

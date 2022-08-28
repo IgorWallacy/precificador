@@ -65,6 +65,14 @@
     z-index: 4;
 }
 
+.botao-pedido-colado {
+    position: absolute;
+    top: 500px;
+    right: 15px;
+    border-radius: 50px;
+    z-index: 4;
+}
+
 .field {
     display: flex;
     align-items: center;

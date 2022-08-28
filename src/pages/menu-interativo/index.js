@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStore,
   faTags,
+  faBox,
   faUserGroup,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -19,7 +20,6 @@ import "./menu-interativo.css";
 import Typing from "react-typing-animation";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { faEye } from "@fortawesome/free-regular-svg-icons";
 
 const MenuInterativo = () => {
   const [nome, setNome] = useState("");
@@ -139,11 +139,19 @@ const MenuInterativo = () => {
           <h1>Compras</h1>
           <div className="opcoes-menu">
             <Button
-              label="Fornecedor"
+              label="Novo pedido"
               icon="pi pi-users"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/compras/analise/fornecedor")}
             />
+
+            <Button
+              label="Consultar pedido"
+              icon="pi pi-list"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/compras/consulta")}
+            />
+
             {/*   <Button
             label="Futura"
             icon="pi pi-wallet"
@@ -155,11 +163,11 @@ const MenuInterativo = () => {
         {filial?.length > 1 ? (
           <>
             <div className="menu-categoria">
-              <FontAwesomeIcon icon={faEye} size="2x" />
-              <h1>Consultas</h1>
+              <FontAwesomeIcon icon={faBox} size="2x" />
+              <h1>Produtos</h1>
               <div className="opcoes-menu">
                 <Button
-                  label="Produtos"
+                  label="Consultar produtos"
                   icon="pi pi-box"
                   className="p-button-rounded p-button-help p-button-lg"
                   onClick={() => navigate("/consulta")}

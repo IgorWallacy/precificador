@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./styles.css";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import ImagemDestque from "../../../../assets/img/compras-fornecedor.svg";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
@@ -79,6 +80,7 @@ export default function AnaliseFornecedor() {
     today: " Hoje ",
     clear: " Limpar ",
   });
+  const navigate = useNavigate();
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [globalFilterValue3, setGlobalFilterValue3] = useState("");
   const [loading, setLoading] = useState(false);
@@ -124,6 +126,8 @@ export default function AnaliseFornecedor() {
 
   const [idPedido, setIdPedido] = useState(null);
 
+  const [idPedidoParam, setIdPedidoParam] = useState(null);
+
   const [totalPedido, setTotalPedido] = useState(0);
 
   const [filters2, setFilters2] = useState({
@@ -140,6 +144,23 @@ export default function AnaliseFornecedor() {
   });
 
   let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
+
+  let params = useParams();
+
+  const getPedidos = (id) => {
+    if (id) {
+      api
+        .get(`/api/pedido/compra/${id}`)
+        .then((r) => {
+          setFornecedor(r.data.fornecedor);
+          setPrazoEntrega(r.data.prazoEntrega);
+          setCondicaoPagamento(r.data.condicaoPagamento);
+        })
+        .catch((e) => {
+          //  console.log(e);
+        });
+    }
+  };
 
   const getDuplicatas = () => {
     api
@@ -683,6 +704,10 @@ export default function AnaliseFornecedor() {
       detail: "Pedido finalizado",
       life: 3000,
     });
+    setTimeout(() => {
+      // console.log("Delayed for 1 second.");
+      navigate("/compras/analise/fornecedor");
+    }, "1000");
   };
 
   const leftContents = () => {
@@ -763,7 +788,7 @@ export default function AnaliseFornecedor() {
       },
       //   pageSize: {width : 1001 , height : 200},
       pageSize: "A4",
-      pageMargins: [10, 50, 10, 25],
+      pageMargins: [25, 50, 10, 25],
       fontSize: 12,
       // by default we use portrait, you can change it to landscape if you wish
       pageOrientation: "landscape",
@@ -774,9 +799,9 @@ export default function AnaliseFornecedor() {
           } -
         Condição de pagamento : ${condicaoPagamento} dia(s) - Prazo para entrega : ${moment(
             prazoEntrega
-          ).format("DD/MM/YY")}  - Pedido para a(s) loja(s) ${
-            lojas[0]?.nome
-          }  ${lojas?.length > 1 ? lojas[1]?.nome : ""}
+          ).format("DD/MM/YY")}  -   Loja 1 -  ${lojas[0]?.nome}  Loja 2 -  ${
+            lojas[1]?.nome
+          } 
 `,
           style: "header",
           margin: [40, 10],
@@ -792,16 +817,24 @@ export default function AnaliseFornecedor() {
       content: pedidos.map(function (item, i) {
         return {
           layout: "lightHorizontalLines", // optional
-          lineHeight: 1,
+          lineHeight: 2,
           fontSize: 9,
           table: {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 1,
-            widths: [5, 100, 100, 100, 150, 150, 50],
+            widths: [5, 100, 100, 100, 150, 150, 60],
 
             body: [
-              ["", "", "", "", "", "", ""],
+              [
+                "#",
+                "EAN",
+                "Produto",
+                "Preço unitário",
+                "Quantidade loja 1",
+                "Quantidade loja 2",
+                "Total",
+              ],
 
               [
                 { text: i + 1 },
@@ -818,50 +851,44 @@ export default function AnaliseFornecedor() {
                 },
 
                 {
-                  text:
-                    "Preço Unitário R$ " +
-                    Intl.NumberFormat("pt-BR", {
-                      style: "decimal",
-                      currency: "BRL",
-                      minimumFractionDigits: "2",
-                      maximumFractionDigits: "2",
-                    }).format(item.preco),
+                  text: Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                    minimumFractionDigits: "2",
+                    maximumFractionDigits: "2",
+                  }).format(item.preco),
                   style: "preco",
                 },
 
                 {
                   text:
-                    `${lojas[0]?.nome.substring(0, 13)} ` +
-                    "Quantidade " +
                     item.quantidade1 +
-                    ` ${item.unidadeCompra} ( Embalagem com ${
-                      item.embalagem == 0 ? 1 : item.embalagem
+                    ` ${
+                      item.unidadeCompra ? item.unidadeCompra : ""
+                    } ( Embalagem com ${
+                      item.embalagem === 0 ? 1 : item.embalagem
                     })`,
                 },
 
                 {
                   text:
-                    `${lojas[1] ? lojas[1]?.nome.substring(0, 13) : ""} ` +
-                    "Quantidade " +
-                    item.quantidade2
-                      ? item.quantidade2
-                      : "" +
-                        ` ${item.unidadeCompra} ( Embalagem com ${
-                          item.embalagem == 0 ? 1 : item.embalagem
-                        })`,
+                    item.quantidade2 +
+                    ` ${
+                      item.unidadeCompra ? item.unidadeCompra : ""
+                    } ( Embalagem com ${
+                      item.embalagem === 0 ? 1 : item.embalagem
+                    })`,
                 },
 
                 {
-                  text:
-                    "Total " +
-                    Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(
-                      item.preco *
-                        (item.quantidade1 + item.quantidade2) *
-                        (item.embalagem === 0 ? 1 : item.embalagem)
-                    ),
+                  text: Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(
+                    item.preco *
+                      (item.quantidade1 + item.quantidade2) *
+                      (item.embalagem === 0 ? 1 : item.embalagem)
+                  ),
                 },
               ],
             ],
@@ -874,23 +901,29 @@ export default function AnaliseFornecedor() {
   };
 
   const getItensPedido = () => {
-    api
-      .get(`/api/pedido/compra/itens/pedidoId/${idPedido}`)
-      .then((r) => {
-        // console.log(r.data);
-        setPedidos(r.data);
-      })
-      .catch((error) => {
-        // console.log(error.data);
+    if (params.id || idPedido) {
+      api
+        .get(
+          `/api/pedido/compra/itens/pedidoId/${
+            params.id ? params.id : idPedido
+          }`
+        )
+        .then((r) => {
+          // console.log(r.data);
+          setPedidos(r.data);
+        })
+        .catch((error) => {
+          // console.log(error.data);
 
-        toast.current.show({
-          severity: "error",
-          summary: "Erro",
-          detail: `${error.data}`,
-          life: 3000,
-        });
-      })
-      .finally((f) => {});
+          toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: `${error.data}`,
+            life: 3000,
+          });
+        })
+        .finally((f) => {});
+    }
   };
 
   const gravarPedido = () => {
@@ -1074,7 +1107,7 @@ export default function AnaliseFornecedor() {
     let total =
       rowData.preco *
       (rowData.quantidade1 + rowData.quantidade2) *
-      rowData.embalagem;
+      (rowData.embalagem === 0 ? 1 : rowData.embalagem);
 
     return Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -1235,7 +1268,7 @@ export default function AnaliseFornecedor() {
   };
 
   const deletarProdutoPedido = (rowData) => {
-    console.log(rowData);
+    // console.log(rowData);
     api
       .delete(`/api/pedido/compra/deletar/${rowData.id}`)
       .then((r) => {
@@ -1333,7 +1366,16 @@ export default function AnaliseFornecedor() {
     );
   };
 
+  const getIdPedidoUrl = () => {
+    setIdPedido(params.id);
+    getItensPedido(params.id);
+  };
+
   useEffect(() => {
+    getIdPedidoUrl();
+
+    getPedidos(params.id);
+
     getFornecedores();
     getLojas();
     getCondficaoPagamento();
@@ -1349,8 +1391,14 @@ export default function AnaliseFornecedor() {
         className="botao-add-colado"
         onClick={() => setVisibleLeft(true)}
       />
+      <Button
+        label="Consultar outro pedido"
+        icon="pi pi-arrow-right"
+        className="botao-pedido-colado"
+        onClick={() => navigate("/compras/consulta")}
+      />
       <div className="img-fornecedor">
-        <img src={ImagemDestque} style={{ width: "250px" }} />
+        <img src={ImagemDestque} style={{ width: "250px" }} alt="logo" />
       </div>
       <Dialog
         header="Adicionar produto a lista de compras"
@@ -1533,8 +1581,11 @@ export default function AnaliseFornecedor() {
               showButtonBar
               locale="pt-BR"
               dateFormat="dd/mm/yy"
+              placeholder={moment(prazoEntrega).format("DD/MM/YYYY")}
+              mask="99/99/9999"
               style={{ width: "100%", margin: "10px 0px" }}
               value={prazoEntrega}
+              viewDate={prazoEntrega}
               onChange={(e) => setPrazoEntrega(e.value)}
               required
             />
@@ -1569,7 +1620,6 @@ export default function AnaliseFornecedor() {
               value={pedidos}
               emptyMessage="Nenhum produto adicionado a lista"
             >
-              <Column field="idpedido.id" header="N° do pedido"></Column>
               <Column field={EanOrCodigoPedido} header="Código/Ean"></Column>
               <Column field="idproduto.nome" header="Produto"></Column>
               <Column
@@ -1613,7 +1663,7 @@ export default function AnaliseFornecedor() {
           className="p-button p-button-secondary p-button-rounded "
           label={
             idPedido
-              ? `Visualizar lista de pedido n°   ${idPedido} `
+              ? `Abrir lista do pedido n°   ${idPedido} `
               : "Criar novo pedido"
           }
         />
@@ -1670,6 +1720,8 @@ export default function AnaliseFornecedor() {
             </h4>
 
             <Calendar
+              placeholder="dd/mm/yyyy"
+              mask="99/99/9999"
               showOnFocus={false}
               showButtonBar
               showIcon
@@ -1687,6 +1739,8 @@ export default function AnaliseFornecedor() {
             </h4>
 
             <Calendar
+              placeholder="dd/mm/yyyy"
+              mask="99/99/9999"
               showButtonBar
               showOnFocus={false}
               showIcon

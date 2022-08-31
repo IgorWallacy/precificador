@@ -4,7 +4,9 @@ import { DataTable } from "primereact/datatable";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Calendar } from "primereact/calendar";
+
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
@@ -14,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 import Logo from "../../../assets/img/undraw_services_re_hu5n.svg";
 import "./styles.css";
+import { formataMoeda } from "../../../util";
 
 const ListaCompras = () => {
   const navigate = useNavigate();
@@ -31,7 +34,7 @@ const ListaCompras = () => {
     api
       .get(`/api/pedido/compra/todos`)
       .then((r) => {
-        //  console.log(r.data);
+        console.log(r.data);
         setPedidos(r.data);
       })
       .catch((e) => {
@@ -117,6 +120,7 @@ const ListaCompras = () => {
               field={condicaoPagamentoTemplate}
               header="Prazo para pagamento "
             ></Column>
+
             <Column header="Consultar" field={consultaTemplate} />
           </DataTable>
         </div>

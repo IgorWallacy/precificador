@@ -33,6 +33,7 @@ import api from "../../../../services/axios";
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { formataMoeda } from "../../../../util";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function AnaliseFornecedor() {
@@ -101,9 +102,10 @@ export default function AnaliseFornecedor() {
   const [displayDialog, setDisplayDialog] = useState(false);
 
   const [produto, setProduto] = useState([""]);
-  const [quantidade1, setQuantidade1] = useState(null);
-  const [quantidade2, setQuantidade2] = useState(null);
-  const [preco, setPreco] = useState(null);
+  const [quantidade1, setQuantidade1] = useState(0);
+  const [quantidade2, setQuantidade2] = useState(0);
+  const [preco, setPreco] = useState(0);
+  const [total, setTotal] = useState(0);
 
   const [condicaoPagamento, setCondicaoPagamento] = useState();
   const [condicoesPagamento, setCondicoesPagamento] = useState([]);
@@ -601,6 +603,7 @@ export default function AnaliseFornecedor() {
   const hideDialog = () => {
     // setSubmitted(false);
     setDisplayDialog(false);
+    // setTotal(0);
   };
 
   const adicionarProduto = (rowData) => {
@@ -611,7 +614,6 @@ export default function AnaliseFornecedor() {
         detail: "Infome o preço e quantidade para compra",
       });
     } else {
-      // console.log(rowData.id);
       api
         .post(`/api/pedido/compra/salvar/${idPedido}`, {
           idpedido: { id: idPedido },
@@ -622,34 +624,11 @@ export default function AnaliseFornecedor() {
           quantidade1: quantidade1,
           quantidade2: quantidade2,
           preco: preco,
+          total: total,
         })
         .then((r) => {
           getItensPedido();
-          //    console.log(r.data);
-          /*  setPedidos((oldArray) => [
-            ...oldArray,
-            {
-              idproduto: rowData.id,
-              produto: rowData.produto,
-              codigo: rowData.codigo,
-              ean: rowData.ean,
-              quantidade_venda: rowData.quantidade_vendida,
 
-              unidade_compra: rowData.unidade_compra,
-              embalagem: Intl.NumberFormat("pt-BR", {}).format(
-                rowData.embalagem
-              ),
-              quantidade1: quantidade1,
-              quantidade2: quantidade2,
-              preco: Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-                mode: "decimal",
-              }).format(preco),
-            },
-          ]);
-          //   console.log(produto);
-*/
           toast.current.show({
             severity: "success",
             summary: "Sucesso",
@@ -1292,6 +1271,8 @@ export default function AnaliseFornecedor() {
       });
   };
 
+  const somaTotal = () => {};
+
   const deletarItemPedido = (rowData) => {
     return (
       <>
@@ -1458,6 +1439,13 @@ export default function AnaliseFornecedor() {
                 value={quantidade1}
                 onChange={(e) => setQuantidade1(e.value)}
                 required
+                onBlur={(e) =>
+                  setTotal(
+                    preco *
+                      (quantidade1 + quantidade2) *
+                      (produto.embalagem <= 0 ? 1 : produto.embalagem)
+                  )
+                }
               />
             </div>
             {lojas[1]?.nome ? (
@@ -1470,6 +1458,13 @@ export default function AnaliseFornecedor() {
                     id="quantidade2"
                     value={quantidade2}
                     onChange={(e) => setQuantidade2(e.value)}
+                    onBlur={(e) =>
+                      setTotal(
+                        preco *
+                          (quantidade1 + quantidade2) *
+                          (produto.embalagem <= 0 ? 1 : produto.embalagem)
+                      )
+                    }
                   />
                 </div>
               </>
@@ -1512,7 +1507,29 @@ export default function AnaliseFornecedor() {
               value={preco}
               onChange={(e) => setPreco(e.value)}
               required
+              onBlur={(e) =>
+                setTotal(
+                  preco *
+                    (quantidade1 + quantidade2) *
+                    (produto.embalagem <= 0 ? 1 : produto.embalagem)
+                )
+              }
             />
+          </div>
+
+          <div>
+            <label
+              style={{ fontWeight: "800", margin: "10px" }}
+              htmlFor="preco"
+            >
+              Total
+            </label>
+
+            {formataMoeda(
+              preco *
+                (quantidade1 + quantidade2) *
+                (produto.embalagem <= 0 ? 1 : produto.embalagem)
+            )}
           </div>
 
           <div>
@@ -1545,7 +1562,9 @@ export default function AnaliseFornecedor() {
               className="p-button p-button-success p-button-rounded p-button-sm"
               label="Adicionar"
               icon="pi pi-plus"
-              onClick={() => adicionarProduto(produto)}
+              onClick={() => {
+                adicionarProduto(produto);
+              }}
             />
           </div>
         </div>

@@ -34,7 +34,7 @@ const ListaCompras = () => {
     api
       .get(`/api/pedido/compra/todos`)
       .then((r) => {
-        console.log(r.data);
+        //  console.log(r.data);
         setPedidos(r.data);
       })
       .catch((e) => {
@@ -62,7 +62,7 @@ const ListaCompras = () => {
   };
 
   const condicaoPagamentoTemplate = (data) => {
-    return <> {data.condicaoPagamento} dias </>;
+    return <> {data.condicaoPagamento.descricao} </>;
   };
 
   const prazoEntregaTemplate = (data) => {
@@ -71,6 +71,10 @@ const ListaCompras = () => {
 
   const emissaoTemplate = (data) => {
     return moment(data?.dataEmissao).format("DD/MM/YYYY");
+  };
+
+  const totalTemplate = (data) => {
+    return formataMoeda(data.total);
   };
 
   return (
@@ -120,6 +124,7 @@ const ListaCompras = () => {
               field={condicaoPagamentoTemplate}
               header="Prazo para pagamento "
             ></Column>
+            <Column header="Total" field={totalTemplate} />
 
             <Column header="Consultar" field={consultaTemplate} />
           </DataTable>

@@ -59,16 +59,20 @@
 
 .botao-add-colado {
     position: fixed;
-    top: 500px;
-    left: 1px;
+    top: 45%;
+    left: 0.2%;
     border-radius: 50px;
     z-index: 4;
 }
 
-.botao-pedido-colado {
+
+
+
+
+.botao-numero-pedido {
     position: absolute;
-    top: 500px;
-    right: 15px;
+    top: 45%;
+    left: 2%;
     border-radius: 50px;
     z-index: 4;
 }

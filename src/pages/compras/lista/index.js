@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
 
 import { DataTable } from "primereact/datatable";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { FilterMatchMode } from "primereact/api";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 
-import { ColumnGroup } from "primereact/columngroup";
-import { Row } from "primereact/row";
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
 import api from "../../../services/axios";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import { Toolbar } from "primereact/toolbar";
 
 import Logo from "../../../assets/img/undraw_services_re_hu5n.svg";
 import "./styles.css";
@@ -20,12 +19,16 @@ import { formataMoeda } from "../../../util";
 
 const ListaCompras = () => {
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const [pedidos, setPedidos] = useState([]);
 
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    dataEmissao: {
+      value: null,
+      matchMode: FilterMatchMode.DATE_IS,
+    },
 
     "fornecedor.nome": { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   });
@@ -36,9 +39,13 @@ const ListaCompras = () => {
       .then((r) => {
         //  console.log(r.data);
         setPedidos(r.data);
+        setLoading(true);
       })
       .catch((e) => {
         //  console.log(e);
+      })
+      .finally((f) => {
+        setLoading(false);
       });
   };
 
@@ -69,13 +76,51 @@ const ListaCompras = () => {
     return moment(data.prazoEntrega).format("DD/MM/YYYY");
   };
 
-  const emissaoTemplate = (data) => {
-    return moment(data?.dataEmissao).format("DD/MM/YYYY");
-  };
-
   const totalTemplate = (data) => {
     return formataMoeda(data.total);
   };
+
+  const dataEmissaoTemplate = (data) => {
+    return moment(data.dataEmissao).format("DD/MM/YYYY");
+  };
+
+  const deletarTemplate = (data) => {
+    return (
+      <>
+        <Button
+          label="Deletar"
+          icon="pi pi-trash"
+          className="p-button-rounded p-button-danger"
+          onClick={() => deletar(data)}
+        />
+      </>
+    );
+  };
+
+  const deletar = (data) => {
+    setLoading(true);
+    api
+      .delete(`/api/pedido/compra/deletar/pedido/${data.id}`)
+      .then((r) => {
+        setLoading(false);
+      })
+      .catch((e) => {})
+      .finally((f) => {
+        setLoading(false);
+        getPedidos();
+      });
+  };
+
+  const leftContents = (
+    <React.Fragment>
+      <Button
+        label="Novo pedido"
+        icon="pi pi-plus"
+        className="mr-2 p-button p-button-rounded"
+        onClick={() => navigate("/compras/analise/fornecedor")}
+      />
+    </React.Fragment>
+  );
 
   return (
     <>
@@ -83,12 +128,16 @@ const ListaCompras = () => {
       <Footer />
 
       <div className="container-pedido">
-        <div>
+        <div className="logo-consulta-pedido">
           <h1 style={{ color: "#FFFF" }}>Consulta pedidos de compras</h1>
-          <img src={Logo} style={{ width: "400px", height: "400px" }} />
+          <img src={Logo} style={{ width: "250px", height: "250px" }} />
+        </div>
+        <div className="botao-novo">
+          <Toolbar left={leftContents} />
         </div>
         <div className="tabela-pedidos">
           <DataTable
+            loading={loading}
             filterDisplay="row"
             dataKey="id"
             filters={filters2}
@@ -112,9 +161,8 @@ const ListaCompras = () => {
             ></Column>
             <Column
               header="Emissão"
-              filterField="dataEmissao"
-              dataType="date"
-              body={emissaoTemplate}
+              field="dataEmissao"
+              body={dataEmissaoTemplate}
             />
             <Column
               field={prazoEntregaTemplate}
@@ -127,6 +175,7 @@ const ListaCompras = () => {
             <Column header="Total" field={totalTemplate} />
 
             <Column header="Consultar" field={consultaTemplate} />
+            <Column header="Deletar" field={deletarTemplate} />
           </DataTable>
         </div>
       </div>

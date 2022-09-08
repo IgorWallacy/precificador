@@ -11,9 +11,26 @@
 
 .container-pedido {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
     gap: 5px
+}
+
+.logo-consulta-pedido {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
+
+.botao-novo {
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    flex-wrap: wrap;
+
+    padding: 25px;
 }

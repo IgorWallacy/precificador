@@ -1,7 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
+
 import "./styles.css";
+
+import { AdicionarProduto } from "./adicionar-produto";
+
 import { useNavigate, useParams } from "react-router-dom";
-import ImagemDestque from "../../../../assets/img/compras-fornecedor.svg";
+
+import { Messages } from "primereact/messages";
+import { Message } from "primereact/message";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
@@ -32,13 +38,30 @@ import moment from "moment";
 
 import api from "../../../../services/axios";
 
+import ReactLoading from "react-loading";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import TextTransition, { presets } from "react-text-transition";
+
 import { formataMoeda } from "../../../../util";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function AnaliseFornecedor() {
+  const TEXTS = [
+    "Calculando sugestões ...",
+    "Processando ...",
+    "Aguarde por favor ...",
+    "Processando ...",
+    "Adicionando produtos a lista",
+    "Processando ...",
+    "Mais um momento por favor",
+    "Ao final do processo, será exibida a sugestão",
+  ];
+
+  const [index, setIndex] = React.useState(0);
+  const msgs1 = useRef(null);
+
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
     dayNames: [
@@ -88,6 +111,7 @@ export default function AnaliseFornecedor() {
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [globalFilterValue3, setGlobalFilterValue3] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loading3, setLoading3] = useState(false);
   const [dataInicialCompra, setDataInicialCompra] = useState(
     new Date(new Date().setDate(new Date().getDate() - 90))
   );
@@ -120,6 +144,8 @@ export default function AnaliseFornecedor() {
   const [condicoesPagamento, setCondicoesPagamento] = useState([]);
   const [prazoEntrega, setPrazoEntrega] = useState(null);
 
+  const [loadingAddPedido, setLoadingAddPedido] = useState(false);
+
   const toast = useRef(null);
   const toast2 = useRef(null);
   const toast3 = useRef(null);
@@ -145,6 +171,10 @@ export default function AnaliseFornecedor() {
 
   const [loading2, setLoading2] = useState(false);
 
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const [dialogSelectedProducts, setDialogSelectedProducts] = useState(false);
+
   const matchModes = [
     {
       label: "Maior ou igual que...",
@@ -155,6 +185,10 @@ export default function AnaliseFornecedor() {
       value: FilterMatchMode.LESS_THAN_OR_EQUAL_TO,
     },
   ];
+
+  const clearMessages = () => {
+    msgs1.current.clear();
+  };
 
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -233,7 +267,7 @@ export default function AnaliseFornecedor() {
         toast.current.show({
           severity: "error",
           summary: "Erro",
-          detail: `${error}`,
+          detail: `${error.data}`,
         });
       })
       .finally(() => {});
@@ -260,7 +294,7 @@ export default function AnaliseFornecedor() {
         toast.current.show({
           severity: "error",
           summary: "Erro",
-          detail: `${error}`,
+          detail: `${error.data}`,
         });
       })
       .finally(() => {
@@ -277,7 +311,11 @@ export default function AnaliseFornecedor() {
         setCondicoesPagamento(r.data);
       })
       .catch((error) => {
-        toast.show({ severity: "error", summary: "Erro", detail: `${error}` });
+        toast.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${error.data}`,
+        });
       })
       .finally(setLoading(false));
   };
@@ -293,7 +331,7 @@ export default function AnaliseFornecedor() {
         toast.current.show({
           severity: "error",
           summary: "Erro",
-          detail: `${error}`,
+          detail: `${error.data}`,
         });
       })
       .finally(() => {
@@ -342,7 +380,7 @@ export default function AnaliseFornecedor() {
           toast.current.show({
             severity: "error",
             summary: "Erro",
-            detail: `${error}`,
+            detail: `${error.data}`,
           });
         })
         .finally(() => {
@@ -619,7 +657,8 @@ export default function AnaliseFornecedor() {
               className="cfop-button"
               data-pr-tooltip={rowData.cfop_descricao}
             >
-              {rowData.cfop} <br />
+              {rowData.cfop} - Bonificação
+              <br />
               <FaGift />
             </span>
           </>
@@ -657,7 +696,7 @@ export default function AnaliseFornecedor() {
             <Button
               disabled={idPedido ? false : true}
               style={{ margin: "5px" }}
-              label={idPedido ? "" : "Crie um pedido para habilitar"}
+              label={idPedido ? "Adicionar" : "Crie um pedido para habilitar"}
               className="p-button-rounded p-button-sm"
               icon="pi pi-shopping-bag"
               //  onClick={() => adicionarProduto(rowdata)}
@@ -732,6 +771,124 @@ export default function AnaliseFornecedor() {
     }
   };
 
+  const adicionarProdutoMassa = (rowData) => {
+    if (!lojaSelecionada) {
+      toast3.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: "Selecione uma loja para o pedido",
+      });
+    } else {
+      setLoadingAddPedido(true);
+      rowData.map((m) => {
+        api
+          .post(
+            `/api_react/compras/produtos/${m?.id}/${moment(
+              dataInicialCompra
+            ).format("YYYY-MM-DD")}/${moment(dataFinalCompra).format(
+              "YYYY-MM-DD"
+            )}/${fornecedor.id}/${lojaSelecionada.id}/${moment(moment.now())
+              .subtract(diasVenda, "days")
+              .format("YYYY-MM-DD")}/${moment(dataFinalVenda).format(
+              "YYYY-MM-DD"
+            )}`
+          )
+          .then((r) => {
+            let total =
+              r.data[0].quantidade_vendida * r.data[0].preco_medio_venda;
+
+            let venda_diaria = total / diasVenda;
+
+            let qtdeAComprar =
+              venda_diaria *
+              (tempoDiasPedido + tempoDiasEntrega + margemErroDiasEntrega);
+
+            api
+              .post(`/api/pedido/compra/salvar/${idPedido}`, {
+                idpedido: { id: idPedido },
+                idproduto: { id: m.id },
+                unidadeCompra: {
+                  id: r.data[0].id_unidade_compra
+                    ? r.data[0].id_unidade_compra
+                    : 30,
+                },
+                quantidadeVenda: r.data[0].quantidade_vendida,
+                fatorConversao: fator,
+
+                embalagem: Intl.NumberFormat("pt-BR", {}).format(
+                  m.embalagem ? m.embalagem : 1
+                ),
+
+                quantidade: qtdeAComprar.toFixed(),
+                filial: { id: lojaSelecionada.id },
+                //  quantidade2: quantidade2,
+                preco: r.data[0].ultimoprecocompra,
+                total: total,
+              })
+              .then((r) => {
+                // getItensPedidoProduto(rowData);
+                setLoadingAddPedido(true);
+                msgs1.current.show({
+                  severity: "success",
+                  life: 2000,
+                  content: (
+                    <React.Fragment>
+                      <img
+                        alt="logo"
+                        src={`${eanUrl}/${m?.ean}`}
+                        onError={(e) =>
+                          (e.target.src =
+                            "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                        }
+                        width="32"
+                      />
+                      <div className="ml-2">
+                        {m.produto} adicionado com sucesso
+                      </div>
+                    </React.Fragment>
+                  ),
+                });
+              })
+              .catch((error) => {
+                msgs1.current.show({
+                  severity: "danger",
+                  life: 2000,
+                  content: (
+                    <React.Fragment>
+                      <img
+                        alt="logo"
+                        src={`${eanUrl}/${m?.ean}`}
+                        onError={(e) =>
+                          (e.target.src =
+                            "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                        }
+                        width="32"
+                      />
+                      <div className="ml-2">
+                        Não foi possível adicionar {m.produto} a lista,
+                        verifique !
+                      </div>
+                    </React.Fragment>
+                  ),
+                });
+              })
+              .finally((f) => {
+                setLoadingAddPedido(false);
+                getItensPedido();
+                setDialogSelectedProducts(false);
+                setVisibleLeft(true);
+                setSelectedProducts([]);
+              });
+          })
+          .catch((e) => {})
+          .finally((f) => {});
+      });
+
+      //  console.log(rowData);
+      //setDialogSelectedProducts(false);
+    }
+  };
+
   const finalizarPedido = () => {
     if (
       fornecedor === null ||
@@ -789,6 +946,13 @@ export default function AnaliseFornecedor() {
     return (
       <>
         <Button
+          style={{ margin: "5px" }}
+          icon="pi pi-times"
+          className="p-button p-button-rounded p-button-danger"
+          label="Voltar"
+          onClick={() => setVisibleLeft(false)}
+        />
+        <Button
           disabled={idPedido ? false : true}
           style={{ margin: "5px" }}
           icon="pi pi-cloud-upload"
@@ -822,7 +986,7 @@ export default function AnaliseFornecedor() {
       styles: {
         header: {
           fontSize: 12,
-          alignment: "left",
+          alignment: "center",
           marginTop: 5,
         },
       },
@@ -835,11 +999,12 @@ export default function AnaliseFornecedor() {
       header: [
         {
           text: `Pedido de compra N° ${idPedido} - Fornecedor : ${
-            fornecedor.nome
-          } -
+            fornecedor?.codigo
+          } - ${fornecedor?.nome} -
+          Emissão ${moment(pedidos?.dataEmissao).format("DD/MM/YYYY")}
         Condição de pagamento : ${
           condicaoPagamento?.descricao
-        }  - Prazo para entrega : ${moment(prazoEntrega).format("DD/MM/YY")}
+        }  - Prazo para entrega : ${moment(prazoEntrega).format("DD/MM/YYYY")}
        Total do pedido: ${formataMoeda(totalPedido)}
 `,
 
@@ -851,21 +1016,19 @@ export default function AnaliseFornecedor() {
       content: pedidos.map(function (item, i) {
         return {
           layout: "lightHorizontalLines", // optional
-          lineHeight: 2,
+          lineHeight: 1,
           fontSize: 9,
           table: {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 0,
-            widths: [15, 120, 66, 140, 40, 45, "*"],
+            widths: [20, 66, 140, 40, 40, 40, "*"],
 
             body: [
               ["", "", "", "", "", "", ""],
 
               [
                 { text: i + 1 },
-
-                { text: item.filial.id + "-" + item.filial.nome },
 
                 {
                   text: item.idproduto.ean
@@ -902,6 +1065,9 @@ export default function AnaliseFornecedor() {
                     currency: "BRL",
                   }).format(item.preco * item.quantidade),
                 },
+                {
+                  text: item.filial.id + "-" + item.filial.nome,
+                },
               ],
             ],
           },
@@ -922,6 +1088,7 @@ export default function AnaliseFornecedor() {
         )
         .then((r) => {
           //   console.log(r.data);
+          setLoading3(true);
           setPedidos(r.data);
         })
         .catch((error) => {
@@ -934,7 +1101,9 @@ export default function AnaliseFornecedor() {
             life: 3000,
           });
         })
-        .finally((f) => {});
+        .finally((f) => {
+          setLoading3(false);
+        });
     }
   };
 
@@ -974,7 +1143,7 @@ export default function AnaliseFornecedor() {
           toast.current.show({
             severity: "error",
             summary: "Erro",
-            detail: `Erro ao criar o pedido ${error} `,
+            detail: `Erro ao criar o pedido ${error.data} `,
             life: 3000,
           });
         });
@@ -1268,8 +1437,10 @@ export default function AnaliseFornecedor() {
           .format("YYYY-MM-DD")}/${moment(dataFinalVenda).format("YYYY-MM-DD")}`
       )
       .then((r) => {
+        //  console.log(r.data);
         setProdutoPorFilialLista(r.data);
         setPreco(r.data[0].ultimoprecocompra);
+        setUnidadeMedida(r.data[0].id_unidade_compra);
 
         let total = r.data[0].quantidade_vendida * r.data[0].preco_medio_venda;
 
@@ -1413,6 +1584,11 @@ export default function AnaliseFornecedor() {
     getLojas();
     getCondficaoPagamento();
     getDuplicatas();
+    const intervalId = setInterval(
+      () => setIndex((index) => index + 1),
+      3000 // every 3 seconds
+    );
+    return () => clearTimeout(intervalId);
   }, []);
 
   const linhaSelecionada = (data) => {
@@ -1428,15 +1604,22 @@ export default function AnaliseFornecedor() {
       icon: "pi pi-fw pi-list",
       command: () => setVisibleLeft(true),
     },
+
+    {
+      label: "Adicionar selecionados",
+      disabled: selectedProducts.length > 0 ? false : true,
+      icon: "pi pi-plus-circle",
+      command: () => setDialogSelectedProducts(true),
+    },
+    {
+      label: "Limpar mensagens/notificações",
+      icon: "pi pi-times",
+      command: () => clearMessages(),
+    },
     {
       label: "Duplicatas vencendo hoje",
       icon: "pi pi-fw pi-file",
       command: () => setDialogDuplicatas(true),
-    },
-    {
-      label: "Consultar outro pedido",
-      icon: "pi pi-folder",
-      command: () => navigate("/compras/consulta"),
     },
   ];
 
@@ -1444,7 +1627,7 @@ export default function AnaliseFornecedor() {
     return (
       <>
         <Button
-          style={{ marginTop: "20px" }}
+          style={{ margin: "0px 10px" }}
           className="p-button p-button-success p-button-rounded "
           label="Adicionar"
           icon="pi pi-plus"
@@ -1453,10 +1636,18 @@ export default function AnaliseFornecedor() {
           }}
         />
         <Button
+          style={{ margin: "0px 10px" }}
           label="Listar pedido"
           icon="pi pi-list"
           onClick={() => setVisibleLeft(true)}
           className="p-button-rounded p-button-primary"
+        />
+        <Button
+          style={{ margin: "0px 10px" }}
+          label="Fechar / Próximo"
+          icon="pi pi-times"
+          onClick={() => setDisplayDialog(false)}
+          className="p-button-rounded p-button-danger"
         />
       </>
     );
@@ -1467,264 +1658,504 @@ export default function AnaliseFornecedor() {
       <Header />
 
       <Footer />
-
+      {/*
       <Button
         icon="pi pi-shopping-cart"
         label={`${idPedido ? "Pedido " + idPedido : ""} `}
         className="botao-add-colado"
         onClick={() => setVisibleLeft(true)}
       />
-
-      <div className="img-fornecedor">
-        <img src={ImagemDestque} style={{ width: "250px" }} alt="logo" />
-      </div>
-
-      <Dialog
-        header={`Adicionar ${produto.produto} a lista de compras`}
-        modal={true}
-        visible={displayDialog}
-        onHide={hideDialog}
-        // style={{ width: "100%" }}
-        footer={fecharTemplate}
-        maximized
-        resizable
-        position="top"
-      >
-        <Toast ref={toast3} position="top-center" />
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "5px",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            {produto?.ean ? produto.ean : produto.codigo}
-            <br />
-            <img
+  */}
+      {displayDialog ? (
+        <>
+          <AdicionarProduto
+            eanUrl={eanUrl}
+            produto={produto}
+            displayDialog={displayDialog}
+            hideDialog={hideDialog}
+            fecharTemplate={fecharTemplate}
+            lojaSelecionada={lojaSelecionada}
+            produtoSelecionado={produtoSelecionado}
+            data_inclusao_template={data_inclusao_template}
+            saldo_estoque_template={saldo_estoque_template}
+            sugestao_quantidade_compra={sugestao_quantidade_compra}
+            valor_unitario_template={valor_unitario_template}
+            preco_media_venda_template={preco_media_venda_template}
+            quantidade_vendida_template={quantidade_vendida_template}
+            venda_diaria_template={venda_diaria_template}
+            total_template={total_template}
+            dialogProdutoPorFilial={dialogProdutoPorFilial}
+            itemPorPedido={itemPorPedido}
+            footerGroupPedidoProduto={footerGroupPedidoProduto}
+            loading2={loading2}
+            precoPedido={precoPedido}
+            precoPedidoLinhaTotal={precoPedidoLinhaTotal}
+            deletarItemPedido={deletarItemPedido}
+            quantidade_comprada_template_02={quantidade_comprada_template_02}
+            total_comprado_template_02={total_comprado_template_02}
+            quantidade={quantidade}
+            preco={preco}
+            unidadeMedida={unidadeMedida}
+            loadingLojas={loadingLojas}
+            produtoPorFilialLista={produtoPorFilialLista}
+            fator={fator}
+            setFator={setFator}
+            diasVenda={diasVenda}
+            setQuantidade={setQuantidade}
+            setTotal={setTotal}
+            unidadeMedidaLista={unidadeMedidaLista}
+            setUnidadeMedida={setUnidadeMedida}
+            toast3={toast3}
+            lojas={lojas}
+            loadinglojas={loadingLojas}
+          />
+        </>
+      ) : (
+        <>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          ></div>
+          <div className="container-fornecedor">
+            <h1
               style={{
-                width: "100px",
-                height: "100px",
-                margin: "5px",
-                borderRadius: "25px",
-                padding: "5px",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              src={`${eanUrl}/${produto.ean}`}
-              onError={(e) =>
-                (e.target.src =
-                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
-              }
-              alt={produto?.ean}
-            />
-          </div>
-          <div>
-            <h4>
-              Quantidade loja {lojaSelecionada?.id} - {lojaSelecionada?.nome}
-            </h4>
-            <InputNumber
-              autoFocus
-              style={{ width: "100%", marginTop: "10px" }}
-              size={1}
-              id="quantidade"
-              disabled={lojaSelecionada ? false : true}
-              value={quantidade}
-              onChange={(e) => setQuantidade(e.value)}
-              required
-              onBlur={(e) => setTotal(preco * quantidade)}
-            />
-          </div>
-          <div>
-            <h4>UN Compra </h4>
-            <Dropdown
-              style={{ width: "100%", marginTop: "10px" }}
-              required
-              value={unidadeMedida}
-              options={unidadeMedidaLista}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setUnidadeMedida(e.value)}
-              placeholder="Selecione uma unidade"
-            />
-          </div>
-          <div>
-            <h4>Embalagem com </h4>
-            <InputNumber
-              style={{ width: "100%", marginTop: "10px" }}
-              placeholder="Fator de conversão"
-              value={fator}
-              onChange={(e) => setFator(e.value)}
-              onBlur={(e) => setTotal(preco * quantidade)}
-            />
-          </div>
-          <div>
-            <h4>Preço para compra</h4>
-            <InputNumber
-              style={{ width: "100%", marginTop: "10px" }}
-              mode="decimal"
-              prefix="R$ "
-              locale="pt-BR"
-              minFractionDigits={2}
-              maxFractionDigits={2}
-              id="preco"
-              value={preco}
-              onChange={(e) => setPreco(e.value)}
-              required
-              onBlur={(e) => setTotal(preco * quantidade)}
-            />
-          </div>
-          <div>
-            <h1>Subtotal </h1>
-            <h1>{formataMoeda(preco * quantidade)}</h1>
-          </div>
+            >
+              Análise de compras
+            </h1>
 
-          <DataTable
-            emptyMessage="Sem dados para exibir no momento. Selecione uma loja para análise"
-            loading={loadingLojas}
-            style={{ width: "100%" }}
-            value={produtoPorFilialLista}
-            responsiveLayout="stack"
+            {idPedido ? (
+              <>
+                <div>
+                  {fornecedor?.leadttimecompra ? (
+                    <>
+                      <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+
+                  <div className="fornecedor-input">
+                    <h4>Selecione um fornecedor para análise</h4>
+                    <Dropdown
+                      disabled={idPedido ? true : false}
+                      required
+                      style={{ marginTop: "10px" }}
+                      placeholder="Selecione um fornecedor"
+                      value={fornecedor}
+                      options={fornecedores}
+                      optionLabel="nome"
+                      itemTemplate={itemTemplate}
+                      filter
+                      showClear
+                      filterBy="nome,codigo"
+                      onChange={(e) => {
+                        setFornecedor(e.target.value);
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="fornecedor-input">
+                    <h4 style={{ color: "red" }}>
+                      Informe o período inicial para análise de compra
+                    </h4>
+
+                    <Calendar
+                      placeholder="dd/mm/yyyy"
+                      mask="99/99/9999"
+                      showOnFocus={false}
+                      showButtonBar
+                      showIcon
+                      dateFormat="dd/mm/yy"
+                      locale="pt-BR"
+                      style={{ marginTop: "10px" }}
+                      onChange={(e) => setDataInicialCompra(e.target.value)}
+                      value={dataInicialCompra}
+                    ></Calendar>
+                  </div>
+
+                  <div className="fornecedor-input">
+                    <h4 style={{ color: "red" }}>
+                      Informe o período final para análise de compra
+                    </h4>
+
+                    <Calendar
+                      placeholder="dd/mm/yyyy"
+                      mask="99/99/9999"
+                      showButtonBar
+                      showOnFocus={false}
+                      showIcon
+                      dateFormat="dd/mm/yy"
+                      locale="pt-BR"
+                      style={{ marginTop: "10px" }}
+                      onChange={(e) => setDataFinalCompra(e.target.value)}
+                      value={dataFinalCompra}
+                    ></Calendar>
+                  </div>
+                </div>
+                <div>
+                  <div className="fornecedor-input">
+                    <h4 style={{ color: "green" }}>
+                      Informe a quantidade de dias para análise de vendas
+                    </h4>
+
+                    <InputNumber
+                      showButtons
+                      style={{ marginTop: "10px", width: "40%" }}
+                      onChange={(e) => setDiasVenda(e.value)}
+                      value={diasVenda}
+                      placeholder="Informe a quantidade de dias para análise"
+                    ></InputNumber>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="fornecedor-input">
+                    <h4 style={{ color: "green" }}>Tempo do pedido (dias) </h4>
+
+                    <InputNumber
+                      showButtons
+                      style={{ marginTop: "10px", width: "40%" }}
+                      onChange={(e) => {
+                        setTempoDiasPedido(e.value);
+                      }}
+                      value={tempoDiasPedido}
+                    ></InputNumber>
+                  </div>
+
+                  <div className="fornecedor-input">
+                    <h4 style={{ color: "green" }}>
+                      Tempo de entrega ( dias )
+                    </h4>
+
+                    <InputNumber
+                      showButtons
+                      style={{ marginTop: "10px", width: "40%" }}
+                      onChange={(e) => settempoDiasEntrega(e.value)}
+                      value={tempoDiasEntrega}
+                    ></InputNumber>
+                  </div>
+
+                  <div className="fornecedor-input">
+                    <h4 style={{ color: "green" }}>Margem de erro (dias)</h4>
+
+                    <InputNumber
+                      showButtons
+                      style={{ marginTop: "10px", width: "40%" }}
+                      onChange={(e) => setMargemErroDiasEntrega(e.value)}
+                      value={margemErroDiasEntrega}
+                    ></InputNumber>
+                  </div>
+                </div>
+
+                <div>
+                  <Button
+                    loading={loading}
+                    style={{ marginTop: "30px" }}
+                    icon="pi pi-search"
+                    label={loading ? "Analisando..." : "Pesquisar"}
+                    className="p-button-lg p-button-success p-button-rounded"
+                    onClick={analisar}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignContent: "center",
+                    justifyContent: "space-evenly",
+                    gap: "15px",
+                    color: "#FFF",
+                  }}
+                >
+                  {fornecedor?.leadttimecompra ? (
+                    <>
+                      <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                  <div className="fornecedor-input">
+                    <h4>Selecione um fornecedor para análise</h4>
+                    <Dropdown
+                      disabled={idPedido ? true : false}
+                      required
+                      style={{ width: "100%", margin: "10px 0px" }}
+                      placeholder="Selecione um fornecedor"
+                      value={fornecedor}
+                      options={fornecedores}
+                      optionLabel="nome"
+                      itemTemplate={itemTemplate}
+                      filter
+                      showClear
+                      filterBy="nome,codigo"
+                      onChange={(e) => {
+                        setFornecedor(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="fornecedor-input">
+                    <h4>Informe um prazo para entrega</h4>
+                    <Calendar
+                      placeholder="Informe o prazo para entrega"
+                      mask="99/99/9999"
+                      showIcon
+                      showButtonBar
+                      locale="pt-BR"
+                      dateFormat="dd/mm/yy"
+                      style={{ width: "100%", margin: "10px 0px" }}
+                      value={prazoEntrega}
+                      onChange={(e) => setPrazoEntrega(e.value)}
+                    />
+                  </div>
+                  <div className="fornecedor-input">
+                    <h4>Informe uma condição de pagamento</h4>
+                    <Dropdown
+                      style={{ width: "100%", margin: "10px 0px" }}
+                      filter
+                      value={condicaoPagamento}
+                      // optionValue="id"
+                      options={condicoesPagamento}
+                      optionLabel="descricao"
+                      onChange={(e) => setCondicaoPagamento(e.value)}
+                      placeholder="Selecione uma condição de pagamento"
+                    />
+                  </div>
+                  <div className="fornecedor-input">
+                    <Button
+                      disabled={idPedido ? true : false}
+                      style={{ width: "100%", margin: "10px 0px" }}
+                      icon="pi pi-save"
+                      className="p-button p-button-success p-button-rounded p-button-md"
+                      label={
+                        idPedido
+                          ? `Pedido número ` +
+                            idPedido +
+                            ` criado, adicione os itens a lista do pedido`
+                          : "Gravar rascunho"
+                      }
+                      onClick={() => gravarPedido()}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+          <Toast ref={toast} position="bottom-center" />
+
+          <Dialog
+            closable={false}
+            header="Adicionar produtos selecionados a lista de pedidos"
+            visible={dialogSelectedProducts}
+            onHide={() => setDialogSelectedProducts(false)}
           >
-            <Column field="idfilial" header="Loja"></Column>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignContent: "center",
+                gap: "20px",
+                flexWrap: "wrap",
+              }}
+            >
+              {loadingAddPedido ? (
+                <>
+                  <h1>
+                    <TextTransition springConfig={presets.wobbly}>
+                      {TEXTS[index % TEXTS.length]}
+                    </TextTransition>
+                  </h1>
+
+                  <ReactLoading
+                    type="cylon"
+                    color="#8600C9"
+                    height={100}
+                    width={100}
+                  />
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignContent: "center",
+                gap: "20px",
+                flexWrap: "wrap",
+              }}
+            >
+              <div>
+                <Toast ref={toast3} position="bottom" />
+                <h4>Informe uma loja para o pedido</h4>
+                <Dropdown
+                  style={{ margin: "10px" }}
+                  optionLabel="nome"
+                  value={lojaSelecionada}
+                  options={lojas}
+                  onChange={(e) => setLojaSelecionada(e.value)}
+                  placeholder="Selecione uma loja para o pedido"
+                  disabled={loadingAddPedido}
+                />
+              </div>
+              <div>
+                <Button
+                  loading={loadingAddPedido}
+                  disabled={loadingAddPedido}
+                  icon="pi pi-plus-circle"
+                  className="p-button p-button-rounded p-button-success"
+                  label="Adicionar"
+                  style={{ width: "100%", margin: "10px" }}
+                  onClick={() => adicionarProdutoMassa(selectedProducts)}
+                />
+
+                <Button
+                  disabled={loadingAddPedido}
+                  icon="pi pi-times"
+                  className="p-button p-button-rounded p-button-danger"
+                  label="Cancelar"
+                  style={{ width: "100%", margin: "10px" }}
+                  onClick={() => setDialogSelectedProducts(false)}
+                />
+              </div>
+            </div>
+          </Dialog>
+          <Messages ref={msgs1} />
+          <DataTable
+            style={{
+              width: "100%",
+            }}
+            selection={selectedProducts}
+            selectionMode="single"
+            onSelectionChange={(e) => setSelectedProducts(e.value)}
+            dataKey="id"
+            footerColumnGroup={footerGroupAnalise}
+            rows={3}
+            paginator
+            paginatorTemplate={template1}
+            footer={"Existem " + produtos.length + " produto(s) para análise"}
+            breakpoint="968px"
+            loading={loading}
+            stripedRows
+            value={produtos}
+            //   reorderableColumns
+            editMode="row"
+            //   scrollDirection="vertical"
+            //   scrollable
+            //   scrollHeight="flex"
+
+            filters={filters2}
+            size="small"
+            responsiveLayout="stack"
+            emptyMessage="Nenhum produto encontrado para análise"
+            showGridlines
+            header={headerDataTable}
+            rowGroupMode="subheader"
+            filterDisplay="row"
+            filter
+            sortOrder={1}
+            // resizableColumns
+            columnResizeMode="fit"
+            // onRowSelect={linhaSelecionada}
+            globalFilterFields={[
+              "codigo",
+              "ean",
+              "numeronfultcompra",
+              "produto",
+            ]}
+          >
             <Column
-              field={data_inclusao_template}
+              selectionMode="multiple"
+              headerStyle={{ width: "3em" }}
+            ></Column>
+            <Column
+              field="data_inclusao"
+              sortable
+              body={data_inclusao_template}
               header="Nota fiscal última compra"
             ></Column>
-            <Column field={saldo_estoque_template} header="Estoque"></Column>
+
             <Column
-              field={sugestao_quantidade_compra}
-              header="Sugestão"
+              field="codigo"
+              sortable
+              body={EanOrCodigo}
+              header="Código"
             ></Column>
 
             <Column
-              field={valor_unitario_template}
-              header="Custo Últm.Compra"
+              field="produto"
+              filter
+              showFilterMenu={true}
+              filterPlaceholder="Pesquisar produto ..."
+              sortable
+              header="Produto"
+            ></Column>
+
+            <Column field={cfop_template} header="CFOP"></Column>
+
+            <Column
+              field={botaoAddTemplate}
+              header={idPedido ? "Adicionar" : "Novo pedido "}
             ></Column>
 
             <Column
-              field={quantidade_comprada_template}
-              header="Compra"
-            ></Column>
-
-            <Column
-              field={total_comprado_template}
-              header="Total comprado"
-            ></Column>
-
-            <Column
-              header="Preço médio de venda"
-              field={preco_media_venda_template}
-            ></Column>
-
-            <Column
-              field={quantidade_vendida_template}
-              header={`Qtde venda ${diasVenda} dias`}
-            ></Column>
-
-            <Column
-              field={venda_diaria_template}
-              header="Qtde venda diária"
-            ></Column>
-
-            <Column
-              field={total_template}
-              header={`Total vendido ${diasVenda} dias`}
-            ></Column>
-          </DataTable>
-
-          <DataTable
-            value={lojas}
-            style={{ width: "25%" }}
-            responsiveLayout="stack"
-            selectionMode="single"
-            dataKey="id"
-            emptyMessage="Nenhuma loja encontrada"
-            onRowSelect={dialogProdutoPorFilial}
-          >
-            <Column field="codigo" header="Código"></Column>
-            <Column field="nome" header="Loja"></Column>
-          </DataTable>
-
-          <DataTable
-            value={itemPorPedido}
-            footerColumnGroup={footerGroupPedidoProduto}
-            responsiveLayout="stack"
-            loading={loading2}
-            emptyMessage="Nenhum produto adicionado a  lista"
-          >
-            <Column field="filial.id" header="Cód.Loja"></Column>
-            <Column field="filial.nome" header="Loja"></Column>
-            <Column field="idproduto.nome" header="Produto"></Column>
-
-            <Column field="preco" header="Preço" body={precoPedido} />
-            <Column field="unidadeCompra.nome" header="UN" />
-            <Column field="fatorConversao" header="Emb" />
-            <Column field="quantidade" header="Quantidade" />
-            <Column
-              field={precoPedidoLinhaTotal}
-              header="Preço Total "
-            ></Column>
-
-            <Column header="Deletar item" field={deletarItemPedido}></Column>
-          </DataTable>
-
-          <DataTable
-            value={produtoSelecionado}
-            responsiveLayout="stack"
-            style={{ width: "100%" }}
-          >
-            <Column header="Loja" body="Todas" />
-
-            <Column
-              field={saldo_estoque_template}
-              header="Estoque total"
-            ></Column>
-
-            <Column
-              field={sugestao_quantidade_compra}
-              header="Sugestão"
-            ></Column>
-
-            <Column
-              field={quantidade_comprada_template_02}
+              filter
+              showFilterMenu={true}
+              filterMatchModeOptions={matchModes}
+              filterPlaceholder="Filtrar compras  ..."
+              field="quantidade_comprada"
+              body={quantidade_comprada_template_02}
               header="Compra total no período"
             ></Column>
-
             <Column
-              field={total_comprado_template_02}
-              header="Total comprado no período"
+              filter
+              showFilterMenu={true}
+              filterMatchModeOptions={matchModes}
+              filterPlaceholder="Filtrar estoque  ..."
+              field="saldo_estoque"
+              sortable
+              header="Saldo em Estoque"
+              body={saldo_estoque_template}
             ></Column>
-
             <Column
-              header="Preço médio de venda"
-              field={preco_media_venda_template}
-            ></Column>
-
-            <Column
-              field={quantidade_vendida_template}
+              filter
+              showFilterMenu={true}
+              filterMatchModeOptions={matchModes}
+              filterPlaceholder="Filtrar vendas"
+              field="quantidade_vendida"
+              body={quantidade_vendida_template}
               header={`Qtde venda ${diasVenda} dias`}
             ></Column>
 
             <Column
-              field={venda_diaria_template}
-              header="Qtde venda diária"
-            ></Column>
-
-            <Column
-              field={total_template}
-              header={`Total vendido ${diasVenda} dias`}
+              field="quantidade_vendida"
+              header="Classificação"
+              sortable
+              body={giroTemplate}
             ></Column>
           </DataTable>
-        </div>
-      </Dialog>
+        </>
+      )}
 
       <Sidebar
         fullScreen
-        style={{ width: "100%" }}
         visible={visibleLeft}
+        showCloseIcon={false}
         onHide={() => setVisibleLeft(false)}
       >
         <Toast ref={toast2} position="bottom-center" />
@@ -1745,18 +2176,32 @@ export default function AnaliseFornecedor() {
               footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras`}
               footerColumnGroup={footerGroupPedido}
               value={pedidos}
+              breakpoint="968px"
+              rows={10}
+              loading={loading3}
+              paginator
+              paginatorTemplate={template1}
               emptyMessage="Nenhum produto adicionado a lista"
             >
-              <Column field="filial.id" header="Cód.Loja" />
-              <Column field="filial.nome" header="Loja" />
+              <Column field="filial.id" sortable header="Cód.Loja" />
+              <Column field="filial.nome" sortable header="Loja" />
               <Column field={EanOrCodigoPedido} header="Código/Ean"></Column>
-              <Column field="idproduto.nome" header="Produto"></Column>
-              <Column field="quantidade" header={`Quantidade`}></Column>
+              <Column field="idproduto.nome" sortable header="Produto"></Column>
+              <Column
+                field="quantidade"
+                sortable
+                header={`Quantidade`}
+              ></Column>
 
-              <Column field="unidadeCompra.nome" header="UN"></Column>
-              <Column field="fatorConversao" header="Emb.C/"></Column>
+              <Column field="unidadeCompra.nome" sortable header="UN"></Column>
+              <Column field="fatorConversao" sortable header="Emb.C/"></Column>
 
-              <Column field={precoPedido} header="Preço unitário "></Column>
+              <Column
+                field="preco"
+                body={precoPedido}
+                sortable
+                header="Preço unitário "
+              ></Column>
 
               <Column
                 field={precoPedidoLinhaTotal}
@@ -1772,351 +2217,6 @@ export default function AnaliseFornecedor() {
           </div>
         </div>
       </Sidebar>
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <TabMenu model={items} />
-      </div>
-      <div className="container-fornecedor">
-        <h1
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          Análise de compras
-        </h1>
-
-        {idPedido ? (
-          <>
-            <div>
-              {fornecedor?.leadttimecompra ? (
-                <>
-                  <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
-                </>
-              ) : (
-                <></>
-              )}
-
-              <div className="fornecedor-input">
-                <h4>Selecione um fornecedor para análise</h4>
-                <Dropdown
-                  disabled={idPedido ? true : false}
-                  required
-                  style={{ marginTop: "10px" }}
-                  placeholder="Selecione um fornecedor"
-                  value={fornecedor}
-                  options={fornecedores}
-                  optionLabel="nome"
-                  itemTemplate={itemTemplate}
-                  filter
-                  showClear
-                  filterBy="nome,codigo"
-                  onChange={(e) => {
-                    setFornecedor(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-            <div>
-              <div className="fornecedor-input">
-                <h4 style={{ color: "red" }}>
-                  Informe o período inicial para análise de compra
-                </h4>
-
-                <Calendar
-                  placeholder="dd/mm/yyyy"
-                  mask="99/99/9999"
-                  showOnFocus={false}
-                  showButtonBar
-                  showIcon
-                  dateFormat="dd/mm/yy"
-                  locale="pt-BR"
-                  style={{ marginTop: "10px" }}
-                  onChange={(e) => setDataInicialCompra(e.target.value)}
-                  value={dataInicialCompra}
-                ></Calendar>
-              </div>
-
-              <div className="fornecedor-input">
-                <h4 style={{ color: "red" }}>
-                  Informe o período final para análise de compra
-                </h4>
-
-                <Calendar
-                  placeholder="dd/mm/yyyy"
-                  mask="99/99/9999"
-                  showButtonBar
-                  showOnFocus={false}
-                  showIcon
-                  dateFormat="dd/mm/yy"
-                  locale="pt-BR"
-                  style={{ marginTop: "10px" }}
-                  onChange={(e) => setDataFinalCompra(e.target.value)}
-                  value={dataFinalCompra}
-                ></Calendar>
-              </div>
-            </div>
-            <div>
-              <div className="fornecedor-input">
-                <h4 style={{ color: "green" }}>
-                  Informe a quantidade de dias para análise de vendas
-                </h4>
-
-                <InputNumber
-                  showButtons
-                  style={{ marginTop: "10px", width: "40%" }}
-                  onChange={(e) => setDiasVenda(e.value)}
-                  value={diasVenda}
-                  placeholder="Informe a quantidade de dias para análise"
-                ></InputNumber>
-              </div>
-            </div>
-
-            <div>
-              <div className="fornecedor-input">
-                <h4 style={{ color: "green" }}>Tempo do pedido (dias) </h4>
-
-                <InputNumber
-                  showButtons
-                  style={{ marginTop: "10px", width: "40%" }}
-                  onChange={(e) => {
-                    setTempoDiasPedido(e.value);
-                  }}
-                  value={tempoDiasPedido}
-                ></InputNumber>
-              </div>
-
-              <div className="fornecedor-input">
-                <h4 style={{ color: "green" }}>Tempo de entrega ( dias )</h4>
-
-                <InputNumber
-                  showButtons
-                  style={{ marginTop: "10px", width: "40%" }}
-                  onChange={(e) => settempoDiasEntrega(e.value)}
-                  value={tempoDiasEntrega}
-                ></InputNumber>
-              </div>
-
-              <div className="fornecedor-input">
-                <h4 style={{ color: "green" }}>Margem de erro (dias)</h4>
-
-                <InputNumber
-                  showButtons
-                  style={{ marginTop: "10px", width: "40%" }}
-                  onChange={(e) => setMargemErroDiasEntrega(e.value)}
-                  value={margemErroDiasEntrega}
-                ></InputNumber>
-              </div>
-            </div>
-
-            <div>
-              <Button
-                loading={loading}
-                style={{ marginTop: "30px" }}
-                icon="pi pi-search"
-                label={loading ? "Analisando..." : "Pesquisar"}
-                className="p-button-lg p-button-success p-button-rounded"
-                onClick={analisar}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignContent: "center",
-                justifyContent: "space-evenly",
-                gap: "15px",
-                color: "#FFF",
-              }}
-            >
-              {fornecedor?.leadttimecompra ? (
-                <>
-                  <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
-                </>
-              ) : (
-                <></>
-              )}
-              <div className="fornecedor-input">
-                <h4>Selecione um fornecedor para análise</h4>
-                <Dropdown
-                  disabled={idPedido ? true : false}
-                  required
-                  style={{ width: "100%", margin: "10px 0px" }}
-                  placeholder="Selecione um fornecedor"
-                  value={fornecedor}
-                  options={fornecedores}
-                  optionLabel="nome"
-                  itemTemplate={itemTemplate}
-                  filter
-                  showClear
-                  filterBy="nome,codigo"
-                  onChange={(e) => {
-                    setFornecedor(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="fornecedor-input">
-                <h4>Informe um prazo para entrega</h4>
-                <Calendar
-                  placeholder="Informe o prazo para entrega"
-                  mask="99/99/9999"
-                  showIcon
-                  showButtonBar
-                  locale="pt-BR"
-                  dateFormat="dd/mm/yy"
-                  style={{ width: "100%", margin: "10px 0px" }}
-                  value={prazoEntrega}
-                  onChange={(e) => setPrazoEntrega(e.value)}
-                />
-              </div>
-              <div className="fornecedor-input">
-                <h4>Informe uma condição de pagamento</h4>
-                <Dropdown
-                  style={{ width: "100%", margin: "10px 0px" }}
-                  filter
-                  value={condicaoPagamento}
-                  // optionValue="id"
-                  options={condicoesPagamento}
-                  optionLabel="descricao"
-                  onChange={(e) => setCondicaoPagamento(e.value)}
-                  placeholder="Selecione uma condição de pagamento"
-                />
-              </div>
-              <div className="fornecedor-input">
-                <Button
-                  disabled={idPedido ? true : false}
-                  style={{ width: "100%", margin: "10px 0px" }}
-                  icon="pi pi-save"
-                  className="p-button p-button-success p-button-rounded p-button-md"
-                  label={
-                    idPedido
-                      ? `Pedido número ` +
-                        idPedido +
-                        ` criado, adicione os itens a lista do pedido`
-                      : "Gravar rascunho"
-                  }
-                  onClick={() => gravarPedido()}
-                />
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-      <Toast ref={toast} position="bottom-center" />
-
-      <DataTable
-        style={{
-          width: "100%",
-        }}
-        rows={3}
-        paginator
-        footerColumnGroup={footerGroupAnalise}
-        paginatorTemplate={template1}
-        footer={"Existem " + produtos.length + " produto(s) para análise"}
-        breakpoint="968px"
-        loading={loading}
-        stripedRows
-        value={produtos}
-        selectionMode="single"
-        //   reorderableColumns
-        editMode="row"
-        dataKey="idproduto"
-        //   scrollDirection="vertical"
-        //   scrollable
-        //   scrollHeight="flex"
-
-        filters={filters2}
-        size="small"
-        responsiveLayout="stack"
-        emptyMessage="Nenhum produto encontrado para análise"
-        showGridlines
-        header={headerDataTable}
-        rowGroupMode="subheader"
-        filterDisplay="row"
-        filter
-        sortOrder={1}
-        // resizableColumns
-        columnResizeMode="fit"
-        // onRowSelect={linhaSelecionada}
-        globalFilterFields={["codigo", "ean", "numeronfultcompra", "produto"]}
-      >
-        <Column
-          field="data_inclusao"
-          sortable
-          body={data_inclusao_template}
-          header="Nota fiscal última compra"
-        ></Column>
-
-        <Column
-          field="codigo"
-          sortable
-          body={EanOrCodigo}
-          header="Código"
-        ></Column>
-
-        <Column
-          field="produto"
-          filter
-          showFilterMenu={true}
-          filterPlaceholder="Pesquisar produto ..."
-          sortable
-          header="Produto"
-        ></Column>
-
-        <Column field={cfop_template} header="CFOP"></Column>
-
-        <Column
-          field={botaoAddTemplate}
-          header={idPedido ? "Adicionar" : "Novo pedido "}
-        ></Column>
-
-        <Column
-          filter
-          showFilterMenu={true}
-          filterMatchModeOptions={matchModes}
-          filterPlaceholder="Filtrar compras  ..."
-          field="quantidade_comprada"
-          body={quantidade_comprada_template_02}
-          header="Compra total no período"
-        ></Column>
-        <Column
-          filter
-          showFilterMenu={true}
-          filterMatchModeOptions={matchModes}
-          filterPlaceholder="Filtrar estoque  ..."
-          field="saldo_estoque"
-          sortable
-          header="Saldo em Estoque"
-          body={saldo_estoque_template}
-        ></Column>
-        <Column
-          filter
-          showFilterMenu={true}
-          filterMatchModeOptions={matchModes}
-          filterPlaceholder="Filtrar vendas"
-          field="quantidade_vendida"
-          body={quantidade_vendida_template}
-          header={`Qtde venda ${diasVenda} dias`}
-        ></Column>
-
-        <Column
-          field="quantidade_vendida"
-          header="Classificação"
-          sortable
-          body={giroTemplate}
-        ></Column>
-      </DataTable>
 
       <Dialog
         visible={dialogDuplicatas}
@@ -2178,6 +2278,16 @@ export default function AnaliseFornecedor() {
           <Column field={status_duplicate_template} header="Status"></Column>
         </DataTable>
       </Dialog>
+      {displayDialog ? (
+        <></>
+      ) : (
+        <>
+          <TabMenu
+            style={{ display: "fixed", marginBottom: "1px" }}
+            model={items}
+          />
+        </>
+      )}
     </>
   );
 }

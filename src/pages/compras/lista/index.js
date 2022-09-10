@@ -130,7 +130,6 @@ const ListaCompras = () => {
       <div className="container-pedido">
         <div className="logo-consulta-pedido">
           <h1 style={{ color: "#FFFF" }}>Consulta pedidos de compras</h1>
-          <img src={Logo} style={{ width: "250px", height: "250px" }} />
         </div>
         <div className="botao-novo">
           <Toolbar left={leftContents} />

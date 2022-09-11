@@ -9,13 +9,16 @@ const Main = () => {
     <>
       <div className="agenda-label">
         <Typing speed={50}>
-          <h1> Pesquisar notas fiscais de entrada </h1>
+          <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
+            Pesquisar notas fiscais de entrada,
+          </h1>
 
           <h4
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              fontFamily: "cabin-sketch-bold",
             }}
           >
             Agendar os preços de venda

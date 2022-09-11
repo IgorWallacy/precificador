@@ -13,7 +13,7 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { Toolbar } from "primereact/toolbar";
 
-import Logo from "../../../assets/img/undraw_services_re_hu5n.svg";
+//import Logo from "../../../assets/img/undraw_services_re_hu5n.svg";
 import "./styles.css";
 import { formataMoeda } from "../../../util";
 
@@ -129,7 +129,9 @@ const ListaCompras = () => {
 
       <div className="container-pedido">
         <div className="logo-consulta-pedido">
-          <h1 style={{ color: "#FFFF" }}>Consulta pedidos de compras</h1>
+          <h1 style={{ color: "#FFFF", fontFamily: "cabin-sketch-bold" }}>
+            Consulta pedidos de compras
+          </h1>
         </div>
         <div className="botao-novo">
           <Toolbar left={leftContents} />

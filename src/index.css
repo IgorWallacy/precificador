@@ -1,3 +1,5 @@
+@import url("https://use.typekit.net/koz6qgk.css");
+
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto+Flex:opsz@8..144&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
@@ -9,10 +11,14 @@
   padding: 0px;
   box-sizing: border-box;
   font-family: 'Roboto Flex', 'Montserrat', sans-serif;
-  font-size : '14px';
+  font-size: '14px';
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+
+
+
 }
+
 
 
 
@@ -25,7 +31,7 @@
   right: 0;
   overflow: auto;
   background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-  
+
 }
 
 
@@ -37,7 +43,7 @@
   flex-direction: column;
   border: 1px solid #FFF;
   border-top-left-radius: 50px;
-  border-top-right-radius: 50px ;
+  border-top-right-radius: 50px;
   flex-wrap: wrap;
   margin-top: 50px;
 
@@ -48,8 +54,8 @@
 
 .btn-topo {
   position: fixed;
-  top:10px;
-  right:10px;
+  top: 10px;
+  right: 10px;
   overflow: visible;
   z-index: 4;
 }
@@ -141,7 +147,7 @@
 }
 
 .p-selectbutton .p-button.p-highlight .p-focus {
- 
+
 
 
   color: rgba(0, 0, 0, 0.87);
@@ -153,19 +159,19 @@
   0% {
     background-position: 0% 0%;
 
-  } 
+  }
+
   50% {
 
     background-position: 50% 75%;
 
   }
-  100%{
+
+  100% {
 
     background-position: 25% 100%;
   }
 
-  
-  
+
+
 }
-
-

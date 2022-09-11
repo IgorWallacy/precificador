@@ -1,19 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-.menu-left{
+
+.menu-left {
 
     display: flex;
     flex-direction: column;
     margin: 10px;
     justify-content: center;
-    
+
     flex-wrap: wrap;
 }
 
 .texto-menu-interativo {
 
-   
+
     font-size: 2rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'cabin-sketch-bold', 'cabin-sketch-regular', 'Poppins', sans-serif;
+
+
 
 }
 
@@ -26,13 +29,13 @@
     align-items: center;
     gap: 50px;
     flex-wrap: wrap;
-   
+
     color: #FFFF;
     border: 1px solid #FFFF;
     padding: 15px;
-    margin: 5px 5px ;
+    margin: 5px 5px;
     border-radius: 50px;
-  
+
 }
 
 .opcoes-menu {
@@ -43,9 +46,9 @@
     color: #FFFF;
     gap: 25px;
     flex-wrap: wrap;
-  
-  
-   
+
+
+
 
 }
 
@@ -56,9 +59,9 @@
     flex-direction: column;
     align-items: center;
     color: #FFFF;
-     gap: 25px;
+    gap: 25px;
     flex-wrap: wrap;
-  
+
     border-radius: 50px;
     margin-top: 25px;
     padding: 25px;

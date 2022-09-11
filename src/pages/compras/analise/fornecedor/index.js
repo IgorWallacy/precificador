@@ -3,11 +3,12 @@ import React, { useEffect, useState, useRef } from "react";
 import "./styles.css";
 
 import { AdicionarProduto } from "./adicionar-produto";
-
+import { exibirPedido } from "./imprimir-pedido";
+import { PedidoListaSidebar } from "./lista-pedidos-sidebar";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Messages } from "primereact/messages";
-import { Message } from "primereact/message";
+
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
@@ -42,8 +43,6 @@ import ReactLoading from "react-loading";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import TextTransition, { presets } from "react-text-transition";
-
-import { formataMoeda } from "../../../../util";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -618,10 +617,10 @@ export default function AnaliseFornecedor() {
 
   const EanOrCodigoPedido = (rowData) => {
     //console.log(rowData);
-    if (rowData.idproduto.ean) {
+    if (rowData?.idproduto?.ean) {
       return (
         <>
-          <div>{rowData.idproduto.ean} </div>
+          <div>{rowData?.idproduto?.ean} </div>
           <div>
             <img
               style={{
@@ -631,18 +630,18 @@ export default function AnaliseFornecedor() {
                 borderRadius: "25px",
                 padding: "5px",
               }}
-              src={`${eanUrl}/${rowData.idproduto.ean}`}
+              src={`${eanUrl}/${rowData?.idproduto?.ean}`}
               onError={(e) =>
                 (e.target.src =
                   "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
               }
-              alt={rowData.idproduto.ean}
+              alt={rowData?.idproduto?.ean}
             />
           </div>
         </>
       );
     } else {
-      return rowData.idproduto.codigo;
+      return rowData?.idproduto?.codigo;
     }
   };
 
@@ -828,7 +827,7 @@ export default function AnaliseFornecedor() {
               .then((r) => {
                 // getItensPedidoProduto(rowData);
                 setLoadingAddPedido(true);
-                msgs1.current.show({
+                /*  msgs1.current.show({
                   severity: "success",
                   life: 2000,
                   content: (
@@ -846,12 +845,17 @@ export default function AnaliseFornecedor() {
                         {m.produto} adicionado com sucesso
                       </div>
                     </React.Fragment>
-                  ),
-                });
+                  ), 
+                });*/
               })
               .catch((error) => {
+                toast.show({
+                  severity: "error",
+                  summary: "Erro",
+                  detail: `${error.data}`,
+                });
                 msgs1.current.show({
-                  severity: "danger",
+                  severity: "error",
                   life: 2000,
                   content: (
                     <React.Fragment>
@@ -928,7 +932,7 @@ export default function AnaliseFornecedor() {
           });
           setTimeout(() => {
             // console.log("Delayed for 1 second.");
-            navigate("/compras/analise/fornecedor");
+            navigate("/compras/consulta");
           }, "1000");
         })
         .catch((e) => {
@@ -974,108 +978,19 @@ export default function AnaliseFornecedor() {
           style={{ margin: "5px" }}
           icon="pi pi-print"
           className="p-button p-button-warning p-button-rounded"
-          onClick={() => imprimirPedido()}
+          onClick={() =>
+            exibirPedido({
+              pedidos,
+              idPedido,
+              fornecedor,
+              condicaoPagamento,
+              prazoEntrega,
+              totalPedido,
+            })
+          }
         />
       </>
     );
-  };
-
-  const imprimirPedido = () => {
-    //  console.log(pedidos);
-    var dd = {
-      styles: {
-        header: {
-          fontSize: 12,
-          alignment: "center",
-          marginTop: 5,
-        },
-      },
-      //   pageSize: {width : 1001 , height : 200},
-      pageSize: "A4",
-      pageMargins: [5, 80, 5, 5],
-      fontSize: 12,
-      // by default we use portrait, you can change it to landscape if you wish
-      pageOrientation: "portrait",
-      header: [
-        {
-          text: `Pedido de compra N° ${idPedido} - Fornecedor : ${
-            fornecedor?.codigo
-          } - ${fornecedor?.nome} -
-          Emissão ${moment(pedidos?.dataEmissao).format("DD/MM/YYYY")}
-        Condição de pagamento : ${
-          condicaoPagamento?.descricao
-        }  - Prazo para entrega : ${moment(prazoEntrega).format("DD/MM/YYYY")}
-       Total do pedido: ${formataMoeda(totalPedido)}
-`,
-
-          style: "header",
-          margin: [5, 5],
-        },
-      ],
-
-      content: pedidos.map(function (item, i) {
-        return {
-          layout: "lightHorizontalLines", // optional
-          lineHeight: 1,
-          fontSize: 9,
-          table: {
-            // headers are automatically repeated if the table spans over multiple pages
-            // you can declare how many rows should be treated as headers
-            headerRows: 0,
-            widths: [20, 66, 140, 40, 40, 40, "*"],
-
-            body: [
-              ["", "", "", "", "", "", ""],
-
-              [
-                { text: i + 1 },
-
-                {
-                  text: item.idproduto.ean
-                    ? item.idproduto.ean
-                    : item.idproduto.codigo,
-                  style: "ean",
-                },
-                {
-                  text: item.idproduto.nome.substring(0, 35),
-                  style: "descricao",
-                },
-
-                {
-                  text: Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                    minimumFractionDigits: "2",
-                    maximumFractionDigits: "2",
-                  }).format(item.preco),
-                  style: "preco",
-                },
-
-                {
-                  text:
-                    item.quantidade +
-                    ` ${item.unidadeCompra ? item.unidadeCompra.codigo : ""} (${
-                      item.fatorConversao === 0 ? 1 : item.fatorConversao
-                    })`,
-                },
-
-                {
-                  text: Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(item.preco * item.quantidade),
-                },
-                {
-                  text: item.filial.id + "-" + item.filial.nome,
-                },
-              ],
-            ],
-          },
-        };
-      }),
-    };
-
-    pdfMake.createPdf(dd).open();
   };
 
   const getItensPedido = () => {
@@ -1727,6 +1642,8 @@ export default function AnaliseFornecedor() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                fontFamily: "cabin-sketch-regular",
+                fontWeight: "400",
               }}
             >
               Análise de compras
@@ -1975,7 +1892,14 @@ export default function AnaliseFornecedor() {
                 <>
                   <h1>
                     <TextTransition springConfig={presets.wobbly}>
-                      {TEXTS[index % TEXTS.length]}
+                      <h2
+                        style={{
+                          fontWeight: "700",
+                          fontStyle: "normal",
+                        }}
+                      >
+                        {TEXTS[index % TEXTS.length]}
+                      </h2>
                     </TextTransition>
                   </h1>
 
@@ -2159,6 +2083,7 @@ export default function AnaliseFornecedor() {
         onHide={() => setVisibleLeft(false)}
       >
         <Toast ref={toast2} position="bottom-center" />
+        <Messages ref={msgs1} />
         <div className="lista-itens">
           <Toolbar
             style={{ margin: "20px" }}
@@ -2166,54 +2091,34 @@ export default function AnaliseFornecedor() {
             left={rightContents}
           />
           <div style={{ width: "100%" }}>
-            <DataTable
-              style={{
-                padding: "10px",
-                backgroundColor: "#FFF",
-                borderRadius: "25px",
-                border: "1px solid #FFF",
-              }}
-              footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras`}
-              footerColumnGroup={footerGroupPedido}
-              value={pedidos}
-              breakpoint="968px"
-              rows={10}
-              loading={loading3}
-              paginator
-              paginatorTemplate={template1}
-              emptyMessage="Nenhum produto adicionado a lista"
-            >
-              <Column field="filial.id" sortable header="Cód.Loja" />
-              <Column field="filial.nome" sortable header="Loja" />
-              <Column field={EanOrCodigoPedido} header="Código/Ean"></Column>
-              <Column field="idproduto.nome" sortable header="Produto"></Column>
-              <Column
-                field="quantidade"
-                sortable
-                header={`Quantidade`}
-              ></Column>
-
-              <Column field="unidadeCompra.nome" sortable header="UN"></Column>
-              <Column field="fatorConversao" sortable header="Emb.C/"></Column>
-
-              <Column
-                field="preco"
-                body={precoPedido}
-                sortable
-                header="Preço unitário "
-              ></Column>
-
-              <Column
-                field={precoPedidoLinhaTotal}
-                header="Preço Total "
-              ></Column>
-
-              <Column header="Deletar item" field={deletarItemPedido}></Column>
-
-              <Column
-              //  body={() => abrirDialogDeleteProduto()}
-              ></Column>
-            </DataTable>
+            <PedidoListaSidebar
+              msgs1={msgs1}
+              loadingLojas={loadingLojas}
+              produtoPorFilialLista={produtoPorFilialLista}
+              data_inclusao_template={data_inclusao_template}
+              saldo_estoque_template={saldo_estoque_template}
+              sugestao_quantidade_compra={sugestao_quantidade_compra}
+              valor_unitario_template={valor_unitario_template}
+              quantidade_comprada_template={quantidade_comprada_template}
+              total_comprado_template={total_comprado_template}
+              preco_media_venda_template={preco_media_venda_template}
+              quantidade_vendida_template={quantidade_vendida_template}
+              diasVenda={diasVenda}
+              venda_diaria_template={venda_diaria_template}
+              total_template={total_template}
+              dialogProdutoPorFilial={dialogProdutoPorFilial}
+              lojas={lojas}
+              getItensPedido={getItensPedido}
+              pedidos={pedidos}
+              footerGroupPedido={footerGroupPedido}
+              loading3={loading3}
+              template1={template1}
+              EanOrCodigoPedido={EanOrCodigoPedido}
+              precoPedido={precoPedido}
+              precoPedidoLinhaTotal={precoPedidoLinhaTotal}
+              deletarItemPedido={deletarItemPedido}
+              unidadeMedidaLista={unidadeMedidaLista}
+            />
           </div>
         </div>
       </Sidebar>

@@ -170,9 +170,18 @@ const Login = () => {
             <div className="form-login">
               <img style={{ width: "250px" }} src={ImagemDestque} />
               <div></div>
-              <h4 style={{ fontSize: "20px", margin: "15px", color: "#FFF" }}>
+              <h4
+                style={{
+                  fontSize: "20px",
+                  margin: "15px",
+                  color: "#FFF",
+                }}
+              >
                 <Typing speed={50}>
-                  Utilize sua conta uniplus para acesso ao sistema
+                  <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
+                    {" "}
+                    Utilize sua conta uniplus para acesso ao sistema
+                  </h1>
                 </Typing>{" "}
               </h4>
               <form onSubmit={login}>

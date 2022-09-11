@@ -96,8 +96,10 @@ const MenuInterativo = () => {
           <Typing speed={50} startDelay={10}>
             <div className="texto-menu-interativo">
               <img src={ImagemDestque} style={{ width: "150px" }} />
-              <em>{greetingMessage()}</em> <h1>{nome}</h1>
-              <em>o que você deseja fazer hoje ? </em>{" "}
+              {greetingMessage()}{" "}
+              <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
+                {nome} o que você deseja fazer hoje ?
+              </h1>
             </div>
           </Typing>
         </div>

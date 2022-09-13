@@ -8,7 +8,7 @@ import { PedidoListaSidebar } from "./lista-pedidos-sidebar";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Messages } from "primereact/messages";
-
+import { Card } from "primereact/card";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
@@ -53,13 +53,11 @@ export default function AnaliseFornecedor() {
     "Aguarde por favor ...",
     "Processando ...",
     "Adicionando produtos a lista",
-    "Processando ...",
-    "Mais um momento por favor",
-    "Ao final do processo, será exibida a sugestão",
   ];
 
   const [index, setIndex] = React.useState(0);
   const msgs1 = useRef(null);
+  const [selectedProductsPedido, setSelectedProductsPedido] = useState([]);
 
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -152,7 +150,7 @@ export default function AnaliseFornecedor() {
   const [dialogDuplicatas, setDialogDuplicatas] = useState(false);
   const [duplicatas, setDuplicatas] = useState([]);
 
-  const [tempoDiasPedido, setTempoDiasPedido] = useState(1);
+  const [tempoDiasPedido, setTempoDiasPedido] = useState(30);
   const [tempoDiasEntrega, settempoDiasEntrega] = useState(1);
   const [margemErroDiasEntrega, setMargemErroDiasEntrega] = useState(1);
 
@@ -173,6 +171,9 @@ export default function AnaliseFornecedor() {
   const [selectedProducts, setSelectedProducts] = useState([]);
 
   const [dialogSelectedProducts, setDialogSelectedProducts] = useState(false);
+
+  const [dialogSelectedProductsAtualizar, setDialogSelectedProductsAtualizar] =
+    useState(false);
 
   const matchModes = [
     {
@@ -389,7 +390,7 @@ export default function AnaliseFornecedor() {
   };
 
   const venda_diaria_template = (rowData) => {
-    let total = rowData.quantidade_vendida * rowData.preco_medio_venda;
+    let total = rowData.quantidade_vendida;
     let venda_diaria = total / diasVenda;
     let totalF = Intl.NumberFormat("pt-BR", {
       style: "decimal",
@@ -408,7 +409,7 @@ export default function AnaliseFornecedor() {
   };
 
   const sugestao_quantidade_compra = (rowData) => {
-    let total = rowData.quantidade_vendida * rowData.preco_medio_venda;
+    let total = rowData.quantidade_vendida;
     let venda_diaria = total / diasVenda;
 
     let qtdeAComprar =
@@ -497,6 +498,7 @@ export default function AnaliseFornecedor() {
   };
 
   const quantidade_comprada_template = (rowData) => {
+    //console.log(rowData);
     let embalagem = Intl.NumberFormat("pt-BR", {
       style: "decimal",
     }).format(rowData.embalagem);
@@ -570,11 +572,9 @@ export default function AnaliseFornecedor() {
   const giroTemplate = (rowData) => {
     let totalEstrelas =
       (rowData.quantidade_vendida /
-        (rowData.quantidade_comprada
-          ? rowData.quantidade_comprada
-          : 0 * rowData.embalagem
-          ? rowData.embalagem
-          : 0)) *
+        (rowData.quantidade_comprada <= 0
+          ? rowData.quantidade_vendida
+          : rowData.quantidade_comprada)) *
       5;
 
     return (
@@ -590,23 +590,35 @@ export default function AnaliseFornecedor() {
     if (rowData?.ean) {
       return (
         <>
-          <div>{rowData?.ean} </div>
-          <div>
-            <img
-              style={{
-                width: "100px",
-                height: "100px",
-                margin: "5px",
-                borderRadius: "25px",
-                padding: "5px",
-              }}
-              src={`${eanUrl}/${rowData?.ean}`}
-              onError={(e) =>
-                (e.target.src =
-                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
-              }
-              alt={rowData?.ean}
-            />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              flexWrap: "wrap",
+              gap: "1px",
+              flexDirection: "column",
+            }}
+          >
+            <div>{rowData?.ean} </div>
+
+            <div>
+              <img
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  margin: "5px",
+                  borderRadius: "25px",
+                  padding: "5px",
+                }}
+                src={`${eanUrl}/${rowData?.ean}`}
+                onError={(e) =>
+                  (e.target.src =
+                    "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                }
+                alt={rowData?.ean}
+              />
+            </div>
           </div>
         </>
       );
@@ -779,6 +791,7 @@ export default function AnaliseFornecedor() {
       });
     } else {
       setLoadingAddPedido(true);
+      setLoading3(true);
       rowData.map((m) => {
         api
           .post(
@@ -793,8 +806,7 @@ export default function AnaliseFornecedor() {
             )}`
           )
           .then((r) => {
-            let total =
-              r.data[0].quantidade_vendida * r.data[0].preco_medio_venda;
+            let total = r.data[0].quantidade_vendida;
 
             let venda_diaria = total / diasVenda;
 
@@ -826,7 +838,10 @@ export default function AnaliseFornecedor() {
               })
               .then((r) => {
                 // getItensPedidoProduto(rowData);
+
                 setLoadingAddPedido(true);
+                setLoading3(true);
+                setSelectedProducts([]);
                 /*  msgs1.current.show({
                   severity: "success",
                   life: 2000,
@@ -971,16 +986,34 @@ export default function AnaliseFornecedor() {
   const rightContents = () => {
     return (
       <>
+        <Button
+          disabled={selectedProductsPedido.length > 0 ? false : true}
+          label="Deletar selecionados"
+          className="p-button p-button-rounded p-button-danger"
+          icon="pi pi-times"
+          style={{ marginRight: "10px" }}
+          onClick={() => deletarProdutoPedidoMassa(selectedProductsPedido)}
+        />
+
+        <Button
+          disabled={selectedProductsPedido.length > 0 ? false : true}
+          label="Atualizar selecionados"
+          className="p-button p-button-rounded p-button-success"
+          icon="pi pi-refresh"
+          style={{ marginRight: "10px" }}
+          onClick={() => setDialogSelectedProductsAtualizar(true)}
+        />
+
         {idPedido ? <></> : <></>}
         <Button
-          disabled={pedidos[0]?.id ? false : true}
-          label={`Imprimir pedido N° ${idPedido}`}
+          disabled={selectedProductsPedido.length > 0 ? false : true}
+          label={`Imprimir produtos selecionados do pedido N° ${idPedido}`}
           style={{ margin: "5px" }}
           icon="pi pi-print"
           className="p-button p-button-warning p-button-rounded"
           onClick={() =>
             exibirPedido({
-              pedidos,
+              selectedProductsPedido,
               idPedido,
               fornecedor,
               condicaoPagamento,
@@ -1357,7 +1390,7 @@ export default function AnaliseFornecedor() {
         setPreco(r.data[0].ultimoprecocompra);
         setUnidadeMedida(r.data[0].id_unidade_compra);
 
-        let total = r.data[0].quantidade_vendida * r.data[0].preco_medio_venda;
+        let total = r.data[0].quantidade_vendida;
 
         let venda_diaria = total / diasVenda;
 
@@ -1374,7 +1407,6 @@ export default function AnaliseFornecedor() {
   };
 
   const deletarProdutoPedido = (rowData) => {
-    // console.log(rowData);
     api
       .delete(`/api/pedido/compra/deletar/${rowData.id}`)
       .then((r) => {
@@ -1397,6 +1429,33 @@ export default function AnaliseFornecedor() {
         getItensPedido();
         getItensPedidoProduto(produtoSelecionado[0]);
       });
+  };
+
+  const deletarProdutoPedidoMassa = (rowData) => {
+    rowData.map((m) => {
+      api
+        .delete(`/api/pedido/compra/deletar/${m.id}`)
+        .then((r) => {
+          toast2.current.show({
+            severity: "success",
+            summary: "Sucesso",
+            detail: `Produto(s) deletado(s) com sucesso !`,
+            life: 3000,
+          });
+          setSelectedProductsPedido([]);
+        })
+        .catch((e) => {
+          toast2.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: `Erro ao deletar ${e.data}`,
+            life: 3000,
+          });
+        })
+        .finally(() => {
+          getItensPedido();
+        });
+    });
   };
 
   const deletarItemPedido = (rowData) => {
@@ -1513,30 +1572,90 @@ export default function AnaliseFornecedor() {
     setProdutoSelecionado(dados);
   };
 
-  const items = [
-    {
-      label: "Lista de pedidos",
-      icon: "pi pi-fw pi-list",
-      command: () => setVisibleLeft(true),
-    },
-
-    {
-      label: "Adicionar selecionados",
-      disabled: selectedProducts.length > 0 ? false : true,
-      icon: "pi pi-plus-circle",
-      command: () => setDialogSelectedProducts(true),
-    },
-    {
-      label: "Limpar mensagens/notificações",
-      icon: "pi pi-times",
-      command: () => clearMessages(),
-    },
-    {
-      label: "Duplicatas vencendo hoje",
-      icon: "pi pi-fw pi-file",
-      command: () => setDialogDuplicatas(true),
-    },
-  ];
+  const acoesRapida = () => {
+    return (
+      <>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        ></div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
+            className="p-button p-button-rounded"
+            icon="pi pi-list"
+            style={{ margin: "5px" }}
+            label="Lista de pedidos"
+            onClick={() => setVisibleLeft(true)}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
+            className="p-button p-button-rounded p-button-success"
+            icon="pi pi-plus-circle"
+            style={{ margin: "5px" }}
+            label="Adicionar produtos selecionados"
+            disabled={selectedProducts.length > 0 ? false : true}
+            onClick={() => setDialogSelectedProducts(true)}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
+            className="p-button p-button-rounded p-button-danger"
+            icon="pi pi-times"
+            style={{ margin: "5px" }}
+            label="Limpar mensagens/notificações"
+            onClick={() => clearMessages()}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
+            className="p-button p-button-rounded p-button-secondary"
+            icon="pi pi-list"
+            style={{ margin: "5px" }}
+            label="Duplicatas vencendo hoje"
+            onClick={() => setDialogDuplicatas(true)}
+          />
+        </div>
+      </>
+    );
+  };
 
   const fecharTemplate = () => {
     return (
@@ -1737,10 +1856,13 @@ export default function AnaliseFornecedor() {
 
                 <div>
                   <div className="fornecedor-input">
-                    <h4 style={{ color: "green" }}>Tempo do pedido (dias) </h4>
+                    <h4 style={{ color: "green" }}>
+                      Comprar para quantos dias?{" "}
+                    </h4>
 
                     <InputNumber
                       showButtons
+                      min={1}
                       style={{ marginTop: "10px", width: "40%" }}
                       onChange={(e) => {
                         setTempoDiasPedido(e.value);
@@ -1756,6 +1878,7 @@ export default function AnaliseFornecedor() {
 
                     <InputNumber
                       showButtons
+                      min={1}
                       style={{ marginTop: "10px", width: "40%" }}
                       onChange={(e) => settempoDiasEntrega(e.value)}
                       value={tempoDiasEntrega}
@@ -1766,6 +1889,7 @@ export default function AnaliseFornecedor() {
                     <h4 style={{ color: "green" }}>Margem de erro (dias)</h4>
 
                     <InputNumber
+                      min={1}
                       showButtons
                       style={{ marginTop: "10px", width: "40%" }}
                       onChange={(e) => setMargemErroDiasEntrega(e.value)}
@@ -1937,6 +2061,7 @@ export default function AnaliseFornecedor() {
                   disabled={loadingAddPedido}
                 />
               </div>
+
               <div>
                 <Button
                   loading={loadingAddPedido}
@@ -1960,119 +2085,130 @@ export default function AnaliseFornecedor() {
             </div>
           </Dialog>
           <Messages ref={msgs1} />
-          <DataTable
-            style={{
-              width: "100%",
-            }}
-            selection={selectedProducts}
-            selectionMode="single"
-            onSelectionChange={(e) => setSelectedProducts(e.value)}
-            dataKey="id"
-            footerColumnGroup={footerGroupAnalise}
-            rows={3}
-            paginator
-            paginatorTemplate={template1}
-            footer={"Existem " + produtos.length + " produto(s) para análise"}
-            breakpoint="968px"
-            loading={loading}
-            stripedRows
-            value={produtos}
-            //   reorderableColumns
-            editMode="row"
-            //   scrollDirection="vertical"
-            //   scrollable
-            //   scrollHeight="flex"
 
-            filters={filters2}
-            size="small"
-            responsiveLayout="stack"
-            emptyMessage="Nenhum produto encontrado para análise"
-            showGridlines
-            header={headerDataTable}
-            rowGroupMode="subheader"
-            filterDisplay="row"
-            filter
-            sortOrder={1}
-            // resizableColumns
-            columnResizeMode="fit"
-            // onRowSelect={linhaSelecionada}
-            globalFilterFields={[
-              "codigo",
-              "ean",
-              "numeronfultcompra",
-              "produto",
-            ]}
-          >
-            <Column
+          <Card style={{ margin: "5px 10px" }}>
+            <DataTable
+              scrollable
+              scrollHeight="650px"
+              style={{
+                width: "100%",
+              }}
+              selection={selectedProducts}
               selectionMode="multiple"
-              headerStyle={{ width: "3em" }}
-            ></Column>
-            <Column
-              field="data_inclusao"
-              sortable
-              body={data_inclusao_template}
-              header="Nota fiscal última compra"
-            ></Column>
+              onSelectionChange={(e) => setSelectedProducts(e.value)}
+              dataKey="id"
+              footerColumnGroup={footerGroupAnalise}
+              rows={50}
+              paginator
+              paginatorTemplate={template1}
+              footer={"Existem " + produtos.length + " produto(s) para análise"}
+              breakpoint="968px"
+              loading={loading}
+              stripedRows
+              value={produtos}
+              //   reorderableColumns
+              editMode="row"
+              //   scrollDirection="vertical"
+              //   scrollable
+              //   scrollHeight="flex"
 
-            <Column
-              field="codigo"
-              sortable
-              body={EanOrCodigo}
-              header="Código"
-            ></Column>
-
-            <Column
-              field="produto"
+              filters={filters2}
+              size="small"
+              responsiveLayout="stack"
+              emptyMessage="Nenhum produto encontrado para análise"
+              showGridlines
+              header={headerDataTable}
+              rowGroupMode="subheader"
+              filterDisplay="row"
               filter
-              showFilterMenu={true}
-              filterPlaceholder="Pesquisar produto ..."
-              sortable
-              header="Produto"
-            ></Column>
+              sortOrder={1}
+              // resizableColumns
+              columnResizeMode="fit"
+              // onRowSelect={linhaSelecionada}
+              globalFilterFields={[
+                "codigo",
+                "ean",
+                "numeronfultcompra",
+                "produto",
+              ]}
+            >
+              <Column
+                selectionMode="multiple"
+                headerStyle={{ width: "3em" }}
+              ></Column>
+              <Column
+                field="data_inclusao"
+                sortable
+                body={data_inclusao_template}
+                header="Nota fiscal última compra"
+              ></Column>
 
-            <Column field={cfop_template} header="CFOP"></Column>
+              <Column
+                field="codigo"
+                sortable
+                body={EanOrCodigo}
+                header="Código"
+              ></Column>
 
-            <Column
-              field={botaoAddTemplate}
-              header={idPedido ? "Adicionar" : "Novo pedido "}
-            ></Column>
+              <Column
+                field="produto"
+                //  filter
+                //  showFilterMenu={true}
+                //  filterPlaceholder="Pesquisar produto ..."
+                sortable
+                header="Produto"
+              ></Column>
 
-            <Column
-              filter
-              showFilterMenu={true}
-              filterMatchModeOptions={matchModes}
-              filterPlaceholder="Filtrar compras  ..."
-              field="quantidade_comprada"
-              body={quantidade_comprada_template_02}
-              header="Compra total no período"
-            ></Column>
-            <Column
-              filter
-              showFilterMenu={true}
-              filterMatchModeOptions={matchModes}
-              filterPlaceholder="Filtrar estoque  ..."
-              field="saldo_estoque"
-              sortable
-              header="Saldo em Estoque"
-              body={saldo_estoque_template}
-            ></Column>
-            <Column
-              filter
-              showFilterMenu={true}
-              filterMatchModeOptions={matchModes}
-              filterPlaceholder="Filtrar vendas"
-              field="quantidade_vendida"
-              body={quantidade_vendida_template}
-              header={`Qtde venda ${diasVenda} dias`}
-            ></Column>
+              <Column field={cfop_template} header="CFOP"></Column>
 
-            <Column
-              field="quantidade_vendida"
-              header="Classificação"
-              sortable
-              body={giroTemplate}
-            ></Column>
-          </DataTable>
+              <Column
+                field={botaoAddTemplate}
+                header={idPedido ? "Adicionar" : "Novo pedido "}
+              ></Column>
+
+              <Column
+                filter
+                showFilterMenu={true}
+                filterMatchModeOptions={matchModes}
+                filterPlaceholder="Filtrar compras  ..."
+                field="quantidade_comprada"
+                body={quantidade_comprada_template_02}
+                header="Compra total no período"
+              ></Column>
+              <Column
+                filter
+                showFilterMenu={true}
+                filterMatchModeOptions={matchModes}
+                filterPlaceholder="Filtrar estoque  ..."
+                field="saldo_estoque"
+                sortable
+                header="Saldo em Estoque"
+                body={saldo_estoque_template}
+              ></Column>
+              <Column
+                filter
+                showFilterMenu={true}
+                filterMatchModeOptions={matchModes}
+                filterPlaceholder="Filtrar vendas"
+                field="quantidade_vendida"
+                body={quantidade_vendida_template}
+                header={`Qtde venda ${diasVenda} dias`}
+              ></Column>
+
+              <Column
+                field="sugestao"
+                body={sugestao_quantidade_compra}
+                header={`Sugestão de compra`}
+              ></Column>
+
+              <Column
+                field="quantidade_vendida"
+                header="Classificação"
+                sortable
+                body={giroTemplate}
+              ></Column>
+            </DataTable>
+          </Card>
         </>
       )}
 
@@ -2084,7 +2220,7 @@ export default function AnaliseFornecedor() {
       >
         <Toast ref={toast2} position="bottom-center" />
         <Messages ref={msgs1} />
-        <div className="lista-itens">
+        <div>
           <Toolbar
             style={{ margin: "20px" }}
             right={leftContents}
@@ -2092,6 +2228,20 @@ export default function AnaliseFornecedor() {
           />
           <div style={{ width: "100%" }}>
             <PedidoListaSidebar
+              dialogSelectedProductsAtualizar={dialogSelectedProductsAtualizar}
+              setDialogSelectedProductsAtualizar={
+                setDialogSelectedProductsAtualizar
+              }
+              selectedProductsPedido={selectedProductsPedido}
+              setSelectedProductsPedido={setSelectedProductsPedido}
+              setLoadingLojas={setLoadingLojas}
+              fornecedor={fornecedor}
+              dataInicialCompra={dataInicialCompra}
+              dataFinalCompra={dataFinalCompra}
+              dataFinalVenda={dataFinalVenda}
+              tempoDiasPedido={tempoDiasPedido}
+              tempoDiasEntrega={tempoDiasEntrega}
+              margemErroDiasEntrega={margemErroDiasEntrega}
               msgs1={msgs1}
               loadingLojas={loadingLojas}
               produtoPorFilialLista={produtoPorFilialLista}
@@ -2106,7 +2256,6 @@ export default function AnaliseFornecedor() {
               diasVenda={diasVenda}
               venda_diaria_template={venda_diaria_template}
               total_template={total_template}
-              dialogProdutoPorFilial={dialogProdutoPorFilial}
               lojas={lojas}
               getItensPedido={getItensPedido}
               pedidos={pedidos}
@@ -2118,6 +2267,9 @@ export default function AnaliseFornecedor() {
               precoPedidoLinhaTotal={precoPedidoLinhaTotal}
               deletarItemPedido={deletarItemPedido}
               unidadeMedidaLista={unidadeMedidaLista}
+              quantidade_comprada_template_02={quantidade_comprada_template_02}
+              total_comprado_template_02={total_comprado_template_02}
+              giroTemplate={giroTemplate}
             />
           </div>
         </div>
@@ -2184,13 +2336,19 @@ export default function AnaliseFornecedor() {
         </DataTable>
       </Dialog>
       {displayDialog ? (
-        <></>
+        <> </>
       ) : (
         <>
-          <TabMenu
-            style={{ display: "fixed", marginBottom: "1px" }}
-            model={items}
-          />
+          <div
+            style={{
+              display: "fixed",
+              marginBottom: "1px",
+              backgroundColor: "#F2F2F2",
+              margin: "0px 3px",
+            }}
+          >
+            <Toolbar left={acoesRapida} />
+          </div>
         </>
       )}
     </>

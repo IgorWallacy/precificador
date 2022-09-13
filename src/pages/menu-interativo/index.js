@@ -98,7 +98,7 @@ const MenuInterativo = () => {
               <img src={ImagemDestque} style={{ width: "150px" }} />
               {greetingMessage()}{" "}
               <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-                {nome} o que você deseja fazer hoje ?
+                {nome}. O que você deseja fazer hoje ?
               </h1>
             </div>
           </Typing>

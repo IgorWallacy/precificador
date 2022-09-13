@@ -4,7 +4,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import moment from "moment";
 
 const exibirPedido = ({
-  pedidos,
+  selectedProductsPedido,
   idPedido,
   fornecedor,
   condicaoPagamento,
@@ -12,7 +12,7 @@ const exibirPedido = ({
   totalPedido,
 }) => {
   ImprimirPedido({
-    pedidos,
+    selectedProductsPedido,
     idPedido,
     fornecedor,
     condicaoPagamento,
@@ -21,7 +21,7 @@ const exibirPedido = ({
   });
 };
 const ImprimirPedido = ({
-  pedidos,
+  selectedProductsPedido,
   idPedido,
   fornecedor,
   condicaoPagamento,
@@ -48,7 +48,9 @@ const ImprimirPedido = ({
         text: `Pedido de compra N° ${idPedido} - Fornecedor : ${
           fornecedor?.codigo
         } - ${fornecedor?.nome} -
-          Emissão ${moment(pedidos?.dataEmissao).format("DD/MM/YYYY")}
+          Emissão ${moment(selectedProductsPedido?.dataEmissao).format(
+            "DD/MM/YYYY"
+          )}
         Condição de pagamento : ${
           condicaoPagamento?.descricao
         }  - Prazo para entrega : ${moment(prazoEntrega).format("DD/MM/YYYY")}
@@ -60,7 +62,7 @@ const ImprimirPedido = ({
       },
     ],
 
-    content: pedidos.map(function (item, i) {
+    content: selectedProductsPedido.map(function (item, i) {
       return {
         layout: "lightHorizontalLines", // optional
         lineHeight: 1,

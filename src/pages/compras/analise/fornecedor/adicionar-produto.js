@@ -39,8 +39,7 @@ const AdicionarProduto = ({
   saldo_estoque_template,
   sugestao_quantidade_compra,
   valor_unitario_template,
-  quantidade_comprada_template,
-  total_comprado_template,
+
   preco_media_venda_template,
   quantidade_vendida_template,
   venda_diaria_template,
@@ -192,17 +191,14 @@ const AdicionarProduto = ({
             header="Nota fiscal última compra"
           ></Column>
           <Column field={saldo_estoque_template} header="Estoque"></Column>
-          <Column field={sugestao_quantidade_compra} header="Sugestão"></Column>
 
           <Column
             field={valor_unitario_template}
             header="Custo Últm.Compra"
           ></Column>
 
-          <Column field={quantidade_comprada_template} header="Compra"></Column>
-
           <Column
-            field={total_comprado_template}
+            field={total_comprado_template_02}
             header="Total comprado"
           ></Column>
 

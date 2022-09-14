@@ -13,10 +13,10 @@ const teste = () => {
 };
 
 const AdicionarProduto = ({
+  indexP,
   produto,
-  displayDialog,
-  hideDialog,
-  fecharTemplate,
+  fecharTemplateRight,
+  fecharTemplateLeft,
   preco,
   quantidade,
   lojaSelecionada,
@@ -64,8 +64,15 @@ const AdicionarProduto = ({
           width: "100%",
         }}
       >
-        <h1 style={{ color: "#FFF", margin: "5px" }}>
-          Adicionar {produto.produto} a lista de compras{" "}
+        <h1
+          style={{
+            fontFamily: "cabin-sketch-bold",
+            color: "#FFF",
+            margin: "5px",
+            fontSize: "50px",
+          }}
+        >
+          {indexP} - {produto?.produto}
         </h1>
       </div>
 
@@ -87,7 +94,7 @@ const AdicionarProduto = ({
       >
         <Toast ref={toast3} position="bottom" />
         <div>
-          {produto?.ean ? produto.ean : produto.codigo}
+          {produto?.ean ? produto?.ean : produto?.codigo}
           <br />
           <img
             style={{
@@ -97,7 +104,7 @@ const AdicionarProduto = ({
               borderRadius: "5px",
               padding: "5px",
             }}
-            src={`${eanUrl}/${produto.ean}`}
+            src={`${eanUrl}/${produto?.ean}`}
             onError={(e) =>
               (e.target.src =
                 "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
@@ -290,7 +297,8 @@ const AdicionarProduto = ({
       </div>
       <Toolbar
         style={{ backgroundColor: "#F2F2F2", position: "fixed", bottom: "1px" }}
-        right={fecharTemplate}
+        right={fecharTemplateRight}
+        left={fecharTemplateLeft}
       />
     </>
   );

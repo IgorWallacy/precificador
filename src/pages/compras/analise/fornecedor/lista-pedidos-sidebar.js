@@ -277,94 +277,92 @@ const PedidoListaSidebar = ({
     <>
       <Toast ref={toast} position="bottom-center" />
       <Messages ref={msgs1} />
-      <Card>
-        <DataTable
-          style={{
-            padding: "10px",
-            backgroundColor: "#F2F2F2",
-            borderRadius: "25px",
-            border: "1px solid #FFF",
-          }}
-          scrollable
-          resizableColumns
-          columnResizeMode="fit"
-          showGridlines
-          scrollHeight="650px"
-          responsiveLayout="scroll"
-          footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras - Produtos selecionados ${selectedProductsPedido.length}`}
-          footerColumnGroup={footerGroupPedido}
-          value={pedidos}
-          breakpoint="968px"
-          rows={20}
-          stripedRows
-          loading={loading3}
-          paginator
-          paginatorTemplate={template1}
-          emptyMessage="Nenhum produto adicionado a lista"
-          editMode="row"
-          dataKey="id"
-          filters={filters2}
-          filterDisplay="row"
-          selection={selectedProductsPedido}
-          selectionMode="multiple"
-          onSelectionChange={(e) => setSelectedProductsPedido(e.value)}
-        >
-          <Column
-            selectionMode="multiple"
-            headerStyle={{ width: "3em" }}
-          ></Column>
 
-          <Column
-            field="filial.id"
-            body={lojaTemplate}
-            filter
-            sortable
-            header="Cód.Loja"
-          />
-
-          <Column
-            field="idproduto.ean"
-            filter
-            //  body={EanOrCodigoPedido}
-            header="Código/Ean"
-          ></Column>
-          <Column
-            field="idproduto.nome"
-            filter
-            sortable
-            header="Produto"
-          ></Column>
-
-          <Column field="unidadeCompra.nome" sortable header="UN"></Column>
-          <Column field="fatorConversao" sortable header="Emb.C/"></Column>
-
-          <Column
-            field="quantidade"
-            filter
-            sortable
-            header="Quantidade"
-          ></Column>
-          <Column
-            field="preco"
-            body={precoPedido}
-            sortable
-            header="Preço unitário "
-          ></Column>
-
-          <Column field={precoPedidoLinhaTotal} header="Preço Total "></Column>
-
-          <Column header="Editar" field={editar}></Column>
-
-          <Column header="Deletar item" field={deletarItemPedido}></Column>
-        </DataTable>
-      </Card>
-      <Dialog
+      <DataTable
         style={{
           padding: "10px",
           backgroundColor: "#F2F2F2",
           borderRadius: "25px",
           border: "1px solid #FFF",
+          width: "100%",
         }}
+        //  scrollable
+        //    resizableColumns
+        columnResizeMode="fit"
+        showGridlines
+        //  scrollHeight="800px"
+        responsiveLayout="scroll"
+        footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras - Produtos selecionados ${selectedProductsPedido.length}`}
+        footerColumnGroup={footerGroupPedido}
+        value={pedidos}
+        breakpoint="968px"
+        rows={3}
+        stripedRows
+        loading={loading3}
+        paginator
+        paginatorTemplate={template1}
+        emptyMessage="Nenhum produto adicionado a lista"
+        editMode="row"
+        dataKey="id"
+        filters={filters2}
+        filterDisplay="row"
+        selection={selectedProductsPedido}
+        selectionMode="multiple"
+        onSelectionChange={(e) => setSelectedProductsPedido(e.value)}
+      >
+        <Column
+          selectionMode="multiple"
+          headerStyle={{ width: "3em" }}
+        ></Column>
+
+        <Column
+          field="filial.id"
+          body={lojaTemplate}
+          filter
+          sortable
+          header="Cód.Loja"
+        />
+
+        <Column
+          field="idproduto.ean"
+          filter
+          //  body={EanOrCodigoPedido}
+          header="Código/Ean"
+        ></Column>
+        <Column
+          field="idproduto.nome"
+          filter
+          sortable
+          header="Produto"
+        ></Column>
+
+        <Column field="unidadeCompra.nome" sortable header="UN"></Column>
+        <Column field="fatorConversao" sortable header="Emb.C/"></Column>
+
+        <Column field="quantidade" filter sortable header="Quantidade"></Column>
+        <Column
+          field="preco"
+          body={precoPedido}
+          sortable
+          header="Preço unitário "
+        ></Column>
+
+        <Column field={precoPedidoLinhaTotal} header="Preço Total "></Column>
+
+        <Column header="Editar" field={editar}></Column>
+
+        <Column header="Deletar item" field={deletarItemPedido}></Column>
+      </DataTable>
+
+      <Dialog
+        style={{
+          padding: "1px",
+          backgroundColor: "#F2F2F2",
+          borderRadius: "25px",
+          border: "1px solid #FFF",
+          width: "100%",
+        }}
+        maximizable
         modal
         header={`${produto?.idproduto?.nome} - ${produto?.filial?.nome}`}
         closable={false}

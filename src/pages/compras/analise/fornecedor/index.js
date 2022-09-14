@@ -6,6 +6,7 @@ import { AdicionarProduto } from "./adicionar-produto";
 import { exibirPedido } from "./imprimir-pedido";
 import { PedidoListaSidebar } from "./lista-pedidos-sidebar";
 import { useNavigate, useParams } from "react-router-dom";
+import { ProgressBar } from "primereact/progressbar";
 
 import { Messages } from "primereact/messages";
 import { Card } from "primereact/card";
@@ -47,6 +48,7 @@ import TextTransition, { presets } from "react-text-transition";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function AnaliseFornecedor() {
+  let i = 0;
   const TEXTS = [
     "Calculando sugestões ...",
     "Processando ...",
@@ -175,6 +177,10 @@ export default function AnaliseFornecedor() {
   const [dialogSelectedProductsAtualizar, setDialogSelectedProductsAtualizar] =
     useState(false);
 
+  const [produtoMassaResponse, setProdutoMassaResponse] = useState(0);
+
+  const [indexP, setIndexP] = useState(0);
+
   const matchModes = [
     {
       label: "Maior ou igual que...",
@@ -193,6 +199,7 @@ export default function AnaliseFornecedor() {
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    numeronfultcompra: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     quantidade_vendida: {
       value: null,
       matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO,
@@ -207,7 +214,6 @@ export default function AnaliseFornecedor() {
     },
     produto: { value: null, matchMode: FilterMatchMode.CONTAINS },
     codigo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    numeronfultcompra: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
   const [filters3, setFilters3] = useState({
@@ -227,7 +233,7 @@ export default function AnaliseFornecedor() {
     setLoading2(true);
     setItemPorPedido([]);
     api
-      .get(`/api/pedido/compra/itens/pedidoId/${idPedido}/${data.id}`)
+      .get(`/api/pedido/compra/itens/pedidoId/${idPedido}/${data?.id}`)
       .then((r) => {
         setItemPorPedido(r.data);
       })
@@ -687,42 +693,6 @@ export default function AnaliseFornecedor() {
     );
   };
 
-  const openNew = (produto) => {
-    setQuantidade(null);
-    getItensPedidoProduto(produto);
-    setPreco(produto.ultimoprecocompra);
-    setDisplayDialog(true);
-
-    linhaSelecionada(produto);
-    setProduto({ ...produto });
-  };
-
-  const botaoAddTemplate = (rowdata) => {
-    //  setProduto({...rowdata})
-
-    return (
-      <>
-        {idPedido ? (
-          <>
-            <Button
-              disabled={idPedido ? false : true}
-              style={{ margin: "5px" }}
-              label={idPedido ? "Adicionar" : "Crie um pedido para habilitar"}
-              className="p-button-rounded p-button-sm"
-              icon="pi pi-shopping-bag"
-              //  onClick={() => adicionarProduto(rowdata)}
-              onClick={() => openNew(rowdata)}
-            />
-          </>
-        ) : (
-          <>
-            <h4></h4>
-          </>
-        )}
-      </>
-    );
-  };
-
   const hideDialog = () => {
     // setSubmitted(false);
     setProdutoPorFilialLista(null);
@@ -783,6 +753,7 @@ export default function AnaliseFornecedor() {
   };
 
   const adicionarProdutoMassa = (rowData) => {
+    setProdutoMassaResponse(0);
     if (!lojaSelecionada) {
       toast3.current.show({
         severity: "warn",
@@ -792,7 +763,9 @@ export default function AnaliseFornecedor() {
     } else {
       setLoadingAddPedido(true);
       setLoading3(true);
-      rowData.map((m) => {
+      let d = rowData.sort();
+
+      d.map((m) => {
         api
           .post(
             `/api_react/compras/produtos/${m?.id}/${moment(
@@ -813,6 +786,9 @@ export default function AnaliseFornecedor() {
             let qtdeAComprar =
               venda_diaria *
               (tempoDiasPedido + tempoDiasEntrega + margemErroDiasEntrega);
+
+            i++;
+            setProdutoMassaResponse(i);
 
             api
               .post(`/api/pedido/compra/salvar/${idPedido}`, {
@@ -841,7 +817,7 @@ export default function AnaliseFornecedor() {
 
                 setLoadingAddPedido(true);
                 setLoading3(true);
-                setSelectedProducts([]);
+                // setSelectedProducts([]);
                 /*  msgs1.current.show({
                   severity: "success",
                   life: 2000,
@@ -869,37 +845,45 @@ export default function AnaliseFornecedor() {
                   summary: "Erro",
                   detail: `${error.data}`,
                 });
-                msgs1.current.show({
-                  severity: "error",
-                  life: 2000,
-                  content: (
-                    <React.Fragment>
-                      <img
-                        alt="logo"
-                        src={`${eanUrl}/${m?.ean}`}
-                        onError={(e) =>
-                          (e.target.src =
-                            "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
-                        }
-                        width="32"
-                      />
-                      <div className="ml-2">
-                        Não foi possível adicionar {m.produto} a lista,
-                        verifique !
-                      </div>
-                    </React.Fragment>
-                  ),
-                });
               })
               .finally((f) => {
-                setLoadingAddPedido(false);
                 getItensPedido();
-                setDialogSelectedProducts(false);
-                setVisibleLeft(true);
-                setSelectedProducts([]);
+
+                if (i === selectedProducts.length) {
+                  setDialogSelectedProducts(false);
+                  setVisibleLeft(true);
+                  setSelectedProducts([]);
+                  setProdutoMassaResponse(0);
+                  setLoadingAddPedido(false);
+                }
               });
           })
-          .catch((e) => {})
+          .catch((e) => {
+            i++;
+            setProdutoMassaResponse(i);
+
+            msgs1.current.show({
+              severity: "error",
+              life: 2000,
+              content: (
+                <React.Fragment>
+                  <img
+                    alt="logo"
+                    src={`${eanUrl}/${m?.ean}`}
+                    onError={(e) =>
+                      (e.target.src =
+                        "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                    }
+                    width="32"
+                  />
+                  <div className="ml-2">
+                    Erro : {e} - Não foi possível adicionar {m.produto} a lista,
+                    verifique !
+                  </div>
+                </React.Fragment>
+              ),
+            });
+          })
           .finally((f) => {});
       });
 
@@ -1611,6 +1595,34 @@ export default function AnaliseFornecedor() {
           }}
         >
           <Button
+            className="p-button p-button-rounded p-button-info"
+            icon="pi pi-plus-circle"
+            style={{ margin: "5px" }}
+            label="Adicionar produtos"
+            disabled={produtos.length > 0 ? false : true}
+            onClick={() => {
+              setDisplayDialog(true);
+              setProduto(produtos[indexP]);
+
+              setQuantidade(null);
+              getItensPedidoProduto(produtos[indexP]);
+              setPreco(produtos[indexP].ultimoprecocompra);
+
+              setProdutoPorFilialLista([]);
+              linhaSelecionada(produtos[indexP]);
+            }}
+          />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
             className="p-button p-button-rounded p-button-success"
             icon="pi pi-plus-circle"
             style={{ margin: "5px" }}
@@ -1657,18 +1669,25 @@ export default function AnaliseFornecedor() {
     );
   };
 
-  const fecharTemplate = () => {
+  const fecharTemplateLeft = () => {
     return (
       <>
         <Button
           style={{ margin: "0px 10px" }}
-          className="p-button p-button-success p-button-rounded "
-          label="Adicionar"
-          icon="pi pi-plus"
+          className="p-button p-button-danger p-button-rounded "
+          label="Fechar / Sair"
+          icon="pi pi-times"
           onClick={() => {
-            adicionarProduto(produto);
+            setDisplayDialog(false);
           }}
         />
+      </>
+    );
+  };
+
+  const fecharTemplateRight = () => {
+    return (
+      <>
         <Button
           style={{ margin: "0px 10px" }}
           label="Listar pedido"
@@ -1678,10 +1697,53 @@ export default function AnaliseFornecedor() {
         />
         <Button
           style={{ margin: "0px 10px" }}
-          label="Fechar / Próximo"
-          icon="pi pi-times"
-          onClick={() => setDisplayDialog(false)}
-          className="p-button-rounded p-button-danger"
+          className="p-button p-button-success p-button-rounded "
+          label="Adicionar"
+          icon="pi pi-plus"
+          onClick={() => {
+            adicionarProduto(produto);
+          }}
+        />
+
+        <Button
+          disabled={indexP === 0}
+          style={{ margin: "0px 10px" }}
+          label={`Anterior : ${indexP - 1} ${produtos[indexP]?.produto} `}
+          icon="pi pi-arrow-left"
+          onClick={() => {
+            setIndexP(indexP - 1);
+
+            setQuantidade(null);
+            getItensPedidoProduto(produtos[indexP]);
+            setPreco(produtos[indexP]?.ultimoprecocompra);
+            setDisplayDialog(true);
+            setProdutoPorFilialLista([]);
+            linhaSelecionada(produtos[indexP]);
+            setProduto(produtos[indexP]);
+          }}
+          className="p-button-rounded p-button-help"
+        />
+
+        <Button
+          style={{ margin: "0px 10px" }}
+          label={`Próximo ${indexP + 1} ${
+            produtos[indexP + 1]?.produto ? produtos[indexP]?.produto : ""
+          }`}
+          disabled={produtos.length === indexP}
+          icon="pi pi-arrow-right"
+          onClick={() => {
+            setIndexP(indexP + 1);
+
+            setProduto(produtos[indexP]);
+
+            setQuantidade(null);
+            getItensPedidoProduto(produtos[indexP]);
+            setPreco(produtos[indexP]?.ultimoprecocompra);
+            setDisplayDialog(true);
+            setProdutoPorFilialLista([]);
+            linhaSelecionada(produtos[indexP]);
+          }}
+          className="p-button-rounded p-button-info"
         />
       </>
     );
@@ -1703,11 +1765,13 @@ export default function AnaliseFornecedor() {
       {displayDialog ? (
         <>
           <AdicionarProduto
+            indexP={indexP}
             eanUrl={eanUrl}
             produto={produto}
             displayDialog={displayDialog}
             hideDialog={hideDialog}
-            fecharTemplate={fecharTemplate}
+            fecharTemplateRight={fecharTemplateRight}
+            fecharTemplateLeft={fecharTemplateLeft}
             lojaSelecionada={lojaSelecionada}
             produtoSelecionado={produtoSelecionado}
             data_inclusao_template={data_inclusao_template}
@@ -1763,6 +1827,7 @@ export default function AnaliseFornecedor() {
                 alignItems: "center",
                 fontFamily: "cabin-sketch-regular",
                 fontWeight: "400",
+                fontSize: "50px",
               }}
             >
               Análise de compras
@@ -2012,31 +2077,28 @@ export default function AnaliseFornecedor() {
                 flexWrap: "wrap",
               }}
             >
-              {loadingAddPedido ? (
-                <>
-                  <h1>
-                    <TextTransition springConfig={presets.wobbly}>
-                      <h2
-                        style={{
-                          fontWeight: "700",
-                          fontStyle: "normal",
-                        }}
-                      >
-                        {TEXTS[index % TEXTS.length]}
-                      </h2>
-                    </TextTransition>
-                  </h1>
-
-                  <ReactLoading
-                    type="cylon"
-                    color="#8600C9"
-                    height={100}
-                    width={100}
-                  />
-                </>
-              ) : (
-                <></>
-              )}
+              <div>
+                {produtoMassaResponse <= selectedProducts.length &&
+                produtoMassaResponse > 0 ? (
+                  <>
+                    <h3>
+                      <p>
+                        Adicionando {produtoMassaResponse} de{" "}
+                        {selectedProducts.length}
+                      </p>
+                    </h3>
+                    <ProgressBar
+                      value={(
+                        (parseInt(produtoMassaResponse) /
+                          selectedProducts.length) *
+                        100
+                      ).toFixed()}
+                    />
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
             </div>
             <div
               style={{
@@ -2135,20 +2197,18 @@ export default function AnaliseFornecedor() {
               <Column
                 selectionMode="multiple"
                 headerStyle={{ width: "3em" }}
+                body={EanOrCodigo}
               ></Column>
+
               <Column
-                field="data_inclusao"
+                field="numeronfultcompra"
                 sortable
+                filter
                 body={data_inclusao_template}
                 header="Nota fiscal última compra"
               ></Column>
 
-              <Column
-                field="codigo"
-                sortable
-                body={EanOrCodigo}
-                header="Código"
-              ></Column>
+              <Column sortable header="Código" filter field="codigo"></Column>
 
               <Column
                 field="produto"
@@ -2160,11 +2220,6 @@ export default function AnaliseFornecedor() {
               ></Column>
 
               <Column field={cfop_template} header="CFOP"></Column>
-
-              <Column
-                field={botaoAddTemplate}
-                header={idPedido ? "Adicionar" : "Novo pedido "}
-              ></Column>
 
               <Column
                 filter
@@ -2213,16 +2268,16 @@ export default function AnaliseFornecedor() {
       )}
 
       <Sidebar
-        fullScreen
+        style={{ width: "100%" }}
         visible={visibleLeft}
         showCloseIcon={false}
         onHide={() => setVisibleLeft(false)}
       >
         <Toast ref={toast2} position="bottom-center" />
         <Messages ref={msgs1} />
-        <div>
+        <div style={{ width: "100%" }}>
           <Toolbar
-            style={{ margin: "20px" }}
+            style={{ margin: "5px" }}
             right={leftContents}
             left={rightContents}
           />

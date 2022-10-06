@@ -49,7 +49,7 @@ const PrecificadorExecuta = () => {
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
-  const [replicarPreco, setReplicarPreco] = useState(0);
+  const [replicarPreco, setReplicarPreco] = useState(1);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   //const [expandedRows, setExpandedRows] = useState(null);
   const replicarPrecoOpcoes = [
@@ -556,8 +556,8 @@ const PrecificadorExecuta = () => {
           <div>
             <img
               style={{
-                width: "100px",
-                height: "100px",
+                width: "75px",
+                height: "75px",
                 margin: "5px",
                 borderRadius: "25px",
                 padding: "5px",
@@ -1186,13 +1186,14 @@ const PrecificadorExecuta = () => {
         value={etiquetaSelecionada}
         options={[
           {
-            name: "Etiqueta 101x31 - Preço centralizado, cod.Barras",
-            value: 1,
-          },
-          {
             name: "Etiqueta 101x31 - Quebra linha, preço a direita, cod.Barras",
             value: 2,
           },
+          {
+            name: "Etiqueta 101x31 - Preço centralizado, cod.Barras",
+            value: 1,
+          },
+
           {
             name: "Etiqueta 101x31 - Preço a direita QRCODE",
             value: 3,
@@ -1529,12 +1530,10 @@ const PrecificadorExecuta = () => {
             />
 
             <div className="datatable-templating-demo p-fluid">
-              <Tooltip target=".export-buttons>button" position="bottom" />
-
               <DataTable
                 responsiveLayout={layoutDatable ? "stack" : "scroll"}
                 breakpoint="1390px"
-                style={{ width: "100%" }}
+                style={{ width: "100%", backgroundColor: "#F2F2F2" }}
                 footer={
                   "Existem " + produtos.length + " produto(s) para análise"
                 }
@@ -1555,7 +1554,7 @@ const PrecificadorExecuta = () => {
                   "razaosocial",
                 ]}
                 filters={filters2}
-                size="normal"
+                size="small"
                 emptyMessage="Nenhum produto encontrado para precificação"
                 showGridlines
                 header={headerDataTable}

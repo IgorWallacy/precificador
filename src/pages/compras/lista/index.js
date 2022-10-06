@@ -143,6 +143,7 @@ const ListaCompras = () => {
             dataKey="id"
             filters={filters2}
             paginator
+            size="small"
             rows={5}
             style={{ width: "100%" }}
             value={pedidos}

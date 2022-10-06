@@ -923,8 +923,8 @@ const PrecificadorAgenda = () => {
           <div>
             <img
               style={{
-                width: "100px",
-                height: "100px",
+                width: "75px",
+                height: "75px",
                 margin: "5px",
                 borderRadius: "25px",
                 padding: "5px",
@@ -991,12 +991,12 @@ const PrecificadorAgenda = () => {
         <div className="headerTemplateDataTable">
           <DataTable
             showGridlines
-            size="large"
+            size="small"
             stripedRows
             value={dados}
             responsiveLayout="stack"
             breakpoint="960px"
-            style={{ width: "100%" }}
+            style={{ width: "100%", backgroundColor: "#F2F2F2" }}
           >
             <Column
               field="razaosocial"
@@ -1428,7 +1428,7 @@ const PrecificadorAgenda = () => {
               footer={"Existem " + produtos.length + " produto(s) para análise"}
               //     stripedRows
               value={produtos}
-              selectionMode="single"
+              // selectionMode="single"
               //   reorderableColumns
               editMode="row"
               dataKey="id"
@@ -1443,7 +1443,8 @@ const PrecificadorAgenda = () => {
                 "razaosocial",
               ]}
               filters={filters2}
-              size="normal"
+              size="small"
+              style={{ backgroundColor: "#F2F2F2" }}
               responsiveLayout="stack"
               emptyMessage="Nenhum produto encontrado para precificação"
               showGridlines

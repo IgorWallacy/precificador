@@ -6,7 +6,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
-import { Messages } from "primereact/messages";
+
 import { FilterMatchMode } from "primereact/api";
 import { SelectButton } from "primereact/selectbutton";
 
@@ -28,6 +28,7 @@ import api from "../../../../services/axios";
 
 import { formataMoeda } from "../../../../util";
 import moment from "moment";
+import { FaStore, FaProductHunt } from "react-icons/fa";
 
 const PedidoListaSidebar = ({
   msgs1,
@@ -75,8 +76,9 @@ const PedidoListaSidebar = ({
   editDialog,
   setEditDialog,
 }) => {
+  const [indexAtual, setIndexAtual] = useState(-1);
   const [produto, setProduto] = useState([]);
-
+  const [editMode, setEditMode] = useState(false);
   const [quantidade, setQuantidade] = useState(0);
   const [preco, setPreco] = useState(0);
   const [fator, setFator] = useState(0);
@@ -181,19 +183,62 @@ const PedidoListaSidebar = ({
       <>
         <Button
           className="p-button p-button-primary p-button-rounded p-button-sm"
-          icon="pi pi-pencil"
+          icon="pi pi-eye"
+          tooltip="Visualizar detalhes"
           onClick={() => editarDialog(data, props)}
         />
       </>
     );
   };
 
+  const onRowEditComplete = (e) => {
+    let data = e;
+    console.log(data);
+    api
+      .post(`/api/pedido/compra/salvar/${data?.idpedido?.id}`, {
+        id: data.id,
+        idpedido: { id: data?.idpedido?.id },
+        idproduto: { id: data?.idproduto?.id },
+        unidadeCompra: data?.unidadeCompra,
+        quantidadeVenda: data?.quantidadeVenda,
+        fatorConversao: data?.fatorConversao,
+
+        embalagem: Intl.NumberFormat("pt-BR", {}).format(data?.embalagem),
+
+        quantidade: quantidade,
+        filial: { id: data?.filial.id },
+        //  quantidade2: quantidade2,
+        preco: data?.preco,
+        total: quantidade * data?.preco,
+      })
+      .then((r) => {
+        setEditMode(false);
+        toast.current.show({
+          severity: "success",
+          summary: "Sucesso",
+          detail: `${data.idproduto.nome} atualizado`,
+        });
+      })
+      .catch((e) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Erro",
+          detail: `${e.message}`,
+        });
+      })
+      .finally((f) => {
+        getItensPedido();
+        setQuantidade(null);
+      });
+  };
+
   const editarDialog = (data, props) => {
+    console.log(data);
     setIndex(props.rowIndex);
     setEditDialog(true);
     setProduto(data);
     setQuantidade(data.quantidade);
-    setFator(data.fatorConversao);
+    setFator(data.embalagem);
     setPreco(data.preco);
     setUnCompra(data.unidadeCompra);
 
@@ -282,7 +327,7 @@ const PedidoListaSidebar = ({
           //  setEditDialog(true);
 
           setQuantidade(pedidos[index].quantidade);
-          setFator(pedidos[index].fatorConversao);
+          setFator(pedidos[index].embalagem);
           setPreco(pedidos[index].preco);
           setUnCompra(pedidos[index].unidadeCompra);
 
@@ -356,7 +401,7 @@ const PedidoListaSidebar = ({
 
   return (
     <>
-      <Toast ref={toast} position="bottom-center" />
+      <Toast ref={toast} position="top-center" />
 
       {editDialog ? (
         <>
@@ -419,6 +464,7 @@ const PedidoListaSidebar = ({
               >
                 <h4>Quantidade atual </h4>
                 <InputNumber
+                  size={3}
                   value={
                     pedidos[index]?.quantidade ? pedidos[index]?.quantidade : 0
                   }
@@ -427,6 +473,7 @@ const PedidoListaSidebar = ({
                 <h4>Nova Quantidade</h4>
                 <InputNumber
                   min={0}
+                  size={3}
                   required
                   autoFocus
                   label="Quantidade"
@@ -447,13 +494,16 @@ const PedidoListaSidebar = ({
                 <h4>Emb</h4>
                 <InputNumber
                   label="emb"
+                  size={1}
                   value={fator}
                   onChange={(e) => setFator(e.value)}
                 />
+
                 <h4>Custo / Novo Preço</h4>
                 <InputNumber
                   prefix="R$ "
                   label="preco"
+                  size={12}
                   mode="decimal"
                   locale="pt-BR"
                   minFractionDigits={2}
@@ -469,72 +519,31 @@ const PedidoListaSidebar = ({
                 <div>
                   <h1>{formataMoeda(quantidade * preco)}</h1>
                 </div>
-                <div>
-                  <Button
-                    className="p-button p-button-success p-button-rounded"
-                    label="Gravar alteração"
-                    icon="pi pi-save"
-                    disabled={loadingLojas || index > pedidos.length}
-                    onClick={() => {
-                      atualizarPedido(produto);
-                    }}
-                  />
-                </div>
-                <div>
-                  <Button
-                    disabled={index <= 0}
-                    className="p-button p-button-warn p-button-rounded"
-                    label="Anterior"
-                    icon="pi pi-arrow-left"
-                    onClick={() => {
-                      setIndex(index - 1);
-                      setProduto(pedidos[index]);
-
-                      setEditDialog(true);
-
-                      setQuantidade(pedidos[index].quantidade);
-                      setFator(pedidos[index].fatorConversao);
-                      setPreco(pedidos[index].preco);
-                      setUnCompra(pedidos[index].unidadeCompra);
-
-                      dialogProdutoPorFilial(pedidos[index]);
-                      setProdutoSelecionado([]);
-                      setProdutoSelecionadoTodasasLojas([]);
-                    }}
-                  />
-                </div>
-                <div>
-                  <Button
-                    disabled={index >= pedidos.length}
-                    className="p-button p-button-info p-button-rounded"
-                    label="Próximo"
-                    icon="pi pi-arrow-right"
-                    onClick={() => {
-                      setIndex(index + 1);
-                      setProduto(pedidos[index]);
-
-                      setEditDialog(true);
-
-                      setQuantidade(pedidos[index].quantidade);
-                      setFator(pedidos[index].fatorConversao);
-                      setPreco(pedidos[index].preco);
-                      setUnCompra(pedidos[index].unidadeCompra);
-
-                      dialogProdutoPorFilial(pedidos[index]);
-                      setProdutoGrafico(pedidos[index]);
-                    }}
-                  />
-                </div>
-                <div>
-                  <Button
-                    className="p-button p-button-rounded p-button-danger"
-                    icon="pi pi-list"
-                    onClick={() => setEditDialog(false)}
-                    label="Voltar a lista"
-                  />
-                </div>
               </div>
-
+              <h1
+                style={{
+                  display: "flex",
+                  alignContent: "center",
+                  justifyContent: "center",
+                  padding: "5px",
+                  fontWeight: "800",
+                  color: "#FFFF",
+                  backgroundColor: "blue",
+                  margin: "5px",
+                }}
+              >
+                {index >= pedidos.length ? (
+                  setEditDialog(false)
+                ) : (
+                  <>
+                    <p>
+                      # {index + 1} - <FaProductHunt />{" "}
+                      {produto?.idproduto?.nome} - <FaStore />{" "}
+                      {produto?.filial?.nome}
+                    </p>
+                  </>
+                )}
+              </h1>
               <div style={{ width: "100%", padding: "10px" }}>
                 <DataTable
                   size="small"
@@ -607,26 +616,70 @@ const PedidoListaSidebar = ({
                   ></Column>
                 </DataTable>
               </div>
-              <h1
-                style={{
-                  alignContent: "center",
-                  padding: "5px",
-                  fontWeight: "800",
-                  color: "#FFFF",
-                  backgroundColor: "blue",
+            </div>
+            <div>
+              <Button
+                disabled={index <= 0}
+                className="p-button p-button-warn p-button-rounded"
+                label="Anterior"
+                icon="pi pi-arrow-left"
+                onClick={() => {
+                  setIndex(index - 1);
+                  setProduto(pedidos[index]);
+
+                  setEditDialog(true);
+
+                  setQuantidade(pedidos[index].quantidade);
+                  setFator(pedidos[index].embalagem);
+                  setPreco(pedidos[index].preco);
+                  setUnCompra(pedidos[index].unidadeCompra);
+
+                  dialogProdutoPorFilial(pedidos[index]);
+                  setProdutoSelecionado([]);
+                  setProdutoSelecionadoTodasasLojas([]);
                 }}
-              >
-                {index >= pedidos.length ? (
-                  setEditDialog(false)
-                ) : (
-                  <>
-                    <p>
-                      N° {index + 1} :{produto?.idproduto?.nome} -{" "}
-                      {produto?.filial?.nome}
-                    </p>
-                  </>
-                )}
-              </h1>
+              />
+            </div>
+            <div>
+              <Button
+                disabled={index >= pedidos.length}
+                className="p-button p-button-info p-button-rounded"
+                label="Próximo"
+                icon="pi pi-arrow-right"
+                onClick={() => {
+                  setIndex(index + 1);
+                  setProduto(pedidos[index]);
+
+                  setEditDialog(true);
+
+                  setQuantidade(pedidos[index].quantidade);
+                  setFator(pedidos[index].embalagem);
+                  setPreco(pedidos[index].preco);
+                  setUnCompra(pedidos[index].unidadeCompra);
+                  setProdutoSelecionado([]);
+                  dialogProdutoPorFilial(pedidos[index]);
+                  setProdutoGrafico(pedidos[index]);
+                }}
+              />
+            </div>
+            <div>
+              <Button
+                className="p-button p-button-rounded p-button-danger"
+                icon="pi pi-list"
+                onClick={() => setEditDialog(false)}
+                label="Voltar a lista"
+              />
+            </div>
+            <div>
+              <Button
+                className="p-button p-button-success p-button-rounded"
+                label="Gravar alteração"
+                icon="pi pi-save"
+                disabled={loadingLojas || index > pedidos.length}
+                onClick={() => {
+                  atualizarPedido(produto);
+                }}
+              />
             </div>
           </div>
         </>
@@ -634,12 +687,13 @@ const PedidoListaSidebar = ({
         <>
           <DataTable
             style={{ marginTop: "1px", backgroundColor: "#F2F2F2" }}
+            // editMode="row"
             scrollable
             // resizableColumns
-            columnResizeMode="fit"
+            // columnResizeMode="fit"
             size="small"
-            // showGridlines
-            scrollHeight="450px"
+            showGridlines
+            scrollHeight="650px"
             responsiveLayout="scroll"
             footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras - Produtos selecionados ${selectedProductsPedido.length}`}
             footerColumnGroup={footerGroupPedido}
@@ -648,45 +702,56 @@ const PedidoListaSidebar = ({
             rows={50}
             // stripedRows
             loading={loading3}
-            paginator
-            paginatorTemplate={template1}
+            //  paginator
+            //  paginatorTemplate={template1}
             emptyMessage="Nenhum produto adicionado a lista"
-            editMode="row"
             dataKey="id"
             filters={filters2}
             filterDisplay="row"
+            sortOrder={1}
             selection={selectedProductsPedido}
             selectionMode="multiple"
             onSelectionChange={(e) => setSelectedProductsPedido(e.value)}
+            onRowEditComplete={onRowEditComplete}
+            sortField="idproduto.nome"
           >
             <Column
               selectionMode="multiple"
-              headerStyle={{ width: "3em" }}
+              headerStyle={{ width: "1px" }}
             ></Column>
-
+            <Column
+              header="#"
+              body={(data, props) => <div> {props.rowIndex + 1}</div>}
+            ></Column>
             <Column
               field="filial.id"
-              body={lojaTemplate}
+              style={{ minWidth: "300px" }}
+              //  body={lojaTemplate}
+              body={(data, props) => (
+                <div>{data.filial.id + "-" + data.filial.nome}</div>
+              )}
               filter
               sortable
               header="Cód.Loja"
             />
-
+            {/*
             <Column
               field="idproduto.ean"
               filter
               //  body={EanOrCodigoPedido}
               header="Código/Ean"
-            ></Column>
+              ></Column>
+              */}
             <Column
+              style={{ minWidth: "600px" }}
               field="idproduto.nome"
               filter
               sortable
               header="Produto"
             ></Column>
-
             <Column
               field="quantidade"
+              style={{ minWidth: "150px" }}
               filter
               filterClear
               filterMatchModeOptions={[
@@ -704,8 +769,52 @@ const PedidoListaSidebar = ({
               header="Quantidade"
             ></Column>
             <Column
-              field="unidadeCompra.nome"
-              filter
+              style={{ minWidth: "150px" }}
+              header={editMode ? "Nova quantidade" : "Editar quantidade"}
+              body={(data, props) => (
+                <div>
+                  {editMode === true && props.rowIndex + 1 === indexAtual ? (
+                    <>
+                      <InputNumber
+                        size={3}
+                        value={quantidade}
+                        mode="decimal"
+                        minFractionDigits={2}
+                        maxFracionDigits={2}
+                        onChange={(e) => setQuantidade(e.value)}
+                        autoFocus
+                        style={{ margin: "1rem" }}
+                      />
+                      <Button
+                        label="Gravar"
+                        icon="pi pi-check"
+                        className="p-button p-button-rounded p-button-sm"
+                        onClick={() => onRowEditComplete(data)}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        icon="pi pi-pencil"
+                        className="p-button p-button-rounded p-button-sm"
+                        onClick={() => {
+                          setEditMode(true);
+                          setIndexAtual(props.rowIndex + 1);
+                        }}
+                      />
+                    </>
+                  )}
+                </div>
+              )}
+            />
+            <Column
+              style={{ minWidth: "150px" }}
+              field="unidadeCompra.codigo"
+              body={(data, props) => (
+                <>
+                  {data.unidadeCompra.codigo} ( {data.embalagem})
+                </>
+              )}
               sortable
               header="UN"
             ></Column>
@@ -715,14 +824,12 @@ const PedidoListaSidebar = ({
               sortable
               header="Preço unitário "
             ></Column>
-
             <Column
               field={precoPedidoLinhaTotal}
               header="Preço Total "
             ></Column>
 
             <Column body={editar}></Column>
-
             <Column field={deletarItemPedido}></Column>
           </DataTable>
         </>

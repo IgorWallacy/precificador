@@ -39,6 +39,8 @@ import { FaGift } from "react-icons/fa";
 
 import moment from "moment";
 
+import emailjs from "@emailjs/browser";
+
 import api from "../../../../services/axios";
 
 import pdfMake from "pdfmake/build/pdfmake";
@@ -162,6 +164,8 @@ export default function AnaliseFornecedor() {
   const [loading2, setLoading2] = useState(false);
 
   const [checked, setChecked] = useState(false);
+
+  const [gerarSugestaoChecked, setGerarSugestaoChecked] = useState(false);
 
   const [dialogSelectedProducts, setDialogSelectedProducts] = useState(false);
 
@@ -718,108 +722,213 @@ export default function AnaliseFornecedor() {
     let d = rowData.sort();
 
     d.map((m) => {
-      api
-        .post(
-          `/api_react/compras/produtos/${m?.id}/${moment(
-            dataInicialCompra
-          ).format("YYYY-MM-DD")}/${moment(dataFinalCompra).format(
-            "YYYY-MM-DD"
-          )}/${fornecedor.id}/${m.idfilial}/${moment(moment.now())
-            .subtract(diasVenda, "days")
-            .format("YYYY-MM-DD")}/${moment(dataFinalVenda).format(
-            "YYYY-MM-DD"
-          )}`
-        )
-        .then((r) => {
-          let total = r.data[0].quantidade_vendida;
+      if (gerarSugestaoChecked) {
+        api
+          .post(
+            `/api_react/compras/produtos/${m?.id}/${moment(
+              dataInicialCompra
+            ).format("YYYY-MM-DD")}/${moment(dataFinalCompra).format(
+              "YYYY-MM-DD"
+            )}/${fornecedor.id}/${m.idfilial}/${moment(moment.now())
+              .subtract(diasVenda, "days")
+              .format("YYYY-MM-DD")}/${moment(dataFinalVenda).format(
+              "YYYY-MM-DD"
+            )}`
+          )
+          .then((r) => {
+            let total = r.data[0].quantidade_vendida;
 
-          let venda_diaria = total / diasVenda;
+            let venda_diaria = total / diasVenda;
 
-          let qtdeAComprar =
-            venda_diaria *
-              (tempoDiasPedido + tempoDiasEntrega + margemErroDiasEntrega) -
-            (checked ? r.data[0].saldo_estoque : 0);
+            let qtdeAComprar =
+              venda_diaria *
+                (tempoDiasPedido + tempoDiasEntrega + margemErroDiasEntrega) -
+              (checked ? r.data[0].saldo_estoque : 0);
 
-          i++;
-          setProdutoMassaResponse(i);
+            i++;
+            setProdutoMassaResponse(i);
 
-          //  console.log(r.data[0]);
+            //  console.log(r.data[0]);
 
-          api
-            .post(`/api/pedido/compra/salvar/${idPedido}`, {
-              idpedido: { id: idPedido },
-              idproduto: { id: m.id },
-              unidadeCompra: {
-                id: r.data[0].id_unidade_compra
-                  ? r.data[0].id_unidade_compra
-                  : 30,
-              },
-              quantidadeVenda: r.data[0].quantidade_vendida,
-              fatorConversao: fator,
+            api
+              .post(`/api/pedido/compra/salvar/${idPedido}`, {
+                idpedido: { id: idPedido },
+                idproduto: { id: m.id },
+                unidadeCompra: {
+                  id: r.data[0].id_unidade_compra
+                    ? r.data[0].id_unidade_compra
+                    : 30,
+                },
+                quantidadeVenda: r.data[0].quantidade_vendida,
+                fatorConversao: fator,
 
-              embalagem: Intl.NumberFormat("pt-BR", {}).format(
-                m.embalagem ? m.embalagem : 1
+                embalagem: Intl.NumberFormat("pt-BR", {}).format(
+                  m.embalagem ? m.embalagem : 1
+                ),
+
+                quantidade: qtdeAComprar.toFixed(),
+                filial: { id: m.idfilial },
+                //  quantidade2: quantidade2,
+                preco: r.data[0].ultimoprecocompra,
+                total: total,
+                unidade_venda: r.data[0].unidade_venda,
+                unidade_compra: r.data[0].unidade_compra,
+                ultimoprecocompra: r.data[0].ultimoprecocompra,
+                saldo_estoque: r.data[0].saldo_estoque,
+
+                quantidade_compra: r.data[0].quantidade_compra,
+              })
+              .then((r) => {
+                // getItensPedidoProduto(rowData);
+
+                setLoadingAddPedido(true);
+                setLoading3(true);
+                // setSelectedProducts([]);
+              })
+              .catch((error) => {})
+              .finally((f) => {
+                getItensPedido();
+
+                if (i === d.length) {
+                  setDialogSelectedProducts(false);
+
+                  setProdutoMassaResponse(0);
+                  setLoadingAddPedido(false);
+                }
+              });
+          })
+          .catch((e) => {
+            i++;
+            setProdutoMassaResponse(i);
+            //    console.log(e);
+
+            msgs1.current.show({
+              severity: "error",
+              life: 20000,
+              content: (
+                <React.Fragment>
+                  <img
+                    alt="logo"
+                    src={`${eanUrl}/${m?.ean}`}
+                    onError={(e) =>
+                      (e.target.src =
+                        "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                    }
+                    width="32"
+                  />
+                  <div className="ml-2">
+                    Erro : {e.message} - Não foi possível adicionar {m?.codigo}{" "}
+                    - {m?.produto} a lista, verifique !
+                  </div>
+                </React.Fragment>
               ),
-
-              quantidade: qtdeAComprar.toFixed(),
-              filial: { id: m.idfilial },
-              //  quantidade2: quantidade2,
-              preco: r.data[0].ultimoprecocompra,
-              total: total,
-              unidade_venda: r.data[0].unidade_venda,
-              unidade_compra: r.data[0].unidade_compra,
-              ultimoprecocompra: r.data[0].ultimoprecocompra,
-              saldo_estoque: r.data[0].saldo_estoque,
-
-              quantidade_compra: r.data[0].quantidade_compra,
-            })
-            .then((r) => {
-              // getItensPedidoProduto(rowData);
-
-              setLoadingAddPedido(true);
-              setLoading3(true);
-              // setSelectedProducts([]);
-            })
-            .catch((error) => {})
-            .finally((f) => {
-              getItensPedido();
-
-              if (i === d.length) {
-                setDialogSelectedProducts(false);
-
-                setProdutoMassaResponse(0);
-                setLoadingAddPedido(false);
-              }
             });
-        })
-        .catch((e) => {
-          i++;
-          setProdutoMassaResponse(i);
-          //    console.log(e);
+          })
+          .finally((f) => {});
+      } else {
+        api
+          .post(
+            `/api_react/compras/produtos/${m?.id}/${moment(
+              new Date(new Date().setDate(new Date().getDate()))
+            ).format("YYYY-MM-DD")}/${moment(
+              new Date(new Date().setDate(new Date().getDate()))
+            ).format("YYYY-MM-DD")}/${fornecedor.id}/${m.idfilial}/${moment(
+              moment.now()
+            ).format("YYYY-MM-DD")}/${moment(
+              new Date(new Date().setDate(new Date().getDate()))
+            ).format("YYYY-MM-DD")}`
+          )
+          .then((r) => {
+            let total = r.data[0].quantidade_vendida;
 
-          msgs1.current.show({
-            severity: "error",
-            life: 20000,
-            content: (
-              <React.Fragment>
-                <img
-                  alt="logo"
-                  src={`${eanUrl}/${m?.ean}`}
-                  onError={(e) =>
-                    (e.target.src =
-                      "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
-                  }
-                  width="32"
-                />
-                <div className="ml-2">
-                  Erro : {e.message} - Não foi possível adicionar {m.produto} a
-                  lista, verifique !
-                </div>
-              </React.Fragment>
-            ),
-          });
-        })
-        .finally((f) => {});
+            let venda_diaria = total / diasVenda;
+
+            let qtdeAComprar =
+              venda_diaria *
+                (tempoDiasPedido + tempoDiasEntrega + margemErroDiasEntrega) -
+              (checked ? r.data[0].saldo_estoque : 0);
+
+            i++;
+            setProdutoMassaResponse(i);
+
+            //  console.log(r.data[0]);
+
+            api
+              .post(`/api/pedido/compra/salvar/${idPedido}`, {
+                idpedido: { id: idPedido },
+                idproduto: { id: m.id },
+                unidadeCompra: {
+                  id: r.data[0].id_unidade_compra
+                    ? r.data[0].id_unidade_compra
+                    : 30,
+                },
+                quantidadeVenda: r.data[0].quantidade_vendida,
+                fatorConversao: fator,
+
+                embalagem: Intl.NumberFormat("pt-BR", {}).format(
+                  m.embalagem ? m.embalagem : 1
+                ),
+
+                quantidade: qtdeAComprar.toFixed(),
+                filial: { id: m.idfilial },
+                //  quantidade2: quantidade2,
+                preco: r.data[0].ultimoprecocompra,
+                total: total,
+                unidade_venda: r.data[0].unidade_venda,
+                unidade_compra: r.data[0].unidade_compra,
+                ultimoprecocompra: r.data[0].ultimoprecocompra,
+                saldo_estoque: r.data[0].saldo_estoque,
+
+                quantidade_compra: r.data[0].quantidade_compra,
+              })
+              .then((r) => {
+                // getItensPedidoProduto(rowData);
+
+                setLoadingAddPedido(true);
+                setLoading3(true);
+                // setSelectedProducts([]);
+              })
+              .catch((error) => {})
+              .finally((f) => {
+                getItensPedido();
+
+                if (i === d.length) {
+                  setDialogSelectedProducts(false);
+
+                  setProdutoMassaResponse(0);
+                  setLoadingAddPedido(false);
+                }
+              });
+          })
+          .catch((e) => {
+            i++;
+            setProdutoMassaResponse(i);
+            //    console.log(e);
+
+            msgs1.current.show({
+              severity: "error",
+              life: 20000,
+              content: (
+                <React.Fragment>
+                  <img
+                    alt="logo"
+                    src={`${eanUrl}/${m?.ean}`}
+                    onError={(e) =>
+                      (e.target.src =
+                        "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                    }
+                    width="32"
+                  />
+                  <div className="ml-2">
+                    Erro : {e.message} - Não foi possível adicionar {m.codigo} -{" "}
+                    {m.produto} a lista, verifique !
+                  </div>
+                </React.Fragment>
+              ),
+            });
+          })
+          .finally((f) => {});
+      }
     });
 
     //  console.log(rowData);
@@ -933,7 +1042,7 @@ export default function AnaliseFornecedor() {
         {idPedido ? <></> : <></>}
         <Button
           disabled={selectedProductsPedido.length > 0 ? false : true}
-          label={`Imprimir produtos selecionados do pedido N° ${idPedido}`}
+          label={`Imprimir produtos selecionados`}
           style={{ margin: "5px" }}
           icon="pi pi-print"
           className="p-button p-button-warning p-button-rounded"
@@ -1317,7 +1426,7 @@ export default function AnaliseFornecedor() {
       })
       .finally(() => {
         getItensPedido();
-        getItensPedidoProduto(produtoSelecionado[0]);
+        // getItensPedidoProduto(produtoSelecionado[0]);
       });
   };
 
@@ -1572,7 +1681,7 @@ export default function AnaliseFornecedor() {
                 fontSize: "50px",
               }}
             >
-              Análise de compras
+              Análise de compras {idPedido ? <>Pedido # {idPedido}</> : <></>}
             </h1>
 
             <Dialog
@@ -1721,32 +1830,44 @@ export default function AnaliseFornecedor() {
                       value={margemErroDiasEntrega}
                     ></InputNumber>
                   </div>
-                </div>
-                <div className="field-checkbox">
-                  <Checkbox
-                    inputId="binary"
-                    checked={checked}
-                    onChange={(e) => setChecked(e.checked)}
-                  />
+                  <div>
+                    <Checkbox
+                      inputId="binary"
+                      checked={checked}
+                      onChange={(e) => setChecked(e.checked)}
+                    />
 
-                  <label htmlFor="binary">Considerar o estoque</label>
-                </div>
-                <div>
-                  <Button
-                    loading={loading}
-                    style={{ marginTop: "30px" }}
-                    icon="pi pi-search"
-                    label={loading ? "Analisando..." : "Pesquisar"}
-                    className=" p-button-success p-button-rounded"
-                    onClick={analisar}
-                  />
-                  <Button
-                    label="Alterar cabeçalho "
-                    icon="pi pi-refresh"
-                    style={{ marginLeft: "15px" }}
-                    className="p-button p-button-rounded "
-                    onClick={() => setDisplayDialog(true)}
-                  />
+                    <label htmlFor="binary">Considerar o estoque</label>
+                  </div>
+                  <div style={{ marginTop: "8px" }}>
+                    <Checkbox
+                      inputId="binary"
+                      checked={gerarSugestaoChecked}
+                      onChange={(e) => setGerarSugestaoChecked(e.checked)}
+                    />
+
+                    <label htmlFor="binary">
+                      Gerar com sugestão (Processo mais lento )
+                    </label>
+                  </div>
+
+                  <div>
+                    <Button
+                      loading={loading}
+                      style={{ marginTop: "30px" }}
+                      icon="pi pi-search"
+                      label={loading ? "Analisando..." : "Pesquisar"}
+                      className=" p-button-success p-button-rounded"
+                      onClick={analisar}
+                    />
+                    <Button
+                      label="Alterar cabeçalho "
+                      icon="pi pi-refresh"
+                      style={{ marginLeft: "15px" }}
+                      className="p-button p-button-rounded "
+                      onClick={() => setDisplayDialog(true)}
+                    />
+                  </div>
                 </div>
               </>
             ) : (

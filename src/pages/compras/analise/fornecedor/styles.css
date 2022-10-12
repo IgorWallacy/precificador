@@ -36,8 +36,9 @@
     display: flex;
     flex-direction: column;
     margin: 30px;
-
-    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
 
 .lista-itens {

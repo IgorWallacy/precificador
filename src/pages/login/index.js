@@ -1,5 +1,6 @@
 import "./index.css";
 import ImagemDestque from "../../assets/img/undraw_login_re_4vu2.svg";
+import ImagemOffline from "../../assets/img/offline.png";
 
 import React, { useState, useContext, useRef, useEffect } from "react";
 
@@ -9,6 +10,7 @@ import Context from "../../contexts";
 
 import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
+import { Dialog } from "primereact/dialog";
 
 import { Button } from "primereact/button";
 import axios from "axios";
@@ -141,6 +143,16 @@ const Login = () => {
 
   return (
     <>
+      <Dialog closable={false} visible={statusApi === "Offline"}>
+        <h1>API {statusApi} </h1>
+        <img src={ImagemOffline} />
+        <h1>Tentando restabelecer a conexão com o servidor </h1>
+        <h4>
+          {" "}
+          caso o problema persista, verifique sua conexão com a internet ou
+          reinicie o servidor
+        </h4>
+      </Dialog>
       <Toast ref={toast} position="bottom-center" />
       <div className="status-api">
         <Badge

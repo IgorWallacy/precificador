@@ -5,6 +5,10 @@ import "./styless.css";
 import api from "../../services/axios";
 import React, { useState, useEffect } from "react";
 
+import { Dialog } from "primereact/dialog";
+
+import ImagemOffline from "../../assets/img/offline.png";
+
 const Footer = () => {
   const [statusApi, setStatusApi] = useState("Online");
 
@@ -15,7 +19,7 @@ const Footer = () => {
         setStatusApi(r.data.status);
       })
       .catch((error) => {
-        setStatusApi("Offline");
+        setStatusApi(error.message);
       });
   };
 
@@ -29,6 +33,16 @@ const Footer = () => {
 
   return (
     <>
+      <Dialog closable={false} visible={statusApi === "Network Error"}>
+        <h1>API {statusApi} </h1>
+        <img src={ImagemOffline} />
+        <h1>Tentando restabelecer a conexão com o servidor </h1>
+        <h4>
+          {" "}
+          caso o problema persista, verifique sua conexão com a internet ou
+          reinicie o servidor
+        </h4>
+      </Dialog>
       <div className="footer">
         <div className="status-api">
           <Badge

@@ -11,6 +11,7 @@ import {
   faTags,
   faBox,
   faUserGroup,
+  faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 
 import ImagemDestque from "../../assets/img/undraw_select_option_re_u4qn.svg";
@@ -96,9 +97,10 @@ const MenuInterativo = () => {
           <Typing speed={50} startDelay={10}>
             <div className="texto-menu-interativo">
               {greetingMessage()}
-              <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-                {nome}. O que você deseja fazer hoje ?
-              </h1>
+              <h1 style={{ fontFamily: "cabin-sketch-bold" }}>{nome}</h1>
+              <h2 style={{ fontFamily: "cabin-sketch-bold" }}>
+                O que você deseja fazer hoje ?
+              </h2>
             </div>
           </Typing>
         </div>
@@ -131,6 +133,19 @@ const MenuInterativo = () => {
               icon="pi pi-shopping-cart"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/vendas")}
+            />
+          </div>
+        </div>
+        <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faGlobe} size="2x" />
+          <h1>Status</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="PDV"
+              icon="pi pi-globe"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/pdv/status")}
             />
           </div>
         </div>

@@ -598,6 +598,7 @@ const PrecificadorExecuta = () => {
       },
 
       styles: {
+        i: { fontSize: 8 },
         header: {
           fontSize: 20,
           alignment: "center",
@@ -606,19 +607,19 @@ const PrecificadorExecuta = () => {
 
         ean: {
           bold: true,
-          fontSize: 10,
+          fontSize: 8,
           //   fontSize : 50
         },
         descricao: {
           alignment: "left",
           bold: true,
-          fontSize: 10,
+          fontSize: 8,
           //   fontSize : 40,
         },
         preco: {
           alignment: "right",
           bold: true,
-          fontSize: 10,
+          fontSize: 8,
           //  fontSize : 85,
         },
       },
@@ -638,13 +639,13 @@ const PrecificadorExecuta = () => {
               ["", "", "", "", "", "", ""],
 
               [
-                { text: i + 1 },
+                { text: i + 1, style: "i" },
                 {
                   text: moment(item.dataagendada).format("DD/MM/YY"),
                   style: "ean",
                 },
                 { text: item.ean ? item.ean : item.codigo, style: "ean" },
-                { text: item.descricao.substring(0, 35), style: "descricao" },
+                { text: item.descricao, style: "descricao" },
 
                 {
                   text:
@@ -1238,39 +1239,40 @@ const PrecificadorExecuta = () => {
             flexDirection: "row",
           }}
         >
-          {replicarPreco ? (
-            <Tag
-              className="mr-2"
-              style={{ margin: "10px" }}
-              rounded
-              value="Replicar a atualização de preços para todas as filiais"
-              severity="success"
-              icon="pi pi-check"
-            ></Tag>
-          ) : (
-            <Tag
-              className="mr-2"
-              style={{ margin: "10px" }}
-              icon="pi pi-times"
-              rounded
-              severity="danger"
-              value="Não replicar a atualização de preços para todas as filiais"
-            ></Tag>
-          )}
           <Button
             style={{ margin: "10px" }}
-            label="Confirmar e atualizar produtos selecionados"
+            label="Gravar preços agendados"
+            tooltip="Atualizar produtos selecionados"
             icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
             disabled={!produtoSelecionado || !produtoSelecionado.length}
             className="p-button-rounded p-button-success"
             onClick={() => atualizarProdutosSelecionados()}
           />
         </div>
+        {replicarPreco ? (
+          <Tag
+            className="mr-1"
+            style={{ margin: "5px" }}
+            rounded
+            value="Replicar a atualização de preços para todas as lojas"
+            severity="info"
+            icon="pi pi-check"
+          ></Tag>
+        ) : (
+          <Tag
+            className="mr-1"
+            style={{ margin: "5px" }}
+            icon="pi pi-times"
+            rounded
+            severity="danger"
+            value="Não replicar a atualização de preços para todas as lojas"
+          ></Tag>
+        )}
       </React.Fragment>
     ) : (
       <>
         <Button
-          label="Confirmar e atualizar produtos selecionados"
+          label="Gravar preços agendados"
           icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
           disabled={!produtoSelecionado || !produtoSelecionado.length}
           className="p-button-rounded p-button-success"

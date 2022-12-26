@@ -1017,7 +1017,7 @@ const PrecificadorAgenda = () => {
             <Column
               field="nomeFilial"
               bodyStyle={{ fontWeight: 800 }}
-              header="Filial de entrada"
+              header="Loja"
             ></Column>
             <Column
               field={dataInclusaoNota}

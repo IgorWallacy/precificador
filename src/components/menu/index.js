@@ -72,6 +72,17 @@ const Menu = (data) => {
         },
       ],
     },
+    {
+      label: "PDV",
+      icon: "pi pi-shield",
+      items: [
+        {
+          label: "Status",
+          icon: "pi pi-star",
+          command: () => navigate("/pdv/status"),
+        },
+      ],
+    },
   ];
 
   return (

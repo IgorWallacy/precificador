@@ -12,6 +12,7 @@ import MenuInterativo from "../pages/menu-interativo";
 import VendasDataTableComponent from "../pages/vendas/data-table-vendas-por-finalizador";
 import ConsultaProduto from "../pages/produto/consulta";
 import ListaCompras from "../pages/compras/lista";
+import StatusPdv from "../pages/pdv/status";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -49,6 +50,7 @@ export default function Router() {
             element={<AnaliseFornecedor />}
           />
           <Route path="compras/consulta" element={<ListaCompras />} />
+          <Route path="pdv/status" element={<StatusPdv />} />
         </Route>
       </Routes>
     </Context.Provider>

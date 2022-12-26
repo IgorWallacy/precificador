@@ -22,8 +22,8 @@
     align-content: space-between;
     flex-wrap: wrap;
     width: 100%;
-    padding: 5px;
-    margin: 5px;
+
+
     border: 1px solid #FFF;
     border-top-left-radius: 50px;
     border-top-right-radius: 50px;
@@ -50,7 +50,7 @@
     align-content: center;
     flex-direction: row;
     flex-wrap: wrap;
-    margin: 1em;
+
     width: 100%;
     color: #F2f2f2;
 }

@@ -12,6 +12,7 @@ import {
   faBox,
   faUserGroup,
   faGlobe,
+  faBusinessTime,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./menu-interativo.css";
@@ -131,6 +132,19 @@ const MenuInterativo = () => {
               icon="pi pi-shopping-cart"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/vendas")}
+            />
+          </div>
+        </div>
+        <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faBusinessTime} size="2x" />
+          <h1>B.I</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="Business Intelligence"
+              icon="pi pi-prime"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/bi/pivot")}
             />
           </div>
         </div>

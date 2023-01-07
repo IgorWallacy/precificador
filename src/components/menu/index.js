@@ -84,12 +84,12 @@ const Menu = (data) => {
       ],
     },
     {
-      label: "BI",
-      icon: "pi pi-report",
+      label: "Business Intelligence",
+      icon: "pi pi-prime",
       items: [
         {
-          label: "BI",
-          icon: "pi pi-report",
+          label: "Análises",
+          icon: "pi pi-slack",
           command: () => navigate("/bi/pivot"),
         },
       ],

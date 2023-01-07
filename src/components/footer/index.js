@@ -35,7 +35,7 @@ const Footer = () => {
     <>
       <Dialog closable={false} visible={statusApi === "Network Error"}>
         <h1>API {statusApi} </h1>
-        <img src={ImagemOffline} />
+        <img style={{ width: "250px" }} src={ImagemOffline} />
         <h1>Tentando restabelecer a conexão com o servidor </h1>
         <h4>
           {" "}

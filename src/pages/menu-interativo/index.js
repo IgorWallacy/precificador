@@ -14,8 +14,6 @@ import {
   faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 
-import ImagemDestque from "../../assets/img/undraw_select_option_re_u4qn.svg";
-
 import "./menu-interativo.css";
 
 import Typing from "react-typing-animation";

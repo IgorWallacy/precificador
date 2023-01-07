@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import {
-  faCalendarWeek,
-  faCashRegister,
-  faStore,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCashRegister, faStore } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Footer from "../../../components/footer";

@@ -83,6 +83,17 @@ const Menu = (data) => {
         },
       ],
     },
+    {
+      label: "BI",
+      icon: "pi pi-report",
+      items: [
+        {
+          label: "BI",
+          icon: "pi pi-report",
+          command: () => navigate("/bi/pivot"),
+        },
+      ],
+    },
   ];
 
   return (

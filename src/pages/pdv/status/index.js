@@ -89,12 +89,14 @@ const StatusPdv = () => {
       </h1>
       <div className="status">
         <DataTable
+          rowGroupMode="rowspan"
+          groupRowsBy="filial"
           style={{ padding: "15px", width: "100%" }}
           emptyMessage="Nenhum pdv encontrado"
           value={pdvs}
           responsiveLayout="stack"
           stripedRows
-          header={`Monitorando`}
+          header={` Monitorando ... `}
         >
           <Column field="filial" sortable header="Loja"></Column>
           <Column field={ultimoPing} header="Status"></Column>
@@ -102,6 +104,7 @@ const StatusPdv = () => {
           <Column field="usuario" header="Operador(a)"></Column>
           <Column field={ultimaCarga} header="Carga base"></Column>
           <Column field="ip" header="IP"></Column>
+          <Column field="ipservidor" header="Servidor" />
           <Column field="versao" header="Versão"></Column>
         </DataTable>
       </div>

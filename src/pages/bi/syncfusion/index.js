@@ -19,12 +19,14 @@ import * as numbers from './numbers.json';
 
 import { Button } from "primereact/button";
 
+
 import "./styless.css";
 
 import ptBR from './ptBR.json'
+
 import { useRef } from "react";
 
-
+import moment from "moment";
 
 L10n.load(ptBR);
 
@@ -34,10 +36,15 @@ setCulture('pt');
 setCurrencyCode('BRL');
 
 
-const SyncfusionPivot = ({ data }) => {
+const SyncfusionPivot = ({ data, date1, date2 }) => {
+
+
 
     const ref = useRef()
 
+    const trend = () => {
+        ref.current.grid.autoFitColumns();
+    }
     const groupSettings = {
 
         showFieldsPanel: true,
@@ -47,12 +54,19 @@ const SyncfusionPivot = ({ data }) => {
     const gridSettings = {
         allowAutoResizing: true,
         allowSelection: true,
+        allowReordering: true,
         selectionSettings: { mode: 'Row', type: 'Multiple', cellSelectionMode: 'Box' },
-        columnWidth: 120,
-        rowHeight: 60,
+
+        columnWidth: 50,
+        rowHeight: 45,
+        gridLines: 'Both',
+        clipMode: 'EllipsisWithTooltip'
     }
 
+
+
     const dataSourceSettings = {
+        allowLabelFilter: true,
         columns: [],
         dataSource: data,
         excludeFields: ['id', 'codigo', 'promocao', 'dataEmissao', 'codigoFilial'],
@@ -60,6 +74,8 @@ const SyncfusionPivot = ({ data }) => {
         filters: [
             { name: "nomeFilial", caption: "Loja" },
             { name: "promocaoNome", caption: "Nome da promoção" },
+            { name: "codigo", caption: "Código do produto" },
+
         ],
 
         rows: [
@@ -120,15 +136,58 @@ const SyncfusionPivot = ({ data }) => {
         ],
     };
 
+    const excelExportProperties = {
+        fileName: `anlise_de_custo_x_venda_de_${moment(date1).format('DD_MM_YY')}_a_${moment(date2).format('DD_MM_YY')}.xlsx`
+    }
+
+    const pdfExportProperties = {
+        fileName: `anlise_de_custo_x_venda_de_${moment(date1).format('DD_MM_YY')}_a_${moment(date2).format('DD_MM_YY')}.pdf`,
+        pageOrientation: 'Landscape',
+        pageSize: 'Ledger',
+        header: {
+
+            fromTop: 0,
+            height: 130,
+
+            contents: [
+                {
+                    type: 'Text',
+                    value: ` Análise custo x venda ${moment(date1).format('DD/MM/YY')} a ${moment(date2).format('DD/MM/YY')} `,
+                    position: { x: 0, y: 100 },
+                    style: { textBrushColor: '#000000', fontSize: 15, dashStyle: 'Solid', hAlign: 'Left' }
+                }
+            ]
+        },
+        footer: {
+            fromBottom: 160,
+            height: 150,
+            contents: [
+                {
+                    type: 'PageNumber',
+                    pageNumberType: 'Arabic',
+                    format: 'Pag {$current} de {$total}',
+                    position: { x: 0, y: 25 },
+                    style: { textBrushColor: '#02007a', fontSize: 15 }
+                }
+            ]
+        }
+    };
+
     return (
         <>
             <div style={{
-                backgroundColor: '#f2f2f2'
+                backgroundColor: '#f2f2f2',
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                flexDirection: "column",
+                // margin: "2rem",
             }}>
 
                 <div>
-                    <Button icon="pi pi-file-excel" className="p-button p-button-rounded p-button-success" style={{ margin: '1em' }} label="Exportar Excel" onClick={() => ref.current.excelExport()} />
-                    <Button icon="pi pi-file-pdf" className="p-button p-button-rounded p-button-secondary" style={{ margin: '1em' }} label="Exportar PDF" onClick={() => ref.current.pdfExport()} />
+                    <Button icon="pi pi-file-excel" className="p-button p-button-rounded p-button-success" style={{ margin: '1em' }} label="Exportar Excel" onClick={() => ref.current.excelExport(excelExportProperties)} />
+                    <Button icon="pi pi-file-pdf" className="p-button p-button-rounded p-button-secondary" style={{ margin: '1em' }} label="Exportar PDF" onClick={() => ref.current.pdfExport(pdfExportProperties)} />
 
                 </div>
                 <div>
@@ -143,22 +202,26 @@ const SyncfusionPivot = ({ data }) => {
                         allowValueFilter={true}
                         allowNumberFormatting={true}
                         allowExcelExport={true}
+                        exportAllPages={true}
                         allowPdfExport={true}
+                        allowRepeatHeader={false}
                         allowDataCompression={false}
                         enableFieldSearching={true}
                         enableValueSorting={true}
                         enableVirtualization={false}
+                        enableSorting={true}
                         showGroupingBar={true}
                         showTooltip={false}
                         id="PivotView"
 
                         showFieldList={true}
-                        height={600}
+                        height={700}
                         gridSettings={gridSettings}
                         groupingBarSettings={groupSettings}
                         dataSourceSettings={dataSourceSettings}
                         allowCalculatedField={true}
 
+                        dataBound={trend.bind()}
 
                     >
                         <Inject services={[CalculatedField, FieldList, GroupingBar, Toolbar, VirtualScroll, ExcelExport, PDFExport]} />

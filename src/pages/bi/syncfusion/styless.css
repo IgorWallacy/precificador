@@ -24,10 +24,7 @@
 }
 
 
-/* Hiding row axis in grouping bar */
-#PivotView .e-group-rows {
-    display: none;
-}
+
 
 /* Hiding row axis in field list */
 .e-pivotfieldlist-wrapper .e-field-list-rows {

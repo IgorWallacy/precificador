@@ -13,7 +13,7 @@ import VendasDataTableComponent from "../pages/vendas/data-table-vendas-por-fina
 import ConsultaProduto from "../pages/produto/consulta";
 import ListaCompras from "../pages/compras/lista";
 import StatusPdv from "../pages/pdv/status";
-import Pivot from "../pages/bi/pivot";
+import Pivot from "../pages/bi";
 export default function Router() {
   const [logado, setLogado] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState();

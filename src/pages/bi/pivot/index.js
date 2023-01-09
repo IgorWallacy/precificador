@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as FlexmonsterReact from "react-flexmonster";
 
+
+import SyncfusionPivot from "../syncfusion";
+
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
@@ -12,12 +15,14 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Calendar } from "primereact/calendar";
 import { Toolbar } from "primereact/toolbar";
+import { TabView, TabPanel } from 'primereact/tabview';
+import { Avatar } from 'primereact/avatar';
 
 import moment from "moment/moment";
 
 const Pivot = () => {
   const [data, setData] = useState([]);
-  const pivRef = useRef(null);
+  const ref = useRef(null);
 
   const [date1, setDate1] = useState(null);
   const [date2, setDate2] = useState(null);
@@ -27,6 +32,7 @@ const Pivot = () => {
 
   const onReportComplete = () => {
     setLoading(false);
+    console.log(">>>>>", ref.current.webdatarocks.getReport());
   };
   const customizeToolbar = (toolbar) => {
     let tabs = toolbar.getTabs();
@@ -47,13 +53,10 @@ const Pivot = () => {
         ).format("yyyy-MM-DD")}`
       )
       .then((r) => {
-        toast.current.show({
-          severity: "info",
-          summary: "Calculando...",
-          detail: `Por favor aguarde`,
-        });
+
         setData(r.data);
         setLoading(false);
+
       })
       .catch((e) => {
         setLoading(false);
@@ -63,12 +66,17 @@ const Pivot = () => {
           detail: `${e.message}`,
         });
       })
-      .finally((f) => {});
+      .finally((f) => {
+        setLoading(false)
+
+
+      });
   };
 
   const onReady = () => {
     // Connect Flexmonster to the data
-    pivRef.pivot.flexmonster.connectTo({ data });
+    ref.pivot.flexmonster.connectTo({ data });
+
   };
 
   const leftContents = (
@@ -85,6 +93,24 @@ const Pivot = () => {
     </React.Fragment>
   );
 
+  const tabHeaderITemplate = (options) => {
+    return (
+      <div className="flex align-items-center px-3" style={{ cursor: 'pointer' }} onClick={options.onClick}>
+        <Avatar image="images/avatar/amyelsner.png" onImageError={(e) => e.target.src = 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'} shape="circle" className="mx-2" />
+        FlexMonster
+      </div>
+    )
+  };
+
+  const tabHeaderIITemplate = (options) => {
+    return (
+      <div className="flex align-items-center px-3" style={{ cursor: 'pointer' }} onClick={options.onClick}>
+        <Avatar image="images/avatar/amyelsner.png" onImageError={(e) => e.target.src = 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'} shape="circle" className="mx-2" />
+        SyncFusion
+      </div>
+    )
+  };
+
   useEffect(() => {
     // getDados();
   }, []);
@@ -100,6 +126,9 @@ const Pivot = () => {
       ) : (
         <>
           <Toolbar left={leftContents} />
+
+
+
         </>
       )}
 
@@ -119,7 +148,11 @@ const Pivot = () => {
               {moment(date2).format("DD/MM/YYYY")}
             </h4>
           </div>
-          <div
+          { /*
+           <TabView>
+            <TabPanel header="Header I" headerTemplate={tabHeaderITemplate}>
+              
+               <div
             style={{
               display: "flex",
               justifyContent: "center",
@@ -128,8 +161,9 @@ const Pivot = () => {
             }}
           >
             <FlexmonsterReact.Pivot
-              ref={pivRef}
+              ref={ref}
               beforetoolbarcreated={customizeToolbar}
+              componentFolder="https://cdn.webdatarocks.com/"
               toolbar={true}
               width="100%"
               height={600}
@@ -147,7 +181,7 @@ const Pivot = () => {
               }}
               report={{
                 dataSource: {
-                  data: data,
+                  data: data? data : [],
 
                   mapping: {
                     id: {
@@ -302,8 +336,29 @@ const Pivot = () => {
                 },
               }}
               //licenseKey="XXXX-XXXX-XXXX-XXXX-XXXX"
-            />
+            /> 
+           
           </div>
+                       
+                    </TabPanel>
+                    <TabPanel headerTemplate={tabHeaderIITemplate} headerClassName="flex align-items-center">
+                       <SyncfusionPivot data={data}></SyncfusionPivot>
+                    </TabPanel>
+           
+                </TabView>
+          */}
+          <div style={{
+            display: "flex",
+            flexDirection: 'column',
+            justifyContent: "center",
+            alignItems: "center",
+            // margin: "1rem",
+            //  padding: "1rem",
+            border: '1px solid #f2f2f2'
+          }}>
+            <SyncfusionPivot data={data}></SyncfusionPivot>
+          </div>
+
         </>
       ) : (
         <>

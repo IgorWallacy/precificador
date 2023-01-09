@@ -11,8 +11,6 @@ import { Sidebar } from "primereact/sidebar";
 import Context from "../../contexts";
 import { useNavigate } from "react-router-dom";
 
-import CountdownTimer from "react-component-countdown-timer";
-
 import Logo from "../../assets/img/logo_duca.png";
 
 import Menu from "../menu";
@@ -85,24 +83,7 @@ const Header = (data) => {
                     {isLogado.usuarioLogado} - {nome}{" "}
                   </h4>
                 </div>
-                <div className="expira">
-                  <h4>Acesso expira em </h4>{" "}
-                  <CountdownTimer
-                    border
-                    responsive
-                    color="#FFF"
-                    backgroundColor="#db3236"
-                    onEnd={() => isTokenValid()}
-                    hourTitle="Hora(s)"
-                    minuteTitle="Min"
-                    secondTitle="Seg"
-                    count={
-                      JSON.parse(localStorage.getItem("access_token"))
-                        .expires_in
-                    }
-                    hideDay
-                  />
-                </div>
+
                 <div>
                   <Button
                     label="Sair"

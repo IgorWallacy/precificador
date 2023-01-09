@@ -1,5 +1,6 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+
+
 
 import "primereact/resources/themes/lara-light-teal/theme.css"; //theme
 import "primereact/resources/primereact.min.css"; //core css
@@ -9,18 +10,29 @@ import { BrowserRouter } from "react-router-dom";
 
 import Router from "./Routes";
 
-import "./index.css";
+import { registerLicense } from '@syncfusion/ej2-base';
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+import ReactDOM from 'react-dom';
+import './index.css';
 
-root.render(
+import reportWebVitals from './reportWebVitals';
+
+// Registering Syncfusion license key
+registerLicense('ORg4AjUWIQA/Gnt2VVhkQlFadVdJXGFWfVJpTGpQdk5xdV9DaVZUTWY/P1ZhSXxQdkRjXn5XcnFWT2dbWUE=');
+
+ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
+   <BrowserRouter>
       <div className=" fullscreen">
         <div id="main">
           <Router />
         </div>
       </div>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById('root')
 );
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+reportWebVitals();

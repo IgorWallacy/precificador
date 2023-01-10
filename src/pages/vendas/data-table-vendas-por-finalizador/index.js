@@ -25,6 +25,8 @@ import { Toast } from "primereact/toast";
 
 import { Skeleton } from "primereact/skeleton";
 
+import AppChart from "./chart";
+
 function VendasDataTableComponent() {
   const [loja, setLoja] = useState(0);
   const [filiais, setFiliais] = useState();
@@ -498,7 +500,17 @@ function VendasDataTableComponent() {
       <Footer />
 
       <div className="container-venda">
-        <img style={{ width: "250px" }} src={ImagemDestque} />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1em'
+        }}>
+          <img style={{ width: "250px" }} src={ImagemDestque} />
+          <AppChart vendas={vendas} vendasECF={vendasECF} vendasNfce={vendasNfce} />
+        </div>
+
         <div className="cards-info">
           <div className="field">
             <Calendar

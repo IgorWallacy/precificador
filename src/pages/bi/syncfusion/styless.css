@@ -24,7 +24,10 @@
 }
 
 
+.calculando {
 
+    color: #FFFF
+}
 
 /* Hiding row axis in field list */
 .e-pivotfieldlist-wrapper .e-field-list-rows {
@@ -46,4 +49,107 @@
 /* Hiding filter axis in field list */
 .e-pivotfieldlist-wrapper .e-field-list-filters {
     display: none;
+}
+
+#container {
+    visibility: hidden;
+}
+
+#loader {
+    color: #008cff;
+    font-family: 'Helvetica Neue', 'calibiri';
+    font-size: 14px;
+    height: 40px;
+    left: 45%;
+    position: absolute;
+    top: 45%;
+    width: 30%;
+}
+
+.wrap {
+    margin: 0 auto;
+    width: 240px;
+}
+
+.custom-texto {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    color: #FFFF;
+    font-size: 450 px;
+    position: sticky;
+    backdrop-filter: blur(2px);
+    top: 100%;
+    width: 100vmax;
+    height: 100vmax;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+
+
+}
+
+h5 {
+    font-weight: bold;
+    text-align: center;
+}
+
+@keyframes custom-rolling {
+    0% {
+        -webkit-transform: translate(-50%, -50%) rotate(0deg);
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: translate(-50%, -50%) rotate(360deg);
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+@-webkit-keyframes custom-rolling {
+    0% {
+        -webkit-transform: translate(-50%, -50%) rotate(0deg);
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: translate(-50%, -50%) rotate(360deg);
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.custom-rolling {
+    position: relative;
+}
+
+.custom-rolling div,
+.custom-rolling div:after {
+    border: 16px solid #8A05BE;
+    border-radius: 50%;
+    border-top-color: transparent;
+    height: 160px;
+    position: absolute;
+    width: 160px;
+}
+
+.custom-rolling div {
+    -webkit-animation: custom-rolling 1.3s linear infinite;
+    animation: custom-rolling 1.3s linear infinite;
+    top: 10px;
+    left: 10px;
+}
+
+
+
+.custom-rolling div:after {
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+.custom-rolling {
+    -webkit-transform: translate(-31px, -31px) scale(0.31) translate(31px, 31px);
+    height: 62px !important;
+    transform: translate(-31px, -31px) scale(0.31) translate(31px, 31px);
+    width: 62px !important;
 }

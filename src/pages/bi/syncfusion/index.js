@@ -16,7 +16,7 @@ import * as currencies from './currencies.json';
 import * as numbers from './numbers.json';
 
 
-
+import 'primeicons/primeicons.css';
 import { Button } from "primereact/button";
 
 
@@ -42,8 +42,11 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
 
     const ref = useRef()
 
+
+
     const trend = () => {
-        ref.current.grid.autoFitColumns();
+        //  ref.current.grid.autoFitColumns();
+        // console.log(data)
     }
     const groupSettings = {
 
@@ -52,12 +55,13 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
     }
 
     const gridSettings = {
+        allowReordering: true,
         allowAutoResizing: true,
         allowSelection: true,
-        allowReordering: true,
+        allowTextWrap: true,
         selectionSettings: { mode: 'Row', type: 'Multiple', cellSelectionMode: 'Box' },
 
-        columnWidth: 50,
+        columnWidth: 125,
         rowHeight: 45,
         gridLines: 'Both',
         clipMode: 'EllipsisWithTooltip'
@@ -67,6 +71,8 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
 
     const dataSourceSettings = {
         allowLabelFilter: true,
+        allowValueFilter: true,
+        enableSorting: true,
         columns: [],
         dataSource: data,
         excludeFields: ['id', 'codigo', 'promocao', 'dataEmissao', 'codigoFilial'],
@@ -78,8 +84,9 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
 
         ],
 
+
         rows: [
-            { name: "grupoPai", caption: 'Seção I', showValueTypeIcon: false },
+            { name: "grupoPai", caption: 'Seção I', showValueTypeIcon: true },
             { name: "grupoFilho", caption: 'Seção II', showValueTypeIcon: false },
             { name: "grupoNeto", caption: 'Seção III', showValueTypeIcon: false },
             { name: "descricao", caption: 'Produto', showValueTypeIcon: false },
@@ -154,7 +161,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                     type: 'Text',
                     value: ` Análise custo x venda ${moment(date1).format('DD/MM/YY')} a ${moment(date2).format('DD/MM/YY')} `,
                     position: { x: 0, y: 100 },
-                    style: { textBrushColor: '#000000', fontSize: 15, dashStyle: 'Solid', hAlign: 'Left' }
+                    style: { textBrushColor: '#000000', fontSize: 20, dashStyle: 'Solid', hAlign: 'Center' }
                 }
             ]
         },
@@ -190,11 +197,11 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                     <Button icon="pi pi-file-pdf" className="p-button p-button-rounded p-button-secondary" style={{ margin: '1em' }} label="Exportar PDF" onClick={() => ref.current.pdfExport(pdfExportProperties)} />
 
                 </div>
-                <div>
+                <div className="control-section">
 
 
                     <PivotViewComponent
-
+                        spinnerTemplate={'<div class="custom-texto "> <h1>Calculando vendas, Aguarde por favor </h1> </div>'}
                         ref={ref}
                         locale='pt'
                         currencyCode="BRL"
@@ -202,6 +209,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                         allowValueFilter={true}
                         allowNumberFormatting={true}
                         allowExcelExport={true}
+
                         exportAllPages={true}
                         allowPdfExport={true}
                         allowRepeatHeader={false}
@@ -215,13 +223,16 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                         id="PivotView"
 
                         showFieldList={true}
-                        height={700}
+
                         gridSettings={gridSettings}
                         groupingBarSettings={groupSettings}
                         dataSourceSettings={dataSourceSettings}
                         allowCalculatedField={true}
 
                         dataBound={trend.bind()}
+
+                        width={'100%'}
+                        height={'700'}
 
                     >
                         <Inject services={[CalculatedField, FieldList, GroupingBar, Toolbar, VirtualScroll, ExcelExport, PDFExport]} />

@@ -11,6 +11,38 @@
 @import '../../../../node_modules/@syncfusion/ej2-react-pivotview/styles/material.css';
 
 
+
+.e-pivotview {
+    width: 100%;
+    height: 100%;
+}
+
+#ddldiv {
+    margin-top: -446px;
+}
+
+.e-bigger #ddldiv {
+    margin-top: -452px;
+}
+
+#ddldiv.e-device {
+    margin-top: -480px;
+}
+
+@media only screen and (max-width: 500px) {
+    ddldiv {
+        margin-top: -480px;
+    }
+}
+
+#PivotViewcontainerwrapper {
+    height: auto !important;
+}
+
+.e-bigger .e-float-input.e-control-wrapper {
+    width: 100% !important;
+}
+
 /* Hiding column axis in grouping bar */
 #PivotView .e-group-columns {
     display: none;

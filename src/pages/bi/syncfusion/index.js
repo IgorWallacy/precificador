@@ -7,9 +7,12 @@ import {
     Toolbar,
     VirtualScroll,
     ExcelExport,
-    PDFExport
+    PDFExport,
+    PivotChart,
+
 
 } from "@syncfusion/ej2-react-pivotview";
+import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { L10n, setCulture, setCurrencyCode, loadCldr } from '@syncfusion/ej2-base';
 
 import * as currencies from './currencies.json';
@@ -18,6 +21,8 @@ import * as numbers from './numbers.json';
 
 import 'primeicons/primeicons.css';
 import { Button } from "primereact/button";
+import { TabView, TabPanel } from 'primereact/tabview';
+
 
 
 import "./styless.css";
@@ -180,6 +185,45 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
         }
     };
 
+    const chartOnLoad = (args) => {
+
+        let selectedTheme = 'Material';
+        args.chart.theme = (selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)).replace(/-dark/i, "Dark");
+    }
+
+    let fields = { text: 'text', value: 'value' };
+    let chartTypes = [
+        { 'value': 'Column', 'text': 'Coluna' },
+        { 'value': 'Bar', 'text': 'Barra' },
+        { 'value': 'Line', 'text': 'Linha' },
+        { 'value': 'Spline', 'text': 'Spline' },
+        { 'value': 'Area', 'text': 'Area' },
+        { 'value': 'SplineArea', 'text': 'SplineArea' },
+        { 'value': 'StepLine', 'text': 'StepLine' },
+        { 'value': 'StepArea', 'text': 'StepArea' },
+        { 'value': 'StackingColumn', 'text': 'StackingColumn' },
+        { 'value': 'StackingBar', 'text': 'StackingBar' },
+        { 'value': 'StackingArea', 'text': 'StackingArea' },
+        { 'value': 'StackingColumn100', 'text': 'StackingColumn100' },
+        { 'value': 'StackingBar100', 'text': 'StackingBar100' },
+        { 'value': 'StackingArea100', 'text': 'StackingArea100' },
+        { 'value': 'Scatter', 'text': 'Scatter' },
+        { 'value': 'Bubble', 'text': 'Bolha' },
+        { 'value': 'Polar', 'text': 'Polar' },
+        { 'value': 'Radar', 'text': 'Radar' },
+        { 'value': 'Pareto', 'text': 'Pareto' },
+        { 'value': 'Pie', 'text': 'Pizza' },
+        { 'value': 'Doughnut', 'text': 'Doughnut' },
+        { 'value': 'Funnel', 'text': 'Funil' },
+        { 'value': 'Pyramid', 'text': 'Pirâmide' },
+    ];
+
+    function ddlOnChange(args) {
+        ref.current.chartSettings.chartSeries.type = args.value;
+    }
+
+
+
     return (
         <>
             <div style={{
@@ -192,52 +236,119 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                 // margin: "2rem",
             }}>
 
-                <div>
-                    <Button icon="pi pi-file-excel" className="p-button p-button-rounded p-button-success" style={{ margin: '1em' }} label="Exportar Excel" onClick={() => ref.current.excelExport(excelExportProperties)} />
-                    <Button icon="pi pi-file-pdf" className="p-button p-button-rounded p-button-secondary" style={{ margin: '1em' }} label="Exportar PDF" onClick={() => ref.current.pdfExport(pdfExportProperties)} />
 
-                </div>
                 <div className="control-section">
 
+                    <TabView className="tabview-header-icon">
+                        <TabPanel header="Tabela" leftIcon="pi pi-table">
+                            <div>
+                                <Button icon="pi pi-file-excel" className="p-button p-button-rounded p-button-success" style={{ margin: '1em' }} label="Exportar Excel" onClick={() => ref.current.excelExport(excelExportProperties)} />
+                                <Button icon="pi pi-file-pdf" className="p-button p-button-rounded p-button-secondary" style={{ margin: '1em' }} label="Exportar PDF" onClick={() => ref.current.pdfExport(pdfExportProperties)} />
 
-                    <PivotViewComponent
-                        spinnerTemplate={'<div class="custom-texto "> <h1>Calculando vendas, Aguarde por favor </h1> </div>'}
-                        ref={ref}
-                        locale='pt'
-                        currencyCode="BRL"
-                        allowLabelFilter={true}
-                        allowValueFilter={true}
-                        allowNumberFormatting={true}
-                        allowExcelExport={true}
+                            </div>
+                            <PivotViewComponent
+                                spinnerTemplate={'<div class="custom-texto "> <h1>Calculando vendas, Aguarde por favor </h1> </div>'}
+                                ref={ref}
+                                locale='pt'
+                                currencyCode="BRL"
+                                allowLabelFilter={true}
+                                allowValueFilter={true}
+                                allowNumberFormatting={true}
+                                allowExcelExport={true}
 
-                        exportAllPages={true}
-                        allowPdfExport={true}
-                        allowRepeatHeader={false}
-                        allowDataCompression={false}
-                        enableFieldSearching={true}
-                        enableValueSorting={true}
-                        enableVirtualization={false}
-                        enableSorting={true}
-                        showGroupingBar={true}
-                        showTooltip={false}
-                        id="PivotView"
+                                exportAllPages={true}
+                                allowPdfExport={true}
+                                allowRepeatHeader={false}
+                                allowDataCompression={false}
+                                enableFieldSearching={true}
+                                enableValueSorting={true}
+                                enableVirtualization={false}
+                                enableSorting={true}
+                                showGroupingBar={true}
+                                showTooltip={false}
+                                id="PivotView"
 
-                        showFieldList={true}
+                                showFieldList={true}
 
-                        gridSettings={gridSettings}
-                        groupingBarSettings={groupSettings}
-                        dataSourceSettings={dataSourceSettings}
-                        allowCalculatedField={true}
+                                gridSettings={gridSettings}
+                                groupingBarSettings={groupSettings}
+                                dataSourceSettings={dataSourceSettings}
+                                allowCalculatedField={true}
 
-                        dataBound={trend.bind()}
+                                dataBound={trend.bind()}
 
-                        width={'100%'}
-                        height={'700'}
+                                width={'100%'} height={700}
 
-                    >
-                        <Inject services={[CalculatedField, FieldList, GroupingBar, Toolbar, VirtualScroll, ExcelExport, PDFExport]} />
-                    </PivotViewComponent>
+
+                                displayOption={{ view: 'Table' }} chartSettings={{ title: 'Análise de vendas', chartSeries: { type: "Column" }, load: chartOnLoad.bind() }}
+                            >
+                                <Inject services={[CalculatedField, FieldList, GroupingBar, Toolbar, VirtualScroll, ExcelExport, PDFExport, PivotChart]} />
+                            </PivotViewComponent>
+
+
+                        </TabPanel>
+                        <TabPanel header="Gráficos" rightIcon="pi pi-chart-bar">
+                            <div className='col-lg-3 property-section'>
+
+                                <table id='property' title='Properties' className='property-panel-table' style={{ width: '100%' }}>
+                                    <tbody>
+                                        <tr style={{ height: '50px' }}>
+                                            <td>
+                                                <div>
+                                                    <DropDownListComponent placeholder={'Escolha um gráfico'} floatLabelType={'Auto'} fields={fields} change={ddlOnChange.bind()} id="charttypes" index={0} enabled={true} dataSource={chartTypes} />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                            <PivotViewComponent
+                                spinnerTemplate={'<div class="custom-texto "> <h1>Calculando vendas, Aguarde por favor </h1> </div>'}
+                                ref={ref}
+                                locale='pt'
+                                currencyCode="BRL"
+                                allowLabelFilter={true}
+                                allowValueFilter={true}
+                                allowNumberFormatting={true}
+                                allowExcelExport={true}
+
+                                exportAllPages={true}
+                                allowPdfExport={true}
+                                allowRepeatHeader={false}
+                                allowDataCompression={false}
+                                enableFieldSearching={true}
+                                enableValueSorting={true}
+                                enableVirtualization={false}
+                                enableSorting={true}
+                                showGroupingBar={true}
+                                showTooltip={true}
+                                id="PivotView2"
+
+                                showFieldList={true}
+
+                                gridSettings={gridSettings}
+                                groupingBarSettings={groupSettings}
+                                dataSourceSettings={dataSourceSettings}
+                                allowCalculatedField={true}
+
+                                dataBound={trend.bind()}
+
+                                width={1300}
+                                height={480}
+                                displayOption={{ view: 'Chart' }} chartSettings={{ title: 'Análise de vendas', chartSeries: { type: "Column" }, load: chartOnLoad.bind() }}
+                            >
+                                <Inject services={[CalculatedField, FieldList, GroupingBar, Toolbar, VirtualScroll, ExcelExport, PDFExport, PivotChart]} />
+                            </PivotViewComponent>
+
+                        </TabPanel>
+
+                    </TabView>
+
+
                 </div>
+
             </div>
         </>
     )

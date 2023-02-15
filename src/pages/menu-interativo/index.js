@@ -91,23 +91,34 @@ const MenuInterativo = () => {
     <>
       <Header filial={filial?.length} />
       <Footer />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          color: "#DDDD",
+          padding: "1em",
+        }}
+      >
+        <Typing speed={25} startDelay={10}>
+          <div className="texto-menu-interativo">
+            {greetingMessage()}
+            <h1 style={{ fontFamily: "cabin-sketch-bold" }}>{nome}</h1>
+            <h2 style={{ fontFamily: "cabin-sketch-bold" }}>
+              O que você deseja fazer hoje ?
+            </h2>
+          </div>
+        </Typing>
+      </div>
       <div className="menu-interativo">
-        <div style={{ width: "100%" }} className="menu-categoria">
-          <Typing speed={50} startDelay={10}>
-            <div className="texto-menu-interativo">
-              {greetingMessage()}
-              <h1 style={{ fontFamily: "cabin-sketch-bold" }}>{nome}</h1>
-              <h2 style={{ fontFamily: "cabin-sketch-bold" }}>
-                O que você deseja fazer hoje ?
-              </h2>
-            </div>
-          </Typing>
-        </div>
-
         <div className="menu-categoria">
           <FontAwesomeIcon icon={faTags} size="2x" />
           <h1>Precificar</h1>
           <div className="opcoes-menu">
+            <div>
+              <h1>Notas ficais</h1>
+            </div>
             <Button
               label="Agendar preços"
               icon="pi pi-calendar"
@@ -119,6 +130,23 @@ const MenuInterativo = () => {
               icon="pi pi-sync"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/precificar-executar")}
+            />
+          </div>
+          <div className="opcoes-menu">
+            <div>
+              <h1>Produtos</h1>
+            </div>
+            <Button
+              label="Agendar preços"
+              icon="pi pi-calendar"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/produtos/precificar-agendar")}
+            />
+            <Button
+              label="Conferir e atualizar preços"
+              icon="pi pi-sync"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/produtos/precificar-executar")}
             />
           </div>
         </div>
@@ -188,24 +216,6 @@ const MenuInterativo = () => {
   /> */}
           </div>
         </div>
-        {filial?.length > 1 ? (
-          <>
-            <div className="menu-categoria">
-              <FontAwesomeIcon icon={faBox} size="2x" />
-              <h1>Produtos</h1>
-              <div className="opcoes-menu">
-                <Button
-                  label="Consultar produtos"
-                  icon="pi pi-box"
-                  className="p-button-rounded p-button-help p-button-lg"
-                  onClick={() => navigate("/consulta")}
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          <></>
-        )}
       </div>
     </>
   );

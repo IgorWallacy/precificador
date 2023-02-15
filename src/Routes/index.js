@@ -36,7 +36,10 @@ export default function Router() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/" element={<PrivateRoutes />}>
-          <Route path="consulta" element={<PrecificaProduto />} />
+          <Route
+            path="produtos/precificar-agendar"
+            element={<PrecificaProduto />}
+          />
           <Route path="menu" element={<MenuInterativo />} />
           <Route path="precificar-agendar" element={<App />} />
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />

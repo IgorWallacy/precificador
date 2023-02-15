@@ -14,13 +14,30 @@ const Menu = (data) => {
       command: () => navigate("/menu"),
     },
     {
-      label: "Precificação",
+      label: "Precificação de notas",
       icon: "pi pi-fw pi-pencil",
       items: [
         {
           label: "Agendar",
           icon: "pi pi-calendar",
           command: () => navigate("/precificar-agendar"),
+        },
+
+        {
+          label: "Conferir e atualizar",
+          icon: "pi pi-save",
+          command: () => navigate("/precificar-executar"),
+        },
+      ],
+    },
+    {
+      label: "Precificação de produtos",
+      icon: "pi pi-fw pi-pencil",
+      items: [
+        {
+          label: "Agendar",
+          icon: "pi pi-calendar",
+          command: () => navigate("/produtos/precificar-agendar"),
         },
 
         {
@@ -41,20 +58,7 @@ const Menu = (data) => {
         },
       ],
     },
-    {
-      label: "Produtos",
 
-      icon: "pi pi-box",
-      items: [
-        {
-          disabled:
-            filial.filial === 1 || filial === "undefined" ? true : false,
-          label: "Consultar produtos",
-          icon: "pi pi-list",
-          command: () => navigate("/consulta"),
-        },
-      ],
-    },
     {
       label: "Compras",
       icon: "pi pi-shopping-bag",

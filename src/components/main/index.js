@@ -8,7 +8,7 @@ const Main = () => {
   return (
     <>
       <div className="agenda-label">
-        <Typing speed={50}>
+        <Typing speed={25}>
           <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
             Pesquisar notas fiscais de entrada,
           </h1>

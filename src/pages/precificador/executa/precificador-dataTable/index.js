@@ -1440,7 +1440,7 @@ const PrecificadorExecuta = () => {
         <Footer />
       </div>
       <div className="agenda-label">
-        <Typing speed={50}>
+        <Typing speed={25}>
           <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
             Pesquisar agendamentos de preços,{" "}
           </h1>

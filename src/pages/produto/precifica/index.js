@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { ProgressBar } from "primereact/progressbar";
@@ -9,6 +11,8 @@ import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { Tag } from "primereact/tag";
 import { Calendar } from "primereact/calendar";
+import { Toolbar } from "primereact/toolbar";
+
 import { addLocale } from "primereact/api";
 
 import {
@@ -17,7 +21,6 @@ import {
   CalculatedField,
   FieldList,
   GroupingBar,
-  Toolbar,
   VirtualScroll,
   ExcelExport,
   PDFExport,
@@ -95,6 +98,7 @@ const PrecificaProduto = () => {
   const [headers, setHeaders] = useState();
   const [agendar, setAgendar] = useState(new Date());
   const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const navigate = useNavigate();
 
   const getProdutoDataTable = () => {
     setLoading2(true);
@@ -154,7 +158,25 @@ const PrecificaProduto = () => {
     enableSorting: false,
     allowSelection: true,
     showGrandTotals: true,
+    excludeFields: [
+      "precopromocionalfilial",
+      "precopromocional",
+      "precopromocionalfamilia",
 
+      "usuarioAgendado",
+      "dataAgendada",
+      "precoAgendado",
+      "idfamilia",
+      "unidade",
+      "idfilial",
+      "dataprecocusto",
+      "custoalteradopor",
+      "dataalteracaopreco",
+      "percentualmarkup",
+      "dataultimacompra",
+      "idproduto",
+      "id",
+    ],
     columns: [{ name: "filial", caption: "Loja" }],
     valueSortSettings: { headerDelimiter: " - " },
     values: [
@@ -605,10 +627,17 @@ const PrecificaProduto = () => {
     return (
       <>
         {rowData.dataAgendada ? (
-          <Tag
-            severity="success"
-            value={moment(rowData.dataAgendada).format("DD/MM/yyyy (dddd)")}
-          />
+          moment(rowData.dataAgendada).isSameOrBefore(moment()) ? (
+            <Tag
+              severity="warning"
+              value={moment(rowData.dataAgendada).format("DD/MM/yyyy (dddd)")}
+            />
+          ) : (
+            <Tag
+              severity="success"
+              value={moment(rowData.dataAgendada).format("DD/MM/yyyy (dddd)")}
+            />
+          )
         ) : (
           <>
             {" "}
@@ -619,12 +648,26 @@ const PrecificaProduto = () => {
     );
   };
 
+  const leftContents = () => {
+    return (
+      <>
+        <Button
+          label="Voltar"
+          className="p-button p-button-rounded p-button-danger"
+          icon="pi pi-backward"
+          onClick={() => navigate("/menu")}
+        />
+      </>
+    );
+  };
+
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
       <Toast ref={toast2} position="center" />
       <Header />
       <Footer />
+      <Toolbar left={leftContents} />
       {!loading ? (
         <>
           <div style={{ padding: "2px" }}>
@@ -648,7 +691,7 @@ const PrecificaProduto = () => {
                     CalculatedField,
                     FieldList,
                     GroupingBar,
-                    Toolbar,
+
                     VirtualScroll,
                     ExcelExport,
                     PDFExport,
@@ -678,6 +721,7 @@ const PrecificaProduto = () => {
                         {produtoDatatables[0]?.ean +
                           " - " +
                           produtoDatatables[0]?.produto +
+                          " " +
                           " "}
                         {produtoDatatables[0]?.idfamilia ? (
                           <>
@@ -690,6 +734,11 @@ const PrecificaProduto = () => {
                           <></>
                         )}
                       </h4>
+                      <div>
+                        <h4>UN</h4>
+                        {produtoDatatables[0]?.unidade}
+                      </div>
+
                       <div>
                         <h4>Agendar para </h4>
                         <Calendar

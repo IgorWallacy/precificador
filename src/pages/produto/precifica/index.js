@@ -8,6 +8,8 @@ import { InputNumber } from "primereact/inputnumber";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { Tag } from "primereact/tag";
+import { Calendar } from "primereact/calendar";
+import { addLocale } from "primereact/api";
 
 import {
   PivotViewComponent,
@@ -30,6 +32,51 @@ import Footer from "../../../components/footer";
 import moment from "moment/moment";
 
 const PrecificaProduto = () => {
+  addLocale("pt-BR", {
+    firstDayOfWeek: 0,
+    dayNames: [
+      "domingo",
+      "segunda",
+      "terça",
+      "quarta",
+      "quinta",
+      "sexta",
+      "sábado",
+    ],
+    dayNamesShort: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+    dayNamesMin: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"],
+    monthNames: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    monthNamesShort: [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Maio",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ],
+    today: " Hoje ",
+    clear: " Limpar ",
+  });
+
   const pivotObj = useRef(null);
   const toast = useRef(null);
   const toast2 = useRef(null);
@@ -433,6 +480,7 @@ const PrecificaProduto = () => {
         {rowData.precoAgendado > rowData.precocusto ? (
           <>
             <div style={{ color: "green" }}>
+              <div> {markupFormatado} de markup </div>
               <font size="5"> {precoAgendaFormatado} </font>
             </div>
           </>
@@ -611,17 +659,43 @@ const PrecificaProduto = () => {
                 emptyMessage="Selecione um produto"
                 header={
                   <>
-                    <h4
+                    <div
                       style={{
                         display: "flex",
-                        justifyContent: "center",
+                        justifyContent: "space-evenly",
                         alignItems: "center",
+                        flexWrap: "wrap",
                       }}
                     >
-                      {produtoDatatables[0]?.ean +
-                        " - " +
-                        produtoDatatables[0]?.produto}
-                    </h4>
+                      <h4>
+                        {produtoDatatables[0]?.ean +
+                          " - " +
+                          produtoDatatables[0]?.produto +
+                          " "}
+                        {produtoDatatables[0]?.idfamilia ? (
+                          <>
+                            <i
+                              className="pi pi-users"
+                              style={{ fontSize: "2em" }}
+                            ></i>
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                      </h4>
+                      <div>
+                        <h4>Agendar para </h4>
+                        <Calendar
+                          showButtonBar
+                          showIcon
+                          locale="pt-BR"
+                          style={{ marginTop: "2px" }}
+                          value={agendar}
+                          dateFormat="dd/mm/yy"
+                          onChange={(e) => setAgendar(e.value)}
+                        ></Calendar>
+                      </div>
+                    </div>
                   </>
                 }
                 value={produtoDatatables}

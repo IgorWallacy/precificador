@@ -145,7 +145,15 @@ const Login = () => {
     <>
       <Dialog closable={false} visible={statusApi === "Offline"}>
         <h1>API {statusApi} </h1>
-        <img src={ImagemOffline} />
+        <img
+          src={ImagemOffline}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "75%",
+          }}
+        />
         <h1>Tentando restabelecer a conexão com o servidor </h1>
         <h4>
           {" "}

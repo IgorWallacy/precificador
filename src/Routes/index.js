@@ -14,6 +14,7 @@ import ConsultaProduto from "../pages/produto/consulta";
 import ListaCompras from "../pages/compras/lista";
 import StatusPdv from "../pages/pdv/status";
 import Pivot from "../pages/bi";
+import PrecificaProduto from "../pages/produto/precifica";
 export default function Router() {
   const [logado, setLogado] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState();
@@ -35,7 +36,7 @@ export default function Router() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/" element={<PrivateRoutes />}>
-          <Route path="consulta" element={<ConsultaProduto />} />
+          <Route path="consulta" element={<PrecificaProduto />} />
           <Route path="menu" element={<MenuInterativo />} />
           <Route path="precificar-agendar" element={<App />} />
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />

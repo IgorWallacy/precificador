@@ -604,10 +604,17 @@ const PrecificaProduto = () => {
   const dataAgendadaTemplate = (rowData) => {
     return (
       <>
-        <Tag
-          severity="success"
-          value={moment(rowData.dataAgendada).format("DD/MM/yyyy (dddd)")}
-        />
+        {rowData.dataAgendada ? (
+          <Tag
+            severity="success"
+            value={moment(rowData.dataAgendada).format("DD/MM/yyyy (dddd)")}
+          />
+        ) : (
+          <>
+            {" "}
+            <Tag severity="info" value="Sem agendamento" />
+          </>
+        )}
       </>
     );
   };

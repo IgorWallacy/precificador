@@ -8,22 +8,21 @@ const Main = () => {
   return (
     <>
       <div className="agenda-label">
-        <Typing speed={25}>
-          <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-            Pesquisar notas fiscais de entrada,
-          </h1>
+        <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
+          Pesquisar notas fiscais de entrada,
+        </h1>
 
-          <h4
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "cabin-sketch-bold",
-            }}
-          >
-            Agendar os preços de venda
-          </h4>
-        </Typing>
+        <h4
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "cabin-sketch-bold",
+          }}
+        >
+          Agendar os preços de venda
+        </h4>
+
         <img style={{ width: "250px" }} src={DestaqueImg} />
       </div>
 

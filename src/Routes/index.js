@@ -15,6 +15,7 @@ import ListaCompras from "../pages/compras/lista";
 import StatusPdv from "../pages/pdv/status";
 import Pivot from "../pages/bi";
 import PrecificaProduto from "../pages/produto/precifica";
+import ProdutoPrecificadorExecuta from "../pages/produto/executa-precificacao/executa/precificador-dataTable";
 export default function Router() {
   const [logado, setLogado] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState();
@@ -39,6 +40,10 @@ export default function Router() {
           <Route
             path="produtos/precificar-agendar"
             element={<PrecificaProduto />}
+          />
+          <Route
+            path="produtos/precificar-executar"
+            element={<ProdutoPrecificadorExecuta />}
           />
           <Route path="menu" element={<MenuInterativo />} />
           <Route path="precificar-agendar" element={<App />} />

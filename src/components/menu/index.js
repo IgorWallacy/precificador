@@ -43,7 +43,7 @@ const Menu = (data) => {
         {
           label: "Conferir e atualizar",
           icon: "pi pi-save",
-          command: () => navigate("/precificar-executar"),
+          command: () => navigate("/produtos/precificar-executar"),
         },
       ],
     },

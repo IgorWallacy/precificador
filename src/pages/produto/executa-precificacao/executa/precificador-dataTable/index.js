@@ -1544,7 +1544,7 @@ const ProdutoPrecificadorExecuta = () => {
               right={botaoatualizar}
             />
 
-            <div className="datatable-templating-demo p-fluid">
+            <div>
               <DataTable
                 responsiveLayout={layoutDatable ? "stack" : "scroll"}
                 breakpoint="1390px"

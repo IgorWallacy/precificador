@@ -1440,22 +1440,21 @@ const PrecificadorExecuta = () => {
         <Footer />
       </div>
       <div className="agenda-label">
-        <Typing speed={25}>
-          <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-            Pesquisar agendamentos de preços,{" "}
-          </h1>
+        <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
+          Pesquisar agendamentos de preços,{" "}
+        </h1>
 
-          <h4
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "cabin-sketch-bold",
-            }}
-          >
-            Atualizar os preços de venda
-          </h4>
-        </Typing>
+        <h4
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "cabin-sketch-bold",
+          }}
+        >
+          Atualizar os preços de venda
+        </h4>
+
         <img style={{ width: "250px" }} src={ImagemDestque} />
       </div>
 
@@ -1531,7 +1530,7 @@ const PrecificadorExecuta = () => {
               right={botaoatualizar}
             />
 
-            <div className="datatable-templating-demo p-fluid">
+            <div>
               <DataTable
                 responsiveLayout={layoutDatable ? "stack" : "scroll"}
                 breakpoint="1390px"

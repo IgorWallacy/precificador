@@ -1111,8 +1111,12 @@ const PrecificadorAgenda = () => {
           detail: ` Informe a data inicial e final  `,
         });
       } else {
-        let dataI = dataInicial?.toISOString().slice(0, 20);
-        let dataF = dataFinal?.toISOString().slice(0, 20);
+        let dataI = moment(dataInicial)
+          .format("YYYY-MM-DDTHH:MM:ss.")
+          .slice(0, 20);
+        let dataF = moment(dataFinal)
+          .format("YYYY-MM-DDTHH:MM:ss.")
+          .slice(0, 20);
 
         if (dataI && dataF) {
           let filialId = filiaisSelect ? filiaisSelect.id : 0;

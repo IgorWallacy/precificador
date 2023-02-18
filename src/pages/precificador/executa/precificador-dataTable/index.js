@@ -49,7 +49,7 @@ const PrecificadorExecuta = () => {
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
-  const [replicarPreco, setReplicarPreco] = useState(1);
+  const [replicarPreco, setReplicarPreco] = useState(0);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   //const [expandedRows, setExpandedRows] = useState(null);
   const replicarPrecoOpcoes = [
@@ -512,6 +512,7 @@ const PrecificadorExecuta = () => {
       .then((response) => {
         //   toast.current.show({severity: 'success', summary: 'Success Message', detail: 'Order submitted'});
         setProdutos(_products2);
+
         buscarProdutos();
         toast.current.show({
           severity: "success",
@@ -597,10 +598,25 @@ const PrecificadorExecuta = () => {
         columns: [{ text: "Relatório de preços agendados", style: "header" }],
       },
 
+      footer: {
+        columns: [
+          {
+            text: "Impresso em " + moment().format("DD/MM/yyyy HH:mm:ss"),
+
+            style: "footer",
+          },
+        ],
+      },
+
       styles: {
         i: { fontSize: 8 },
         header: {
           fontSize: 20,
+          alignment: "center",
+          marginTop: 5,
+        },
+        footer: {
+          fontSize: 10,
           alignment: "center",
           marginTop: 5,
         },
@@ -633,13 +649,17 @@ const PrecificadorExecuta = () => {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 0,
-            widths: [25, 65, 60, 100, 70, 70, "*"],
+            widths: [20, 50, 40, 60, 90, 70, 70, "*"],
 
             body: [
-              ["", "", "", "", "", "", ""],
+              ["", "", "", "", "", "", "", ""],
 
               [
                 { text: i + 1, style: "i" },
+                {
+                  text: "L" + item.idfilial + "-" + "N" + item.numeronotafiscal,
+                  style: "ean",
+                },
                 {
                   text: moment(item.dataagendada).format("DD/MM/YY"),
                   style: "ean",
@@ -1093,7 +1113,7 @@ const PrecificadorExecuta = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-              //     console.log(response.data);
+              //  console.log(response.data);
               setLoading(false);
 
               if (response.data.length === 0) {
@@ -1241,33 +1261,16 @@ const PrecificadorExecuta = () => {
         >
           <Button
             style={{ margin: "10px" }}
-            label="Gravar preços agendados"
-            tooltip="Atualizar produtos selecionados"
+            label={`Gravar ( ${
+              produtoSelecionado ? produtoSelecionado?.length : 0
+            }  ) preços agendados `}
+            // tooltip="Atualizar produtos selecionados"
             icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
             disabled={!produtoSelecionado || !produtoSelecionado.length}
             className="p-button-rounded p-button-success"
             onClick={() => atualizarProdutosSelecionados()}
           />
         </div>
-        {replicarPreco ? (
-          <Tag
-            className="mr-1"
-            style={{ margin: "5px" }}
-            rounded
-            value="Replicar a atualização de preços para todas as lojas"
-            severity="info"
-            icon="pi pi-check"
-          ></Tag>
-        ) : (
-          <Tag
-            className="mr-1"
-            style={{ margin: "5px" }}
-            icon="pi pi-times"
-            rounded
-            severity="danger"
-            value="Não replicar a atualização de preços para todas as lojas"
-          ></Tag>
-        )}
       </React.Fragment>
     ) : (
       <>
@@ -1456,6 +1459,25 @@ const PrecificadorExecuta = () => {
         </h4>
 
         <img style={{ width: "250px" }} src={ImagemDestque} />
+        {replicarPreco ? (
+          <Tag
+            className="mr-10"
+            style={{ margin: "5px" }}
+            rounded
+            value="Replicar a atualização de preços para todas as lojas"
+            severity="info"
+            icon="pi pi-check"
+          ></Tag>
+        ) : (
+          <Tag
+            className="mr-10"
+            style={{ margin: "5px" }}
+            icon="pi pi-times"
+            rounded
+            severity="danger"
+            value="Não replicar a atualização de preços para todas as lojas"
+          ></Tag>
+        )}
       </div>
 
       {produtos.length < 1 ? (
@@ -1578,6 +1600,11 @@ const PrecificadorExecuta = () => {
                   selectionMode="multiple"
                   headerStyle={{ width: "3rem" }}
                   exportable={false}
+                ></Column>
+                <Column sortable header="Loja" field="nomeFilial"></Column>
+                <Column
+                  header="N° Nota fiscal"
+                  field="numeronotafiscal"
                 ></Column>
                 <Column header="Código " field={EanOrCodigo}></Column>
 

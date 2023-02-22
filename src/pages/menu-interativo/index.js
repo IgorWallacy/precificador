@@ -162,6 +162,14 @@ const MenuInterativo = () => {
               onClick={() => navigate("/vendas")}
             />
           </div>
+          <div className="opcoes-menu">
+            <Button
+              label="Produtos sem vendas"
+              icon="pi  pi-times   "
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/produtos/sem-vendas")}
+            />
+          </div>
         </div>
         <div className="menu-categoria">
           {" "}
@@ -187,33 +195,6 @@ const MenuInterativo = () => {
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/pdv/status")}
             />
-          </div>
-        </div>
-
-        <div className="menu-categoria">
-          <FontAwesomeIcon icon={faUserGroup} size="2x" />
-          <h1>Compras</h1>
-          <div className="opcoes-menu">
-            <Button
-              label="Novo pedido"
-              icon="pi pi-users"
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/compras/analise/fornecedor")}
-            />
-
-            <Button
-              label="Consultar pedido"
-              icon="pi pi-list"
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/compras/consulta")}
-            />
-
-            {/*   <Button
-            label="Futura"
-            icon="pi pi-wallet"
-            className="p-button-rounded p-button-help p-button-lg"
-            onClick={() => navigate("/vendas/futura")}
-  /> */}
           </div>
         </div>
       </div>

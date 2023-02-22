@@ -47,6 +47,7 @@ const Menu = (data) => {
         },
       ],
     },
+
     {
       label: "Vendas",
       icon: "pi pi-shopping-cart",
@@ -55,6 +56,11 @@ const Menu = (data) => {
           label: "PDV",
           icon: "pi pi-shopping-bag",
           command: () => navigate("/vendas"),
+        },
+        {
+          label: "Produtos sem vendas",
+          icon: "pi pi-times",
+          command: () => navigate("/produtos/sem-vendas"),
         },
       ],
     },

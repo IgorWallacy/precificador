@@ -41,6 +41,7 @@
     "react-easyfullscreen": "^1.1.2",
     "react-flexmonster": "^2.9.41",
     "react-icons": "^4.4.0",
+    "react-json-to-excel": "^1.0.7",
     "react-loading": "^2.0.3",
     "react-router-dom": "6",
     "react-scripts": "^5.0.1",

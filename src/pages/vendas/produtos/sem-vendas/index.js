@@ -13,6 +13,7 @@ import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
 import { Typography } from "@mui/material";
 
 import { ExportToCsv } from "export-to-csv";
+import { exportToExcel } from "react-json-to-excel";
 
 import MaterialReactTable from "material-react-table";
 
@@ -142,6 +143,20 @@ const ProdutosSemVendas = () => {
     csvExporter.generateCsv(rows.map((row) => row.original));
   };
 
+  const handleExportExcelRows = (rows) => {
+    let dados = rows.map((row) => row.original);
+    if (dados?.length > 0) {
+      let dados2 = dados.map((d) => {
+        return {
+          ...d,
+          ultimacompra: moment(d.ultimacompra).format("DD/MM/YYYY"),
+        };
+      });
+
+      exportToExcel(dados2, "Produtos_sem_venda");
+    }
+  };
+
   useEffect(() => {
     getLojas();
   }, []);
@@ -186,7 +201,7 @@ const ProdutosSemVendas = () => {
       "Nov",
       "Dez",
     ],
-    today: " Agora ",
+    today: " Hoje ",
     clear: " Limpar ",
   });
 
@@ -241,6 +256,7 @@ const ProdutosSemVendas = () => {
                     <div
                       style={{
                         display: "flex",
+                        flexWrap: "wrap",
                         justifyContent: "space-evenly",
                         alignItems: "center",
                         gap: "25px",
@@ -257,9 +273,10 @@ const ProdutosSemVendas = () => {
                           {moment(dataUltimaCompra).format("DD/MM/YY")}
                         </Typography>
                       </div>
-                      <div>
+                      <div style={{ margin: "5px" }}>
                         <Button
-                          className="p-button p-button-rounded p-button-success"
+                          style={{ margin: "5px" }}
+                          className="p-button p-button-rounded p-button-primary"
                           icon="pi pi-file-excel"
                           //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
                           onClick={() =>
@@ -267,6 +284,17 @@ const ProdutosSemVendas = () => {
                           }
                           variant="contained"
                           label="Exportar CSV"
+                        ></Button>
+                        <Button
+                          style={{ margin: "5px" }}
+                          className="p-button p-button-rounded p-button-success"
+                          icon="pi pi-file-excel"
+                          //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
+                          onClick={() =>
+                            handleExportExcelRows(table.getRowModel().rows)
+                          }
+                          variant="contained"
+                          label="Exportar Excel"
                         ></Button>
                       </div>
                     </div>
@@ -279,6 +307,7 @@ const ProdutosSemVendas = () => {
               <div
                 style={{
                   display: "flex",
+                  flexWrap: "wrap",
                   justifyContent: "center",
                   color: "#f2f2f2",
                   marginTop: "20px",
@@ -295,7 +324,7 @@ const ProdutosSemVendas = () => {
                   alignItems: "center",
                   gap: "5px",
                   color: "#FFFF",
-
+                  flexWrap: "wrap",
                   padding: "5px",
                   margin: "5px",
                 }}
@@ -303,6 +332,7 @@ const ProdutosSemVendas = () => {
                 <div
                   style={{
                     display: "flex",
+                    flexWrap: "wrap",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
@@ -323,6 +353,7 @@ const ProdutosSemVendas = () => {
                 <div
                   style={{
                     display: "flex",
+                    flexWrap: "wrap",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
@@ -343,6 +374,7 @@ const ProdutosSemVendas = () => {
                 <div
                   style={{
                     display: "flex",
+                    flexWrap: "wrap",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
@@ -362,6 +394,7 @@ const ProdutosSemVendas = () => {
                 <div
                   style={{
                     display: "flex",
+                    flexWrap: "wrap",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
@@ -382,6 +415,7 @@ const ProdutosSemVendas = () => {
               <div
                 style={{
                   display: "flex",
+                  flexWrap: "wrap",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",

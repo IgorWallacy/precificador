@@ -102,6 +102,7 @@ const PrecificaProduto = () => {
 
   const getProdutoDataTable = () => {
     setLoading2(true);
+
     return api
       .get(
         `/api/produto/consulta/codigo/${valorSelecionado.substring(
@@ -704,7 +705,7 @@ const PrecificaProduto = () => {
               <DataTable
                 responsiveLayout="stack"
                 editMode="row"
-                dataKey="idproduto"
+                dataKey="id"
                 onRowEditComplete={onRowEditComplete}
                 emptyMessage="Selecione um produto"
                 header={

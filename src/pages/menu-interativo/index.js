@@ -170,6 +170,14 @@ const MenuInterativo = () => {
               onClick={() => navigate("/produtos/sem-vendas")}
             />
           </div>
+          <div className="opcoes-menu">
+            <Button
+              label="Indicadores"
+              icon="pi  pi-chart-line   "
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/vendas/indicadores")}
+            />
+          </div>
         </div>
         <div className="menu-categoria">
           {" "}

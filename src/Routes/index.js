@@ -17,6 +17,7 @@ import Pivot from "../pages/bi";
 import PrecificaProduto from "../pages/produto/precifica";
 import ProdutoPrecificadorExecuta from "../pages/produto/executa-precificacao/executa/precificador-dataTable";
 import ProdutosSemVendas from "../pages/vendas/produtos/sem-vendas";
+import GraficosIndex from "../pages/vendas/graficos";
 export default function Router() {
   const [logado, setLogado] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState();
@@ -51,6 +52,7 @@ export default function Router() {
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
           <Route path="vendas" element={<VendasDataTableComponent />} />
           <Route path="produtos/sem-vendas" element={<ProdutosSemVendas />} />
+          <Route path="vendas/indicadores" element={<GraficosIndex />} />
           <Route path="bi/pivot" element={<Pivot />} />
           <Route
             path="compras/analise/fornecedor"

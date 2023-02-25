@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo } from "react";
 
 import api from "../../../../services/axios";
 
@@ -12,7 +12,6 @@ import { Toolbar } from "primereact/toolbar";
 import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
 import { Typography } from "@mui/material";
 
-import { ExportToCsv } from "export-to-csv";
 import { exportToExcel } from "react-json-to-excel";
 
 import MaterialReactTable from "material-react-table";
@@ -126,22 +125,6 @@ const ProdutosSemVendas = () => {
     ],
     []
   );
-
-  const csvOptions = {
-    fieldSeparator: ",",
-    quoteStrings: '"',
-    decimalSeparator: ".",
-    showLabels: true,
-    useBom: true,
-    useKeysAsHeaders: true,
-    headers: columns.map((c) => c.header),
-  };
-
-  const csvExporter = new ExportToCsv(csvOptions);
-
-  const handleExportRows = (rows) => {
-    csvExporter.generateCsv(rows.map((row) => row.original));
-  };
 
   const handleExportExcelRows = (rows) => {
     let dados = rows.map((row) => row.original);
@@ -274,17 +257,6 @@ const ProdutosSemVendas = () => {
                         </Typography>
                       </div>
                       <div style={{ margin: "5px" }}>
-                        <Button
-                          style={{ margin: "5px" }}
-                          className="p-button p-button-rounded p-button-primary"
-                          icon="pi pi-file-excel"
-                          //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
-                          onClick={() =>
-                            handleExportRows(table.getRowModel().rows)
-                          }
-                          variant="contained"
-                          label="Exportar CSV"
-                        ></Button>
                         <Button
                           style={{ margin: "5px" }}
                           className="p-button p-button-rounded p-button-success"

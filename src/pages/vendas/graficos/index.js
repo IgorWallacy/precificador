@@ -133,26 +133,16 @@ const GraficosIndex = () => {
   const getVendasMeioPagamento = () => {
     setLoadingMeioPagamento(true);
 
-    if (!pdv) {
-      setPdv({ pdv: "0" });
-    }
-
-    let codigo = loja?.codigo;
-
-    if (!loja) {
-      codigo = 0;
-    }
-
     return api
       .get(
-        `/api_vga/vendas/total/${codigo}/${moment(
+        `/api_vga/vendas/total/${loja?.codigo ? loja.codigo : 0}/${moment(
           dataInicialMeioPagamento
         ).format("YYYY-MM-DD")}/${moment(dataFinalMeioPagamento).format(
           "YYYY-MM-DD"
-        )}/${pdv.pdv}`
+        )}/${pdv ? pdv : 0}`
       )
       .then((r) => {
-        console.log(r.data);
+        //  console.log(r.data);
         setVendasMeioPagamento(r.data);
       })
       .catch((e) => {
@@ -227,6 +217,7 @@ const GraficosIndex = () => {
           flexWrap: "wrap",
           gap: "10px",
           margin: "5px",
+          justifyContent: "flex-start",
         }}
       >
         <div
@@ -236,15 +227,15 @@ const GraficosIndex = () => {
             flexWrap: "wrap",
             gap: "5px",
             padding: "1px",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             border: "1px solid #FFFF",
-            width: "49%",
           }}
         >
           <div
             style={{
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
+              justifyContent: "flex-start",
               alignContent: "center",
               flexWrap: "wrap",
               gap: "1px",
@@ -295,10 +286,10 @@ const GraficosIndex = () => {
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-            width: "49%",
+
             padding: "1px",
           }}
         >
@@ -306,13 +297,14 @@ const GraficosIndex = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               flexWrap: "wrap",
             }}
           >
             <div
               style={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 alignContent: "center",
                 flexWrap: "wrap",
@@ -362,95 +354,71 @@ const GraficosIndex = () => {
         <div
           style={{
             display: "flex",
-
+            flexDirection: "column",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-            width: "55%",
-            padding: "5px",
+            margin: "5px",
+            padding: "10px",
+            justifyContent: "flex-start",
+            alignItems: "center",
           }}
         >
-          <div>
-            <Calendar
-              style={{ margin: "5px" }}
-              dateFormat="dd/mm/yy"
-              locale="pt-BR"
-              showIcon
-              showButtonBar
-              placeholder="Data inicial"
-              value={dataInicialMeioPagamento}
-              onChange={(e) => setDataInicialMeioPagamento(e.value)}
-            ></Calendar>
-            <Calendar
-              style={{ margin: "5px" }}
-              dateFormat="dd/mm/yy"
-              locale="pt-BR"
-              showIcon
-              showButtonBar
-              placeholder="Data final"
-              value={dataFinalMeioPagamento}
-              onChange={(e) => setDataFinalMeioPagamento(e.value)}
-            ></Calendar>
-            <Dropdown
-              style={{ margin: "5px" }}
-              value={loja}
-              options={lojaList}
-              onChange={(e) => setLoja(e.value)}
-              optionLabel="nome"
-              placeholder="Selecione uma loja"
-            />
+          <Calendar
+            style={{ margin: "5px" }}
+            dateFormat="dd/mm/yy"
+            locale="pt-BR"
+            showIcon
+            showButtonBar
+            placeholder="Data inicial"
+            value={dataInicialMeioPagamento}
+            onChange={(e) => setDataInicialMeioPagamento(e.value)}
+          ></Calendar>
+          <Calendar
+            style={{ margin: "5px" }}
+            dateFormat="dd/mm/yy"
+            locale="pt-BR"
+            showIcon
+            showButtonBar
+            placeholder="Data final"
+            value={dataFinalMeioPagamento}
+            onChange={(e) => setDataFinalMeioPagamento(e.value)}
+          ></Calendar>
+          <Dropdown
+            showClear
+            style={{ margin: "5px" }}
+            value={loja}
+            options={lojaList}
+            onChange={(e) => setLoja(e.value)}
+            optionLabel="nome"
+            placeholder="Selecione uma loja"
+          />
 
-            <Button
-              style={{ margin: "5px" }}
-              label="Gerar"
-              loading={loadingMeioPagamento}
-              className="p-button p-button-rounded"
-              icon="pi pi-chart-bar"
-              onClick={getVendasMeioPagamento}
-            />
-
-            <div>
-              {loadingMeioPagamento ? (
-                <>
-                  <ProgressBar mode="indeterminate" />
-                </>
-              ) : (
-                <>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "flex-start",
-                      alignContent: "flex-start",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <PivotViewComponent
-                      enableValueSorting={true}
-                      showFieldList={true}
-                      allowCalculatedField={true}
-                      width={600}
-                      height={"400"}
-                      id="PivotView"
-                      dataSourceSettings={dataSourceSettings}
-                    >
-                      <Inject services={[FieldList]} />
-                    </PivotViewComponent>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+          <Button
+            style={{ margin: "5px" }}
+            label="Gerar"
+            loading={loadingMeioPagamento}
+            className="p-button p-button-rounded"
+            icon="pi pi-chart-bar"
+            onClick={getVendasMeioPagamento}
+          />
+          <GraficoMeioDePagamento dados={vendasMeioPagamento} />
         </div>
+
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            border: "1px solid #FFFF",
-            width: "40%",
+            margin: "5px",
+            padding: "10px",
+            border: "1px solid rgba(255, 255, 255, 255)",
           }}
         >
-          <GraficoMeioDePagamento dados={vendasMeioPagamento} />
+          <PivotViewComponent
+            id="PivotView"
+            dataSourceSettings={dataSourceSettings}
+            enableValueSorting={true}
+            width={400}
+            height={500}
+            gridSettings={{ columnWidth: 10 }}
+          ></PivotViewComponent>
         </div>
       </div>
     </>

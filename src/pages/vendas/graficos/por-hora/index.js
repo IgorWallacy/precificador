@@ -72,6 +72,7 @@ const GraficoVendaPorHora = ({ dados }) => {
         series={series}
         type="bar"
         height={350}
+        width={500}
       />
     </>
   );

@@ -62,6 +62,11 @@ const Menu = (data) => {
           icon: "pi pi-times",
           command: () => navigate("/produtos/sem-vendas"),
         },
+        {
+          label: "Indicadores",
+          icon: "pi pi-chart-line",
+          command: () => navigate("/vendas/indicadores"),
+        },
       ],
     },
 

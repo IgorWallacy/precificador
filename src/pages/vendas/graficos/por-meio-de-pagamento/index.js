@@ -5,11 +5,10 @@ const GraficoMeioDePagamento = ({ dados }) => {
     options: {
       labels: [...new Set(dados.map((d) => d.nomefinalizador))],
       title: {
-        text: "Vendas por meio de pagamento",
+        text: "Vendas por meio de pagamento no PDV",
         align: "center",
-
         style: {
-          fontSize: "14px",
+          color: "#fff",
         },
       },
     },
@@ -19,14 +18,13 @@ const GraficoMeioDePagamento = ({ dados }) => {
 
   return (
     <>
-      <div>
-        <Chart
-          options={state.options}
-          series={state.series}
-          width={450}
-          type="pie"
-        />
-      </div>
+      <Chart
+        options={state.options}
+        series={state.series}
+        height={350}
+        width={500}
+        type="pie"
+      />
     </>
   );
 };

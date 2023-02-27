@@ -923,8 +923,8 @@ const PrecificadorAgenda = () => {
           <div>
             <img
               style={{
-                width: "75px",
-                height: "75px",
+                width: "80px",
+                height: "80px",
                 margin: "5px",
                 borderRadius: "25px",
                 padding: "5px",
@@ -988,50 +988,48 @@ const PrecificadorAgenda = () => {
 
     return (
       <React.Fragment>
-        <div className="headerTemplateDataTable">
-          <DataTable
-            showGridlines
-            size="small"
-            stripedRows
-            value={dados}
-            responsiveLayout="stack"
-            breakpoint="960px"
-            style={{ width: "100%", backgroundColor: "#F2F2F2" }}
-          >
-            <Column
-              field="razaosocial"
-              bodyStyle={{ fontWeight: 800 }}
-              header={
-                <Avatar
-                  icon="pi pi-user"
-                  shape="circle"
-                  style={{ margin: "5px" }}
-                />
-              }
-            ></Column>
-            <Column
-              field="numeronotafiscal"
-              bodyStyle={{ fontWeight: 800 }}
-              header="Nota fiscal"
-            ></Column>
-            <Column
-              field="nomeFilial"
-              bodyStyle={{ fontWeight: 800 }}
-              header="Loja"
-            ></Column>
-            <Column
-              field={dataInclusaoNota}
-              bodyStyle={{ fontWeight: 800 }}
-              header="Data de inclusão"
-            ></Column>
+        <DataTable
+          showGridlines
+          size="small"
+          stripedRows
+          value={dados}
+          responsiveLayout="stack"
+          breakpoint="960px"
+          style={{ width: "100%", backgroundColor: "#F2F2F2" }}
+        >
+          <Column
+            field="razaosocial"
+            bodyStyle={{ fontWeight: 800 }}
+            header={
+              <Avatar
+                icon="pi pi-user"
+                shape="circle"
+                style={{ margin: "5px" }}
+              />
+            }
+          ></Column>
+          <Column
+            field="numeronotafiscal"
+            bodyStyle={{ fontWeight: 800 }}
+            header="Nota fiscal"
+          ></Column>
+          <Column
+            field="nomeFilial"
+            bodyStyle={{ fontWeight: 800 }}
+            header="Loja"
+          ></Column>
+          <Column
+            field={dataInclusaoNota}
+            bodyStyle={{ fontWeight: 800 }}
+            header="Data de inclusão"
+          ></Column>
 
-            <Column
-              field={statusPrecificacao}
-              bodyStyle={{ fontWeight: 800 }}
-              header="Status"
-            ></Column>
-          </DataTable>
-        </div>
+          <Column
+            field={statusPrecificacao}
+            bodyStyle={{ fontWeight: 800 }}
+            header="Status"
+          ></Column>
+        </DataTable>
       </React.Fragment>
     );
   };

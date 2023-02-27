@@ -13,6 +13,11 @@ import { useNavigate } from "react-router-dom";
 
 import Logo from "../../assets/img/logo_duca.png";
 
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+
 import Menu from "../menu";
 
 const Header = (data) => {
@@ -57,6 +62,25 @@ const Header = (data) => {
 
   return (
     <>
+      <AppBar position="relative" color="transparent">
+        <Toolbar
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={() => setVisibleLeft(true)}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
       <div>
         <Sidebar
           className="p-sidebar-lg"
@@ -106,15 +130,7 @@ const Header = (data) => {
         </Sidebar>
       </div>
       <div className="logo-rodape">
-        <img src={Logo} width="350px" alt="logo do sistema" />
-      </div>
-
-      <div className="botao-menu">
-        <Button
-          className=" p-button-sm p-button-rounded p-button-primary"
-          icon="pi pi-align-justify"
-          onClick={() => setVisibleLeft(true)}
-        />
+        <img src={Logo} width="340px" alt="logo do sistema" />
       </div>
     </>
   );

@@ -3,10 +3,14 @@ import Typing from "react-typing-animation";
 import DestaqueImg from "../../assets/img/undraw_projections_re_ulc6.svg";
 
 import "./styles.css";
+import Header from "../header";
+import Footer from "../footer";
 
 const Main = () => {
   return (
     <>
+      <Header />
+      <Footer />
       <div className="agenda-label">
         <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
           Pesquisar notas fiscais de entrada,

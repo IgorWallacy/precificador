@@ -25,16 +25,7 @@
 
 
 
-.headerTemplateDataTable {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
 
-
-}
 
 .image-text {
     font-weight: 600;

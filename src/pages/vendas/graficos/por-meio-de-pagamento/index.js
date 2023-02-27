@@ -4,6 +4,9 @@ const GraficoMeioDePagamento = ({ dados }) => {
   const state = {
     options: {
       labels: [...new Set(dados.map((d) => d.nomefinalizador))],
+      legend: {
+        position: "bottom",
+      },
       title: {
         text: "Vendas por meio de pagamento no PDV",
         align: "center",
@@ -18,13 +21,15 @@ const GraficoMeioDePagamento = ({ dados }) => {
 
   return (
     <>
-      <Chart
-        options={state.options}
-        series={state.series}
-        height={350}
-        width={500}
-        type="pie"
-      />
+      <div style={{ width: "100%" }}>
+        <Chart
+          options={state.options}
+          series={state.series}
+          height={400}
+          width="100%"
+          type="pie"
+        />
+      </div>
     </>
   );
 };

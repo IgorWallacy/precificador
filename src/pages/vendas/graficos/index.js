@@ -9,11 +9,7 @@ import { Dropdown } from "primereact/dropdown";
 import api from "../../../services/axios";
 import GraficoVendaPorHora from "./por-hora";
 
-import {
-  PivotViewComponent,
-  Inject,
-  FieldList,
-} from "@syncfusion/ej2-react-pivotview";
+import { PivotViewComponent } from "@syncfusion/ej2-react-pivotview";
 
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
@@ -75,7 +71,9 @@ const GraficosIndex = () => {
   const [dataInicial, setDataInicial] = useState(new Date());
   const [dataFinal, setDataFinal] = useState(new Date());
 
-  const [dataInicialTicket, setDataInicialTicket] = useState(new Date());
+  const [dataInicialTicket, setDataInicialTicket] = useState(
+    moment().subtract(1, "month")
+  );
   const [dataFinalTicket, setDataFinalTicket] = useState(new Date());
 
   const [dataInicialMeioPagamento, setDataInicialMeioPagamento] = useState(
@@ -213,11 +211,11 @@ const GraficosIndex = () => {
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
           flexWrap: "wrap",
           gap: "10px",
           margin: "5px",
-          justifyContent: "flex-start",
+          justifyContent: "space-around",
         }}
       >
         <div
@@ -305,7 +303,7 @@ const GraficosIndex = () => {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
+                justifyContent: "flex-start",
                 alignContent: "center",
                 flexWrap: "wrap",
                 gap: "1px",
@@ -354,71 +352,86 @@ const GraficosIndex = () => {
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-            margin: "5px",
+            margin: "2px",
             padding: "10px",
             justifyContent: "flex-start",
             alignItems: "center",
           }}
         >
-          <Calendar
-            style={{ margin: "5px" }}
-            dateFormat="dd/mm/yy"
-            locale="pt-BR"
-            showIcon
-            showButtonBar
-            placeholder="Data inicial"
-            value={dataInicialMeioPagamento}
-            onChange={(e) => setDataInicialMeioPagamento(e.value)}
-          ></Calendar>
-          <Calendar
-            style={{ margin: "5px" }}
-            dateFormat="dd/mm/yy"
-            locale="pt-BR"
-            showIcon
-            showButtonBar
-            placeholder="Data final"
-            value={dataFinalMeioPagamento}
-            onChange={(e) => setDataFinalMeioPagamento(e.value)}
-          ></Calendar>
-          <Dropdown
-            showClear
-            style={{ margin: "5px" }}
-            value={loja}
-            options={lojaList}
-            onChange={(e) => setLoja(e.value)}
-            optionLabel="nome"
-            placeholder="Selecione uma loja"
-          />
+          <h1
+            style={{
+              fontFamily: "cabin-sketch-bold",
+              fontWeight: "800",
+              color: "#FFFF",
+              margin: "5px",
+              textAlign: "center",
+            }}
+          >
+            Resumo de vendas do PDV
+          </h1>
+          <div style={{ width: "100%" }}>
+            <Calendar
+              style={{ margin: "5px" }}
+              dateFormat="dd/mm/yy"
+              locale="pt-BR"
+              showIcon
+              showButtonBar
+              placeholder="Data inicial"
+              value={dataInicialMeioPagamento}
+              onChange={(e) => setDataInicialMeioPagamento(e.value)}
+            ></Calendar>
+            <Calendar
+              style={{ margin: "5px" }}
+              dateFormat="dd/mm/yy"
+              locale="pt-BR"
+              showIcon
+              showButtonBar
+              placeholder="Data final"
+              value={dataFinalMeioPagamento}
+              onChange={(e) => setDataFinalMeioPagamento(e.value)}
+            ></Calendar>
+            <Dropdown
+              showClear
+              style={{ margin: "5px" }}
+              value={loja}
+              options={lojaList}
+              onChange={(e) => setLoja(e.value)}
+              optionLabel="nome"
+              placeholder="Selecione uma loja"
+            />
 
-          <Button
-            style={{ margin: "5px" }}
-            label="Gerar"
-            loading={loadingMeioPagamento}
-            className="p-button p-button-rounded"
-            icon="pi pi-chart-bar"
-            onClick={getVendasMeioPagamento}
-          />
-          <GraficoMeioDePagamento dados={vendasMeioPagamento} />
-        </div>
+            <Button
+              style={{ margin: "5px" }}
+              label="Gerar"
+              loading={loadingMeioPagamento}
+              className="p-button p-button-rounded"
+              icon="pi pi-chart-bar"
+              onClick={getVendasMeioPagamento}
+            />
+          </div>
 
-        <div
-          style={{
-            margin: "5px",
-            padding: "10px",
-            border: "1px solid rgba(255, 255, 255, 255)",
-          }}
-        >
-          <PivotViewComponent
-            id="PivotView"
-            dataSourceSettings={dataSourceSettings}
-            enableValueSorting={true}
-            width={400}
-            height={500}
-            gridSettings={{ columnWidth: 10 }}
-          ></PivotViewComponent>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
+          >
+            <GraficoMeioDePagamento dados={vendasMeioPagamento} />
+
+            <PivotViewComponent
+              id="PivotView"
+              dataSourceSettings={dataSourceSettings}
+              enableValueSorting={true}
+              width="100%"
+              height={500}
+              gridSettings={{ columnWidth: 10 }}
+            ></PivotViewComponent>
+          </div>
         </div>
       </div>
     </>

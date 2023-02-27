@@ -51,13 +51,12 @@ const Footer = () => {
           reinicie o servidor
         </h4>
       </Dialog>
-      <div className="footer">
-        <div className="status-api">
-          <Badge
-            severity={statusApi === "UP" ? "success" : "danger"}
-            value={statusApi === "UP" ? "API Online " : "API Offline"}
-          ></Badge>
-        </div>
+
+      <div style={{ position: "absolute", top: "2%", right: "2%" }}>
+        <Badge
+          severity={statusApi === "UP" ? "success" : "danger"}
+          value={statusApi === "UP" ? "API Online " : "API Offline"}
+        ></Badge>
       </div>
     </>
   );

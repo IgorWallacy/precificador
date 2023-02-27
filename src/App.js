@@ -1,22 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 
 import "flexmonster/flexmonster.css";
 
+import { BrowserRouter } from "react-router-dom";
 
-import Main from "./components/main";
-
-import Header from "./components/header";
-
-import Footer from "./components/footer";
+import Router from "./Routes";
 
 function App() {
   return (
     <>
-      <div className="header">
-        <Header />
-      </div>
-      <Footer />
-      <Main />
+      <BrowserRouter>
+        <div className="fullscreen">
+          <div id="main">
+            <Router />
+          </div>
+        </div>
+      </BrowserRouter>
     </>
   );
 }

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { PanelMenu } from "primereact/panelmenu";
 import { useNavigate } from "react-router-dom";
 
 const Menu = (data) => {
   const navigate = useNavigate();
-
-  const [filial, setFilial] = useState(data.filial);
 
   const items = [
     {
@@ -70,23 +68,6 @@ const Menu = (data) => {
       ],
     },
 
-    {
-      label: "Compras",
-      icon: "pi pi-shopping-bag",
-      items: [
-        {
-          label: "Novo pedido",
-          icon: "pi pi-shopping-bag",
-          command: () => navigate("/compras/analise/fornecedor"),
-        },
-
-        {
-          label: "Consultar pedidos",
-          icon: "pi pi-list",
-          command: () => navigate("/compras/consulta"),
-        },
-      ],
-    },
     {
       label: "PDV",
       icon: "pi pi-shield",

@@ -105,8 +105,20 @@ const ProdutosSemVendas = () => {
       {
         header: "Última compra",
 
-        accessorFn: (row) => moment(row.ultimacompra).format("DD/MM/YYYY"),
+        accessorFn: (row) => moment(row?.ultimacompra).format("DD/MM/YYYY"),
       },
+
+      {
+        header: "Dias sem venda",
+
+        accessorFn: (row) => moment(new Date()).diff(row?.ultima_venda, "days"),
+      },
+      {
+        header: "Última venda",
+
+        accessorFn: (row) => moment(row?.ultima_venda).format("DD/MM/YYYY"),
+      },
+
       {
         header: "Estoque",
         accessorKey: "saldo_estoque",
@@ -127,12 +139,21 @@ const ProdutosSemVendas = () => {
   );
 
   const handleExportExcelRows = (rows) => {
-    let dados = rows.map((row) => row.original);
+    let dados = rows.map((row) => row);
     if (dados?.length > 0) {
       let dados2 = dados.map((d) => {
         return {
-          ...d,
+          grupoI: d.grupoI,
+          grupoII: d.grupoII,
+          grupoIII: d.grupoIII,
+          codigo: d.codigo,
+          ean: d.ean,
+          produto: d.produto,
+          fornecedor: d.fornecedor,
+          saldo_estoque: d.saldo_estoque,
+          ultima_venda: moment(d.ultima_venda).format("DD/MM/YYYY"),
           ultimacompra: moment(d.ultimacompra).format("DD/MM/YYYY"),
+          dias_sem_venda: moment(new Date()).diff(d.ultima_venda, "days"),
         };
       });
 
@@ -262,9 +283,7 @@ const ProdutosSemVendas = () => {
                           className="p-button p-button-rounded p-button-success"
                           icon="pi pi-file-excel"
                           //export all data that is currently in the table (ignore pagination, sorting, filtering, etc.)
-                          onClick={() =>
-                            handleExportExcelRows(table.getRowModel().rows)
-                          }
+                          onClick={() => handleExportExcelRows(produtos)}
                           variant="contained"
                           label="Exportar Excel"
                         ></Button>

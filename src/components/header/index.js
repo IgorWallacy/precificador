@@ -16,7 +16,9 @@ import Logo from "../../assets/img/logo_duca.png";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 import Menu from "../menu";
 
@@ -43,23 +45,6 @@ const Header = (data) => {
     setNome(a.nome);
   }, []);
 
-  const isTokenValid = () => {
-    let currentDate = new Date();
-    let token = localStorage.getItem("access_token");
-    let a = JSON.parse(token);
-
-    if (a.expires_in * 1000 < currentDate.getTime()) {
-      //  navigate('/')
-      //   window.location.href("/")
-      window.location.reload();
-      localStorage.clear();
-
-      return true;
-    }
-
-    return false;
-  };
-
   return (
     <>
       <AppBar position="relative" color="transparent">
@@ -67,17 +52,22 @@ const Header = (data) => {
           style={{
             display: "flex",
             flexDirection: "row",
+            alignContent: "space-between",
             justifyContent: "space-between",
           }}
         >
           <IconButton
             size="large"
             edge="start"
-            color="inherit"
+            color="default"
             aria-label="menu"
             onClick={() => setVisibleLeft(true)}
           >
-            <MenuIcon />
+            <FontAwesomeIcon
+              icon={faBars}
+              size="1x"
+              style={{ color: "#F2F2F2" }}
+            />
           </IconButton>
         </Toolbar>
       </AppBar>

@@ -24,7 +24,8 @@
 
 .logo-rodape {
 
-
+    display: flex;
+    justify-content: end;
     transform: translateY(0px);
     animation: float 5s ease-in-out infinite;
 }

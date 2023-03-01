@@ -43,6 +43,7 @@ const Footer = () => {
             width: "75%",
           }}
           src={ImagemOffline}
+          alt="Imagem de erro de conexão"
         />
         <h1>Tentando restabelecer a conexão com o servidor </h1>
         <h4>

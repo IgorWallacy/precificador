@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import { TabPanel, TabView } from "primereact/tabview";
+
 import Login from "../pages/login";
 
 import PrecificadorExecuta from "../pages/precificador/executa/precificador-dataTable";
@@ -23,7 +23,6 @@ import Main from "../components/main";
 export default function Router() {
   const [logado, setLogado] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState();
-  const [activeIndex, setActiveIndex] = useState(0);
 
   const PrivateRoutes = () => {
     const location = useLocation();

@@ -90,10 +90,17 @@ const PrecificaProduto = () => {
   const [produtos, setProdutos] = useState([]);
   const [produtoDatatables, setProdutosDatatables] = useState([]);
   const [exibirdialogSugestao, setExibirDialogSugestao] = useState(false);
+
+  const [produtoEmExibicaoMetaDialog, setprodutoEmExibicaoMetaDialog] =
+    useState(null);
+  const [exibirDialogMeta, setExibirDialogMeta] = useState(false);
+
   const [produtoEmExibicaoSugestaoDialog, setprodutoEmExibicaoSugestaoDialog] =
     useState("");
   const [novoPercentualMarkupMinimo, setNovoPercentualMarkupMinimo] =
     useState(null);
+
+  const [novaMeta, setNovaMeta] = useState(null);
 
   const [headers, setHeaders] = useState();
   const [agendar, setAgendar] = useState(new Date());
@@ -388,6 +395,24 @@ const PrecificaProduto = () => {
     );
   };
 
+  const meta = (rowData) => {
+    return (
+      <>
+        {" "}
+        <h4 style={{ color: "green" }}>
+          {" "}
+          Meta de{" "}
+          {Intl.NumberFormat("pt-BR", {
+            mode: "decimal",
+            minFractionDigits: 2,
+            maxFracionDigits: 2,
+          }).format(rowData.meta)}{" "}
+          %
+        </h4>{" "}
+      </>
+    );
+  };
+
   const sugestaoVenda = (rowData) => {
     let sugestao =
       (rowData.precocusto * rowData.percentualmarkup) / 100 +
@@ -439,9 +464,26 @@ const PrecificaProduto = () => {
     );
   };
 
+  const buttonMeta = (rowData) => {
+    return (
+      <>
+        <Button
+          onClick={() => abrirDialogMeta(rowData)}
+          icon="pi pi-chart-line"
+          className="p-button p-button-sm p-button-rounded"
+        />
+      </>
+    );
+  };
+
   const abrirDialogSugestao = (rowData) => {
     setExibirDialogSugestao(true);
     setprodutoEmExibicaoSugestaoDialog(rowData);
+  };
+
+  const abrirDialogMeta = (rowData) => {
+    setExibirDialogMeta(true);
+    setprodutoEmExibicaoMetaDialog(rowData);
   };
 
   const atualizarmarkupminimo = () => {
@@ -478,6 +520,44 @@ const PrecificaProduto = () => {
         summary: "Aviso",
 
         detail: ` Informe o novo percentual de markup mínimo `,
+      });
+    }
+  };
+
+  const atualizarmeta = () => {
+    if (novaMeta) {
+      setLoading2(true);
+
+      api
+        .put(
+          `/api/produto/atualizarmeta/${
+            produtoEmExibicaoMetaDialog.idproduto
+          }/${
+            produtoEmExibicaoMetaDialog.idfamilia
+              ? produtoEmExibicaoMetaDialog.idfamilia
+              : 0
+          }/${novaMeta}`
+        )
+        .then((r) => {})
+        .catch((error) => {
+          toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: ` Erro ao atualizar  ... Erro : ${error}  `,
+          });
+        })
+        .finally(() => {
+          setExibirDialogMeta(false);
+          setLoading2(false);
+          setNovaMeta(null);
+          getProdutoDataTable();
+        });
+    } else {
+      toast2.current.show({
+        severity: "warn",
+        summary: "Aviso",
+
+        detail: ` Informe a nova meta `,
       });
     }
   };
@@ -719,11 +799,13 @@ const PrecificaProduto = () => {
                       }}
                     >
                       <h4>
-                        {produtoDatatables[0]?.ean +
-                          " - " +
-                          produtoDatatables[0]?.produto +
-                          " " +
-                          " "}
+                        {produtoDatatables[0]?.produto
+                          ? produtoDatatables[0]?.ean +
+                            " - " +
+                            produtoDatatables[0]?.produto +
+                            " " +
+                            " "
+                          : "Selecione um produto"}
                         {produtoDatatables[0]?.idfamilia ? (
                           <>
                             <i
@@ -735,10 +817,7 @@ const PrecificaProduto = () => {
                           <></>
                         )}
                       </h4>
-                      <div>
-                        <h4>UN</h4>
-                        {produtoDatatables[0]?.unidade}
-                      </div>
+                      <div>{produtoDatatables[0]?.unidade}</div>
 
                       <div>
                         <h4>Agendar para </h4>
@@ -791,6 +870,13 @@ const PrecificaProduto = () => {
                   header="Editar sugestão"
                   field={buttonSugestao}
                   body={buttonSugestao}
+                ></Column>
+
+                <Column header="Meta de %Markup" field={meta}></Column>
+                <Column
+                  header="Editar Meta"
+                  field={buttonMeta}
+                  body={buttonMeta}
                 ></Column>
 
                 <Column
@@ -853,6 +939,47 @@ const PrecificaProduto = () => {
               onClick={() => atualizarmarkupminimo()}
               style={{ margin: "1rem" }}
               label="Atualizar"
+              icon="pi pi-refresh"
+              className="p-button p-buttun-sucess p-button-rounded"
+            />
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        modal={false}
+        position="bottom"
+        visible={exibirDialogMeta}
+        onHide={() => setExibirDialogMeta(false)}
+      >
+        <div className="dialog-sugestao">
+          <div>
+            <h4>{produtoEmExibicaoMetaDialog?.produto}</h4>
+          </div>
+
+          <div>Meta atual</div>
+
+          <h4> {produtoEmExibicaoMetaDialog?.meta} % </h4>
+
+          <div>
+            <b>Nova Meta</b>
+          </div>
+
+          <div>
+            <InputNumber
+              value={novaMeta}
+              mode="decimal"
+              minFractionDigits={2}
+              maxFracionDigits={2}
+              onChange={(e) => setNovaMeta(e.value)}
+              autoFocus
+              style={{ margin: "1rem" }}
+            />{" "}
+            %
+            <Button
+              onClick={() => atualizarmeta()}
+              style={{ margin: "1rem" }}
+              label="Atualizar meta"
               icon="pi pi-refresh"
               className="p-button p-buttun-sucess p-button-rounded"
             />

@@ -78,6 +78,7 @@ const Pivot = () => {
         ).format("yyyy-MM-DD")}`
       )
       .then((r) => {
+        //console.log(r.data);
         setData(r.data);
         setLoading(false);
       })

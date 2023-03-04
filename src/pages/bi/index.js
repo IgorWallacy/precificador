@@ -7,6 +7,7 @@ import Footer from "../../components/footer";
 
 import api from "../../services/axios";
 
+import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Calendar } from "primereact/calendar";
@@ -66,8 +67,15 @@ const Pivot = () => {
   const [date1, setDate1] = useState(null);
   const [date2, setDate2] = useState(null);
 
+  const [modocalculo, setModocalculo] = useState(0);
+
   const [loading, setLoading] = useState(null);
   const toast = useRef(null);
+
+  const modocalculoList = [
+    { name: "Preço de compra na venda (Sem impostos)", value: 0 },
+    { name: "Preço de custo na venda (Com impostos)", value: 1 },
+  ];
 
   const getDados = () => {
     setLoading(true);
@@ -75,7 +83,7 @@ const Pivot = () => {
       .get(
         `/api_vendas/bi/${moment(date1).format("yyyy-MM-DD")}/${moment(
           date2
-        ).format("yyyy-MM-DD")}`
+        ).format("yyyy-MM-DD")}/${modocalculo}`
       )
       .then((r) => {
         //console.log(r.data);
@@ -141,7 +149,11 @@ const Pivot = () => {
           >
             <h4 style={{ color: "#f2f2f2" }}>
               {" "}
-              Exibindo o custo pela última compra na data da venda <br />
+              Exibindo o custo{" "}
+              {modocalculo === 0
+                ? "pela compra ( SEM IMPOSTOS )"
+                : "pelo preco de custo ( COM IMPOSTOS)"}{" "}
+              na data da venda <br />
               Exibindo dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
               {moment(date2).format("DD/MM/YYYY")}
             </h4>
@@ -230,6 +242,28 @@ const Pivot = () => {
                     onChange={(e) => setDate2(e.value)}
                   />
                 </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "flex-start",
+                    flexWrap: "wrap",
+                    flexDirection: "column",
+                  }}
+                >
+                  <label style={{ color: "#F2f2f2" }} htmlFor="basic">
+                    Modo de cálculo de custo
+                  </label>
+                  <Dropdown
+                    value={modocalculo}
+                    onChange={(e) => setModocalculo(e.value)}
+                    options={modocalculoList}
+                    optionLabel="name"
+                    placeholder="Selecione o modo de cálculo do custo "
+                    className="w-full md:w-14rem"
+                  />
+                </div>
+
                 <div
                   style={{
                     display: "flex",

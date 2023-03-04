@@ -67,7 +67,7 @@ const Pivot = () => {
   const [date1, setDate1] = useState(null);
   const [date2, setDate2] = useState(null);
 
-  const [modocalculo, setModocalculo] = useState(0);
+  const [modocalculo, setModocalculo] = useState(1);
 
   const [loading, setLoading] = useState(null);
   const toast = useRef(null);
@@ -251,7 +251,7 @@ const Pivot = () => {
                     flexDirection: "column",
                   }}
                 >
-                  <label style={{ color: "#F2f2f2" }} htmlFor="basic">
+                  <label style={{ color: "#F2f2f2" }}>
                     Modo de cálculo de custo
                   </label>
                   <Dropdown
@@ -260,7 +260,6 @@ const Pivot = () => {
                     options={modocalculoList}
                     optionLabel="name"
                     placeholder="Selecione o modo de cálculo do custo "
-                    className="w-full md:w-14rem"
                   />
                 </div>
 

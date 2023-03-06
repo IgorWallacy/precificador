@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-
-import "flexmonster/flexmonster.css";
+import React from "react";
 
 import { BrowserRouter } from "react-router-dom";
 

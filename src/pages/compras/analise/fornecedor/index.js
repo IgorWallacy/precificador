@@ -39,8 +39,6 @@ import { FaGift } from "react-icons/fa";
 
 import moment from "moment";
 
-import emailjs from "@emailjs/browser";
-
 import api from "../../../../services/axios";
 
 import pdfMake from "pdfmake/build/pdfmake";

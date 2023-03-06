@@ -52,23 +52,22 @@ const Header = (data) => {
           style={{
             display: "flex",
             flexDirection: "row",
-            alignContent: "space-between",
-            justifyContent: "space-between",
+            alignContent: "flex-start",
+            justifyContent: "flex-start",
+            gap: "10px",
           }}
         >
-          <IconButton
-            size="large"
-            edge="start"
-            color="default"
-            aria-label="menu"
+          <Button
+            icon="pi pi-align-justify"
+            className="p-button p-button-rounded"
             onClick={() => setVisibleLeft(true)}
-          >
-            <FontAwesomeIcon
-              icon={faBars}
-              size="1x"
-              style={{ color: "#F2F2F2" }}
-            />
-          </IconButton>
+          />
+
+          <Button
+            icon="pi pi-home"
+            className="p-button p-button-rounded"
+            onClick={() => navigate("/menu")}
+          />
         </Toolbar>
       </AppBar>
       <div>
@@ -110,7 +109,7 @@ const Header = (data) => {
 
                 <div style={{ width: "100%" }}>
                   {" "}
-                  <Menu filial={data} />
+                  <Menu />
                 </div>
               </>
             ) : (

@@ -1182,28 +1182,12 @@ const PrecificadorAgenda = () => {
         className=" botao-flutuante-atualizar p-button-rounded p-button-success p-button-sm"
       />
 
-      <Button
-        tooltip="Abrir atualização de preços"
-        onClick={() => navigate("/precificar-executar")}
-        tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-arrow-right"
-        className=" botao-flutuante-menu p-button-rounded p-button-success p-button-sm"
-      />
-
       <SelectButton
         value={usarMarkup}
         options={options}
         optionLabel="name"
         onChange={(e) => setUsarMarkup(e.target.value)}
         className=" botao-flutuante-up-down p-button-rounded  p-button-sm"
-      />
-
-      <Button
-        onClick={() => setExibirDialogPesquisa(true)}
-        tooltip="Abrir pesquisa rápida"
-        tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-search"
-        className="botao-flutuante-pesquisar p-button-rounded p-button-primary p-button-sm"
       />
     </React.Fragment>
   );

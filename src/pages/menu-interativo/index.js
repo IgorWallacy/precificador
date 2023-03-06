@@ -9,8 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStore,
   faTags,
-  faBox,
-  faUserGroup,
   faGlobe,
   faBusinessTime,
 } from "@fortawesome/free-solid-svg-icons";
@@ -89,7 +87,7 @@ const MenuInterativo = () => {
 
   return (
     <>
-      <Header filial={filial?.length} />
+      <Header />
       <Footer />
       <div
         style={{
@@ -189,6 +187,14 @@ const MenuInterativo = () => {
               icon="pi pi-prime"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/bi/pivot")}
+            />
+          </div>
+          <div className="opcoes-menu">
+            <Button
+              label="Metas"
+              icon="pi  pi-chart-bar   "
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/vendas/metas")}
             />
           </div>
         </div>

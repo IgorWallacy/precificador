@@ -19,6 +19,7 @@ import ProdutoPrecificadorExecuta from "../pages/produto/executa-precificacao/ex
 import ProdutosSemVendas from "../pages/vendas/produtos/sem-vendas";
 import GraficosIndex from "../pages/vendas/graficos";
 import Main from "../components/main";
+import MetasComponent from "../pages/vendas/produtos/metas";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -57,6 +58,7 @@ export default function Router() {
           <Route path="vendas" element={<VendasDataTableComponent />} />
           <Route path="produtos/sem-vendas" element={<ProdutosSemVendas />} />
           <Route path="vendas/indicadores" element={<GraficosIndex />} />
+          <Route path="vendas/metas" element={<MetasComponent />} />
           <Route path="bi/pivot" element={<Pivot />} />
           <Route
             path="compras/analise/fornecedor"

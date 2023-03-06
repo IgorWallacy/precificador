@@ -2,7 +2,7 @@ import React from "react";
 import { PanelMenu } from "primereact/panelmenu";
 import { useNavigate } from "react-router-dom";
 
-const Menu = (data) => {
+const Menu = () => {
   const navigate = useNavigate();
 
   const items = [

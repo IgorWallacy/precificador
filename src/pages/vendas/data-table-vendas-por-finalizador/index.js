@@ -26,7 +26,7 @@ import { Toast } from "primereact/toast";
 import { Skeleton } from "primereact/skeleton";
 
 import AppChart from "./chart";
-
+import "primeflex/primeflex.css";
 function VendasDataTableComponent() {
   const [loja, setLoja] = useState(0);
   const [filiais, setFiliais] = useState();
@@ -500,15 +500,21 @@ function VendasDataTableComponent() {
       <Footer />
 
       <div className="container-venda">
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1em'
-        }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "1em",
+          }}
+        >
           <img style={{ width: "250px" }} src={ImagemDestque} />
-          <AppChart vendas={vendas} vendasECF={vendasECF} vendasNfce={vendasNfce} />
+          <AppChart
+            vendas={vendas}
+            vendasECF={vendasECF}
+            vendasNfce={vendasNfce}
+          />
         </div>
 
         <div className="cards-info">

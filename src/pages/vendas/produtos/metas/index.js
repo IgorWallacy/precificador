@@ -185,13 +185,20 @@ const MetasComponent = () => {
                 {row?.original?.codigo?.trim()?.split("   ").length === 2 ? (
                   <>
                     <Button
+                      className="p-button p-button-rounded p-button-danger"
+                      icon="pi pi-chart-line"
+                      tooltip="Atenção ! Alterar em vermelho, altera todos os grupos abaixo"
+                      onClick={() => dadosDialog(row)}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Button
                       className="p-button p-button-rounded p-button-secondary"
                       icon="pi pi-chart-line"
                       onClick={() => dadosDialog(row)}
                     />
                   </>
-                ) : (
-                  <></>
                 )}
               </>
             )}

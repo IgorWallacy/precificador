@@ -11,6 +11,7 @@ import {
   faTags,
   faGlobe,
   faBusinessTime,
+  faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./menu-interativo.css";
@@ -195,6 +196,14 @@ const MenuInterativo = () => {
               icon="pi  pi-chart-bar   "
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/vendas/metas")}
+            />
+          </div>{" "}
+          <div className="opcoes-menu">
+            <Button
+              label="Compras por fornecedor"
+              icon="pi pi-users"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/compras/estoque")}
             />
           </div>
         </div>

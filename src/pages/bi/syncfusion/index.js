@@ -82,6 +82,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
       { name: "promocaoNome", caption: "Nome da promoção" },
       { name: "codigo", caption: "Código do produto" },
       { name: "meta", caption: "% Meta" },
+      { name: "fornecedor", caption: "Fornecedor" },
     ],
 
     rows: [

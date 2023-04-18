@@ -46,6 +46,12 @@ const Menu = () => {
       ],
     },
 
+    /*
+      label: "Alteração de preços",
+      icon: "pi pi-fw pi-change",
+      command: () => navigate("/produtos/precos-alterados"),
+    */
+
     {
       label: "Vendas",
       icon: "pi pi-shopping-cart",
@@ -87,6 +93,16 @@ const Menu = () => {
           label: "Análises",
           icon: "pi pi-slack",
           command: () => navigate("/bi/pivot"),
+        },
+        {
+          label: "Compras por fornecedor",
+          icon: "pi pi-users",
+          command: () => navigate("/compras/estoque"),
+        },
+        {
+          label: "Metas",
+          icon: "pi pi-chart-line",
+          command: () => navigate("/vendas/metas"),
         },
       ],
     },

@@ -3,11 +3,15 @@ import React, { useMemo, useEffect, useState, useRef } from "react";
 import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
 import MaterialReactTable from "material-react-table";
 
+import { DataTable } from "primereact/datatable";
+import { FilterMatchMode } from "primereact/api";
+import { Column } from "primereact/column";
 import { Toast } from "primereact/toast";
 import { ProgressBar } from "primereact/progressbar";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputNumber } from "primereact/inputnumber";
+import { InputText } from "primereact/inputtext";
 
 import api from "../../../../services/axios";
 import Header from "../../../../components/header";
@@ -15,14 +19,37 @@ import Footer from "../../../../components/footer";
 
 const MetasComponent = () => {
   const toast = useRef(null);
+  const [loadingMeta, setloadinMeta] = useState(false);
   const [grupos, setGrupos] = useState([]);
   const [dialogMeta, setDialogMeta] = useState(false);
   const [grupoSelecionado, setGrupoSelecionado] = useState([]);
   const [novaMeta, setNovaMeta] = useState(null);
+  const [produtos, setProdutos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [globalFilterValue, setGlobalFilterValue] = useState("");
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
 
   const dadosDialog = (row) => {
     setGrupoSelecionado(row);
     setDialogMeta(true);
+    getProdutos(row);
+  };
+
+  const getProdutos = (rowData) => {
+    setProdutos([]);
+    setLoading(true);
+    api
+      .get(`/api/produto/${rowData?.original?.codigo}`)
+      .then((r) => {
+        setProdutos(r.data);
+        //console.log(r.data);
+      })
+      .catch((e) => {})
+      .finally((f) => {
+        setLoading(false);
+      });
   };
 
   const columns = useMemo(
@@ -71,6 +98,7 @@ const MetasComponent = () => {
   };
 
   const atualizarMeta = async () => {
+    setloadinMeta(true);
     return await api
       .put(
         `/api/grupos/atualizarmeta/${grupoSelecionado?.original?.codigo}/${novaMeta}`
@@ -81,6 +109,7 @@ const MetasComponent = () => {
           summary: "Sucesso !",
           detail: "Meta atualizada",
         });
+
         getGrupos();
       })
       .catch((e) => {
@@ -92,9 +121,34 @@ const MetasComponent = () => {
         });
       })
       .finally((f) => {
+        setloadinMeta(false);
         setDialogMeta(false);
         setNovaMeta(null);
       });
+  };
+
+  const renderHeader = () => {
+    return (
+      <div className="flex justify-content-end">
+        <span className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText
+            value={globalFilterValue}
+            onChange={onGlobalFilterChange}
+            placeholder="Pesquisar"
+          />
+        </span>
+      </div>
+    );
+  };
+  const onGlobalFilterChange = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
+
+    _filters["global"].value = value;
+
+    setFilters(_filters);
+    setGlobalFilterValue(value);
   };
 
   useEffect(() => {
@@ -150,12 +204,29 @@ const MetasComponent = () => {
             />
             {"  % "}
             <Button
+              loading={loadingMeta}
+              disabled={loadingMeta}
               label="Atualizar meta"
               className="p-button p-button-rounded p-button-success"
               icon="pi pi-refresh"
               onClick={atualizarMeta}
             />
           </div>
+        </div>
+        <div>
+          <h1>Produtos</h1>
+          <DataTable
+            filters={filters}
+            header={renderHeader}
+            globalFilterFields={["codigo", "ean", "nome"]}
+            loading={loading}
+            value={produtos}
+            tableStyle={{ minWidth: "50rem" }}
+          >
+            <Column field="codigo" header="Código"></Column>
+            <Column field="ean" header="Ean"></Column>
+            <Column field="nome" header="Nome"></Column>
+          </DataTable>
         </div>
       </Dialog>
 

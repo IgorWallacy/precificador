@@ -1,4 +1,4 @@
-import  { useEffect, useState, useMemo } from "react";
+import  { useEffect, useState, useMemo, useRef } from "react";
 
 import api from "../../../services/axios";
 
@@ -7,6 +7,7 @@ import { Box } from "@mui/material";
 import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
 import { exportToExcel } from "react-json-to-excel";
 
+import { Toast } from 'primereact/toast';
 import { Button } from "primereact/button";
 import { ProgressBar } from "primereact/progressbar";
 import { Steps } from "primereact/steps";
@@ -22,6 +23,8 @@ import Header from "../../../components/header";
 import { BadgeRounded, PointOfSaleSharp, ShoppingCart } from "@mui/icons-material";
 
 const EstoquePorEmpresa = () => {
+  const toast = useRef(null);
+  
   const [produto, setProduto] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -119,9 +122,10 @@ const EstoquePorEmpresa = () => {
     
     const data = {
       fornecedor : fornecedor?.id,
-      dataIncialVenda : moment(dataIncialVenda).format("YYYY-MM-DD"),
+      
+      dataInicialVenda : moment(dataIncialVenda).format("YYYY-MM-DD"),
       dataFinalVenda : moment(dataFinalVenda).format("YYYY-MM-DD"),
-      dataIncialCompra : moment(dataIncialCompra).format("YYYY-MM-DD"),
+      dataInicialCompra : moment(dataIncialCompra).format("YYYY-MM-DD"),
       dataFinalCompra : moment(dataFinalCompra).format("YYYY-MM-DD")
     }
     
@@ -130,12 +134,16 @@ const EstoquePorEmpresa = () => {
       .then((r) => {
     //    console.log(r.data);
         setProduto(r.data)
+        if(r.data.length === 0 && loading === false) {
+          toast.current.show({ severity: 'info', summary: 'Aviso', detail: 'Nenhum produto encontrado para análise !' }) 
+        }
       })
       .catch((e) => {
         console.log(e);
       })
       .finally((f) => {
         setLoading(false);
+       
       });
   };
 
@@ -387,6 +395,8 @@ const EstoquePorEmpresa = () => {
 
   return (
     <>
+    <Toast ref={toast} position="bottom-center" />
+
     <Header/>
 
     {loading ? (

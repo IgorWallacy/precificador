@@ -21,7 +21,8 @@ import GraficosIndex from "../pages/vendas/graficos";
 import Main from "../components/main";
 import MetasComponent from "../pages/vendas/produtos/metas";
 import PrecosAlteradosComponent from "../pages/produto/precos-alterados";
-import EstoqueComprasComponent from "../pages/compras/estoque";
+
+import EstoquePorEmpresa from "../pages/compras/estoquePorEmpresa";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -70,7 +71,8 @@ export default function Router() {
             path="compras/analise/fornecedor"
             element={<AnaliseFornecedor />}
           />
-          <Route path="compras/estoque" element={<EstoqueComprasComponent />} />
+          <Route path="compras/estoque" element={<EstoquePorEmpresa />} />
+         
           <Route
             path="compras/analise/fornecedor/pedido/:id"
             exact={true}

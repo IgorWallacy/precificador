@@ -200,12 +200,13 @@ const MenuInterativo = () => {
           </div>{" "}
           <div className="opcoes-menu">
             <Button
-              label="Compras por fornecedor"
+              label="Análise de compras x Vendas "
               icon="pi pi-users"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/compras/estoque")}
             />
           </div>
+          
         </div>
         <div className="menu-categoria">
           {" "}

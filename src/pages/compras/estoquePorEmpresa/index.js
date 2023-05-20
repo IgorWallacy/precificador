@@ -132,7 +132,7 @@ const EstoquePorEmpresa = () => {
     api
       .post("/api/estoque/compras/empresa", data)
       .then((r) => {
-    //    console.log(r.data);
+       // console.log(r.data);
         setProduto(r.data)
         if(r.data.length === 0 && loading === false) {
           toast.current.show({ severity: 'info', summary: 'Aviso', detail: 'Nenhum produto encontrado para análise !' }) 
@@ -140,6 +140,7 @@ const EstoquePorEmpresa = () => {
       })
       .catch((e) => {
         console.log(e);
+        toast.current.show({ severity: 'error', summary: 'Erro', detail: `${e?.message}` }) 
       })
       .finally((f) => {
         setLoading(false);
@@ -324,6 +325,10 @@ const EstoquePorEmpresa = () => {
 
         header: "UN venda",
       },
+      {
+        accessorFn: (row) => row?.quantidadesaldoestoque,
+        header : "Estoque"
+      }
     ],
 
     []
@@ -354,6 +359,7 @@ const EstoquePorEmpresa = () => {
           }).format(d.total),
           UN_VENDA: d.unvenda,
           quantidade_vendida: d.quantidadevendida,
+          quantidadesaldoestoque : d.quantidadesaldoestoque
           
         };
       });
@@ -433,10 +439,12 @@ const EstoquePorEmpresa = () => {
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
           flexWrap: "wrap",
           justifyContent: "center",
           alignItems: "center",
+          gap:'5px',
+          padding:'1rem'
         }}
       >
         {(() => {
@@ -444,9 +452,11 @@ const EstoquePorEmpresa = () => {
             case 0:
               return (
                 <>
-                <h1 style={{ color: "#FFFF"}}>Informe o período de <i><u>compra</u></i> desejado</h1>
                 <ShoppingCart fontSize="large" style={{color : "#f2f2f2"}} />
-                  <div style={{ display: 'flex', gap: '1rem', margin: "1rem" }}>
+                <h1 style={{ color: "#FFFF"}}>Informe o período de <i><u>compra</u></i> desejado</h1>
+                <p  style={{ color: "#FFFF"}}>O sistema consultará o total e quantidade comprada de cada produto no período escolhido</p>
+                
+                  <div style={{ display: 'flex', gap: '1rem', margin: "1rem", flexWrap : 'wrap' }}>
                    
                     <Calendar
                   value={dataIncialCompra}
@@ -481,8 +491,9 @@ const EstoquePorEmpresa = () => {
                 <PointOfSaleSharp fontSize="large" style={{color : "#f2f2f2" , margin : '2px'}} />
 
                  <h1 style={{ color: "#FFFF"}}>Informe o período de <u><i>venda</i> </u> desejado</h1>
+                 <p style={{ color: "#FFFF"}}>O sistema consultará o total vendido e quantidade de cada produto no período escolhido</p>
                  
-                  <div style={{ display: 'flex', gap: '1rem', margin: "1rem" }}>
+                  <div style={{ display: 'flex', gap: '1rem', margin: "1rem", flexWrap : 'wrap'  }}>
                     
                     <Calendar
                   value={dataIncialVenda}
@@ -515,11 +526,14 @@ const EstoquePorEmpresa = () => {
               return (
                 <>
                  <BadgeRounded fontSize="large" style={{color : "#f2f2f2"}} />
-                  <div style={{ color: "#FFFF", margin: "1rem" }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px',  flexWrap : 'wrap'  }}>
+               
+                  <div style={{ display : 'flex' , flexDirection:'column', color: "#FFFF", margin: "1rem" , alignItems: 'center'}}>
                     <h1>Informe o fornecedor desejado</h1>
+                    <p>O sistema consultará todos os produtos que já foram comprados deste fornecedor</p>
                   </div>
 
-                  <Dropdown style={{ margin : '1rem'}}
+                  <Dropdown 
                   value={fornecedor}
                   onChange={(e) => setFornecedor(e.value)}
                   options={fornecedorList}
@@ -529,10 +543,12 @@ const EstoquePorEmpresa = () => {
                   filterBy="codigo,nome"
                   //valueTemplate={selectedCountryTemplate}
                   itemTemplate={optionTemplate}
-                  className="w-full md:w-14rem"
+                 // className="w-full md:w-14rem"
                 />
 
-                  <div>
+                  
+                </div>
+                <div>
                   <Button
                     icon="pi pi-search"
                     className="p-button p-button-rounded p-button-success"
@@ -541,6 +557,7 @@ const EstoquePorEmpresa = () => {
                     onClick={() => getProdutos()}
                   />
                   </div>
+                 
                 </>
               );
 

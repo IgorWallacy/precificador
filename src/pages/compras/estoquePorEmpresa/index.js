@@ -240,7 +240,7 @@ const EstoquePorEmpresa = () => {
       },
 
       {
-        header: "Quantidade comprada",
+        header: "Qtde comprada",
         accessorKey: "quantidadecompra",
         aggregationFn: "sum",
         //required to render an aggregated cell, show the average salary in the group
@@ -316,9 +316,16 @@ const EstoquePorEmpresa = () => {
         ),
       },
       {
-        header: "Quantidade vendida",
-        accessorFn: (row) => row?.quantidadevendida,
-        accessorKey: "quantidadevendida",
+        header: "Qtde vendida",
+        
+         accessorFn: (row) => 
+        `${new Intl.NumberFormat("pt-BR", {
+            style: "decimal",
+        
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+          }).format(row?.quantidadevendida)}`,
+        
       },
       {
         accessorFn: (row) => row?.unvenda,
@@ -326,7 +333,14 @@ const EstoquePorEmpresa = () => {
         header: "UN venda",
       },
       {
-        accessorFn: (row) => row?.quantidadesaldoestoque,
+        accessorFn: (row) => 
+        `${new Intl.NumberFormat("pt-BR", {
+            style: "decimal",
+        
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+          }).format(row?.quantidadesaldoestoque)}`,
+
         header : "Estoque"
       }
     ],
@@ -358,8 +372,18 @@ const EstoquePorEmpresa = () => {
             maximumFractionDigits: 2,
           }).format(d.total),
           UN_VENDA: d.unvenda,
-          quantidade_vendida: d.quantidadevendida,
-          quantidadesaldoestoque : d.quantidadesaldoestoque
+          quantidade_vendida:  Intl.NumberFormat("pt-BR", {
+            style: "decimal",
+            
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(d.quantidadevendida),
+          quantidadesaldoestoque : Intl.NumberFormat("pt-BR", {
+            style: "decimal",
+            
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(d.quantidadesaldoestoque),
           
         };
       });
@@ -550,6 +574,7 @@ const EstoquePorEmpresa = () => {
                 </div>
                 <div>
                   <Button
+                  style={{margin: '10px'}}
                     icon="pi pi-search"
                     className="p-button p-button-rounded p-button-success"
                     loading={loading}
@@ -592,11 +617,12 @@ const EstoquePorEmpresa = () => {
                  
                   
                 },
-                density: "compact",
+                columnPinning: { left: ['Loja'] },
+                density: "spacious",
                 expanded: true,
                 grouping: ["Produto",],
                 pagination: { pageIndex: 0, pageSize: 100 },
-                sorting: [{ id: "Produto", desc: false }],
+                sorting: [{ id: "Qtde vendida", desc: false }],
               }}
               localization={MRT_Localization_PT_BR}
             />

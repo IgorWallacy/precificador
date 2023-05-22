@@ -358,11 +358,21 @@ const EstoquePorEmpresa = () => {
           Loja: d.nomefilial,
           Codigo: d.codigoproduto,
           Produto: d.nomeproduto,
-          Custo_Ultima_compra: d.precoultimacompra,
-          Custo_Medio: d.precocusto,
+          Custo_Ultima_compra: Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(d.precoultimacompra),
+          Custo_Medio: Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(d.precocusto),
           // Embalagem: d.quantidadeembalagem,
-          UN_COMPRA: d.codigounidademedida,
-          quantidade_comprada: d.quantidadecompra,
+          UN_Compra: d.codigounidademedida,
+          qtde_comprada: d.quantidadecompra,
           Condicao_pagamento: d.condicaopagamento,
           Fornecedor: d.nomefornecedor,
           Total_comprado: Intl.NumberFormat("pt-BR", {
@@ -371,14 +381,14 @@ const EstoquePorEmpresa = () => {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(d.total),
-          UN_VENDA: d.unvenda,
-          quantidade_vendida:  Intl.NumberFormat("pt-BR", {
+          UN_venda: d.unvenda,
+          qtde_vendida:  Intl.NumberFormat("pt-BR", {
             style: "decimal",
             
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(d.quantidadevendida),
-          quantidadesaldoestoque : Intl.NumberFormat("pt-BR", {
+          estoque : Intl.NumberFormat("pt-BR", {
             style: "decimal",
             
             minimumFractionDigits: 2,

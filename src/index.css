@@ -5,6 +5,31 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
 
+/* Estilizando a barra de rolagem */
+::-webkit-scrollbar {
+  width: 8px; /* Largura da barra de rolagem */
+}
+
+/* Estilizando o fundo da barra de rolagem */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Cor de fundo */
+}
+
+/* Estilizando o indicador da barra de rolagem */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Cor do indicador */
+  border-radius: 4px; /* Cantos arredondados */
+}
+
+/* Estilizando o indicador da barra de rolagem ao passar o mouse */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Cor do indicador ao passar o mouse */
+}
+
+/* Estilizando o canto inferior direito da barra de rolagem */
+::-webkit-scrollbar-corner {
+  background-color: #f1f1f1; /* Cor de fundo */
+}
 
 
 * {

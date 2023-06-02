@@ -377,9 +377,9 @@ const PrecificadorAgenda = () => {
       <>
         <div>
           <Tag
-            severity="warning"
-            style={{ margin: "1px", textAlign: "center" }}
-            value=" Pendente "
+            severity="info"
+            style={{ margin: "1px", padding:'1px', textAlign: "center" }}
+            value=" Sem Agendamento "
           />{" "}
           <br />
           {rowData.precoAtual < rowData.precocusto ? (

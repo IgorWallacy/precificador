@@ -377,9 +377,9 @@ const PrecificadorAgenda = () => {
       <>
         <div>
           <Tag
-            severity="warning"
+            severity="info"
             style={{ margin: "1px", textAlign: "center" }}
-            value=" Pendente "
+            value=" Sem agendamento "
           />{" "}
           <br />
           {rowData.precoAtual < rowData.precocusto ? (
@@ -989,7 +989,7 @@ const PrecificadorAgenda = () => {
     return (
       <React.Fragment>
         <DataTable
-          showGridlines
+         // showGridlines
           size="small"
           stripedRows
           value={dados}
@@ -1408,13 +1408,14 @@ const PrecificadorAgenda = () => {
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
+           
               breakpoint="968px"
               loading={loading}
               stripedRows
               footer={"Existem " + produtos.length + " produto(s) para análise"}
               //     stripedRows
               value={produtos}
-              // selectionMode="single"
+               selectionMode="single"
               //   reorderableColumns
               editMode="row"
               dataKey="id"
@@ -1433,7 +1434,7 @@ const PrecificadorAgenda = () => {
               style={{ backgroundColor: "#F2F2F2" }}
               responsiveLayout="stack"
               emptyMessage="Nenhum produto encontrado para precificação"
-              showGridlines
+              //showGridlines
               header={headerDataTable}
               rowGroupMode="subheader"
               groupRowsBy={agrupamento}

@@ -793,6 +793,7 @@ const PrecificadorAgenda = () => {
 
     return (
       <InputNumber
+        
         prefix="R$ "
         placeholder={`Sugestão ${sf}`}
         value={options.value}

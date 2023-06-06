@@ -1410,7 +1410,7 @@ const PrecificadorAgenda = () => {
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
-           
+            
               breakpoint="968px"
               loading={loading}
               stripedRows
@@ -1433,7 +1433,7 @@ const PrecificadorAgenda = () => {
               ]}
               filters={filters2}
               size="small"
-              style={{ backgroundColor: "#F2F2F2" }}
+              style={{ backgroundColor: "#F2F2F2", width : '100%' }}
               responsiveLayout="stack"
               emptyMessage="Nenhum produto encontrado para precificação"
               //showGridlines

@@ -997,6 +997,7 @@ const PrecificadorAgenda = () => {
           value={dados}
           responsiveLayout="stack"
           breakpoint="960px"
+         
           style={{ width: "100%", backgroundColor: "#F2F2F2" }}
         >
           <Column
@@ -1410,8 +1411,8 @@ const PrecificadorAgenda = () => {
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
-            
-              breakpoint="968px"
+             responsiveLayout="stack"
+             breakpoint="960px"
               loading={loading}
               stripedRows
               footer={"Existem " + produtos.length + " produto(s) para análise"}
@@ -1434,7 +1435,7 @@ const PrecificadorAgenda = () => {
               filters={filters2}
               size="small"
               style={{ backgroundColor: "#F2F2F2", width : '100%' }}
-              responsiveLayout="stack"
+              
               emptyMessage="Nenhum produto encontrado para precificação"
               //showGridlines
               header={headerDataTable}

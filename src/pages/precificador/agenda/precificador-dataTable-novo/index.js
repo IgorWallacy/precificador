@@ -16,7 +16,7 @@ import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 import { Tag } from "primereact/tag";
 import { Dialog } from "primereact/dialog";
-import { useNavigate } from "react-router-dom";
+
 
 import { SelectButton } from "primereact/selectbutton";
 
@@ -28,7 +28,7 @@ import "moment/locale/pt-br";
 const PrecificadorAgenda = () => {
   moment.locale("pt-br");
 
-  const navigate = useNavigate();
+ 
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const toast = useRef(null);
   const toast2 = useRef(null);

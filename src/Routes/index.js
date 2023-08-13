@@ -21,6 +21,7 @@ import GraficosIndex from "../pages/vendas/graficos";
 import Main from "../components/main";
 import MetasComponent from "../pages/vendas/produtos/metas";
 import PrecosAlteradosComponent from "../pages/produto/precos-alterados";
+import CadastrarValidade from "../pages/produto/validade/novo";
 
 import EstoquePorEmpresa from "../pages/compras/estoquePorEmpresa";
 
@@ -60,6 +61,7 @@ export default function Router() {
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
           <Route path="vendas" element={<VendasDataTableComponent />} />
           <Route path="produtos/sem-vendas" element={<ProdutosSemVendas />} />
+          <Route path="produtos/validade/novo" element={<CadastrarValidade />} />
           <Route
             path="produtos/precos-alterados"
             element={<PrecosAlteradosComponent />}

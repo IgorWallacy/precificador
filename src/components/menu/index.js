@@ -28,6 +28,7 @@ const Menu = () => {
         },
       ],
     },
+    
     {
       label: "Precificação de produtos",
       icon: "pi pi-fw pi-pencil",

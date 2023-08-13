@@ -8,6 +8,8 @@ import { Dropdown } from "primereact/dropdown";
 import { addLocale } from "primereact/api";
 import { ProgressBar } from "primereact/progressbar";
 import { Toolbar } from "primereact/toolbar";
+import { InputNumber } from 'primereact/inputnumber';
+        
 
 import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
 import { Typography } from "@mui/material";
@@ -30,6 +32,7 @@ const ProdutosSemVendas = () => {
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
   const [dataUltimaCompra, setDataUltimaCompra] = useState();
+  const [diasSemVenda, setDiasSemVenda] = useState(30);
 
   const [selectLojas, setSelectLojas] = useState([]);
   const [lojaSelecionada, setLojaSelecionada] = useState();
@@ -47,6 +50,10 @@ const ProdutosSemVendas = () => {
 
   const pesquisar = () => {
     setLoading(true);
+
+    let dias = moment(new Date()).subtract(diasSemVenda , 'days')
+    
+
     return api
 
       .get(
@@ -54,7 +61,7 @@ const ProdutosSemVendas = () => {
           "YYYY-MM-DD"
         )}/${moment(dataFinal).format("YYYY-MM-DD")}/${
           lojaSelecionada?.id
-        }/${moment(dataUltimaCompra).format("YYYY-MM-DD")}`
+        }/${moment(dataUltimaCompra).format("YYYY-MM-DD")}/${moment(dias).format("YYYY-MM-DD")}`
       )
       .then((r) => {
         //  console.log(r.data);
@@ -401,6 +408,23 @@ const ProdutosSemVendas = () => {
                     value={dataUltimaCompra}
                     onChange={(e) => setDataUltimaCompra(e.value)}
                   />
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <h4>Exibir até {diasSemVenda} dias sem venda(s)</h4>
+                 <InputNumber value={diasSemVenda} onValueChange={(e) => setDiasSemVenda(e.value)} min={1} 
+                 showButtons buttonLayout="horizontal" step={1} 
+                 incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                 decrementButtonClassName="p-button-danger" incrementButtonClassName="p-button-success"/>
                 </div>
               </div>
               <div

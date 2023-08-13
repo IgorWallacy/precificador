@@ -12,6 +12,7 @@ import {
   faGlobe,
   faBusinessTime,
   faUserTie,
+  faCalendar,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./menu-interativo.css";
@@ -131,23 +132,52 @@ const MenuInterativo = () => {
               onClick={() => navigate("/precificar-executar")}
             />
           </div>
+          {filial?.lenght > 1 ? (
+            <>
+              {" "}
+              <div className="opcoes-menu">
+                <div>
+                  <h1>Produtos</h1>
+                </div>
+                <Button
+                  label="Agendar preços"
+                  icon="pi pi-calendar"
+                  className="p-button-rounded p-button-help p-button-lg"
+                  onClick={() => navigate("/produtos/precificar-agendar")}
+                />
+                <Button
+                  label="Conferir e atualizar preços"
+                  icon="pi pi-sync"
+                  className="p-button-rounded p-button-help p-button-lg"
+                  onClick={() => navigate("/produtos/precificar-executar")}
+                />
+              </div>
+            </>
+          ) : (
+            <> </>
+          )}
+        </div>
+        <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faCalendar} size="2x" />
+          <h1>Validade</h1>
           <div className="opcoes-menu">
-            <div>
-              <h1>Produtos</h1>
-            </div>
             <Button
-              label="Agendar preços"
+              label="Cadastrar validades"
               icon="pi pi-calendar"
               className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/produtos/precificar-agendar")}
-            />
-            <Button
-              label="Conferir e atualizar preços"
-              icon="pi pi-sync"
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/produtos/precificar-executar")}
+              onClick={() => navigate("/produtos/validade/novo")}
             />
           </div>
+          <div className="opcoes-menu">
+            <Button
+              label="Consultar validades"
+              icon="pi  pi-calendar   "
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/produtos/sem-vendas")}
+            />
+          </div>
+          
         </div>
         <div className="menu-categoria">
           {" "}
@@ -206,7 +236,6 @@ const MenuInterativo = () => {
               onClick={() => navigate("/compras/estoque")}
             />
           </div>
-          
         </div>
         <div className="menu-categoria">
           {" "}

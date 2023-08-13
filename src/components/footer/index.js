@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 
 import { Dialog } from "primereact/dialog";
 
-import ImagemOffline from "../../assets/img/offline.png";
+import ImagemOffline from "../../assets/img/undraw_monitor_iqpq.svg";
 
 const Footer = () => {
   const [statusApi, setStatusApi] = useState("Online");
@@ -33,17 +33,25 @@ const Footer = () => {
 
   return (
     <>
-      <Dialog closable={false} visible={statusApi === "Network Error"}>
-        <h1>API {statusApi} </h1>
+      <Dialog header={`Aplicativo ` + statusApi} closable={false} visible={statusApi === "Network Error"}>
+        
+         <div style={{
+        display : 'flex',
+        flexDirection : 'column',
+        justifyContent : 'center',
+        alignItems : 'center'
+      }}>
+
+
         <img
+          src={ImagemOffline}
           style={{
             display: "flex",
+            flexDirection: 'column',
             justifyContent: "center",
             alignItems: "center",
-            width: "75%",
+            width: "65%",
           }}
-          src={ImagemOffline}
-          alt="Imagem de erro de conexão"
         />
         <h1>Tentando restabelecer a conexão com o servidor </h1>
         <h4>
@@ -51,6 +59,7 @@ const Footer = () => {
           caso o problema persista, verifique sua conexão com a internet ou
           reinicie o servidor
         </h4>
+        </div>
       </Dialog>
 
       <div style={{ position: "absolute", top: "2%", right: "2%" }}>

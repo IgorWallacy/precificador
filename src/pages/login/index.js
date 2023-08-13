@@ -1,6 +1,6 @@
 import "./index.css";
 import ImagemDestque from "../../assets/img/undraw_login_re_4vu2.svg";
-import ImagemOffline from "../../assets/img/offline.png";
+import ImagemOffline from "../../assets/img/undraw_monitor_iqpq.svg";
 
 import React, { useState, useContext, useRef, useEffect } from "react";
 
@@ -143,15 +143,23 @@ const Login = () => {
 
   return (
     <>
-      <Dialog closable={false} visible={statusApi === "Offline"}>
-        <h1>API {statusApi} </h1>
+      <Dialog header={ `Aplicativo ` + statusApi}  closable={false} visible={statusApi === "Offline"}>
+        <div style={{
+        display : 'flex',
+        flexDirection : 'column',
+        justifyContent : 'center',
+        alignItems : 'center'
+      }}>
+
+
         <img
           src={ImagemOffline}
           style={{
             display: "flex",
+            flexDirection: 'column',
             justifyContent: "center",
             alignItems: "center",
-            width: "75%",
+            width: "65%",
           }}
         />
         <h1>Tentando restabelecer a conexão com o servidor </h1>
@@ -160,6 +168,8 @@ const Login = () => {
           caso o problema persista, verifique sua conexão com a internet ou
           reinicie o servidor
         </h4>
+        </div>
+        
       </Dialog>
       <Toast ref={toast} position="bottom-center" />
       <div className="status-api">

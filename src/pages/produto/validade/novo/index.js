@@ -310,6 +310,7 @@ const CadastrarValidade = () => {
   useEffect(() => {
     getLojas();
     getProdutos();
+    getProdutosLote()
   }, []);
 
   return (

@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PanelMenu } from "primereact/panelmenu";
 import { useNavigate } from "react-router-dom";
 
+import api from '../../services/axios'
+
 const Menu = () => {
   const navigate = useNavigate();
+  const [filial, setFilial] = useState([]);
+
+  const getFilial = () => {
+
+    return api.get("/api/filial").then((r) => {
+      setFilial(r.data)
+    })
+  }
 
   const items = [
     {
@@ -28,24 +38,24 @@ const Menu = () => {
         },
       ],
     },
-    
     {
-      label: "Precificação de produtos",
+      label: "Controle de validade e lote",
       icon: "pi pi-fw pi-pencil",
       items: [
         {
-          label: "Agendar",
-          icon: "pi pi-calendar",
-          command: () => navigate("/produtos/precificar-agendar"),
+          label: "Cadastrar",
+          icon: "pi pi-save",
+          command: () => navigate("/produtos/validade/novo"),
         },
 
         {
-          label: "Conferir e atualizar",
-          icon: "pi pi-save",
-          command: () => navigate("/produtos/precificar-executar"),
+          label: "Consultar",
+          icon: "pi pi-calendar",
+          command: () => navigate("/produtos/validade/consulta"),
         },
       ],
     },
+  
 
     /*
       label: "Alteração de preços",
@@ -95,11 +105,7 @@ const Menu = () => {
           icon: "pi pi-slack",
           command: () => navigate("/bi/pivot"),
         },
-        {
-          label: "Compras por fornecedor",
-          icon: "pi pi-users",
-          command: () => navigate("/compras/estoque"),
-        },
+
         {
           label: "Metas",
           icon: "pi pi-chart-line",
@@ -108,6 +114,45 @@ const Menu = () => {
       ],
     },
   ];
+
+  // Defina o objeto do item "Compras por fornecedor"
+  const comprasFornecedor = {
+    label: "Compras por fornecedor",
+    icon: "pi pi-users",
+    command: () => navigate("/compras/estoque"),
+  };
+
+  const precificarProdutos = {
+    label: "Precificação de produtos",
+    icon: "pi pi-fw pi-pencil",
+    items: [
+      {
+        label: "Agendar",
+        icon: "pi pi-calendar",
+        command: () => navigate("/produtos/precificar-agendar"),
+      },
+
+      {
+        label: "Conferir e atualizar",
+        icon: "pi pi-save",
+        command: () => navigate("/produtos/precificar-executar"),
+      },
+    ],
+  }
+
+  // Verifique a condição e adicione o objeto ao array 'items' se a condição for atendida
+  if (filial.length > 1) {
+    items
+      .find((item) => item.label === "Business Intelligence")
+      .items.push(comprasFornecedor);
+
+      
+      items.push(precificarProdutos);
+  }
+
+  useEffect(() => {
+      getFilial()
+  },[])
 
   return (
     <>

@@ -24,7 +24,7 @@
     "cldr-data": "^36.0.1",
     "export-to-csv": "^0.2.1",
     "file-saver": "^2.0.5",
-    "material-react-table": "latest",
+    "material-react-table": "^1.14.0",
     "moment": "^2.29.3",
     "next-barcode": "^1.4.0",
     "pdfmake": "^0.2.5",
@@ -70,5 +70,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

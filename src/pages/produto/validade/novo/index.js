@@ -18,6 +18,8 @@ import moment from "moment/moment";
 import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
 
+import { useNavigate } from "react-router-dom";
+
 const CadastrarValidade = () => {
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -63,6 +65,9 @@ const CadastrarValidade = () => {
     today: " Hoje ",
     clear: " Limpar ",
   });
+
+  const navigate = useNavigate();
+
 
   const validar = async () => {
     let schema = yup.object().shape({
@@ -336,7 +341,7 @@ const CadastrarValidade = () => {
               color: "#FFFF",
             }}
           >
-            Cadastro de validade(s)
+             {!editando ? <>Cadastrar validade(s)</> : <>Edição de produto</>}
           </h1>
           <div
             style={{
@@ -395,12 +400,11 @@ const CadastrarValidade = () => {
                 <label htmlFor="produto">Nome ou Ean</label>
               </span>
 
-              <span
-                style={{ marginLeft: "1rem", color: "#ffff" }}
-                className="p-float-label"
-              >
+             
+                
                 <Calendar
                   value={validade}
+                  placeholder={validade? moment(validade).format("DD/MM/YYYY") : 'Informe a data de validade'}
                   onChange={(e) => setValidade(e.value)}
                   dateFormat="dd/mm/yy"
                   showIcon
@@ -408,8 +412,7 @@ const CadastrarValidade = () => {
                   locale="pt-BR"
                 />
 
-                <label htmlFor="validade">Data de vencimento </label>
-              </span>
+               
 
               <InputText
                 value={codigoLote}
@@ -424,8 +427,18 @@ const CadastrarValidade = () => {
                 icon="pi pi-check"
                 onClick={validar}
               />
+               <Button
+                style={{ marginLeft: "5px" }}
+                label="Consultar lote(s)"
+                className="p-button p-button-rounded p-button-info"
+                icon="pi pi-search"
+                onClick={() => navigate ('/produtos/validade/consulta')}
+              />
             </div>
           </div>
+          {editando ? <>
+          
+          </> : <>
           <div
             style={{
               display: "flex",
@@ -461,6 +474,7 @@ const CadastrarValidade = () => {
               <Column field={editarLayout} header="Editar" />
             </DataTable>
           </div>
+          </>}
         </>
       )}
     </>

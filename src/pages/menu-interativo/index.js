@@ -24,12 +24,12 @@ import { useNavigate } from "react-router-dom";
 const MenuInterativo = () => {
   const [nome, setNome] = useState("");
   const [headers, setHeaders] = useState();
-  const [filial, setFilial] = useState(null);
+  const [filial, setFilial] = useState(1);
 
   const navigate = useNavigate();
 
   const getFilial = () => {
-    api
+    return api
       .get("/api/filial")
       .then((r) => {
         setFilial(r.data);
@@ -132,7 +132,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/precificar-executar")}
             />
           </div>
-          {filial?.lenght > 1 ? (
+          { filial.length > 1   ? (
             <>
               {" "}
               <div className="opcoes-menu">
@@ -174,10 +174,9 @@ const MenuInterativo = () => {
               label="Consultar validades"
               icon="pi  pi-calendar   "
               className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/produtos/sem-vendas")}
+              onClick={() => navigate("/produtos/validade/consulta")}
             />
           </div>
-          
         </div>
         <div className="menu-categoria">
           {" "}
@@ -228,14 +227,20 @@ const MenuInterativo = () => {
               onClick={() => navigate("/vendas/metas")}
             />
           </div>{" "}
-          <div className="opcoes-menu">
-            <Button
-              label="Análise de compras x vendas "
-              icon="pi pi-users"
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/compras/estoque")}
-            />
-          </div>
+          { filial.length > 1 ? (
+            <>
+              <div className="opcoes-menu">
+                <Button
+                  label="Análise de compras x vendas "
+                  icon="pi pi-users"
+                  className="p-button-rounded p-button-help p-button-lg"
+                  onClick={() => navigate("/compras/estoque")}
+                />
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
         </div>
         <div className="menu-categoria">
           {" "}

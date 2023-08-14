@@ -65,7 +65,7 @@ const Footer = () => {
       <div style={{ position: "absolute", top: "2%", right: "2%" }}>
         <Badge
           severity={statusApi === "UP" ? "success" : "danger"}
-          value={statusApi === "UP" ? "API Online " : "API Offline"}
+          value={statusApi === "UP" ? "Aplicativo On-line " : "Aplicativo Off-line"}
         ></Badge>
       </div>
     </>

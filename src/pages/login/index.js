@@ -90,7 +90,7 @@ const Login = () => {
 
         localStorage.setItem("access_token", accessToken);
 
-        navigate("/menu");
+        navigate("/vendas/indicadores");
       })
       .catch((error) => {
         setLoading(false);
@@ -175,7 +175,7 @@ const Login = () => {
       <div className="status-api">
         <Badge
           severity={statusApi === "UP" ? "success" : "danger"}
-          value={statusApi === "UP" ? "API Online " : "API Offline"}
+          value={statusApi === "UP" ? "API On-line " : "API Off-line"}
         ></Badge>
       </div>
       <div

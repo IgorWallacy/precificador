@@ -24,6 +24,7 @@ import PrecosAlteradosComponent from "../pages/produto/precos-alterados";
 import CadastrarValidade from "../pages/produto/validade/novo";
 
 import EstoquePorEmpresa from "../pages/compras/estoquePorEmpresa";
+import ConsultaLote from "../pages/produto/validade/consulta";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -62,6 +63,7 @@ export default function Router() {
           <Route path="vendas" element={<VendasDataTableComponent />} />
           <Route path="produtos/sem-vendas" element={<ProdutosSemVendas />} />
           <Route path="produtos/validade/novo" element={<CadastrarValidade />} />
+          <Route path="produtos/validade/consulta" element={<ConsultaLote />} />
           <Route
             path="produtos/precos-alterados"
             element={<PrecosAlteradosComponent />}

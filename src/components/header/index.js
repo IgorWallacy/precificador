@@ -7,6 +7,7 @@ import { Avatar } from "primereact/avatar";
 
 import { Button } from "primereact/button";
 import { Sidebar } from "primereact/sidebar";
+import { Calendar } from "primereact/calendar";
 
 import Context from "../../contexts";
 import { useNavigate } from "react-router-dom";
@@ -15,18 +16,17 @@ import Logo from "../../assets/img/logo_duca.png";
 
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 import Menu from "../menu";
+import moment from "moment/moment";
 
 const Header = (data) => {
   const isLogado = useContext(Context);
 
   const [nome, setNome] = useState("");
   const [visibleLeft, setVisibleLeft] = useState(false);
+
+  const [date, setDate] = useState(new Date());
 
   let navigate = useNavigate();
 
@@ -71,8 +71,10 @@ const Header = (data) => {
         </Toolbar>
       </AppBar>
       <div>
+       
         <Sidebar
-          className="p-sidebar-lg"
+        modal={true}
+          className="p-sidebar-md"
           visible={visibleLeft}
           position="right"
           onHide={() => setVisibleLeft(false)}
@@ -121,6 +123,26 @@ const Header = (data) => {
       <div className="logo-rodape">
         <img src={Logo} width="340px" alt="logo do sistema" />
       </div>
+      {visibleLeft ? <>
+        
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "start",
+              padding : '15px',
+              flexDirection  :'column',
+              gap : '1.5rem',
+              flexWrap : 'wrap'
+              
+            }}
+          >
+            <Calendar  inline showWeek />
+           <h1 style={{color : '#f2f2f2'}}> {moment().format("dddd ,DD  MMMM  YYYY - HH:mm  ")} </h1>
+          </div>
+        
+      
+      </> : <></>}
     </>
   );
 };

@@ -175,7 +175,7 @@ const Login = () => {
       <div className="status-api">
         <Badge
           severity={statusApi === "UP" ? "success" : "danger"}
-          value={statusApi === "UP" ? "API On-line " : "API Off-line"}
+          value={statusApi === "UP" ? "Aplicativo On-line " : "Aplicativo Off-line"}
         ></Badge>
       </div>
       <div

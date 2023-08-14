@@ -63,7 +63,7 @@ const GraficosIndex = () => {
     today: " Hoje ",
     clear: " Limpar ",
   });
-
+  const [headers, setHeaders] = useState();
   const [vendas, setVendas] = useState([]);
   const [ticketMedio, setTicketMedio] = useState([]);
   const [vendasMeioPagamento, setVendasMeioPagamento] = useState([]);
@@ -115,6 +115,28 @@ const GraficosIndex = () => {
     filters: [],
     showGrandTotals: true,
     grandTotalsPosition: "Bottom",
+  };
+  const pegarTokenLocalStorage = () => {
+    let token = localStorage.getItem("access_token");
+    let a = JSON.parse(token);
+    var headers = {
+      Authorization: "Bearer " + a.access_token,
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+    setHeaders(headers);
+
+    api.interceptors.request.use(
+      (config) => {
+        // Do something before request is sent
+
+        config.headers["Authorization"] = "bearer " + a.access_token;
+        return config;
+      },
+
+      (error) => {
+        Promise.reject(error);
+      }
+    );
   };
 
   const getFilial = () => {
@@ -197,6 +219,7 @@ const GraficosIndex = () => {
   };
 
   useEffect(() => {
+    pegarTokenLocalStorage()
     getVendas();
     getTicketMedio();
     getVendasMeioPagamento();

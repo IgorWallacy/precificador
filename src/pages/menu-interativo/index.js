@@ -49,7 +49,7 @@ const MenuInterativo = () => {
     };
     setHeaders(headers);
 
-    api.interceptors.request.use(
+    api.interceptors.request.use( 
       (config) => {
         // Do something before request is sent
 

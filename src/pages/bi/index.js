@@ -16,6 +16,8 @@ import { ProgressBar } from "primereact/progressbar";
 import { addLocale } from "primereact/api";
 
 import moment from "moment/moment";
+import DevExpressComponentPivot from "./devexpress";
+
 
 const Pivot = () => {
   addLocale("pt-BR", {
@@ -86,7 +88,7 @@ const Pivot = () => {
         ).format("yyyy-MM-DD")}/${modocalculo}`
       )
       .then((r) => {
-        //console.log(r.data);
+        console.log(r.data);
         setData(r.data);
         setLoading(false);
       })
@@ -174,7 +176,10 @@ const Pivot = () => {
               date1={date1}
               date2={date2}
               data={data}
-            ></SyncfusionPivot>
+          ></SyncfusionPivot> 
+
+        {/*  <DevExpressComponentPivot data ={ data} /> */}
+         
           </div>
         </>
       ) : (

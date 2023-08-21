@@ -25,10 +25,12 @@ import api from "../../../../services/axios";
 import moment from "moment";
 import "moment/locale/pt-br";
 
+
 const PrecificadorAgenda = () => {
   moment.locale("pt-br");
-
  
+  const [dialogFamilia,setDialogFamilia] = useState(false)
+  const [produtosFamilia , setProdutosFamilia] = useState([])
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const toast = useRef(null);
   const toast2 = useRef(null);
@@ -36,7 +38,9 @@ const PrecificadorAgenda = () => {
   const [headers, setHeaders] = useState();
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingFamilia, setLoadingFamilia] = useState(false)
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
+  const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [dataInicial, setDataInicial] = useState();
   const [dataFinal, setDataFinal] = useState();
   const [agendar, setAgendar] = useState(new Date());
@@ -64,6 +68,13 @@ const PrecificadorAgenda = () => {
     descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
     razaosocial: { value: null, matchMode: FilterMatchMode.CONTAINS },
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    nome: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    codigo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    
   });
 
   const [usarMarkup, setUsarMarkup] = useState(true);
@@ -130,6 +141,27 @@ const PrecificadorAgenda = () => {
     today: " Agora ",
     clear: " Limpar ",
   });
+
+  const renderHeaderFamilia = () => {
+    return (
+        <div className="flex justify-content-end">
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText value={globalFilterValue} onChange={onGlobalFilterChangeFamilia} placeholder="Pesquisar" />
+            </span>
+        </div>
+    );
+};
+
+const onGlobalFilterChangeFamilia = (e) => {
+  const value = e.target.value;
+  let _filters = { ...filters };
+
+  _filters['global'].value = value;
+
+  setFilters(_filters);
+  setGlobalFilterValue(value);
+};
 
   const atualizarmarkupminimo = () => {
     if (novoPercentualMarkupMinimo) {
@@ -793,7 +825,8 @@ const PrecificadorAgenda = () => {
 
     return (
       <InputNumber
-        
+       autoFocus
+      
         prefix="R$ "
         placeholder={`Sugestão ${sf}`}
         value={options.value}
@@ -821,7 +854,10 @@ const PrecificadorAgenda = () => {
       .catch((error) => {});
   };
 
+ 
+
   async function onRowEditComplete(e) {
+   
     let { newData, index } = e;
 
     let _produtos = [...produtos];
@@ -946,6 +982,8 @@ const PrecificadorAgenda = () => {
     }
   };
 
+  const header = renderHeaderFamilia();
+
   const onGlobalFilterChange2 = (e) => {
     const value = e.target.value;
     let _filters2 = { ...filters2 };
@@ -989,16 +1027,19 @@ const PrecificadorAgenda = () => {
     let dados = [data];
 
     return (
-      <React.Fragment>
+      
+        <>
+
+       
         <DataTable
-         // showGridlines
+          showGridlines
           size="small"
           stripedRows
           value={dados}
           responsiveLayout="stack"
           breakpoint="960px"
          
-          style={{ width: "100%", backgroundColor: "#F2F2F2" }}
+          style={{ width: "100%", backgroundColor: data?.precificado ? '#D3D3D3' : '#f1f1f1', padding : '1.5rem' }}
         >
           <Column
             field="razaosocial"
@@ -1033,7 +1074,8 @@ const PrecificadorAgenda = () => {
             header="Status"
           ></Column>
         </DataTable>
-      </React.Fragment>
+        </>
+     
     );
   };
 
@@ -1047,6 +1089,7 @@ const PrecificadorAgenda = () => {
             tooltip="Será atualizado o preço da família"
             style={{ width: "1rem", margin: "5px" }}
             icon="pi pi-users"
+            onClick={()=>abrirDialogFamilia(rowData)}
           />
           <br />
         </React.Fragment>
@@ -1061,6 +1104,28 @@ const PrecificadorAgenda = () => {
       );
     }
   };
+
+  const abrirDialogFamilia = (data) => {
+
+    
+    
+    setDialogFamilia(true)
+    getProdutosFamilia(data?.idfamilia)
+    
+    
+  }
+
+  const getProdutosFamilia = (idfamilia) => {
+    setLoadingFamilia(true)
+    return api.get(`/api/produto/familia/${idfamilia}`).then((r) => {
+      setProdutosFamilia(r.data)
+    }).catch((e) => {
+      console.log(e)
+    }).finally((f) => {
+      setLoadingFamilia(false)
+    })
+
+  }
 
   const onRowToggle = (e) => {
     setExpandedRows(e.data);
@@ -1134,7 +1199,7 @@ const PrecificadorAgenda = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-              //  console.log(response.data);
+               // console.log(response.data);
 
               setLoading(false);
 
@@ -1247,6 +1312,8 @@ const PrecificadorAgenda = () => {
     <>
       <Toast ref={toast} position="bottom-center" />
       <Toast ref={toast2} position="center" />
+
+      
 
       {produtos.length < 1 ? (
         <>
@@ -1412,6 +1479,7 @@ const PrecificadorAgenda = () => {
 
             <DataTable
              responsiveLayout="stack"
+            
              breakpoint="960px"
               loading={loading}
               stripedRows
@@ -1423,6 +1491,7 @@ const PrecificadorAgenda = () => {
               editMode="row"
               dataKey="id"
               onRowEditComplete={onRowEditComplete}
+            
               //   scrollDirection="vertical"
               //   scrollable
               //   scrollHeight="flex"
@@ -1434,7 +1503,7 @@ const PrecificadorAgenda = () => {
               ]}
               filters={filters2}
               size="small"
-              style={{ backgroundColor: "#F2F2F2", width : '100%' }}
+              style={{  backgroundColor:  '#f2f2f2', width : '100%', padding :'1.0rem' }}
               
               emptyMessage="Nenhum produto encontrado para precificação"
               //showGridlines
@@ -1573,6 +1642,22 @@ const PrecificadorAgenda = () => {
               ></Column>
             </DataTable>
           </div>
+          
+           
+          
+          <Dialog visible={dialogFamilia} onHide={() => setDialogFamilia(false)} header="Os seguintes produtos pertencem a esta família " >
+
+          <DataTable stripedRows paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}
+            globalFilterFields={['codigo', 'ean', 'nome']} emptyMessage="Nada encontrado"
+            header={header}  filters={filters}
+            loading={loadingFamilia}
+          value={produtosFamilia}  responsiveLayout="stack">
+                    <Column field="codigo" header="Código" />
+                    <Column field="ean" header="Ean" />
+                    <Column field="nome" header="Produto" />
+                    
+                </DataTable>
+            </Dialog>
         </>
       )}
     </>

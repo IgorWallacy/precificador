@@ -1163,13 +1163,22 @@ const PrecificadorExecuta = () => {
 
   const botaovoltar = (
     <React.Fragment>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignContent: "center",
+          flexWrap: "wrap",
+          gap : '1rem',
+        }}
+      >
       <Button
         className="p-button-rounded p-button-danger p-button-sm"
         tooltip="Voltar"
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-arrow-left"
         style={{
-          margin: "0px 10px",
+          margin: "0px 5px",
         }}
         onClick={() => setProdutos([])}
       />
@@ -1180,6 +1189,9 @@ const PrecificadorExecuta = () => {
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-refresh"
         className=" p-button-rounded p-button-success p-button-sm"
+        style={{
+          margin: "0px 5px",
+        }}
       />
       {/*
       <Button
@@ -1198,12 +1210,16 @@ const PrecificadorExecuta = () => {
         tooltip="Imprimir relatório dos preços agendados "
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-file-pdf"
-        style={{ margin: "5px" }}
+        style={{
+          margin: "0px 5px",
+        }}
         className=" p-button-rounded p-button-info p-button-sm"
       />
 
       <Dropdown
-        style={{ margin: "10px" }}
+        style={{
+          margin: "0px 5px",
+        }}
         value={etiquetaSelecionada}
         options={[
           {
@@ -1225,6 +1241,9 @@ const PrecificadorExecuta = () => {
         placeholder="Selecione um modelo de etiqueta"
       />
       <Button
+       style={{
+        margin: "0px 5px",
+      }}
         tooltip="Imprimir etiqueta selecionada "
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-print"
@@ -1234,7 +1253,6 @@ const PrecificadorExecuta = () => {
 
       {window.innerWidth <= 1390 ? (
         <SelectButton
-          style={{ margin: "10px" }}
           value={layoutDatable}
           options={[
             { name: "Layout 1", value: true },
@@ -1246,6 +1264,7 @@ const PrecificadorExecuta = () => {
       ) : (
         <></>
       )}
+      </div>
     </React.Fragment>
   );
 
@@ -1257,10 +1276,11 @@ const PrecificadorExecuta = () => {
             display: "flex",
             justifyContent: "center",
             flexDirection: "row",
+            margin : '1rem'
           }}
         >
           <Button
-            style={{ margin: "10px" }}
+            style={{ margin : '1rem' }}
             label={`Gravar ( ${
               produtoSelecionado ? produtoSelecionado?.length : 0
             }  ) preços agendados `}
@@ -1275,7 +1295,10 @@ const PrecificadorExecuta = () => {
     ) : (
       <>
         <Button
-          label="Gravar preços agendados"
+         style={{ margin : '1rem' }}
+          label={`Gravar ( ${
+            produtoSelecionado ? produtoSelecionado?.length : 0
+          }  ) preços agendados `}
           icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
           disabled={!produtoSelecionado || !produtoSelecionado.length}
           className="p-button-rounded p-button-success"
@@ -1545,7 +1568,15 @@ const PrecificadorExecuta = () => {
         </>
       ) : (
         <>
-          <div className="container-flex">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
+          >
             <Toolbar
               style={{ border: "none" }}
               left={botaovoltar}

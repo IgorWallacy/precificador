@@ -6,24 +6,20 @@ import "primeicons/primeicons.css"; //icons
 
 import { registerLicense } from "@syncfusion/ej2-base";
 
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import "./index.css";
 
-import reportWebVitals from "./reportWebVitals";
+
 import App from "./App";
 
 // Registering Syncfusion license key
 registerLicense(
-  "ORg4AjUWIQA/Gnt2VVhkQlFadVdJXGFWfVJpTGpQdk5xdV9DaVZUTWY/P1ZhSXxQdkRjXn5XcnFWT2dbWUE="
+  "ORg4AjUWIQA/Gnt2V1hiQlhPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9gSXZSc0RgWHpecHZWTmc="
+
 );
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const root = document.getElementById('root');
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-reportWebVitals();
+// Use createRoot to render your top-level component
+const rootElement = createRoot(root);
+rootElement.render(<App />);

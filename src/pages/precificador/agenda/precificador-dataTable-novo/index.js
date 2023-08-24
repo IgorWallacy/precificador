@@ -1172,7 +1172,7 @@ const PrecificadorAgenda = () => {
         severity: "warn",
         summary: "Aviso",
         detail: ` Informe se deseja replicar a precificação para todas as filiais (Sim ou Não) `,
-      });
+      }); 
     } else {
       if (dataInicial === undefined || dataFinal === undefined) {
         toast.current.show({

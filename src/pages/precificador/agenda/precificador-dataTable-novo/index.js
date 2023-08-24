@@ -17,7 +17,6 @@ import { addLocale } from "primereact/api";
 import { Tag } from "primereact/tag";
 import { Dialog } from "primereact/dialog";
 
-
 import { SelectButton } from "primereact/selectbutton";
 
 import api from "../../../../services/axios";
@@ -25,12 +24,11 @@ import api from "../../../../services/axios";
 import moment from "moment";
 import "moment/locale/pt-br";
 
-
 const PrecificadorAgenda = () => {
   moment.locale("pt-br");
- 
-  const [dialogFamilia,setDialogFamilia] = useState(false)
-  const [produtosFamilia , setProdutosFamilia] = useState([])
+
+  const [dialogFamilia, setDialogFamilia] = useState(false);
+  const [produtosFamilia, setProdutosFamilia] = useState([]);
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const toast = useRef(null);
   const toast2 = useRef(null);
@@ -38,7 +36,7 @@ const PrecificadorAgenda = () => {
   const [headers, setHeaders] = useState();
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingFamilia, setLoadingFamilia] = useState(false)
+  const [loadingFamilia, setLoadingFamilia] = useState(false);
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [dataInicial, setDataInicial] = useState();
@@ -74,7 +72,6 @@ const PrecificadorAgenda = () => {
     ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
     nome: { value: null, matchMode: FilterMatchMode.CONTAINS },
     codigo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    
   });
 
   const [usarMarkup, setUsarMarkup] = useState(true);
@@ -144,24 +141,28 @@ const PrecificadorAgenda = () => {
 
   const renderHeaderFamilia = () => {
     return (
-        <div className="flex justify-content-end">
-            <span className="p-input-icon-left">
-                <i className="pi pi-search" />
-                <InputText value={globalFilterValue} onChange={onGlobalFilterChangeFamilia} placeholder="Pesquisar" />
-            </span>
-        </div>
+      <div className="flex justify-content-end">
+        <span className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText
+            value={globalFilterValue}
+            onChange={onGlobalFilterChangeFamilia}
+            placeholder="Pesquisar"
+          />
+        </span>
+      </div>
     );
-};
+  };
 
-const onGlobalFilterChangeFamilia = (e) => {
-  const value = e.target.value;
-  let _filters = { ...filters };
+  const onGlobalFilterChangeFamilia = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
 
-  _filters['global'].value = value;
+    _filters["global"].value = value;
 
-  setFilters(_filters);
-  setGlobalFilterValue(value);
-};
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  };
 
   const atualizarmarkupminimo = () => {
     if (novoPercentualMarkupMinimo) {
@@ -280,8 +281,19 @@ const onGlobalFilterChangeFamilia = (e) => {
     }).format(rowData.precocusto);
     return (
       <>
-        {" "}
-        <font color="red">Custo de {custo} </font>{" "}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection : 'column',
+            alignItems: "cenetr",
+            flexWrap: "wrap",
+            color : 'red'
+          }}
+        >
+         <p>CFOP {rowData?.cfop}</p> 
+         <h3> Custo de {custo}</h3>
+        </div>
       </>
     );
   };
@@ -410,9 +422,8 @@ const onGlobalFilterChangeFamilia = (e) => {
         <div>
           <Tag
             severity="info"
-            style={{ margin: "1px", padding : '1px', textAlign: "center" }}
+            style={{ margin: "1px", padding: "1px", textAlign: "center" }}
             value=" Sem agendamento "
-        
           />
           <br />
           {rowData.precoAtual < rowData.precocusto ? (
@@ -825,8 +836,7 @@ const onGlobalFilterChangeFamilia = (e) => {
 
     return (
       <InputNumber
-       autoFocus
-      
+        autoFocus
         prefix="R$ "
         placeholder={`Sugestão ${sf}`}
         value={options.value}
@@ -854,10 +864,7 @@ const onGlobalFilterChangeFamilia = (e) => {
       .catch((error) => {});
   };
 
- 
-
   async function onRowEditComplete(e) {
-   
     let { newData, index } = e;
 
     let _produtos = [...produtos];
@@ -1027,10 +1034,7 @@ const onGlobalFilterChangeFamilia = (e) => {
     let dados = [data];
 
     return (
-      
-        <>
-
-       
+      <>
         <DataTable
           showGridlines
           size="small"
@@ -1038,8 +1042,11 @@ const onGlobalFilterChangeFamilia = (e) => {
           value={dados}
           responsiveLayout="stack"
           breakpoint="960px"
-         
-          style={{ width: "100%", backgroundColor: data?.precificado ? '#D3D3D3' : '#f1f1f1', padding : '1.5rem' }}
+          style={{
+            width: "100%",
+            backgroundColor: data?.precificado ? "#D3D3D3" : "#f1f1f1",
+            padding: "1.5rem",
+          }}
         >
           <Column
             field="razaosocial"
@@ -1074,8 +1081,7 @@ const onGlobalFilterChangeFamilia = (e) => {
             header="Status"
           ></Column>
         </DataTable>
-        </>
-     
+      </>
     );
   };
 
@@ -1089,7 +1095,7 @@ const onGlobalFilterChangeFamilia = (e) => {
             tooltip="Será atualizado o preço da família"
             style={{ width: "1rem", margin: "5px" }}
             icon="pi pi-users"
-            onClick={()=>abrirDialogFamilia(rowData)}
+            onClick={() => abrirDialogFamilia(rowData)}
           />
           <br />
         </React.Fragment>
@@ -1106,26 +1112,24 @@ const onGlobalFilterChangeFamilia = (e) => {
   };
 
   const abrirDialogFamilia = (data) => {
-
-    
-    
-    setDialogFamilia(true)
-    getProdutosFamilia(data?.idfamilia)
-    
-    
-  }
+    setDialogFamilia(true);
+    getProdutosFamilia(data?.idfamilia);
+  };
 
   const getProdutosFamilia = (idfamilia) => {
-    setLoadingFamilia(true)
-    return api.get(`/api/produto/familia/${idfamilia}`).then((r) => {
-      setProdutosFamilia(r.data)
-    }).catch((e) => {
-      console.log(e)
-    }).finally((f) => {
-      setLoadingFamilia(false)
-    })
-
-  }
+    setLoadingFamilia(true);
+    return api
+      .get(`/api/produto/familia/${idfamilia}`)
+      .then((r) => {
+        setProdutosFamilia(r.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally((f) => {
+        setLoadingFamilia(false);
+      });
+  };
 
   const onRowToggle = (e) => {
     setExpandedRows(e.data);
@@ -1179,8 +1183,8 @@ const onGlobalFilterChangeFamilia = (e) => {
       } else {
         let dataI = moment(dataInicial)
           .format("YYYY-MM-DDTHH:MM:ss.")
-          .slice(0, 20);
-        let dataF = moment(dataFinal)
+          .slice(0, 20)
+        let dataF = moment(dataFinal).add(1 ,'hour')
           .format("YYYY-MM-DDTHH:MM:ss.")
           .slice(0, 20);
 
@@ -1199,7 +1203,7 @@ const onGlobalFilterChangeFamilia = (e) => {
             )
             .then((response) => {
               setProdutos(response.data);
-               // console.log(response.data);
+              // console.log(response.data);
 
               setLoading(false);
 
@@ -1278,6 +1282,7 @@ const onGlobalFilterChangeFamilia = (e) => {
             showIcon
             value={agendar}
             onChange={(e) => setAgendar(e.target.value)}
+            showButtonBar
           />
         </div>
       </div>
@@ -1313,8 +1318,6 @@ const onGlobalFilterChangeFamilia = (e) => {
       <Toast ref={toast} position="bottom-center" />
       <Toast ref={toast2} position="center" />
 
-      
-
       {produtos.length < 1 ? (
         <>
           <div className="form-precificador">
@@ -1332,10 +1335,10 @@ const onGlobalFilterChangeFamilia = (e) => {
                 hideOnDateTimeSelect
                 value={dataInicial}
                 onChange={(e) => setDataInicial(e.target.value)}
-                showButtonBar
+                
                 locale="pt-BR"
                 showTime
-                showSeconds
+                
               />
             </div>
             <div className="form-precificador-input">
@@ -1353,10 +1356,10 @@ const onGlobalFilterChangeFamilia = (e) => {
                 hideOnDateTimeSelect
                 value={dataFinal}
                 onChange={(e) => setDataFinal(e.value)}
-                showButtonBar
+               
                 locale="pt-BR"
                 showTime
-                showSeconds
+               
                 position="bottom"
               />
             </div>
@@ -1478,20 +1481,18 @@ const onGlobalFilterChangeFamilia = (e) => {
             <Tooltip target=".export-buttons>button" position="bottom" />
 
             <DataTable
-             responsiveLayout="stack"
-            
-             breakpoint="960px"
+              responsiveLayout="stack"
+              breakpoint="960px"
               loading={loading}
               stripedRows
               footer={"Existem " + produtos.length + " produto(s) para análise"}
               //     stripedRows
               value={produtos}
-               selectionMode="single"
+              selectionMode="single"
               //   reorderableColumns
               editMode="row"
               dataKey="id"
               onRowEditComplete={onRowEditComplete}
-            
               //   scrollDirection="vertical"
               //   scrollable
               //   scrollHeight="flex"
@@ -1503,8 +1504,11 @@ const onGlobalFilterChangeFamilia = (e) => {
               ]}
               filters={filters2}
               size="small"
-              style={{  backgroundColor:  '#f2f2f2', width : '100%', padding :'1.0rem' }}
-              
+              style={{
+                backgroundColor: "#f2f2f2",
+                width: "100%",
+                padding: "1.0rem",
+              }}
               emptyMessage="Nenhum produto encontrado para precificação"
               //showGridlines
               header={headerDataTable}
@@ -1642,22 +1646,30 @@ const onGlobalFilterChangeFamilia = (e) => {
               ></Column>
             </DataTable>
           </div>
-          
-           
-          
-          <Dialog visible={dialogFamilia} onHide={() => setDialogFamilia(false)} header="Os seguintes produtos pertencem a esta família " >
 
-          <DataTable stripedRows paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}
-            globalFilterFields={['codigo', 'ean', 'nome']} emptyMessage="Nada encontrado"
-            header={header}  filters={filters}
-            loading={loadingFamilia}
-          value={produtosFamilia}  responsiveLayout="stack">
-                    <Column field="codigo" header="Código" />
-                    <Column field="ean" header="Ean" />
-                    <Column field="nome" header="Produto" />
-                    
-                </DataTable>
-            </Dialog>
+          <Dialog
+            visible={dialogFamilia}
+            onHide={() => setDialogFamilia(false)}
+            header="Os seguintes produtos pertencem a esta família "
+          >
+            <DataTable
+              stripedRows
+              paginator
+              rows={5}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              globalFilterFields={["codigo", "ean", "nome"]}
+              emptyMessage="Nada encontrado"
+              header={header}
+              filters={filters}
+              loading={loadingFamilia}
+              value={produtosFamilia}
+              responsiveLayout="stack"
+            >
+              <Column field="codigo" header="Código" />
+              <Column field="ean" header="Ean" />
+              <Column field="nome" header="Produto" />
+            </DataTable>
+          </Dialog>
         </>
       )}
     </>

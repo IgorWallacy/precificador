@@ -13,7 +13,6 @@ import { InputNumber } from "primereact/inputnumber";
 import { Toast } from "primereact/toast";
 import { FilterMatchMode } from "primereact/api";
 
-import { Tooltip } from "primereact/tooltip";
 import { Dropdown } from "primereact/dropdown";
 import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
@@ -26,8 +25,6 @@ import { Tag } from "primereact/tag";
 import { Ripple } from "primereact/ripple";
 import { classNames } from "primereact/utils";
 
-import Typing from "react-typing-animation";
-
 import api from "../../../../services/axios";
 //import { useNavigate } from "react-router-dom";
 
@@ -39,6 +36,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const PrecificadorExecuta = () => {
   //  const navigate = useNavigate();
+
+  const [modoPesquisa, setModoPesquisa] = useState(0);
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const [etiquetaSelecionada, setEtiquetaSelecionada] = useState("");
   const toast = useRef(null);
@@ -51,10 +50,21 @@ const PrecificadorExecuta = () => {
   const [dataFinal, setDataFinal] = useState();
   const [replicarPreco, setReplicarPreco] = useState(0);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const msgs = useRef(null);
   //const [expandedRows, setExpandedRows] = useState(null);
   const replicarPrecoOpcoes = [
     { label: "Sim", value: 1 },
     { label: "Não", value: 0 },
+  ];
+  const modosDePesquisa = [
+    {
+      label: "Agendamento",
+      value: 0,
+    },
+    {
+      label: "Inclusão",
+      value: 1,
+    },
   ];
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -278,6 +288,24 @@ const PrecificadorExecuta = () => {
             </div>
           </>
         )}
+      </>
+    );
+  };
+
+  const usuarioAgendadoTemplate = (row) => {
+    return (
+      <>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexWrap: "wrap",
+            gap: "5px",
+          }}
+        >
+          <h7> {moment(row?.dataInclusao).format("DD/MM/YYYY HH:mm")} </h7>
+          {row?.usuarioAgendado}
+        </div>
       </>
     );
   };
@@ -1095,10 +1123,7 @@ const PrecificadorExecuta = () => {
           detail: ` Informe a data inicial e final  `,
         });
       } else {
-        let dataI = dataInicial?.toISOString().slice(0, 20);
-        let dataF = dataFinal?.toISOString().slice(0, 20);
-
-        if (dataI && dataF) {
+        if (dataInicial && dataFinal) {
           let filialId = filiaisSelect ? filiaisSelect.id : 0;
 
           setLoading(true);
@@ -1106,7 +1131,13 @@ const PrecificadorExecuta = () => {
           await api
 
             .get(
-              `/api_precificacao/produtos/precificar/${dataI}/${dataF}/${filialId}`,
+              `/api_precificacao/produtos/precificar/${moment(
+                dataInicial
+              ).format("YYYY-MM-DD HH:mm:ss [GMT]Z")}/${moment(
+                dataFinal
+              ).format(
+                "YYYY-MM-DD HH:mm:ss [GMT]Z"
+              )}/${filialId}/${modoPesquisa}`,
               {
                 headers: headers,
               }
@@ -1134,7 +1165,8 @@ const PrecificadorExecuta = () => {
                 summary: "Erro",
                 detail: ` ${error}  `,
               });
-
+            })
+            .finally((f) => {
               setLoading(false);
             });
         }
@@ -1169,31 +1201,31 @@ const PrecificadorExecuta = () => {
           justifyContent: "center",
           alignContent: "center",
           flexWrap: "wrap",
-          gap : '1rem',
+          gap: "1rem",
         }}
       >
-      <Button
-        className="p-button-rounded p-button-danger p-button-sm"
-        tooltip="Voltar"
-        tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-arrow-left"
-        style={{
-          margin: "0px 5px",
-        }}
-        onClick={() => setProdutos([])}
-      />
+        <Button
+          className="p-button-rounded p-button-danger p-button-sm"
+          tooltip="Voltar"
+          tooltipOptions={{ position: "bottom" }}
+          icon="pi pi-arrow-left"
+          style={{
+            margin: "0px 5px",
+          }}
+          onClick={() => setProdutos([])}
+        />
 
-      <Button
-        onClick={() => buscarProdutos()}
-        tooltip="Atualizar"
-        tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-refresh"
-        className=" p-button-rounded p-button-success p-button-sm"
-        style={{
-          margin: "0px 5px",
-        }}
-      />
-      {/*
+        <Button
+          onClick={() => buscarProdutos()}
+          tooltip="Atualizar"
+          tooltipOptions={{ position: "bottom" }}
+          icon="pi pi-refresh"
+          className=" p-button-rounded p-button-success p-button-sm"
+          style={{
+            margin: "0px 5px",
+          }}
+        />
+        {/*
       <Button
         onClick={() => imprimeEtiquetaPrecosAgendados()}
         tooltip="Imprimir etiqueta dos preços agendados selecionados "
@@ -1205,65 +1237,65 @@ const PrecificadorExecuta = () => {
       
       */}
 
-      <Button
-        onClick={() => imprimePDFPrecosAgendados()}
-        tooltip="Imprimir relatório dos preços agendados "
-        tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-file-pdf"
-        style={{
-          margin: "0px 5px",
-        }}
-        className=" p-button-rounded p-button-info p-button-sm"
-      />
-
-      <Dropdown
-        style={{
-          margin: "0px 5px",
-        }}
-        value={etiquetaSelecionada}
-        options={[
-          {
-            name: "Etiqueta 101x31 - Quebra linha, preço a direita, cod.Barras",
-            value: 2,
-          },
-          {
-            name: "Etiqueta 101x31 - Preço centralizado, cod.Barras",
-            value: 1,
-          },
-
-          {
-            name: "Etiqueta 101x31 - Preço a direita QRCODE",
-            value: 3,
-          },
-        ]}
-        onChange={(e) => selecionarEtiqueta(e.value)}
-        optionLabel="name"
-        placeholder="Selecione um modelo de etiqueta"
-      />
-      <Button
-       style={{
-        margin: "0px 5px",
-      }}
-        tooltip="Imprimir etiqueta selecionada "
-        tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-print"
-        className="p-button-rounded p-button-info"
-        onClick={() => selecionarEtiqueta(etiquetaSelecionada)}
-      />
-
-      {window.innerWidth <= 1390 ? (
-        <SelectButton
-          value={layoutDatable}
-          options={[
-            { name: "Layout 1", value: true },
-            { name: "Layout 2", value: false },
-          ]}
-          optionLabel="name"
-          onChange={(e) => setLayoutDatable(e.value)}
+        <Button
+          onClick={() => imprimePDFPrecosAgendados()}
+          tooltip="Imprimir relatório dos preços agendados "
+          tooltipOptions={{ position: "bottom" }}
+          icon="pi pi-file-pdf"
+          style={{
+            margin: "0px 5px",
+          }}
+          className=" p-button-rounded p-button-info p-button-sm"
         />
-      ) : (
-        <></>
-      )}
+
+        <Dropdown
+          style={{
+            margin: "0px 5px",
+          }}
+          value={etiquetaSelecionada}
+          options={[
+            {
+              name: "Etiqueta 101x31 - Quebra linha, preço a direita, cod.Barras",
+              value: 2,
+            },
+            {
+              name: "Etiqueta 101x31 - Preço centralizado, cod.Barras",
+              value: 1,
+            },
+
+            {
+              name: "Etiqueta 101x31 - Preço a direita QRCODE",
+              value: 3,
+            },
+          ]}
+          onChange={(e) => selecionarEtiqueta(e.value)}
+          optionLabel="name"
+          placeholder="Selecione um modelo de etiqueta"
+        />
+        <Button
+          style={{
+            margin: "0px 5px",
+          }}
+          tooltip="Imprimir etiqueta selecionada "
+          tooltipOptions={{ position: "bottom" }}
+          icon="pi pi-print"
+          className="p-button-rounded p-button-info"
+          onClick={() => selecionarEtiqueta(etiquetaSelecionada)}
+        />
+
+        {window.innerWidth <= 1390 ? (
+          <SelectButton
+            value={layoutDatable}
+            options={[
+              { name: "Layout 1", value: true },
+              { name: "Layout 2", value: false },
+            ]}
+            optionLabel="name"
+            onChange={(e) => setLayoutDatable(e.value)}
+          />
+        ) : (
+          <></>
+        )}
       </div>
     </React.Fragment>
   );
@@ -1276,11 +1308,11 @@ const PrecificadorExecuta = () => {
             display: "flex",
             justifyContent: "center",
             flexDirection: "row",
-            margin : '1rem'
+            margin: "1rem",
           }}
         >
           <Button
-            style={{ margin : '1rem' }}
+            style={{ margin: "1rem" }}
             label={`Gravar ( ${
               produtoSelecionado ? produtoSelecionado?.length : 0
             }  ) preços agendados `}
@@ -1295,7 +1327,7 @@ const PrecificadorExecuta = () => {
     ) : (
       <>
         <Button
-         style={{ margin : '1rem' }}
+          style={{ margin: "1rem" }}
           label={`Gravar ( ${
             produtoSelecionado ? produtoSelecionado?.length : 0
           }  ) preços agendados `}
@@ -1351,7 +1383,7 @@ const PrecificadorExecuta = () => {
           toast.current.show({
             severity: "error",
             summary: "Erro",
-            detail: ` ${e.data}  `,
+            detail: ` ${e.message}  `,
           });
         })
         .finally((f) => {
@@ -1482,24 +1514,30 @@ const PrecificadorExecuta = () => {
         </h4>
 
         <img style={{ width: "250px" }} src={ImagemDestque} />
-        {replicarPreco ? (
-          <Tag
-            className="mr-10"
-            style={{ margin: "5px" }}
-            rounded
-            value="Replicar a atualização de preços para todas as lojas"
-            severity="info"
-            icon="pi pi-check"
-          ></Tag>
+        {quantidadeFilial.length > 1 ? (
+          <>
+            {replicarPreco ? (
+              <Tag
+                className="mr-10"
+                style={{ margin: "5px" }}
+                rounded
+                value="Replicar a atualização de preços para todas as lojas"
+                severity="info"
+                icon="pi pi-check"
+              ></Tag>
+            ) : (
+              <Tag
+                className="mr-10"
+                style={{ margin: "5px" }}
+                icon="pi pi-times"
+                rounded
+                severity="danger"
+                value="Não replicar a atualização de preços para todas as lojas"
+              ></Tag>
+            )}
+          </>
         ) : (
-          <Tag
-            className="mr-10"
-            style={{ margin: "5px" }}
-            icon="pi pi-times"
-            rounded
-            severity="danger"
-            value="Não replicar a atualização de preços para todas as lojas"
-          ></Tag>
+          <></>
         )}
       </div>
 
@@ -1507,10 +1545,30 @@ const PrecificadorExecuta = () => {
         <>
           <div className="container-flex">
             <div className="form-precificador">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                Pesquisar por
+                <SelectButton
+                  value={modoPesquisa}
+                  onChange={(e) => {
+                    setDataInicial(null);
+                    setDataFinal(null);
+                    setModoPesquisa(e.value);
+                  }}
+                  options={modosDePesquisa}
+                />
+              </div>
               <div className="form-precificador-input">
                 <div>
                   <h5>Período</h5>
                 </div>
+
                 <Calendar
                   selectOtherMonths
                   required
@@ -1520,10 +1578,13 @@ const PrecificadorExecuta = () => {
                   viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
                   hideOnDateTimeSelect
                   value={dataInicial}
-                  onChange={(e) => setDataInicial(e.target.value)}
+                  onChange={(e) => {
+                    setDataInicial(e.target.value);
+                    dataInicial?.setUTCHours(dataInicial.getUTCHours() - 3);
+                  }}
                   showButtonBar
                   locale="pt-BR"
-                  //   showTime
+                  showTime={modoPesquisa}
                   //  showSeconds
                 />
               </div>
@@ -1540,10 +1601,13 @@ const PrecificadorExecuta = () => {
                   dateFormat="dd/mm/yy"
                   hideOnDateTimeSelect
                   value={dataFinal}
-                  onChange={(e) => setDataFinal(e.value)}
+                  onChange={(e) => {
+                    setDataFinal(e.value);
+                    dataFinal?.setUTCHours(dataFinal.getUTCHours() - 3);
+                  }}
                   showButtonBar
                   locale="pt-BR"
-                  //    showTime
+                  showTime={modoPesquisa}
                   //  showSeconds
                 />
               </div>
@@ -1558,7 +1622,9 @@ const PrecificadorExecuta = () => {
             <div className="form-precificador-btn">
               <Button
                 icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
-                label={loading ? "Pesquisando ..." : " Pesquisar "}
+                label={
+                  loading ? "Pesquisando ..." : " Pesquisar agendamento(s) "
+                }
                 disabled={loading}
                 className="p-button-rounded p-button-success p-button-md"
                 onClick={() => buscarProdutos()}
@@ -1583,7 +1649,7 @@ const PrecificadorExecuta = () => {
               right={botaoatualizar}
             />
 
-            <div>
+            <div style={{padding : '1px'}}>
               <DataTable
                 responsiveLayout={layoutDatable ? "stack" : "scroll"}
                 breakpoint="1390px"
@@ -1614,8 +1680,8 @@ const PrecificadorExecuta = () => {
                 header={headerDataTable}
                 //   rowGroupMode="subheader"
                 //    groupRowsBy={agrupamento}
-                paginator
-                rows={3}
+                //paginator
+                //rows={3}
                 paginatorTemplate={template1}
                 //  sortOrder={1}
                 //     rowGroupHeaderTemplate={headerTemplate}
@@ -1733,7 +1799,7 @@ const PrecificadorExecuta = () => {
 
                 <Column
                   header="Agendado por"
-                  field="usuarioAgendado"
+                  field={usuarioAgendadoTemplate}
                   style={{ textAlign: "center", fontWeight: "600" }}
                 ></Column>
 

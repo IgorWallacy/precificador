@@ -87,7 +87,8 @@ const PrecificadorAgenda = () => {
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    // window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
     pegarTokenLocalStorage();
     usarTabelaFormacaoPreecoProduto();
 
@@ -285,14 +286,14 @@ const PrecificadorAgenda = () => {
           style={{
             display: "flex",
             justifyContent: "center",
-            flexDirection : 'column',
+            flexDirection: "column",
             alignItems: "cenetr",
             flexWrap: "wrap",
-            color : 'red'
+            color: "red",
           }}
         >
-         <p>CFOP {rowData?.cfop}</p> 
-         <h3> Custo de {custo}</h3>
+          <p>CFOP {rowData?.cfop}</p>
+          <h3> Custo de {custo}</h3>
         </div>
       </>
     );
@@ -1172,7 +1173,7 @@ const PrecificadorAgenda = () => {
         severity: "warn",
         summary: "Aviso",
         detail: ` Informe se deseja replicar a precificação para todas as filiais (Sim ou Não) `,
-      }); 
+      });
     } else {
       if (dataInicial === undefined || dataFinal === undefined) {
         toast.current.show({
@@ -1181,14 +1182,7 @@ const PrecificadorAgenda = () => {
           detail: ` Informe a data inicial e final  `,
         });
       } else {
-        let dataI = moment(dataInicial)
-          .format("YYYY-MM-DDTHH:MM:ss.")
-          .slice(0, 20)
-        let dataF = moment(dataFinal).add(1 ,'hour')
-          .format("YYYY-MM-DDTHH:MM:ss.")
-          .slice(0, 20);
-
-        if (dataI && dataF) {
+        if (dataInicial && dataFinal) {
           let filialId = filiaisSelect ? filiaisSelect.id : 0;
 
           setLoading(true);
@@ -1196,7 +1190,11 @@ const PrecificadorAgenda = () => {
           await api
 
             .get(
-              `/api_precificacao/produtos/precificar/agendar/${dataI}/${dataF}/${filialId}`,
+              `/api_precificacao/produtos/precificar/agendar/${moment(
+                dataInicial
+              ).format("YYYY-MM-DD HH:mm:ss [GMT]Z")}/${moment(dataFinal).format(
+                "YYYY-MM-DD HH:mm:ss [GMT]Z"
+              )}/${filialId}`,
               {
                 headers: headers,
               }
@@ -1227,7 +1225,8 @@ const PrecificadorAgenda = () => {
               });
 
               setLoading(false);
-            });
+            })
+            .finally((f) => {});
         }
       }
     }
@@ -1335,10 +1334,8 @@ const PrecificadorAgenda = () => {
                 hideOnDateTimeSelect
                 value={dataInicial}
                 onChange={(e) => setDataInicial(e.target.value)}
-                
                 locale="pt-BR"
                 showTime
-                
               />
             </div>
             <div className="form-precificador-input">
@@ -1355,11 +1352,12 @@ const PrecificadorAgenda = () => {
                 dateFormat="dd/mm/yy"
                 hideOnDateTimeSelect
                 value={dataFinal}
-                onChange={(e) => setDataFinal(e.value)}
-               
+                onChange={(e) => {
+                  setDataFinal(e.value);
+                  dataFinal?.setUTCHours(dataFinal.getUTCHours());
+                }}
                 locale="pt-BR"
                 showTime
-               
                 position="bottom"
               />
             </div>

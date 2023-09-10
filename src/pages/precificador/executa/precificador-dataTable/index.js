@@ -74,7 +74,7 @@ const PrecificadorExecuta = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  const [layoutDatable, setLayoutDatable] = useState(false);
+
 
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
@@ -423,7 +423,7 @@ const PrecificadorExecuta = () => {
   };
 
   const status = (rowData) => {
-    return rowData.precoAtual === rowData.precoagendado ? (
+    return rowData?.precoAtual === rowData?.precoagendado ? (
       <>
         <div
           style={{
@@ -436,8 +436,8 @@ const PrecificadorExecuta = () => {
             severity="success"
           ></Tag>
           <br />
-          {rowData.precoAtual < rowData.precocusto ||
-          rowData.precoagendado < rowData.precocusto ? (
+          {rowData?.precoAtual < rowData?.precocusto ||
+          rowData?.precoagendado < rowData?.precocusto ? (
             <>
               <Tag
                 style={{ margin: "1rem" }}
@@ -461,8 +461,8 @@ const PrecificadorExecuta = () => {
             severity="warning"
           ></Tag>
           <br />
-          {rowData.precoAtual < rowData.precocusto ||
-          rowData.precoagendado < rowData.precocusto ? (
+          {rowData?.precoAtual < rowData?.precocusto ||
+          rowData?.precoagendado < rowData?.precocusto ? (
             <>
               <Tag
                 style={{ margin: "1rem" }}
@@ -1283,19 +1283,7 @@ const PrecificadorExecuta = () => {
           onClick={() => selecionarEtiqueta(etiquetaSelecionada)}
         />
 
-        {window.innerWidth <= 1390 ? (
-          <SelectButton
-            value={layoutDatable}
-            options={[
-              { name: "Layout 1", value: true },
-              { name: "Layout 2", value: false },
-            ]}
-            optionLabel="name"
-            onChange={(e) => setLayoutDatable(e.value)}
-          />
-        ) : (
-          <></>
-        )}
+       
       </div>
     </React.Fragment>
   );
@@ -1649,10 +1637,10 @@ const PrecificadorExecuta = () => {
               right={botaoatualizar}
             />
 
-            <div style={{padding : '1px'}}>
+            <div >
               <DataTable
-                responsiveLayout={layoutDatable ? "stack" : "scroll"}
-                breakpoint="1390px"
+               
+                
                 style={{ width: "100%", backgroundColor: "#F2F2F2" }}
                 footer={
                   "Existem " + produtos.length + " produto(s) para análise"
@@ -1806,15 +1794,16 @@ const PrecificadorExecuta = () => {
                 <Column
                   header="Status"
                   field={status}
+                  body={status}
+                  
                   style={{ textAlign: "center", fontWeight: "600" }}
                 ></Column>
-
                 <Column
-                  header="Atualizar e Confirmar"
-                  rowEditor
-                  headerStyle={{ width: "10%", minWidth: "8rem" }}
-                  bodyStyle={{ textAlign: "center" }}
+                  selectionMode="multiple"
+                  headerStyle={{ width: "3rem" }}
+                  exportable={false}
                 ></Column>
+              
               </DataTable>
             </div>
           </div>

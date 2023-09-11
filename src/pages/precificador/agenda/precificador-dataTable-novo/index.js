@@ -23,9 +23,12 @@ import api from "../../../../services/axios";
 
 import moment from "moment";
 import "moment/locale/pt-br";
+import { useNavigate } from "react-router-dom";
 
 const PrecificadorAgenda = () => {
   moment.locale("pt-br");
+
+  const navigate  = useNavigate() 
 
   const [dialogFamilia, setDialogFamilia] = useState(false);
   const [produtosFamilia, setProdutosFamilia] = useState([]);
@@ -1252,6 +1255,13 @@ const PrecificadorAgenda = () => {
         icon={loading ? "pi pi-spin pi-spinner" : "pi pi-refresh"}
         className=" botao-flutuante-atualizar p-button-rounded p-button-success p-button-sm"
       />
+      <Button
+        onClick={() => navigate("/precificar-executar")}
+        tooltip="Navegar para carga e atualização de preços agendados"
+        tooltipOptions={{ position: "bottom" }}
+        icon="pi pi-dollar"
+        className=" botao-flutuante-pesquisar p-button-rounded p-button-info p-button-sm"
+      />
 
       <SelectButton
         value={usarMarkup}
@@ -1282,6 +1292,7 @@ const PrecificadorAgenda = () => {
             value={agendar}
             onChange={(e) => setAgendar(e.target.value)}
             showButtonBar
+            
           />
         </div>
       </div>
@@ -1336,6 +1347,7 @@ const PrecificadorAgenda = () => {
                 onChange={(e) => setDataInicial(e.target.value)}
                 locale="pt-BR"
                 showTime
+                showButtonBar
               />
             </div>
             <div className="form-precificador-input">
@@ -1358,7 +1370,9 @@ const PrecificadorAgenda = () => {
                 }}
                 locale="pt-BR"
                 showTime
+                showButtonBar
                 position="bottom"
+
               />
             </div>
 
@@ -1370,7 +1384,7 @@ const PrecificadorAgenda = () => {
           <div className="form-precificador-btn">
             <Button
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
-              label={loading ? " Pesquisando ..." : " Pesquisar "}
+              label={loading ? " Pesquisando ..." : " Pesquisar notas fiscais  "}
               disabled={loading}
               className="p-button-rounded p-button-success p-button-md"
               onClick={() => buscarProdutos()}

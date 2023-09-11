@@ -219,7 +219,7 @@ const GraficosIndex = () => {
   };
 
   useEffect(() => {
-    pegarTokenLocalStorage()
+    pegarTokenLocalStorage();
     getVendas();
     getTicketMedio();
     getVendasMeioPagamento();
@@ -263,6 +263,7 @@ const GraficosIndex = () => {
             }}
           >
             <Calendar
+              selectOtherMonths
               style={{ margin: "5px" }}
               dateFormat="dd/mm/yy"
               locale="pt-BR"
@@ -273,6 +274,7 @@ const GraficosIndex = () => {
               onChange={(e) => setDataInicial(e.value)}
             ></Calendar>
             <Calendar
+              selectOtherMonths
               style={{ margin: "5px" }}
               dateFormat="dd/mm/yy"
               locale="pt-BR"
@@ -333,6 +335,7 @@ const GraficosIndex = () => {
               }}
             >
               <Calendar
+              selectOtherMonths
                 style={{ margin: "5px" }}
                 dateFormat="dd/mm/yy"
                 locale="pt-BR"
@@ -343,6 +346,7 @@ const GraficosIndex = () => {
                 onChange={(e) => setDataInicialTicket(e.value)}
               ></Calendar>
               <Calendar
+              selectOtherMonths
                 style={{ margin: "5px" }}
                 dateFormat="dd/mm/yy"
                 locale="pt-BR"
@@ -397,6 +401,7 @@ const GraficosIndex = () => {
           </h1>
           <div style={{ width: "100%" }}>
             <Calendar
+            selectOtherMonths
               style={{ margin: "5px" }}
               dateFormat="dd/mm/yy"
               locale="pt-BR"
@@ -407,6 +412,7 @@ const GraficosIndex = () => {
               onChange={(e) => setDataInicialMeioPagamento(e.value)}
             ></Calendar>
             <Calendar
+            selectOtherMonths
               style={{ margin: "5px" }}
               dateFormat="dd/mm/yy"
               locale="pt-BR"

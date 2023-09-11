@@ -320,7 +320,7 @@ function VendasDataTableComponent() {
               <div className="flex justify-content-between mb-3">
                 <div>
                   <span className="block text-500 font-medium mb-3">
-                    NFCE-e
+                    NFC-e
                   </span>
                   <div className="text-900 font-medium text-xl">
                     {totalnfceF}
@@ -521,6 +521,7 @@ function VendasDataTableComponent() {
           <div className="field">
             <Calendar
               locale="pt-BR"
+              selectOtherMonths
               showIcon
               showButtonBar
               id="dateI"
@@ -535,6 +536,7 @@ function VendasDataTableComponent() {
           <div className="field">
             <Calendar
               showIcon
+              selectOtherMonths
               locale="pt-BR"
               showButtonBar
               id="dateF"
@@ -600,7 +602,7 @@ function VendasDataTableComponent() {
               <div className="flex justify-content-between mb-3">
                 <div>
                   <span className="block text-500 font-medium mb-3">
-                    Total Geral NFCE-e
+                    Total Geral NFC-e
                   </span>
                   <div className="text-900 font-medium text-xl">
                     <h1> {totalGeralNfce} </h1>

@@ -74,8 +74,6 @@ const PrecificadorExecuta = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-
-
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
@@ -1282,8 +1280,6 @@ const PrecificadorExecuta = () => {
           className="p-button-rounded p-button-info"
           onClick={() => selecionarEtiqueta(etiquetaSelecionada)}
         />
-
-       
       </div>
     </React.Fragment>
   );
@@ -1481,10 +1477,10 @@ const PrecificadorExecuta = () => {
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
-      <div className="header">
-        <Header />
-        <Footer />
-      </div>
+
+      <Header />
+      <Footer />
+
       <div className="agenda-label">
         <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
           Pesquisar agendamentos de preços,{" "}
@@ -1531,104 +1527,98 @@ const PrecificadorExecuta = () => {
 
       {produtos.length < 1 ? (
         <>
-          <div className="container-flex">
-            <div className="form-precificador">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignContent: "center",
-                  flexWrap: "wrap",
+          <div className="form-precificador">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignContent: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              Pesquisar por
+              <SelectButton
+                value={modoPesquisa}
+                onChange={(e) => {
+                  setDataInicial(null);
+                  setDataFinal(null);
+                  setModoPesquisa(e.value);
                 }}
-              >
-                Pesquisar por
-                <SelectButton
-                  value={modoPesquisa}
-                  onChange={(e) => {
-                    setDataInicial(null);
-                    setDataFinal(null);
-                    setModoPesquisa(e.value);
-                  }}
-                  options={modosDePesquisa}
-                />
-              </div>
-              <div className="form-precificador-input">
-                <div>
-                  <h5>Período</h5>
-                </div>
-
-                <Calendar
-                  selectOtherMonths
-                  required
-                  showIcon
-                  placeholder="Data inicial do agendamento"
-                  dateFormat="dd/mm/yy "
-                  viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
-                  hideOnDateTimeSelect
-                  value={dataInicial}
-                  onChange={(e) => {
-                    setDataInicial(e.target.value);
-                    dataInicial?.setUTCHours(dataInicial.getUTCHours() - 3);
-                  }}
-                  showButtonBar
-                  locale="pt-BR"
-                  showTime={modoPesquisa}
-                  //  showSeconds
-                />
-              </div>
-              <div className="form-precificador-input">
-                <div>
-                  <h5>até</h5>
-                </div>
-
-                <Calendar
-                  selectOtherMonths
-                  required
-                  showIcon
-                  placeholder="Data final do agendamento"
-                  dateFormat="dd/mm/yy"
-                  hideOnDateTimeSelect
-                  value={dataFinal}
-                  onChange={(e) => {
-                    setDataFinal(e.value);
-                    dataFinal?.setUTCHours(dataFinal.getUTCHours() - 3);
-                  }}
-                  showButtonBar
-                  locale="pt-BR"
-                  showTime={modoPesquisa}
-                  //  showSeconds
-                />
-              </div>
-
-              <div className="form-precificador-input">
-                <MostraListaFilial />
-              </div>
-            </div>
-            <div className="form-precificador-btn">
-              <MostraSelectReplicarPrecoFilial />
-            </div>
-            <div className="form-precificador-btn">
-              <Button
-                icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
-                label={
-                  loading ? "Pesquisando ..." : " Pesquisar agendamento(s) "
-                }
-                disabled={loading}
-                className="p-button-rounded p-button-success p-button-md"
-                onClick={() => buscarProdutos()}
+                options={modosDePesquisa}
               />
             </div>
+            <div className="form-precificador-input">
+              <div>
+                <h5>Período</h5>
+              </div>
+
+              <Calendar
+                selectOtherMonths
+                required
+                showIcon
+                placeholder="Data inicial do agendamento"
+                dateFormat="dd/mm/yy "
+                viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                hideOnDateTimeSelect
+                value={dataInicial}
+                onChange={(e) => {
+                  setDataInicial(e.target.value);
+                  dataInicial?.setUTCHours(dataInicial.getUTCHours() - 3);
+                }}
+                showButtonBar
+                locale="pt-BR"
+                showTime={modoPesquisa}
+                //  showSeconds
+              />
+            </div>
+            <div className="form-precificador-input">
+              <div>
+                <h5>até</h5>
+              </div>
+
+              <Calendar
+                selectOtherMonths
+                required
+                showIcon
+                placeholder="Data final do agendamento"
+                dateFormat="dd/mm/yy"
+                hideOnDateTimeSelect
+                value={dataFinal}
+                onChange={(e) => {
+                  setDataFinal(e.value);
+                  dataFinal?.setUTCHours(dataFinal.getUTCHours() - 3);
+                }}
+                showButtonBar
+                locale="pt-BR"
+                showTime={modoPesquisa}
+                //  showSeconds
+              />
+            </div>
+
+            <div className="form-precificador-input">
+              <MostraListaFilial />
+            </div>
+          </div>
+          <div className="form-precificador-btn">
+            <MostraSelectReplicarPrecoFilial />
+          </div>
+          <div className="form-precificador-btn">
+            <Button
+              icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
+              label={loading ? "Pesquisando ..." : " Pesquisar agendamento(s) "}
+              disabled={loading}
+              className="p-button-rounded p-button-success p-button-md"
+              onClick={() => buscarProdutos()}
+            />
           </div>
         </>
       ) : (
         <>
           <div
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-              flexWrap: "wrap",
+              border: "1px solid #F2f2f2",
+              padding: "1px",
+              margin: "1px",
             }}
           >
             <Toolbar
@@ -1636,176 +1626,166 @@ const PrecificadorExecuta = () => {
               left={botaovoltar}
               right={botaoatualizar}
             />
+          </div>
+          <div>
+            <DataTable
+              style={{ padding: "1px", margin: "1px" }}
+              footer={"Existem " + produtos.length + " produto(s) para análise"}
+              loading={loading}
+              stripedRows
+              value={produtos}
+              //   reorderableColumns
+              editMode="row"
+              dataKey="idproduto"
+              onRowEditComplete={onRowEditComplete}
+              //    scrollDirection="vertical"
+              //    scrollable
+              //    scrollHeight="flex"
+              globalFilterFields={[
+                "descricao",
+                "ean",
+                "numeronotafiscal",
+                "razaosocial",
+              ]}
+              filters={filters2}
+              size="small"
+              emptyMessage="Nenhum produto encontrado para precificação"
+              showGridlines
+              header={headerDataTable}
+              //   rowGroupMode="subheader"
+              //    groupRowsBy={agrupamento}
+              //paginator
+              //rows={3}
+              paginatorTemplate={template1}
+              //  sortOrder={1}
+              //     rowGroupHeaderTemplate={headerTemplate}
+              // resizableColumns
+              // columnResizeMode="expand"
+              //  expandableRowGroups
+              //  expandedRows={expandedRows}
+              //   onRowToggle={(e) => setExpandedRows(e.data)}
+              selection={produtoSelecionado}
+              onSelectionChange={(e) => setProdutoSelecionado(e.value)}
+            >
+              <Column
+                selectionMode="multiple"
+                headerStyle={{ width: "3rem" }}
+                exportable={false}
+              ></Column>
+              <Column sortable header="Loja" field="nomeFilial"></Column>
+              <Column header="N° Nota fiscal" field="numeronotafiscal"></Column>
+              <Column header="Código " field={EanOrCodigo}></Column>
 
-            <div >
-              <DataTable
-               
-                
-                style={{ width: "100%", backgroundColor: "#F2F2F2" }}
-                footer={
-                  "Existem " + produtos.length + " produto(s) para análise"
+              <Column
+                field="descricao"
+                header="Produto"
+                sortable
+                body={familiaIcone}
+              ></Column>
+              <Column
+                field={precoCustoTemplate}
+                header="Custo"
+                body={precoCustoTemplate}
+              ></Column>
+
+              <Column
+                field={margem}
+                header={
+                  <>
+                    {" "}
+                    <div>
+                      {" "}
+                      Agendado <hr />{" "}
+                    </div>{" "}
+                    <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
+                  </>
                 }
-                loading={loading}
-                stripedRows
-                value={produtos}
-                //   reorderableColumns
-                editMode="row"
-                dataKey="idproduto"
-                onRowEditComplete={onRowEditComplete}
-                //    scrollDirection="vertical"
-                //    scrollable
-                //    scrollHeight="flex"
-                globalFilterFields={[
-                  "descricao",
-                  "ean",
-                  "numeronotafiscal",
-                  "razaosocial",
-                ]}
-                filters={filters2}
-                size="small"
-                emptyMessage="Nenhum produto encontrado para precificação"
-                showGridlines
-                header={headerDataTable}
-                //   rowGroupMode="subheader"
-                //    groupRowsBy={agrupamento}
-                //paginator
-                //rows={3}
-                paginatorTemplate={template1}
-                //  sortOrder={1}
-                //     rowGroupHeaderTemplate={headerTemplate}
-                // resizableColumns
-                // columnResizeMode="expand"
-                //  expandableRowGroups
-                //  expandedRows={expandedRows}
-                //   onRowToggle={(e) => setExpandedRows(e.data)}
-                selection={produtoSelecionado}
-                onSelectionChange={(e) => setProdutoSelecionado(e.value)}
-              >
-                <Column
-                  selectionMode="multiple"
-                  headerStyle={{ width: "3rem" }}
-                  exportable={false}
-                ></Column>
-                <Column sortable header="Loja" field="nomeFilial"></Column>
-                <Column
-                  header="N° Nota fiscal"
-                  field="numeronotafiscal"
-                ></Column>
-                <Column header="Código " field={EanOrCodigo}></Column>
+                body={margem}
+              ></Column>
 
-                <Column
-                  field="descricao"
-                  header="Produto"
-                  sortable
-                  body={familiaIcone}
-                ></Column>
-                <Column
-                  field={precoCustoTemplate}
-                  header="Custo"
-                  body={precoCustoTemplate}
-                ></Column>
+              <Column
+                field={margemAtual}
+                header={
+                  <>
+                    <div>
+                      Preço Atual <hr />
+                    </div>
+                    <br /> <div> Margem % </div> <br /> <div> Lucro </div>
+                  </>
+                }
+                body={margemAtual}
+                bodyStyle={{
+                  textAlign: "center",
+                }}
+              ></Column>
 
-                <Column
-                  field={margem}
-                  header={
-                    <>
+              <Column
+                style={{ fontWeight: "600", fontSize: "14px" }}
+                field={sugestaoVenda}
+                header={
+                  <>
+                    {" "}
+                    <div>
                       {" "}
-                      <div>
-                        {" "}
-                        Agendado <hr />{" "}
-                      </div>{" "}
-                      <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
-                    </>
-                  }
-                  body={margem}
-                ></Column>
+                      Sugestão <hr />{" "}
+                    </div>{" "}
+                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                  </>
+                }
+                body={sugestaoVenda}
+              ></Column>
 
-                <Column
-                  field={margemAtual}
-                  header={
-                    <>
-                      <div>
-                        Preço Atual <hr />
-                      </div>
-                      <br /> <div> Margem % </div> <br /> <div> Lucro </div>
-                    </>
-                  }
-                  body={margemAtual}
-                  bodyStyle={{
-                    textAlign: "center",
-                  }}
-                ></Column>
-
-                <Column
-                  style={{ fontWeight: "600", fontSize: "14px" }}
-                  field={sugestaoVenda}
-                  header={
-                    <>
+              <Column
+                field="precoagendado"
+                header={
+                  <>
+                    {" "}
+                    <div>
                       {" "}
-                      <div>
-                        {" "}
-                        Sugestão <hr />{" "}
-                      </div>{" "}
-                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                    </>
-                  }
-                  body={sugestaoVenda}
-                ></Column>
+                      Preço Agendado <hr />{" "}
+                    </div>{" "}
+                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                  </>
+                }
+                body={precoAgendadoTemplate}
+                style={{ fontWeight: "600" }}
+                editor={(options) => priceEditor(options)}
+              ></Column>
 
-                <Column
-                  field="precoagendado"
-                  header={
-                    <>
+              <Column
+                field={precoAtualTemplate}
+                header={
+                  <>
+                    {" "}
+                    <div>
                       {" "}
-                      <div>
-                        {" "}
-                        Preço Agendado <hr />{" "}
-                      </div>{" "}
-                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                    </>
-                  }
-                  body={precoAgendadoTemplate}
-                  style={{ fontWeight: "600" }}
-                  editor={(options) => priceEditor(options)}
-                ></Column>
+                      Preço Atual <hr />{" "}
+                    </div>{" "}
+                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                  </>
+                }
+                style={{ fontSize: "17", fontWeight: "600" }}
+                body={precoAtualTemplate}
+              ></Column>
 
-                <Column
-                  field={precoAtualTemplate}
-                  header={
-                    <>
-                      {" "}
-                      <div>
-                        {" "}
-                        Preço Atual <hr />{" "}
-                      </div>{" "}
-                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                    </>
-                  }
-                  style={{ fontSize: "17", fontWeight: "600" }}
-                  body={precoAtualTemplate}
-                ></Column>
+              <Column
+                header="Agendado por"
+                field={usuarioAgendadoTemplate}
+                style={{ textAlign: "center", fontWeight: "600" }}
+              ></Column>
 
-                <Column
-                  header="Agendado por"
-                  field={usuarioAgendadoTemplate}
-                  style={{ textAlign: "center", fontWeight: "600" }}
-                ></Column>
-
-                <Column
-                  header="Status"
-                  field={status}
-                  body={status}
-                  
-                  style={{ textAlign: "center", fontWeight: "600" }}
-                ></Column>
-                <Column
-                  selectionMode="multiple"
-                  headerStyle={{ width: "3rem" }}
-                  exportable={false}
-                ></Column>
-              
-              </DataTable>
-            </div>
+              <Column
+                header="Status"
+                field={status}
+                body={status}
+                style={{ textAlign: "center", fontWeight: "600" }}
+              ></Column>
+              <Column
+                selectionMode="multiple"
+                headerStyle={{ width: "3rem" }}
+                exportable={false}
+              ></Column>
+            </DataTable>
           </div>
         </>
       )}

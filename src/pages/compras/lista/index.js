@@ -61,7 +61,7 @@ const ListaCompras = () => {
           icon="pi pi-eye"
           className="p-button-rounded p-button-info"
           onClick={() =>
-            navigate(`/compras/analise/fornecedor/pedido/${data.id}`)
+            navigate(`/compras/analise/fornecedor/pedido/${data?.id}`)
           }
         />
       </>
@@ -69,19 +69,19 @@ const ListaCompras = () => {
   };
 
   const condicaoPagamentoTemplate = (data) => {
-    return <> {data.condicaoPagamento.descricao} </>;
+    return <> {data?.condicaoPagamento?.descricao} </>;
   };
 
   const prazoEntregaTemplate = (data) => {
-    return moment(data.prazoEntrega).format("DD/MM/YYYY");
+    return moment(data?.prazoEntrega).format("DD/MM/YYYY");
   };
 
   const totalTemplate = (data) => {
-    return formataMoeda(data.total);
+    return formataMoeda(data?.total);
   };
 
   const dataEmissaoTemplate = (data) => {
-    return moment(data.dataEmissao).format("DD/MM/YYYY");
+    return moment(data?.dataEmissao).format("DD/MM/YYYY");
   };
 
   const deletarTemplate = (data) => {

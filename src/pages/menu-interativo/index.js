@@ -255,6 +255,27 @@ const MenuInterativo = () => {
             />
           </div>
         </div>
+       {/* <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faGlobe} size="2x" />
+          <h1>Compras</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="Nova"
+              icon="pi pi-globe"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/compras/analise/fornecedor")}
+            />
+          </div>
+          <div className="opcoes-menu">
+            <Button
+              label="Consultar"
+              icon="pi pi-globe"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/compras/consulta")}
+            />
+          </div>
+          </div>  */}
       </div>
     </>
   );

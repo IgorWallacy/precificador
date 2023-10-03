@@ -197,6 +197,7 @@ const PedidoListaSidebar = ({
     api
       .post(`/api/pedido/compra/salvar/${data?.idpedido?.id}`, {
         id: data.id,
+       
         idpedido: { id: data?.idpedido?.id },
         idproduto: { id: data?.idproduto?.id },
         unidadeCompra: data?.unidadeCompra,
@@ -206,7 +207,7 @@ const PedidoListaSidebar = ({
         embalagem: Intl.NumberFormat("pt-BR", {}).format(data?.embalagem),
 
         quantidade: quantidade,
-        filial: { id: data?.filial.id },
+      //  filial: { id: data?.filial.id },
         //  quantidade2: quantidade2,
         preco: data?.preco,
         total: quantidade * data?.preco,
@@ -355,6 +356,7 @@ const PedidoListaSidebar = ({
       api
         .post(`/api/pedido/compra/salvar/${m?.idpedido?.id}`, {
           id: m.id,
+          
           idpedido: { id: m?.idpedido?.id },
           idproduto: { id: m?.idproduto?.id },
           unidadeCompra: m?.unidadeCompra,
@@ -723,7 +725,7 @@ const PedidoListaSidebar = ({
               header="#"
               body={(data, props) => <div> {props.rowIndex + 1}</div>}
             ></Column>
-            <Column
+           { /* <Column
               field="filial.id"
               style={{ minWidth: "300px" }}
               //  body={lojaTemplate}
@@ -733,7 +735,7 @@ const PedidoListaSidebar = ({
               filter
               sortable
               header="Cód.Loja"
-            />
+              /> */}
             {/*
             <Column
               field="idproduto.ean"

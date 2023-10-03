@@ -80,6 +80,7 @@ const PrecificaProduto = () => {
     clear: " Limpar ",
   });
 
+  const [modoTelaSimplificado , setModoTelaSimplificado] =useState(1)
   const pivotObj = useRef(null);
   const toast = useRef(null);
   const toast2 = useRef(null);
@@ -750,6 +751,7 @@ const PrecificaProduto = () => {
       <Footer />
       <Toolbar left={leftContents} />
       {!loading ? (
+        
         <>
           <div style={{ padding: "2px" }}>
             <div>
@@ -767,6 +769,7 @@ const PrecificaProduto = () => {
                   setValorSelecionado(e.selectedCellsInfo[0]?.value)
                 }
               >
+                
                 <Inject
                   services={[
                     CalculatedField,

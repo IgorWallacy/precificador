@@ -1091,10 +1091,9 @@ const ProdutoPrecificadorExecuta = () => {
           detail: ` Informe a data inicial e final  `,
         });
       } else {
-        let dataI = dataInicial?.toISOString().slice(0, 20);
-        let dataF = dataFinal?.toISOString().slice(0, 20);
+      
 
-        if (dataI && dataF) {
+        if (dataInicial && dataFinal) {
           let filialId = filiaisSelect ? filiaisSelect.id : 0;
 
           setLoading(true);
@@ -1102,7 +1101,13 @@ const ProdutoPrecificadorExecuta = () => {
           await api
 
             .get(
-              `/api_precificacao/produtos/precificar/produto/${dataI}/${dataF}/${filialId}`,
+              `/api_precificacao/produtos/precificar/produto/${moment(
+                dataInicial
+              ).format("YYYY-MM-DD HH:mm:ss [GMT]Z")}/${moment(
+                dataFinal
+              ).format(
+                "YYYY-MM-DD HH:mm:ss [GMT]Z"
+              )}/${filialId}/0`,
               {
                 headers: headers,
               }

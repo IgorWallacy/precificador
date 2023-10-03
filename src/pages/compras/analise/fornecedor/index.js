@@ -56,6 +56,11 @@ export default function AnaliseFornecedor() {
     "Calculando sugestões",
     "Buscando dados",
   ];
+  const [loadingTodosProdutos, setLoadingTodosProdutos] = useState(false);
+  const [todosProdutos, setTodosProdutos] = useState([]);
+  const [selectedTodosProdutos , setSelectedTodosProdutos] = useState(null)
+  const [dialogProduto, setDialogProduto] = useState(false);
+  const [filial, setFilial] = useState(1);
   const [index, setIndex] = React.useState(0);
   const msgs1 = useRef(null);
   const [selectedProductsPedido, setSelectedProductsPedido] = useState([]);
@@ -348,6 +353,7 @@ export default function AnaliseFornecedor() {
       setLoading(false);
     } else {
       //console.log(filial);
+      gravarPedido();
       api
         .post(
           `/api_react/compras/produtos/${moment(dataInicialCompra).format(
@@ -384,6 +390,22 @@ export default function AnaliseFornecedor() {
           }, 1000);
         });
     }
+  };
+
+  const getTodosProdutos = () => {
+    setLoadingTodosProdutos(true);
+    return api
+      .get("/api/produto")
+      .then((r) => {
+        setTodosProdutos(r.data);
+        console.log(todosProdutos);
+      })
+      .catch((e) => {
+        console.log(e?.message);
+      })
+      .finally((f) => {
+        setLoadingTodosProdutos(false);
+      });
   };
 
   const venda_diaria_template = (rowData) => {
@@ -751,6 +773,7 @@ export default function AnaliseFornecedor() {
             api
               .post(`/api/pedido/compra/salvar/${idPedido}`, {
                 idpedido: { id: idPedido },
+
                 idproduto: { id: m.id },
                 unidadeCompra: {
                   id: r.data[0].id_unidade_compra
@@ -949,6 +972,7 @@ export default function AnaliseFornecedor() {
       api
         .post(`/api/pedido/compra/salvar`, {
           id: idPedido,
+          codigo: idPedido,
           fornecedor: fornecedor,
           condicaoPagamento: condicaoPagamento,
           prazoEntrega: prazoEntrega,
@@ -1093,7 +1117,8 @@ export default function AnaliseFornecedor() {
     if (
       fornecedor === null ||
       condicaoPagamento === null ||
-      prazoEntrega === null
+      prazoEntrega === null ||
+      filial === null
     ) {
       toast.current.show({
         severity: "warn",
@@ -1105,6 +1130,7 @@ export default function AnaliseFornecedor() {
       api
         .post(`/api/pedido/compra/salvar`, {
           id: idPedido ? idPedido : "",
+          codigo: idPedido ? idPedido : "",
           fornecedor: fornecedor,
           condicaoPagamento: condicaoPagamento,
           prazoEntrega: prazoEntrega,
@@ -1598,6 +1624,25 @@ export default function AnaliseFornecedor() {
               <></>
             )}
             <div className="fornecedor-input">
+              <h4>Selecione uma loja para análise</h4>
+              <Dropdown
+                //  disabled={idPedido ? true : false}
+                required
+                style={{ width: "100%", margin: "10px 0px" }}
+                placeholder="Selecione uma loja"
+                value={filial}
+                options={lojas}
+                optionLabel="nome"
+                itemTemplate={itemTemplate}
+                filter
+                showClear
+                filterBy="nome,codigo"
+                onChange={(e) => {
+                  setFilial(e.target.value);
+                }}
+              />
+            </div>
+            <div className="fornecedor-input">
               <h4>Selecione um fornecedor para análise</h4>
               <Dropdown
                 //  disabled={idPedido ? true : false}
@@ -1710,6 +1755,26 @@ export default function AnaliseFornecedor() {
                   ) : (
                     <></>
                   )}
+
+                  <div className="fornecedor-input">
+                    <h4>Selecione uma loja para análise</h4>
+                    <Dropdown
+                      //  disabled={idPedido ? true : false}
+                      required
+                      style={{ width: "100%", margin: "10px 0px" }}
+                      placeholder="Selecione uma loja"
+                      value={filial}
+                      options={lojas}
+                      optionLabel="nome"
+                      itemTemplate={itemTemplate}
+                      filter
+                      showClear
+                      filterBy="nome,codigo"
+                      onChange={(e) => {
+                        setFilial(e.target.value);
+                      }}
+                    />
+                  </div>
 
                   <div className="fornecedor-input">
                     <h4>Selecione um fornecedor para análise</h4>
@@ -1854,7 +1919,11 @@ export default function AnaliseFornecedor() {
                       loading={loading}
                       style={{ marginTop: "30px" }}
                       icon="pi pi-search"
-                      label={loading ? "Analisando..." : "Pesquisar"}
+                      label={
+                        loading
+                          ? "Analisando..."
+                          : "Gerar pedido pela análise de compra e venda"
+                      }
                       className=" p-button-success p-button-rounded"
                       onClick={analisar}
                     />
@@ -1887,6 +1956,26 @@ export default function AnaliseFornecedor() {
                   ) : (
                     <></>
                   )}
+
+                  <div className="fornecedor-input">
+                    <h4>Selecione uma loja para análise</h4>
+                    <Dropdown
+                      //  disabled={idPedido ? true : false}
+                      required
+                      style={{ width: "100%", margin: "10px 0px" }}
+                      placeholder="Selecione uma loja"
+                      value={filial}
+                      options={lojas}
+                      optionLabel="nome"
+                      itemTemplate={itemTemplate}
+                      filter
+                      showClear
+                      filterBy="nome,codigo"
+                      onChange={(e) => {
+                        setFilial(e.target.value);
+                      }}
+                    />
+                  </div>
                   <div className="fornecedor-input">
                     <h4>Selecione um fornecedor para análise</h4>
                     <Dropdown
@@ -1952,6 +2041,30 @@ export default function AnaliseFornecedor() {
                 </div>
               </>
             )}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "1rem",
+                margin: "1rem",
+              }}
+              icon="pi pi-plus"
+              label="Adicionar produto"
+              className=" p-button-success p-button-rounded"
+              onClick={() => {
+                getTodosProdutos();
+                setDialogProduto(true);
+              }}
+            />
           </div>
 
           <Dialog
@@ -2172,6 +2285,32 @@ export default function AnaliseFornecedor() {
           <Column field="tipodocumento" sortable header="Tipo"></Column>
           <Column field={valor_duplicata_template} header="Valor"></Column>
           <Column field={status_duplicate_template} header="Status"></Column>
+        </DataTable>
+      </Dialog>
+
+      <Dialog
+        visible={dialogProduto}
+        header="Adicionar produto ao pedido"
+        modal={true}
+        position="center"
+        onHide={() => setDialogProduto(false)}
+      >
+        <DataTable
+          value={todosProdutos}
+          loading={loadingTodosProdutos}
+          showGridlines
+          paginator
+          rows={5}
+          selectionMode='checkbox' selection={selectedTodosProdutos}
+          onSelectionChange={(e) => setSelectedTodosProdutos(e.value)}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          tableStyle={{ minWidth: "50rem" }}
+          globalFilterFields={['nome', 'codigo', 'ean']}
+        >
+          <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
+          <Column field="codigo" header="Código"></Column>
+          <Column field="ean" header="Código de barras"></Column>
+          <Column field="nome" header="Nome"></Column>
         </DataTable>
       </Dialog>
     </>

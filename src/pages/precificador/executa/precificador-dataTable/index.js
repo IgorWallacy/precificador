@@ -1335,7 +1335,7 @@ const PrecificadorExecuta = () => {
             onChange={(e) => setFiliaisSelect(e.value)}
             value={filiaisSelect}
             options={quantidadeFilial}
-            optionLabel="razaosocial"
+            optionLabel="nome"
             placeholder="Selecione uma loja "
             emptyMessage="Nenhuma loja encontrada."
             dropdownIcon="pi pi-chevron-down"

@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
-import MaterialReactTable from "material-react-table";
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 
 import { DataTable } from "primereact/datatable";
 import { FilterMatchMode } from "primereact/api";

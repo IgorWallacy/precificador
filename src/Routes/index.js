@@ -25,6 +25,7 @@ import CadastrarValidade from "../pages/produto/validade/novo";
 
 import EstoquePorEmpresa from "../pages/compras/estoquePorEmpresa";
 import ConsultaLote from "../pages/produto/validade/consulta";
+import MaterialReactComponent from "../pages/bi/material-react";
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -71,6 +72,7 @@ export default function Router() {
           <Route path="vendas/indicadores" element={<GraficosIndex />} />
           <Route path="vendas/metas" element={<MetasComponent />} />
           <Route path="bi/pivot" element={<Pivot />} />
+          <Route path="bi/material-react" element={<MaterialReactComponent />} />
           <Route
             path="compras/analise/fornecedor"
             element={<AnaliseFornecedor />}

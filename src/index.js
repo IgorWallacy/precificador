@@ -14,10 +14,9 @@ import App from "./App";
 
 // Registering Syncfusion license key
 registerLicense(
-  "ORg4AjUWIQA/Gnt2V1hiQlhPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9gSXZSc0RgWHpecHZWTmc="
+  "ORg4AjUWIQA/Gnt2V1hiQlhPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9gSH5ScERrXXtec3FXRWY="
 
 );
-
 const root = document.getElementById('root');
 
 // Use createRoot to render your top-level component

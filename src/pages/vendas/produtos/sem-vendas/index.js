@@ -16,7 +16,7 @@ import { Typography } from "@mui/material";
 
 import { exportToExcel } from "react-json-to-excel";
 
-import MaterialReactTable from "material-react-table";
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 
 import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";

@@ -2,7 +2,7 @@ import  { useEffect, useState, useMemo, useRef } from "react";
 
 import api from "../../../services/axios";
 
-import MaterialReactTable from "material-react-table";
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { Box } from "@mui/material";
 import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
 import { exportToExcel } from "react-json-to-excel";

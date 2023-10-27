@@ -72,20 +72,7 @@ const MenuInterativo = () => {
     setNome(a.nome);
   }, []);
 
-  const greetingMessage = () => {
-    //let h = new Date().toLocaleTimeString('pt-BR', { hour: 'numeric', hour12: false });
-    let h = new Date().getHours();
-    switch (true) {
-      case h <= 5:
-        return "Bom dia";
-      case h < 12:
-        return "Bom dia";
-      case h < 18:
-        return "Boa tarde";
-      default:
-        return "Boa noite";
-    }
-  };
+ 
 
   return (
     <>
@@ -101,15 +88,9 @@ const MenuInterativo = () => {
           padding: "1em",
         }}
       >
-        <Typing speed={25} startDelay={10}>
-          <div className="texto-menu-interativo">
-            {greetingMessage()}
-            <h1 style={{ fontFamily: "cabin-sketch-bold" }}>{nome}</h1>
-            <h2 style={{ fontFamily: "cabin-sketch-bold" }}>
-              O que você deseja fazer hoje ?
-            </h2>
-          </div>
-        </Typing>
+        
+         
+        
       </div>
       <div className="menu-interativo">
         <div className="menu-categoria">

@@ -218,6 +218,7 @@ const Login = () => {
                 <div>
                   <InputText
                     autoFocus
+                    inputmode="text"
                     type="text"
                     value={usuario}
                     style={{ width: "100%", margin: "5px" }}
@@ -228,6 +229,7 @@ const Login = () => {
                 <div>
                   <InputText
                     type="password"
+                    inputmode="text"
                     value={senha}
                     style={{ width: "100%", margin: "5px" }}
                     placeholder="Senha"
@@ -236,11 +238,13 @@ const Login = () => {
                 </div>
                 <div style={{ textAlign: "center" }}>
                   <Button
+                    icon="pi pi-sign-in"
+                    iconPos="right"
                     loading={loading}
                     disabled={loading}
                     type="submit"
-                    className=" botao-login"
-                    label={loading ? "Autenticando ... " : "Acessar"}
+                    className=" p-button p-button-rounded p-button-primary p-button-md botao-login"
+                    label={loading ? "Autenticando ... " : "Entrar"}
                   ></Button>
                 </div>
               </form>

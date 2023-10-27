@@ -83,12 +83,12 @@ const Pivot = () => {
     setLoading(true);
     api
       .get(
-        `/api_vendas/bi/${moment(date1).format("yyyy-MM-DD")}/${moment(
+        `/api_vendas/bi/sync/${moment(date1).format("yyyy-MM-DD")}/${moment(
           date2
         ).format("yyyy-MM-DD")}/${modocalculo}`
       )
       .then((r) => {
-        console.log(r.data);
+        //console.log(r.data);
         setData(r.data);
         setLoading(false);
       })
@@ -176,6 +176,7 @@ const Pivot = () => {
               date1={date1}
               date2={date2}
               data={data}
+              
           ></SyncfusionPivot> 
 
         {/*  <DevExpressComponentPivot data ={ data} /> */}

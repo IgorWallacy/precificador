@@ -16,16 +16,11 @@ body {
 }
 
 .botao-login {
-	border-radius: 20px;
-	border: 1px solid #f4917f;
-	background-image: linear-gradient(to left bottom, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-	margin: 10px;
-	color: #FFFFFF;
-	font-size: 12px;
-	font-weight: bold;
-	padding: 12px 45px;
-	letter-spacing: 1px;
-	text-transform: uppercase;
+	
+
+	
+	margin-top: 10px;
+	
 	transition: transform 80ms ease-in;
 	-webkit-animation: pulse 1s ease infinite;
 	-moz-animation: pulse 1s ease infinite;
@@ -33,21 +28,6 @@ body {
 	-o-animation: pulse 1s ease infinite;
 	animation: pulse 1s ease infinite;
 }
-
-.botao-login button:active {
-	transform: scale(0.95);
-}
-
-.botao-login button:focus {
-	outline: none;
-}
-
-.botao-login button.ghost {
-	background-color: transparent;
-	border-color: #FFFFFF;
-}
-
-
 
 
 .container {

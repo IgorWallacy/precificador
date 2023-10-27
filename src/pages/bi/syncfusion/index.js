@@ -287,6 +287,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                 ref={ref}
                 locale="pt"
                 currencyCode="BRL"
+              
                 allowLabelFilter={true}
                 allowValueFilter={true}
                 allowNumberFormatting={true}
@@ -297,7 +298,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                 allowDataCompression={false}
                 enableFieldSearching={true}
                 enableValueSorting={true}
-                enableVirtualization={false}
+               
                 enableSorting={true}
                 showGroupingBar={true}
                 showTooltip={false}
@@ -323,7 +324,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                     FieldList,
                     GroupingBar,
                     Toolbar,
-                    VirtualScroll,
+                  
                     ExcelExport,
                     PDFExport,
                     PivotChart,

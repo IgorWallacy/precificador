@@ -9,8 +9,28 @@ import { Dialog } from "primereact/dialog";
 
 import ImagemOffline from "../../assets/img/undraw_monitor_iqpq.svg";
 
+import moment from "moment/moment";
+
 const Footer = () => {
   const [statusApi, setStatusApi] = useState("Online");
+  const [nome, setNome] = useState(null);
+  const [headers, setHeaders] = useState();
+  const [saudacao , setSaudacao] = useState(null)
+
+  const greetingMessage = () => {
+    //let h = new Date().toLocaleTimeString('pt-BR', { hour: 'numeric', hour12: false });
+    let h = new Date().getHours();
+    switch (true) {
+      case h <= 5:
+        return setSaudacao("Bom dia")
+      case h < 12:
+        return setSaudacao("Bom dia")
+      case h < 18:
+        return setSaudacao("Boa tarde")
+      default:
+        return setSaudacao("Boa noite")
+    }
+  };
 
   const getStatus = () => {
     api
@@ -23,8 +43,37 @@ const Footer = () => {
       });
   };
 
+  const pegarTokenLocalStorage = () => {
+    let token = localStorage.getItem("access_token");
+    let a = JSON.parse(token);
+    var headers = {
+      Authorization: "Bearer " + a.access_token,
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+    setHeaders(headers);
+
+    api.interceptors.request.use(
+      (config) => {
+        // Do something before request is sent
+
+        config.headers["Authorization"] = "bearer " + a.access_token;
+        return config;
+      },
+
+      (error) => {
+        Promise.reject(error);
+      }
+    );
+  };
+
   useEffect(() => {
     getStatus();
+    greetingMessage()
+    pegarTokenLocalStorage();
+    let token = localStorage.getItem("access_token");
+    let a = JSON.parse(token);
+
+    setNome(a.nome);
 
     setInterval(() => {
       getStatus();
@@ -33,40 +82,48 @@ const Footer = () => {
 
   return (
     <>
-      <Dialog header={`Aplicativo ` + statusApi} closable={false} visible={statusApi === "Network Error"}>
-        
-         <div style={{
-        display : 'flex',
-        flexDirection : 'column',
-        justifyContent : 'center',
-        alignItems : 'center'
-      }}>
-
-
-        <img
-          src={ImagemOffline}
+      <Dialog
+        header={`Aplicativo ` + statusApi}
+        closable={false}
+        visible={statusApi === "Network Error"}
+      >
+        <div
           style={{
             display: "flex",
-            flexDirection: 'column',
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            width: "65%",
           }}
-        />
-        <h1>Tentando restabelecer a conexão com o servidor </h1>
-        <h4>
-          {" "}
-          caso o problema persista, verifique sua conexão com a internet ou
-          reinicie o servidor
-        </h4>
+        >
+          <img
+            src={ImagemOffline}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "65%",
+            }}
+          />
+          <h1>Tentando restabelecer a conexão com o servidor </h1>
+          <h4>
+            {" "}
+            caso o problema persista, verifique sua conexão com a internet ou
+            reinicie o servidor
+          </h4>
         </div>
       </Dialog>
 
       <div style={{ position: "absolute", top: "2%", right: "2%" }}>
         <Badge
           severity={statusApi === "UP" ? "success" : "danger"}
-          value={statusApi === "UP" ? "Aplicativo On-line " : "Aplicativo Off-line"}
+          value={
+            statusApi === "UP" ? "Aplicativo On-line " : "Aplicativo Off-line"
+          }
         ></Badge>
+      </div>
+      <div style={{ position: "absolute", top: "5rem", left: "2%" }}>
+        <Badge  size="normal" severity="primary" value={`${saudacao} ${nome}, hoje é ${moment(new Date()).format("dddd - DD/MM/yyyy ")}`}></Badge>
       </div>
     </>
   );

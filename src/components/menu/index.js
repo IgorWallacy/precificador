@@ -113,6 +113,24 @@ const Menu = () => {
         },
       ],
     },
+    {
+      label: "Estoque",
+      icon: "pi pi-box",
+      items: [
+        {
+          label: "Exportar",
+          icon: "pi pi-file-excel",
+          command: () => navigate("/estoque/ajustes"),
+        },
+        {
+          label: "Inventários",
+          icon: "pi pi-box",
+          command: () => navigate("/estoque/lista-inventario"),
+        },
+
+        
+      ],
+    },
   ];
 
   // Defina o objeto do item "Compras por fornecedor"

@@ -22,10 +22,14 @@ import Main from "../components/main";
 import MetasComponent from "../pages/vendas/produtos/metas";
 import PrecosAlteradosComponent from "../pages/produto/precos-alterados";
 import CadastrarValidade from "../pages/produto/validade/novo";
+import AjusteEstoque from "../pages/estoque";
+import ContagemInventario from "../pages/estoque/contagem";
 
 import EstoquePorEmpresa from "../pages/compras/estoquePorEmpresa";
 import ConsultaLote from "../pages/produto/validade/consulta";
 import MaterialReactComponent from "../pages/bi/material-react";
+import AnaliseInventario from "../pages/estoque/contagem/analise";
+
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
@@ -63,7 +67,10 @@ export default function Router() {
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
           <Route path="vendas" element={<VendasDataTableComponent />} />
           <Route path="produtos/sem-vendas" element={<ProdutosSemVendas />} />
-          <Route path="produtos/validade/novo" element={<CadastrarValidade />} />
+          <Route
+            path="produtos/validade/novo"
+            element={<CadastrarValidade />}
+          />
           <Route path="produtos/validade/consulta" element={<ConsultaLote />} />
           <Route
             path="produtos/precos-alterados"
@@ -72,13 +79,27 @@ export default function Router() {
           <Route path="vendas/indicadores" element={<GraficosIndex />} />
           <Route path="vendas/metas" element={<MetasComponent />} />
           <Route path="bi/pivot" element={<Pivot />} />
-          <Route path="bi/material-react" element={<MaterialReactComponent />} />
+          <Route
+            path="bi/material-react"
+            element={<MaterialReactComponent />}
+          />
           <Route
             path="compras/analise/fornecedor"
             element={<AnaliseFornecedor />}
           />
           <Route path="compras/estoque" element={<EstoquePorEmpresa />} />
-         
+          <Route path="estoque/ajustes" element={<AjusteEstoque />} />
+          <Route
+            path="estoque/lista-inventario"
+            element={<ContagemInventario />}
+          />
+          <Route
+            path="estoque/lista-inventario/:id"
+            exact={true}
+            element={<AnaliseInventario />}
+          />
+          
+
           <Route
             path="compras/analise/fornecedor/pedido/:id"
             exact={true}

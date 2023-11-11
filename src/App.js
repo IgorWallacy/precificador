@@ -3,14 +3,15 @@ import "devextreme/dist/css/dx.light.css";
 import "devextreme/dist/css/dx.light.css";
 
 
-import React from "react";
+import React, { useEffect} from "react";
 
 import { BrowserRouter } from "react-router-dom";
 
 import Router from "./Routes";
 
 function App() {
- 
+
+
   
 
 

@@ -15,6 +15,8 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 
+import { useReactToPrint } from "react-to-print";
+
 import api from "../../../../services/axios";
 import AuditoriaInventario from "../auditoria";
 import moment from "moment";
@@ -23,6 +25,29 @@ export default function AnaliseInventario() {
   let { id } = useParams();
 
   const toast = useRef(null);
+
+  const tabelaRef = useRef();
+  const handlePrint = useReactToPrint({
+    onBeforeGetContent: () => setLinhas(9999),
+
+    content: () => tabelaRef.current,
+  });
+
+  const imprimir = () => {
+    if (linhas === 9999) {
+      handlePrint();
+    } else {
+      setLinhas(9999);
+      toast.current.show({
+        severity: "info",
+        summary: "Aviso",
+        detail: "Tabela ajustada, Imprima novamente! ",
+        life: 3000,
+      });
+    }
+  };
+
+  const [linhas, setLinhas] = useState(5);
 
   const navigate = useNavigate();
 
@@ -184,9 +209,11 @@ export default function AnaliseInventario() {
     );
   };
   const divergenciaEstoqueTemplate = (row) => {
-    return row?.divergencia >= 0 ? (
+    return (row?.quantidadeEstoque >= 0
+      ? row?.quantidadeLida - row?.quantidadeEstoque
+      : row?.quantidadeEstoque + row?.quantidadeLida) >= 0 ? (
       <>
-        {row?.divergencia === 0 ? (
+        {row?.quantidadeLida - row?.quantidadeEstoque === 0 ? (
           <>
             <div>
               <Tag severity="success" value={"Sem divergências"} />
@@ -203,7 +230,11 @@ export default function AnaliseInventario() {
                     style: "decimal",
                     maximumFractionDigits: "3",
                     minimumFractionDigits: 0,
-                  }).format(row?.divergencia)
+                  }).format(
+                    row?.quantidadeEstoque >= 0
+                      ? row?.quantidadeLida - row?.quantidadeEstoque
+                      : row?.quantidadeEstoque + row?.quantidadeLida
+                  )
                 }
               />
             </div>
@@ -212,7 +243,7 @@ export default function AnaliseInventario() {
       </>
     ) : (
       <>
-        {row?.divergencia === 0 ? (
+        {row?.quantidadeLida - row?.quantidadeEstoque === 0 ? (
           <>
             <div>
               <Tag severity="success" value={"Sem divergências"} />
@@ -229,7 +260,11 @@ export default function AnaliseInventario() {
                     style: "decimal",
                     maximumFractionDigits: "3",
                     minimumFractionDigits: 0,
-                  }).format(row?.divergencia)
+                  }).format(
+                    row?.quantidadeEstoque >= 0
+                      ? row?.quantidadeLida - row?.quantidadeEstoque
+                      : row?.quantidadeEstoque + row?.quantidadeLida
+                  )
                 }
               />
             </div>
@@ -282,6 +317,7 @@ export default function AnaliseInventario() {
       <Header />
       <Footer />
       <div
+        ref={tabelaRef}
         style={{
           display: "flex",
           justifyContent: "center",
@@ -294,7 +330,14 @@ export default function AnaliseInventario() {
           padding: "1rem",
         }}
       >
-        <h1>
+        <h1
+          style={{
+            backgroundColor: "black",
+            border: "1px solid #f1f1f1",
+            borderRadius: "25px",
+            padding: "5px",
+          }}
+        >
           {" "}
           Análise do invetário {inventario?.id} - {inventario?.nome} -{" "}
           {inventario?.loja}
@@ -354,6 +397,13 @@ export default function AnaliseInventario() {
                   onClick={() => exportarContagem()}
                   icon="pi pi-file-excel"
                 />
+                <Button
+                  style={{ margin: "0px 5px" }}
+                  label="Imprimir"
+                  className="p-button p-button-rounded p-button-warning"
+                  onClick={() => imprimir()}
+                  icon="pi pi-print"
+                />
               </div>
             </>
           }
@@ -362,7 +412,7 @@ export default function AnaliseInventario() {
         <DataTable
           removableSort
           paginator
-          rows={5}
+          rows={linhas}
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
           loading={loading}
           value={produto}
@@ -374,6 +424,7 @@ export default function AnaliseInventario() {
           globalFilterFields={["produto", "ean", "divergencia"]}
           style={{ width: "100%" }}
           header={header}
+          footer={`Existem ${produto?.length} produtos para análise`}
         >
           <Column sortable field="ean" header="Código"></Column>
           <Column sortable field="produto" header="Produto"></Column>
@@ -409,6 +460,7 @@ export default function AnaliseInventario() {
           ></Column>
         </DataTable>
       </div>
+
       <Dialog
         modal={false}
         maximizable

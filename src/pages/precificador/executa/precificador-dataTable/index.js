@@ -25,6 +25,8 @@ import { Tag } from "primereact/tag";
 import { Ripple } from "primereact/ripple";
 import { classNames } from "primereact/utils";
 
+import { useReactToPrint } from "react-to-print";
+
 import api from "../../../../services/axios";
 //import { useNavigate } from "react-router-dom";
 
@@ -36,6 +38,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const PrecificadorExecuta = () => {
   //  const navigate = useNavigate();
+
+  const tabelaRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => tabelaRef.current,
+  });
 
   const [modoPesquisa, setModoPesquisa] = useState(0);
   const [filiaisSelect, setFiliaisSelect] = useState(0);
@@ -562,7 +569,13 @@ const PrecificadorExecuta = () => {
 
   const renderHeader = () => {
     return (
-      <div className="pesquisa-rapida">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-evenly",
+          alignItems: "center",
+        }}
+      >
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -571,6 +584,18 @@ const PrecificadorExecuta = () => {
             placeholder="Pesquisa "
           />
         </span>
+        <div>
+          <h4>
+            Exibindo dados de {moment(dataInicial).format("DD/MM/YYYY HH:mm:ss")} até{" "}
+            {moment(dataFinal).format("DD/MM/YYYY HH:mm:ss")}{" "}
+          </h4>
+          <h3>
+            
+            { quantidadeFilial.length > 1 ? replicarPreco
+              ? <h4 style={{color:'green'}}> Replicando preços para todas as lojas</h4>
+              : <h4 style={{color:'red'}}> Não replicando preços para todas as lojas</h4>  : ''}
+          </h3>
+        </div>
       </div>
     );
   };
@@ -579,8 +604,8 @@ const PrecificadorExecuta = () => {
     if (rowData.ean) {
       return (
         <>
-          <div>{rowData.ean} </div>
-          <div>
+          {rowData.ean} 
+         {/* <div>
             <img
               style={{
                 width: "75px",
@@ -596,7 +621,7 @@ const PrecificadorExecuta = () => {
               }
               alt={rowData.ean}
             />
-          </div>
+            </div> */}
         </>
       );
     } else {
@@ -1076,7 +1101,7 @@ const PrecificadorExecuta = () => {
     if (rowData.idfamilia > 0) {
       return (
         <React.Fragment>
-          <h5>{rowData.descricao}</h5>
+          {rowData.descricao}
           <Button
             className="p-button-rounded p-button-secondary p-button-sm"
             tooltip="Será atualizado o preço da família"
@@ -1088,8 +1113,8 @@ const PrecificadorExecuta = () => {
     } else {
       return (
         <React.Fragment>
-          {" "}
-          <h5>{rowData.descricao}</h5>
+          
+         {rowData.descricao}
         </React.Fragment>
       );
     }
@@ -1296,6 +1321,15 @@ const PrecificadorExecuta = () => {
           }}
         >
           <Button
+            onClick={() => handlePrint()}
+            label="Imprimir"
+            tooltip="Imprimir tabela"
+            tooltipOptions={{ position: "bottom" }}
+            icon="pi pi-file-pdf"
+            style={{ margin: "1rem" }}
+            className=" p-button-rounded p-button-info "
+          />
+          <Button
             style={{ margin: "1rem" }}
             label={`Gravar ( ${
               produtoSelecionado ? produtoSelecionado?.length : 0
@@ -1310,6 +1344,16 @@ const PrecificadorExecuta = () => {
       </React.Fragment>
     ) : (
       <>
+        <Button
+          onClick={() => handlePrint()}
+          label="Imprimir "
+          tooltip="Imprimir tabela"
+          tooltipOptions={{ position: "bottom" }}
+          icon="pi pi-file-pdf"
+          style={{ margin: "1rem" }}
+          className=" p-button-rounded p-button-info"
+        />
+
         <Button
           style={{ margin: "1rem" }}
           label={`Gravar ( ${
@@ -1627,7 +1671,7 @@ const PrecificadorExecuta = () => {
               right={botaoatualizar}
             />
           </div>
-          <div>
+          <div ref={tabelaRef}>
             <DataTable
               style={{ padding: "1px", margin: "1px" }}
               footer={"Existem " + produtos.length + " produto(s) para análise"}
@@ -1674,12 +1718,13 @@ const PrecificadorExecuta = () => {
               ></Column>
               <Column sortable header="Loja" field="nomeFilial"></Column>
               <Column header="N° Nota fiscal" field="numeronotafiscal"></Column>
-              <Column header="Código " field={EanOrCodigo}></Column>
+              <Column header="Código " body={EanOrCodigo}></Column>
 
               <Column
                 field="descricao"
                 header="Produto"
                 sortable
+                rowSpan={2}
                 body={familiaIcone}
               ></Column>
               <Column

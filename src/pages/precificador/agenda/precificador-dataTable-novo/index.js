@@ -18,7 +18,7 @@ import { Tag } from "primereact/tag";
 import { Dialog } from "primereact/dialog";
 import { ToggleButton } from "primereact/togglebutton";
 import { TriStateCheckbox } from "primereact/tristatecheckbox";
-import { classNames } from "primereact/utils";
+
 
 import { SelectButton } from "primereact/selectbutton";
 
@@ -926,7 +926,7 @@ const PrecificadorAgenda = () => {
           { headers: headers }
         )
         .then((response) => {
-          toast.current.show({
+        /*  toast.current.show({
             severity: "success",
             summary: "Sucesso",
             detail: ` ${
@@ -935,7 +935,7 @@ const PrecificadorAgenda = () => {
               "DD/MM/YYYY (dddd) "
             )} no valor de R$ ${_produtos[index].precoagendado}  `,
           });
-
+*/
           marcarRevisao(_produtos[index], 1);
         })
         .catch((error) => {

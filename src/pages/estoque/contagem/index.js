@@ -18,6 +18,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 
+
 export default function ContagemInventario() {
   const navigate = useNavigate();
 
@@ -165,6 +166,9 @@ export default function ContagemInventario() {
       </div>
     );
   };
+  const inicioTemplate = (row) => {
+    return moment(row?.inicio).format("DD/MM/YYYY HH:mm:ss");
+   }
 
   const visualizarTemplate = (rowData) => {
     return (
@@ -250,6 +254,7 @@ export default function ContagemInventario() {
                 icon="pi pi-refresh"
                 onClick={() => getInvenaritos()}
               />
+            
             </>
           }
         />
@@ -264,8 +269,9 @@ export default function ContagemInventario() {
           tableStyle={{ width: "100%" }}
           removableSort
         >
+          <Column field="inicio" header="Abertura" body={inicioTemplate} />
           <Column field="id" header="Código"></Column>
-          
+           
           <Column field="nome" header="Nome"></Column>
           <Column field="loja" header="Loja"></Column>
           <Column

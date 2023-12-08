@@ -33,6 +33,9 @@ const Login = () => {
 
   const isLogado = useContext(Context);
 
+  const input1Ref = useRef(null);
+  const input2Ref = useRef(null);
+
   let navigate = useNavigate();
 
   let clientId = "doks";
@@ -134,6 +137,15 @@ const Login = () => {
       });
   }
 
+  const handleKeyDown = (e, nextElementRef) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Evita o comportamento padrão do Enter
+
+      // Simula pressionar Tab focando no próximo elemento
+      nextElementRef.current.focus();
+    }
+  };
+
   useEffect(() => {
     getStatus();
     setInterval(() => {
@@ -224,6 +236,9 @@ const Login = () => {
                     style={{ width: "100%", margin: "5px" }}
                     placeholder="Código"
                     onChange={(e) => setUsuario(e.target.value)}
+                    ref={input1Ref}
+                    onKeyDown={(e) => handleKeyDown(e, input2Ref)}
+                    
                   />
                 </div>
                 <div>
@@ -234,6 +249,7 @@ const Login = () => {
                     style={{ width: "100%", margin: "5px" }}
                     placeholder="Senha"
                     onChange={(e) => setSenha(e.target.value)}
+                    ref={input2Ref}
                   />
                 </div>
                 <div style={{ textAlign: "center" }}>

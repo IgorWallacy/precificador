@@ -19,7 +19,6 @@ import { Dialog } from "primereact/dialog";
 import { ToggleButton } from "primereact/togglebutton";
 import { TriStateCheckbox } from "primereact/tristatecheckbox";
 
-
 import { SelectButton } from "primereact/selectbutton";
 
 import api from "../../../../services/axios";
@@ -33,7 +32,11 @@ const PrecificadorAgenda = () => {
 
   const navigate = useNavigate();
 
+  const[produtoFilter,setProdutoFilter] = useState([])
+
   const [agrupadoPorFornecedor, setAgrupadoPorFornecedor] = useState(1);
+
+  const inputPreco = useRef(null);
 
   const [dialogFamilia, setDialogFamilia] = useState(false);
   const [produtosFamilia, setProdutosFamilia] = useState([]);
@@ -62,8 +65,7 @@ const PrecificadorAgenda = () => {
     produtoEmExibicaoSugestaoDialogMarDownDialog,
     setprodutoEmExibicaoSugestaoMarDownDialog,
   ] = useState("");
-  const [novoPercentualMarkupMinimo, setNovoPercentualMarkupMinimo] =
-    useState(null);
+  const novoPercentualMarkupMinimo = useRef(null);
 
   const [novoPercentualMarkDownMinimo, setNovoPercentualMarkDownMinimo] =
     useState(null);
@@ -174,7 +176,7 @@ const PrecificadorAgenda = () => {
     setGlobalFilterValue(value);
   };
 
-  const atualizarmarkupminimo = () => {
+  const atualizarmarkupminimo = (data) => {
     if (novoPercentualMarkupMinimo) {
       setLoading(true);
 
@@ -186,7 +188,7 @@ const PrecificadorAgenda = () => {
             produtoEmExibicaoSugestaoDialog.idfamilia
               ? produtoEmExibicaoSugestaoDialog.idfamilia
               : 0
-          }/${novoPercentualMarkupMinimo}`
+          }/${data}`
         )
         .then((r) => {})
         .catch((error) => {
@@ -199,7 +201,7 @@ const PrecificadorAgenda = () => {
         .finally(() => {
           setExibirDialogSugestao(false);
           setLoading(false);
-          setNovoPercentualMarkupMinimo(null);
+          novoPercentualMarkupMinimo.current = null;
           buscarProdutos();
         });
     } else {
@@ -418,62 +420,6 @@ const PrecificadorAgenda = () => {
             </div>
           </>
         )}
-      </>
-    );
-  };
-
-  const status = (rowData) => {
-    return rowData.dataagendada ? (
-      <>
-        <div style={{ color: "green" }}>
-          <Tag
-            severity="success"
-            style={{ margin: "1rem", textAlign: "center" }}
-            value=" Agendado "
-          />{" "}
-          <br />
-          <Tag
-            severity="success"
-            value={moment(rowData.dataagendada).format("DD/MM/YYYY (dddd)")}
-          />
-          <br />
-          {rowData.precoAtual < rowData.precocusto ||
-          rowData.precoagendado < rowData.precocusto ? (
-            <>
-              <Tag
-                style={{ margin: "1rem" }}
-                value="Preço abaixo do custo "
-                icon="pi pi-exclamation-circle"
-                severity="danger"
-              ></Tag>
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
-      </>
-    ) : (
-      <>
-        <div>
-          <Tag
-            severity="info"
-            style={{ margin: "1px", padding: "1px", textAlign: "center" }}
-            value=" Sem agendamento "
-          />
-          <br />
-          {rowData.precoAtual < rowData.precocusto ? (
-            <>
-              <Tag
-                style={{ margin: "1rem" }}
-                value="Preço abaixo do custo "
-                icon="pi pi-exclamation-circle"
-                severity="danger"
-              ></Tag>
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
       </>
     );
   };
@@ -855,13 +801,11 @@ const PrecificadorAgenda = () => {
     );
   };
 
-  const priceEditor = (options) => {
-    let mdown =
-      options.rowData.precocusto /
-      (1 - options.rowData.percentualmarkdown / 100);
+  const priceEditor = (rowData) => {
+    let mdown = rowData.precocusto / (1 - rowData.percentualmarkdown / 100);
     let mup =
-      (options.rowData.precocusto * options.rowData.percentualmarkup) / 100 +
-      options.rowData.precocusto;
+      (rowData.precocusto * rowData.percentualmarkup) / 100 +
+      rowData.precocusto;
     let sugestao = usarMarkup ? mup : mdown;
 
     let sf = Intl.NumberFormat("pt-BR", {
@@ -870,18 +814,99 @@ const PrecificadorAgenda = () => {
     }).format(sugestao);
 
     return (
-      <InputNumber
-        autoFocus
-        prefix="R$ "
-        placeholder={`Sugestão ${sf}`}
-        value={options.value}
-        onValueChange={(e) => options.editorCallback(e.value)}
-        currency="BRL"
-        mode="decimal"
-        minFractionDigits={2}
-        maxFractionDigits={2}
-        locale="pt-BR"
-      />
+      <>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "5px",
+            flexDirection: "row",
+            flexWrap: "wrap",
+          }}
+        >
+          {rowData.dataagendada ? (
+            <>
+              <div style={{ color: "green" }}>
+                <Tag
+                  severity="success"
+                  style={{ margin: "1rem", textAlign: "center" }}
+                  value=" Agendado "
+                />{" "}
+                <br />
+                <Tag
+                  severity="success"
+                  value={moment(rowData.dataagendada).format(
+                    "DD/MM/YYYY (dddd)"
+                  )}
+                />
+                <br />
+                {rowData.precoAtual < rowData.precocusto ||
+                rowData.precoagendado < rowData.precocusto ? (
+                  <>
+                    <Tag
+                      style={{ margin: "1rem" }}
+                      value="Preço abaixo do custo "
+                      icon="pi pi-exclamation-circle"
+                      severity="danger"
+                    ></Tag>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <Tag
+                  severity="info"
+                  style={{ margin: "1px", padding: "1px", textAlign: "center" }}
+                  value=" Sem agendamento "
+                />
+                <br />
+                {rowData.precoAtual < rowData.precocusto ? (
+                  <>
+                    <Tag
+                      style={{ margin: "1rem" }}
+                      value="Preço abaixo do custo "
+                      icon="pi pi-exclamation-circle"
+                      severity="danger"
+                    ></Tag>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+            </>
+          )}
+
+          <InputNumber
+            ref={inputPreco}
+            //autoFocus
+            tooltip={
+              rowData?.precoagendado ? "" : "Pressione Enter para salvar"
+            }
+            tooltipOptions={{ position: "bottom" }}
+            prefix="R$ "
+            placeholder={`Sugestão ${sf}`}
+            value={rowData?.value}
+            onValueChange={(e) => (inputPreco.current = e.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+
+                onRowEditComplete(rowData, inputPreco.current);
+              }
+            }}
+            currency="BRL"
+            mode="decimal"
+            minFractionDigits={2}
+            maxFractionDigits={2}
+            locale="pt-BR"
+          />
+        </div>
+      </>
     );
   };
 
@@ -899,34 +924,28 @@ const PrecificadorAgenda = () => {
       .catch((error) => {});
   };
 
-  async function onRowEditComplete(e) {
-    let { newData, index } = e;
-
-    let _produtos = [...produtos];
-
-    _produtos[index] = newData;
-
+  async function onRowEditComplete(e, value) {
     pegarTokenLocalStorage();
 
     let intFamilia = 0;
 
-    if (_produtos[index].idfamilia != null) {
-      intFamilia = parseInt(_produtos[index].idfamilia);
+    if (e.idfamilia != null) {
+      intFamilia = parseInt(e.idfamilia);
     }
 
     let usuarioFormatado = usuarioLogado.replace("/", "");
-    if (_produtos[index].precoagendado) {
+    if (value) {
       await api
         .put(
           `/api_precificacao/produtos/precificar/agenda/${
-            _produtos[index].idproduto
-          }/${intFamilia}/${_produtos[index].idnotafiscal}/${
-            _produtos[index].precoagendado
-          }/${moment(agendar).format("YYYY-MM-DD")}/${usuarioFormatado}`,
+            e.idproduto
+          }/${intFamilia}/${e.idnotafiscal}/${value}/${moment(agendar).format(
+            "YYYY-MM-DD"
+          )}/${usuarioFormatado}`,
           { headers: headers }
         )
         .then((response) => {
-        /*  toast.current.show({
+          /*  toast.current.show({
             severity: "success",
             summary: "Sucesso",
             detail: ` ${
@@ -936,13 +955,13 @@ const PrecificadorAgenda = () => {
             )} no valor de R$ ${_produtos[index].precoagendado}  `,
           });
 */
-          marcarRevisao(_produtos[index], 1);
+          marcarRevisao(e, 1);
         })
         .catch((error) => {
           toast.current.show({
             severity: "error",
             summary: "Erro",
-            detail: ` Erro ao atualizar ${_produtos[index].descricao}  ... Erro : ${error}  `,
+            detail: ` Erro ao atualizar ${e.descricao}  ... Erro : ${error}  `,
           });
 
           if (error.response.status === 401) {
@@ -950,6 +969,7 @@ const PrecificadorAgenda = () => {
         })
         .finally((e) => {
           buscarProdutos();
+          inputPreco.current = null;
         });
     } else {
       toast.current.show({
@@ -1141,7 +1161,7 @@ const PrecificadorAgenda = () => {
     if (rowData.idfamilia > 0) {
       return (
         <React.Fragment>
-          <h5>{rowData.descricao}</h5>
+          <h4>{rowData.descricao}</h4>
           <Button
             className="p-button-rounded p-button-secondary p-button-sm"
             tooltip="Será atualizado o preço da família"
@@ -1156,7 +1176,7 @@ const PrecificadorAgenda = () => {
       return (
         <React.Fragment>
           {" "}
-          <h5>{rowData.descricao}</h5>
+          <h4>{rowData.descricao}</h4>
           <br />
         </React.Fragment>
       );
@@ -1252,7 +1272,8 @@ const PrecificadorAgenda = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-              console.log(response.data);
+           
+              //  console.log(response.data);
 
               setLoading(false);
 
@@ -1545,29 +1566,43 @@ const PrecificadorAgenda = () => {
 
               <div>Percentual de markup mínimo atual</div>
 
-              <h4> {produtoEmExibicaoSugestaoDialog.percentualmarkup} % </h4>
+              <h4>
+                {" "}
+                {Intl.NumberFormat("pt-BR", {
+                  style: "decimal",
+                  maximumFractionDigits: "2",
+                  minimumFractionDigits: "2",
+                }).format(
+                  produtoEmExibicaoSugestaoDialog.percentualmarkup
+                )}{" "}
+                %{" "}
+              </h4>
 
               <div>
                 <b>Novo percentual de markup mínimo </b>
               </div>
 
-              <div>
+              <div style={{ marginTop: "5px" }}>
                 <InputNumber
-                  value={novoPercentualMarkupMinimo}
+                  suffix="%"
+                  ref={novoPercentualMarkupMinimo}
+                  autoFocus
+                  // value={rowData?.value}
+                  onValueChange={(e) =>
+                    (novoPercentualMarkupMinimo.current = e.value)
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+
+                      atualizarmarkupminimo(novoPercentualMarkupMinimo.current);
+                    }
+                  }}
+                  placeholder="0,00%"
                   mode="decimal"
                   minFractionDigits={2}
-                  maxFracionDigits={2}
-                  onChange={(e) => setNovoPercentualMarkupMinimo(e.value)}
-                  autoFocus
-                  style={{ margin: "1rem" }}
-                />{" "}
-                %
-                <Button
-                  onClick={() => atualizarmarkupminimo()}
-                  style={{ margin: "1rem" }}
-                  label="Atualizar"
-                  icon="pi pi-refresh"
-                  className="p-button p-buttun-sucess p-button-rounded"
+                  maxFractionDigits={2}
+                  locale="pt-BR"
                 />
               </div>
             </div>
@@ -1625,6 +1660,7 @@ const PrecificadorAgenda = () => {
           <Tooltip target=".export-buttons>button" position="bottom" />
 
           <DataTable
+            onValueChange={filteredData => setProdutoFilter(filteredData)}
             responsiveLayout="stack"
             breakpoint="960px"
             loading={loading}
@@ -1637,15 +1673,15 @@ const PrecificadorAgenda = () => {
                   alignItems: "center",
                 }}
               >
-                Existem {produtos.length} produto(s) para análise
+                Existem {produtos.length} produto(s) para análise / {produtoFilter?.length} produto(s) filtrado(s)
               </div>
             }
+          
             value={produtos}
             selectionMode="single"
             //   reorderableColumns
             editMode="row"
             dataKey="id"
-            onRowEditComplete={onRowEditComplete}
             //   scrollDirection="vertical"
             //   scrollable
             //   scrollHeight="flex"
@@ -1792,16 +1828,13 @@ const PrecificadorAgenda = () => {
                   </>
                 }
                 style={{}}
-                editor={(options) => priceEditor(options)}
                 body={precoAgendoMarkDownTemplate}
               ></Column>
             )}
 
-            <Column field={status} style={{ textAlign: "center" }}></Column>
-
             <Column
               header="Atualizar"
-              rowEditor
+              body={priceEditor}
               headerStyle={{ width: "10%", minWidth: "8rem" }}
               bodyStyle={{ textAlign: "center" }}
             ></Column>

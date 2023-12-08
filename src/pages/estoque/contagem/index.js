@@ -64,7 +64,7 @@ export default function ContagemInventario() {
   };
 
   const gravar = () => {
-    if (nome || loja) {
+    if (nome && loja) {
       return api
         .post("/api/produto/contagem/inventario/salvar", {
           id: "",

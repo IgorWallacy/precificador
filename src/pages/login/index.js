@@ -15,7 +15,7 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import axios from "axios";
 
-import Logo from "../../assets/img/logo_duca.png";
+import Logo from "../../assets/img/logo_jj.png";
 
 import Typing from "react-typing-animation";
 import { Badge } from "primereact/badge";
@@ -138,7 +138,7 @@ const Login = () => {
   }
 
   const handleKeyDown = (e, nextElementRef) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault(); // Evita o comportamento padrão do Enter
 
       // Simula pressionar Tab focando no próximo elemento
@@ -155,59 +155,56 @@ const Login = () => {
 
   return (
     <>
-      <Dialog header={ `Aplicativo ` + statusApi}  closable={false} visible={statusApi === "Offline"}>
-        <div style={{
-        display : 'flex',
-        flexDirection : 'column',
-        justifyContent : 'center',
-        alignItems : 'center'
-      }}>
-
-
-        <img
-          src={ImagemOffline}
+      <Dialog
+        header={`Aplicativo ` + statusApi}
+        closable={false}
+        visible={statusApi === "Offline"}
+      >
+        <div
           style={{
             display: "flex",
-            flexDirection: 'column',
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            width: "65%",
           }}
-        />
-        <h1>Tentando restabelecer a conexão com o servidor </h1>
-        <h4>
-          {" "}
-          caso o problema persista, verifique sua conexão com a internet ou
-          reinicie o servidor
-        </h4>
-        </div>
-        
-      </Dialog>
-      <Toast ref={toast} position="bottom-center" />
-      <div className="status-api">
-        <Badge
-          severity={statusApi === "UP" ? "success" : "danger"}
-          value={statusApi === "UP" ? "Aplicativo On-line " : "Aplicativo Off-line"}
-        ></Badge>
-      </div>
-      <div
-        style={{ marginTop: "10rem" }}
-        className="grid grid-nogutter surface-0 text-800"
-      >
-        <div className=" logo-login col-12 md:col-6 overflow-hidden">
+        >
           <img
-            src={Logo}
-            alt="logo-sistema"
-            className="md:ml-auto block md:h-full"
+            src={ImagemOffline}
             style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: "whitesmoke",
-              clipPath: "polygon(0% 0, 100% 35%, 100% 100%, 0 88%)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "65%",
             }}
           />
+          <h1>Tentando restabelecer a conexão com o servidor </h1>
+          <h4>
+            {" "}
+            caso o problema persista, verifique sua conexão com a internet ou
+            reinicie o servidor
+          </h4>
         </div>
-        <div className="fundo col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
+      </Dialog>
+      <Toast ref={toast} position="bottom-center" />
+
+      <div
+        style={{ display: "flex", alignItems:'center', justifyContent: "center", padding: "1rem" }}
+      >
+        <div
+          style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}
+        >
+          <div>
+            <img
+              src={Logo}
+              alt="logo-sistema"
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+            />
+          </div>
+
           <section>
             <div className="form-login">
               <img style={{ width: "250px" }} src={ImagemDestque} />
@@ -226,11 +223,19 @@ const Login = () => {
                   </h1>
                 </Typing>{" "}
               </h4>
+              <Badge
+                severity={statusApi === "UP" ? "success" : "danger"}
+                value={
+                  statusApi === "UP"
+                    ? "Aplicativo On-line "
+                    : "Aplicativo Off-line"
+                }
+              ></Badge>
               <form onSubmit={login}>
                 <div>
                   <InputText
                     autoFocus
-                    inputmode="text"
+                    inputMode="text"
                     type="text"
                     value={usuario}
                     style={{ width: "100%", margin: "5px" }}
@@ -238,13 +243,12 @@ const Login = () => {
                     onChange={(e) => setUsuario(e.target.value)}
                     ref={input1Ref}
                     onKeyDown={(e) => handleKeyDown(e, input2Ref)}
-                    
                   />
                 </div>
                 <div>
                   <InputText
                     type="password"
-                    inputmode="text"
+                    inputMode="text"
                     value={senha}
                     style={{ width: "100%", margin: "5px" }}
                     placeholder="Senha"

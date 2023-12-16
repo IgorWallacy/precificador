@@ -13,6 +13,7 @@ import {
   faBusinessTime,
   faUserTie,
   faCalendar,
+  faBarcode,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./menu-interativo.css";
@@ -140,24 +141,17 @@ const MenuInterativo = () => {
         </div>
         <div className="menu-categoria">
           {" "}
-          <FontAwesomeIcon icon={faCalendar} size="2x" />
-          <h1>Validade</h1>
+          <FontAwesomeIcon icon={faBarcode} size="2x" />
+          <h1>Inventário</h1>
           <div className="opcoes-menu">
             <Button
-              label="Cadastrar validades"
-              icon="pi pi-calendar"
+              label="Cadastrar inventários"
+              icon="pi pi-qrcode"
               className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/produtos/validade/novo")}
+              onClick={() => navigate("/estoque/lista-inventario")}
             />
           </div>
-          <div className="opcoes-menu">
-            <Button
-              label="Consultar validades"
-              icon="pi  pi-calendar   "
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/produtos/validade/consulta")}
-            />
-          </div>
+         
         </div>
         <div className="menu-categoria">
           {" "}

@@ -292,7 +292,7 @@ export default function ContagemInventario() {
         visible={visible}
         style={{ width: "50vw" }}
         onHide={() => setVisible(false)}
-        modal={false}
+        modal={true}
         position="bottom"
       >
         <Toast ref={toastDialog} position="bottom-center" />

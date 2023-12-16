@@ -12,7 +12,7 @@ import { Calendar } from "primereact/calendar";
 import Context from "../../contexts";
 import { useNavigate } from "react-router-dom";
 
-import Logo from "../../assets/img/logo_duca.png";
+import Logo from "../../assets/img/logo_jj.png";
 
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -121,7 +121,7 @@ const Header = (data) => {
         </Sidebar>
       </div>
       <div className="logo-rodape">
-        <img src={Logo} width="340px" alt="logo do sistema" />
+        <img src={Logo} width="140px" alt="logo do sistema" />
       </div>
       {visibleLeft ? <>
         

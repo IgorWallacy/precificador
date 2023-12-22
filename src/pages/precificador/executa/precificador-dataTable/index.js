@@ -374,7 +374,7 @@ const PrecificadorExecuta = () => {
       </>
     );
   };
-
+ 
   const sugestaoVenda = (rowData) => {
     let sugestao =
       (rowData.precocusto * rowData.percentualmarkup) / 100 +

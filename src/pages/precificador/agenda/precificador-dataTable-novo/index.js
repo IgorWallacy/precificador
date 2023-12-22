@@ -21,6 +21,8 @@ import { TriStateCheckbox } from "primereact/tristatecheckbox";
 
 import { SelectButton } from "primereact/selectbutton";
 
+import { useReactToPrint } from "react-to-print";
+
 import api from "../../../../services/axios";
 
 import moment from "moment";
@@ -30,13 +32,17 @@ import { useNavigate } from "react-router-dom";
 const PrecificadorAgenda = () => {
   moment.locale("pt-br");
 
+  const tabelaRef = useRef();
+
   const navigate = useNavigate();
 
-  const[produtoFilter,setProdutoFilter] = useState([])
+  const [produtoFilter, setProdutoFilter] = useState([]);
 
   const [agrupadoPorFornecedor, setAgrupadoPorFornecedor] = useState(1);
 
   const inputPreco = useRef(null);
+
+  const [linhas, setLinhas] = useState(5);
 
   const [dialogFamilia, setDialogFamilia] = useState(false);
   const [produtosFamilia, setProdutosFamilia] = useState([]);
@@ -149,6 +155,26 @@ const PrecificadorAgenda = () => {
     ],
     today: " Agora ",
     clear: " Limpar ",
+  });
+
+  const imprime = () => {
+    if (linhas === 9999) {
+      handlePrint();
+    } else {
+      setLinhas(9999);
+      toast.current.show({
+        severity: "info",
+        summary: "Aviso",
+        detail: "Tabela ajustada, Imprima novamente! ",
+        life: 3000,
+      });
+    }
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => tabelaRef.current,
+    onAfterPrint : () => setLinhas(5)
+   
   });
 
   const renderHeaderFamilia = () => {
@@ -1037,23 +1063,27 @@ const PrecificadorAgenda = () => {
           )}
 
           <div>{rowData?.ean} </div>
-          <div>
-            <img
-              style={{
-                width: "80px",
-                height: "80px",
-                margin: "5px",
-                borderRadius: "25px",
-                padding: "5px",
-              }}
-              src={`${eanUrl}/${rowData.ean}`}
-              onError={(e) =>
-                (e.target.src =
-                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
-              }
-              alt={rowData.ean}
-            />
-          </div>
+          {linhas < 1000 ? (
+            <div>
+              <img
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  margin: "5px",
+                  borderRadius: "25px",
+                  padding: "5px",
+                }}
+                src={`${eanUrl}/${rowData.ean}`}
+                onError={(e) =>
+                  (e.target.src =
+                    "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                }
+                alt={rowData.ean}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
         </>
       );
     } else {
@@ -1272,7 +1302,7 @@ const PrecificadorAgenda = () => {
             )
             .then((response) => {
               setProdutos(response.data);
-           
+
               //  console.log(response.data);
 
               setLoading(false);
@@ -1316,6 +1346,22 @@ const PrecificadorAgenda = () => {
         }}
         onClick={() => setProdutos([])}
       />
+      {agrupadoPorFornecedor ? (
+        <></>
+      ) : (
+        <>
+          {" "}
+          <Button
+            onClick={() => imprime()}
+            label="Imprimir"
+            tooltip="Imprimir tabela"
+            tooltipOptions={{ position: "bottom" }}
+            icon="pi pi-file-pdf"
+            style={{ margin: "1rem" }}
+            className="p-button-rounded p-button-info "
+          />
+        </>
+      )}
 
       <Button
         onClick={() => buscarProdutos()}
@@ -1522,10 +1568,10 @@ const PrecificadorAgenda = () => {
             }}
           >
             {" "}
-            <h4 style={{ marginRight: "1rem " }}>Escolha um layout </h4>
+            <h4 style={{ marginRight: "1rem " }}>Clique para escolher um layout </h4>
             <ToggleButton
-              onLabel="Agrupar por nota fiscal e fornecedor"
-              offLabel="Agrupar por produto"
+              onLabel="Fornecedor"
+              offLabel="Produto"
               onIcon="pi pi-users"
               offIcon="pi pi-inbox"
               checked={agrupadoPorFornecedor}
@@ -1656,198 +1702,200 @@ const PrecificadorAgenda = () => {
               </div>
             </div>
           </Dialog>
+          <div ref={tabelaRef}>
+            <Tooltip target=".export-buttons>button" position="bottom" />
 
-          <Tooltip target=".export-buttons>button" position="bottom" />
-
-          <DataTable
-            onValueChange={filteredData => setProdutoFilter(filteredData)}
-            responsiveLayout="stack"
-            breakpoint="960px"
-            loading={loading}
-            stripedRows
-            footer={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                Existem {produtos.length} produto(s) para análise / {produtoFilter?.length} produto(s) filtrado(s)
-              </div>
-            }
-          
-            value={produtos}
-            selectionMode="single"
-            //   reorderableColumns
-            editMode="row"
-            dataKey="id"
-            //   scrollDirection="vertical"
-            //   scrollable
-            //   scrollHeight="flex"
-            globalFilterFields={[
-              "descricao",
-              "ean",
-              "numeronotafiscal",
-              "razaosocial",
-            ]}
-            filters={filters2}
-            filterDisplay="row"
-            size="small"
-            style={{
-              backgroundColor: "#f2f2f2",
-              width: "100%",
-              padding: "1.0rem",
-            }}
-            emptyMessage="Nenhum produto encontrado para precificação"
-            showGridlines
-            header={headerDataTable}
-            rowGroupMode={agrupadoPorFornecedor ? "subheader" : null}
-            groupRowsBy={agrupamento}
-            sortField={agrupadoPorFornecedor ? "idnotafiscal" : "descricao"}
-            removableSort
-            sortOrder={1}
-            rowGroupHeaderTemplate={
-              agrupadoPorFornecedor ? headerTemplate : null
-            }
-            //       resizableColumns
-            // columnResizeMode="expand"
-            expandableRowGroups={agrupadoPorFornecedor}
-            expandedRows={expandedRows}
-            onRowToggle={(e) => onRowToggle(e)}
-            paginator={!agrupadoPorFornecedor}
-            rows={4}
-            rowsPerPageOptions={[2, 3, 4, 5, 6, 10, 25, 50, 100]}
-          >
-            <Column
-              header={<> Código </>}
-              field={EanOrCodigo}
-              style={{ textAlign: "center" }}
-            ></Column>
-
-            <Column
-              field="descricao"
-              sortable
-              header="Produto"
-              body={familiaIcone}
-              bodyStyle={{ textAlign: "center" }}
-            ></Column>
-            <Column
-              field={precoCustoTemplate}
-              header="Custo"
-              body={precoCustoTemplate}
-              bodyStyle={{ textAlign: "center" }}
-            ></Column>
-            {usarMarkup ? (
+            <DataTable
+              onValueChange={(filteredData) => setProdutoFilter(filteredData)}
+              responsiveLayout="stack"
+              breakpoint="960px"
+              loading={loading}
+              size="small"
+              stripedRows
+              footer={
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  Existem {produtos.length} produto(s) para análise /{" "}
+                  {produtoFilter?.length === produtos?.length ? 0 : produtoFilter?.length} produto(s) filtrado(s)
+                </div>
+              }
+              value={produtos}
+              selectionMode="single"
+              //   reorderableColumns
+              editMode="row"
+              dataKey="id"
+              //   scrollDirection="vertical"
+              //   scrollable
+              //   scrollHeight="flex"
+              globalFilterFields={[
+                "descricao",
+                "ean",
+                "numeronotafiscal",
+                "razaosocial",
+              ]}
+              filters={filters2}
+              filterDisplay="row"
+              
+              style={{
+                backgroundColor: "#f2f2f2",
+                width: "100%",
+                padding: "1.0rem",
+              }}
+              emptyMessage="Nenhum produto encontrado para precificação"
+              showGridlines
+              header={headerDataTable}
+              rowGroupMode={agrupadoPorFornecedor ? "subheader" : null}
+              groupRowsBy={agrupamento}
+              sortField={agrupadoPorFornecedor ? "idnotafiscal" : "descricao"}
+              removableSort
+              sortOrder={1}
+              rowGroupHeaderTemplate={
+                agrupadoPorFornecedor ? headerTemplate : null
+              }
+              //       resizableColumns
+              // columnResizeMode="expand"
+              expandableRowGroups={agrupadoPorFornecedor}
+              expandedRows={expandedRows}
+              onRowToggle={(e) => onRowToggle(e)}
+              paginator={!agrupadoPorFornecedor}
+              rows={linhas}
+              rowsPerPageOptions={[2, 3, 4, 5, 6, 10, 25, 50, 100]}
+            >
               <Column
-                field={precoAtualTemplate}
-                header={
-                  <>
-                    {" "}
-                    <div>
+                header={<> Código </>}
+                field={EanOrCodigo}
+                style={{ textAlign: "center" }}
+              ></Column>
+
+              <Column
+                field="descricao"
+                sortable
+                header="Produto"
+                body={familiaIcone}
+                bodyStyle={{ textAlign: "center" }}
+              ></Column>
+              <Column
+                field={precoCustoTemplate}
+                header="Custo"
+                body={precoCustoTemplate}
+                bodyStyle={{ textAlign: "center" }}
+              ></Column>
+              {usarMarkup ? (
+                <Column
+                  field={precoAtualTemplate}
+                  header={
+                    <>
                       {" "}
-                      Preço Atual <hr />{" "}
-                    </div>{" "}
-                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                  </>
-                }
-                style={{}}
-                body={precoAtualTemplate}
-              ></Column>
-            ) : (
-              <Column
-                field={precoAtualMarkDownTemplate}
-                header={
-                  <>
-                    <div>
-                      Preço Atual <hr />
-                    </div>
-                    <br /> <div> Markdown % </div> <br /> <div> Venda </div>
-                  </>
-                }
-                style={{}}
-                body={precoAtualMarkDownTemplate}
-              ></Column>
-            )}
+                      <div>
+                        {" "}
+                        Preço Atual <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  style={{}}
+                  body={precoAtualTemplate}
+                ></Column>
+              ) : (
+                <Column
+                  field={precoAtualMarkDownTemplate}
+                  header={
+                    <>
+                      <div>
+                        Preço Atual <hr />
+                      </div>
+                      <br /> <div> Markdown % </div> <br /> <div> Venda </div>
+                    </>
+                  }
+                  style={{}}
+                  body={precoAtualMarkDownTemplate}
+                ></Column>
+              )}
 
-            {usarMarkup ? (
-              <Column
-                style={{ fontSize: "16px" }}
-                field={sugestaoVenda}
-                header={
-                  <>
-                    <div>
-                      Sugestão <hr />{" "}
-                    </div>
-                    <br /> <div> Markup % </div> <br /> <div> Venda </div>
-                  </>
-                }
-                body={sugestaoVenda}
-              ></Column>
-            ) : (
-              <Column
-                style={{ fontSize: "16px" }}
-                field={sugestaoVendaMarkDown}
-                header={
-                  <>
-                    <div>
-                      Sugestão <hr />{" "}
-                    </div>
-                    <br /> <div> Markdown % </div> <br /> <div> Venda </div>
-                  </>
-                }
-                body={sugestaoVendaMarkDown}
-              ></Column>
-            )}
+              {usarMarkup ? (
+                <Column
+                  style={{ fontSize: "16px" }}
+                  field={sugestaoVenda}
+                  header={
+                    <>
+                      <div>
+                        Sugestão <hr />{" "}
+                      </div>
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>
+                    </>
+                  }
+                  body={sugestaoVenda}
+                ></Column>
+              ) : (
+                <Column
+                  style={{ fontSize: "16px" }}
+                  field={sugestaoVendaMarkDown}
+                  header={
+                    <>
+                      <div>
+                        Sugestão <hr />{" "}
+                      </div>
+                      <br /> <div> Markdown % </div> <br /> <div> Venda </div>
+                    </>
+                  }
+                  body={sugestaoVendaMarkDown}
+                ></Column>
+              )}
 
-            {usarMarkup ? (
-              <Column
-                field="precoagendado"
-                header={
-                  <>
-                    {" "}
-                    <div>
+              {usarMarkup ? (
+                <Column
+                  field="precoagendado"
+                  header={
+                    <>
                       {" "}
-                      Preço Agendado <hr />{" "}
-                    </div>{" "}
-                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                  </>
-                }
-                editor={(options) => priceEditor(options)}
-                body={precoAgendoTemplate}
-              ></Column>
-            ) : (
-              <Column
-                field="precoagendado"
-                header={
-                  <>
-                    <div>
-                      Preço Agendado <hr />
-                    </div>
-                    <br /> <div> Markdown % </div> <br /> <div> Venda </div>
-                  </>
-                }
-                style={{}}
-                body={precoAgendoMarkDownTemplate}
-              ></Column>
-            )}
+                      <div>
+                        {" "}
+                        Preço Agendado <hr />{" "}
+                      </div>{" "}
+                      <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
+                    </>
+                  }
+                  editor={(options) => priceEditor(options)}
+                  body={precoAgendoTemplate}
+                ></Column>
+              ) : (
+                <Column
+                  field="precoagendado"
+                  header={
+                    <>
+                      <div>
+                        Preço Agendado <hr />
+                      </div>
+                      <br /> <div> Markdown % </div> <br /> <div> Venda </div>
+                    </>
+                  }
+                  style={{}}
+                  body={precoAgendoMarkDownTemplate}
+                ></Column>
+              )}
 
-            <Column
-              header="Atualizar"
-              body={priceEditor}
-              headerStyle={{ width: "10%", minWidth: "8rem" }}
-              bodyStyle={{ textAlign: "center" }}
-            ></Column>
-            <Column
-              field="revisado"
-              header="Revisado?"
-              dataType="boolean"
-              style={{ minWidth: "6rem" }}
-              body={verifiedBodyTemplate}
-              filter
-              filterElement={verifiedRowFilterTemplate}
-            />
-          </DataTable>
+              <Column
+                header="Atualizar"
+                body={priceEditor}
+                headerStyle={{ width: "10%", minWidth: "8rem" }}
+                bodyStyle={{ textAlign: "center" }}
+              ></Column>
+              <Column
+                field="revisado"
+                header="Revisado?"
+                dataType="boolean"
+                style={{ minWidth: "6rem" }}
+                body={verifiedBodyTemplate}
+                filter
+                filterElement={verifiedRowFilterTemplate}
+              />
+            </DataTable>
+          </div>
 
           <Dialog
             visible={dialogFamilia}

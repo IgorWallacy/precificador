@@ -260,6 +260,8 @@ export default function ContagemInventario() {
         />
 
         <DataTable
+          rows={5}
+          paginator
           responsiveLayout="stack"
           breakpoint="968px"
           stripedRows

@@ -6,6 +6,9 @@ import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 import { Dropdown } from "primereact/dropdown";
 
+import { Card, DatePicker, Statistic, Select } from "antd";
+import locale from "antd/es/date-picker/locale/pt_BR";
+
 import api from "../../../services/axios";
 import GraficoVendaPorHora from "./por-hora";
 
@@ -63,6 +66,7 @@ const GraficosIndex = () => {
     today: " Hoje ",
     clear: " Limpar ",
   });
+
   const [headers, setHeaders] = useState();
   const [vendas, setVendas] = useState([]);
   const [ticketMedio, setTicketMedio] = useState([]);
@@ -91,9 +95,22 @@ const GraficosIndex = () => {
   const [loadingTicketMedio, setLoadingTicketMedio] = useState(false);
   const [loadingMeioPagamento, setLoadingMeioPagamento] = useState(false);
 
+  const [resumoVendas, setResumoVendas] = useState([]);
+  const [loadingResumoVendas, setLoadingResumoVendas] = useState(false);
+  const [lojaResumoSelecionada , setLojaResumoSelecionada] = useState(null)
+
+  const { RangePicker } = DatePicker;
+  const { Option } = Select;
+
+  const [ResumoData, setResumoData] = useState([]);
+
   let dataSourceSettings = {
     enableSorting: true,
-    valueSortSettings: { headerDelimiter: " - " },
+    valueSortSettings: {
+      headerText: "TotalVendido",
+      headerDelimiter: "-",
+      sortOrder: "Ascending",
+    },
     values: [
       { name: "TotalVendido", caption: "Total vendido", type: "Sum" },
       {
@@ -144,9 +161,29 @@ const GraficosIndex = () => {
       .get("/api/filial")
       .then((r) => {
         setLojaList(r.data);
+       // console.log(r.data);
       })
       .catch((e) => {
         console.log(e);
+      });
+  };
+
+  const geTResumoVendas = () => {
+   
+    setLoadingResumoVendas(true);
+    return api
+      .get(
+        `/api/vendas/resumo/${moment(ResumoData?.[0]?.$d).format("YYYY-MM-DD")}/${moment(ResumoData?.[1]?.$d).format("YYYY-MM-DD")}/${lojaResumoSelecionada?lojaResumoSelecionada : 0}`
+      )
+      .then((r) => {
+        //console.table(r.data)
+        setResumoVendas(r.data[0]);
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally((f) => {
+        setLoadingResumoVendas(false);
       });
   };
 
@@ -208,7 +245,7 @@ const GraficosIndex = () => {
       .then((r) => {
         setVendas(r.data);
         setLoading(false);
-        //console.log(r.data);
+      //  console.log(r.data);
       })
       .catch((e) => {
         console.log(e);
@@ -224,6 +261,7 @@ const GraficosIndex = () => {
     getTicketMedio();
     getVendasMeioPagamento();
     getFilial();
+    geTResumoVendas();
   }, []);
 
   return (
@@ -236,9 +274,11 @@ const GraficosIndex = () => {
           display: "flex",
           flexDirection: "column",
           flexWrap: "wrap",
+          padding:'10px',
           gap: "10px",
-          margin: "5px",
-          justifyContent: "space-around",
+          margin: "10px",
+          width: "99%",
+          justifyContent: "center",
         }}
       >
         <div
@@ -246,7 +286,154 @@ const GraficosIndex = () => {
             display: "flex",
             flexDirection: "column",
             flexWrap: "wrap",
+            padding: "10px",
+            width: "100%",
+            justifyContent: "center",
+            border: "1px solid #FFFF",
+          }}
+        >
+          <div style={{ display: "flex", gap: "10px", flexWrap:'wrap', justifyContent : 'center', alignItems:'center' }}>
+            <RangePicker
+              format={"DD/MM/YYYY"}
+              locale={locale}
+              showToday
+              onChange={(e) => setResumoData(e)}
+            />
+            <Select placeholder="Selecione uma loja" allowClear defaultActiveFirstOption={false} style={{ width: 240 }} onChange={(e) => setLojaResumoSelecionada(e)}>
+              {lojaList.map((option) => (
+                <Option key={option.id} value={option.codigo}>
+                  {option.nome}
+                </Option>
+              ))}
+            </Select>
+            <Button style={{margin : '5px'}}
+              icon="pi pi-search"
+              onClick={()=> geTResumoVendas()}
+              label={loadingResumoVendas ? 'Gerando...' : 'Gerar'}
+              loading={loadingResumoVendas}
+              className="p-button p-button-rounded p-button-success"
+            />
+            <h4 style={{ color: "#ffff" }}>
+              {" "}
+              Exibindo os dados de{" "}
+              {moment(ResumoData?.[0]?.$d).format("DD/MM/YYYY")} até{" "}
+              {moment(ResumoData?.[1]?.$d).format("DD/MM/YYYY")}{" "}
+            </h4>
+          </div>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" , width:'100%' }}>
+            <Card bordered={true} title="Cupons">
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Total"
+                value={resumoVendas?.quantidade_cupom}
+                loading={loadingResumoVendas}
+              />
+            </Card>
+            <Card bordered={true} title="Cupons Cancelados">
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Cancelados"
+                value={resumoVendas?.quantidade_cupom_cancelado}
+                loading={loadingResumoVendas}
+              />
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Total Cancelado"
+                value={resumoVendas?.venda_cancelada_cupom}
+                precision={2}
+                prefix="R$"
+                loading={loadingResumoVendas}
+              />
+            </Card>
+            <Card bordered={true} title="Itens Cancelados">
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Cancelados"
+                value={resumoVendas?.quantidade_item_cancelado}
+                loading={loadingResumoVendas}
+              />
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Total Cancelado"
+                value={resumoVendas?.venda_cancelada_item}
+                precision={2}
+                prefix="R$"
+                loading={loadingResumoVendas}
+              />
+            </Card>
+            <Card bordered={true} title="Itens + Cupons Cancelados">
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Cancelados"
+                value={
+                  resumoVendas?.quantidade_item_cancelado +
+                  resumoVendas?.quantidade_cupom_cancelado
+                }
+                loading={loadingResumoVendas}
+              />
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Total Cancelado"
+                value={
+                  resumoVendas?.venda_cancelada_item +
+                  resumoVendas?.venda_cancelada_cupom
+                }
+                precision={2}
+                prefix="R$"
+                loading={loadingResumoVendas}
+              />
+            </Card>
+            <Card bordered={true} title="Venda Bruta (PDV + RETAGUARDA)">
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Total Bruto"
+                value={resumoVendas?.venda_bruta}
+                precision={2}
+                prefix="R$"
+                loading={loadingResumoVendas}
+              />
+            </Card>
+            <Card bordered={true} title="Descontos">
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Total de Descontos"
+                value={resumoVendas?.descontos}
+                precision={2}
+                prefix="R$"
+                loading={loadingResumoVendas}
+              />
+            </Card>
+            <Card bordered={true} title="Venda - Descontos">
+              <Statistic
+                groupSeparator="."
+                decimalSeparator=","
+                title="Total Líquido"
+                value={resumoVendas?.venda_liquida - resumoVendas?.descontos }
+                precision={2}
+                prefix="R$"
+                loading={loadingResumoVendas}
+              />
+            </Card>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexWrap: "wrap",
             gap: "5px",
+            width : '98%',
+            margin:'5px',
             padding: "1px",
             justifyContent: "flex-start",
             border: "1px solid #FFFF",
@@ -312,7 +499,7 @@ const GraficosIndex = () => {
             justifyContent: "flex-start",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-
+            width:'98%',
             padding: "1px",
           }}
         >
@@ -332,10 +519,11 @@ const GraficosIndex = () => {
                 alignContent: "center",
                 flexWrap: "wrap",
                 gap: "1px",
+               
               }}
             >
               <Calendar
-              selectOtherMonths
+                selectOtherMonths
                 style={{ margin: "5px" }}
                 dateFormat="dd/mm/yy"
                 locale="pt-BR"
@@ -346,7 +534,7 @@ const GraficosIndex = () => {
                 onChange={(e) => setDataInicialTicket(e.value)}
               ></Calendar>
               <Calendar
-              selectOtherMonths
+                selectOtherMonths
                 style={{ margin: "5px" }}
                 dateFormat="dd/mm/yy"
                 locale="pt-BR"
@@ -382,6 +570,7 @@ const GraficosIndex = () => {
             flexDirection: "row",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
+            width:'98%',
             margin: "2px",
             padding: "10px",
             justifyContent: "flex-start",
@@ -397,11 +586,11 @@ const GraficosIndex = () => {
               textAlign: "center",
             }}
           >
-            Resumo de vendas do PDV
+            Resumo de vendas ( SOMENTE PDV )
           </h1>
           <div style={{ width: "100%" }}>
             <Calendar
-            selectOtherMonths
+              selectOtherMonths
               style={{ margin: "5px" }}
               dateFormat="dd/mm/yy"
               locale="pt-BR"
@@ -412,7 +601,7 @@ const GraficosIndex = () => {
               onChange={(e) => setDataInicialMeioPagamento(e.value)}
             ></Calendar>
             <Calendar
-            selectOtherMonths
+              selectOtherMonths
               style={{ margin: "5px" }}
               dateFormat="dd/mm/yy"
               locale="pt-BR"

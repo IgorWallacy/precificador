@@ -72,7 +72,7 @@ const TicketMedioGrafico = ({ dados }) => {
         series={series}
         type="bar"
         height={350}
-        width="100%"
+        width="95%"
       />
     </>
   );

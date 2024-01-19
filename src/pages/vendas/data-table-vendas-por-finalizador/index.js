@@ -25,9 +25,14 @@ import { Toast } from "primereact/toast";
 
 import { Skeleton } from "primereact/skeleton";
 
+import { useReactToPrint } from "react-to-print";
+
 import AppChart from "./chart";
 import "primeflex/primeflex.css";
 function VendasDataTableComponent() {
+
+  const tabelaRef = useRef()
+
   const [loja, setLoja] = useState(0);
   const [filiais, setFiliais] = useState();
   const [pdv, setPdv] = useState({ pdv: "0" });
@@ -57,6 +62,12 @@ function VendasDataTableComponent() {
     setTotalGeralECF(0);
     setTotalGeral(0);
   }
+
+  const handlePrint = useReactToPrint({
+   
+
+    content: () => tabelaRef.current,
+  });
 
   const getVendasTotal = () => {
     setLoading(true);
@@ -498,7 +509,7 @@ function VendasDataTableComponent() {
 
       <Header />
       <Footer />
-
+    <div ref={tabelaRef}>
       <div className="container-venda">
         <div
           style={{
@@ -515,6 +526,13 @@ function VendasDataTableComponent() {
             vendasECF={vendasECF}
             vendasNfce={vendasNfce}
           />
+           <Button
+                  style={{ margin: "0px 5px" }}
+                  label="Imprimir"
+                  className="p-button p-button-rounded p-button-warning"
+                  onClick={() => handlePrint()}
+                  icon="pi pi-print"
+                />
         </div>
 
         <div className="cards-info">
@@ -595,7 +613,7 @@ function VendasDataTableComponent() {
         </div>
       </div>
 
-      <div>
+      <div >
         <div className=" cards-info">
           <div className="col-12 md:col-6 lg:col-3 justify-content-end">
             <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
@@ -683,6 +701,7 @@ function VendasDataTableComponent() {
             loading={loading}
           ></DataTable>
         </div>
+      </div>
       </div>
     </>
   );

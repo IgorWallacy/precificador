@@ -21,7 +21,7 @@ const GraficoVendaPorHora = ({ dados }) => {
   });
 
   const resultsArray = Object.entries(results).flatMap(([filial, horas]) => {
-    return Object.entries(horas).map(([hora, total]) => {
+    return Object.entries(horas).sort().map(([hora, total]) => {
       return {
         filial,
         hora,
@@ -36,7 +36,7 @@ const GraficoVendaPorHora = ({ dados }) => {
       background: "#FCF6F532",
     },
     xaxis: {
-      categories: [...new Set(resultsArray.map((d) => d.hora))],
+      categories: [...new Set(resultsArray.sort().map((d) => d.hora))],
     },
     title: {
       text: "Vendas por hora",
@@ -57,7 +57,7 @@ const GraficoVendaPorHora = ({ dados }) => {
           style: "decimal",
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-
+        //  currency : 'BRL',
           useGrouping: false,
         }).format(total)
       );
@@ -70,7 +70,7 @@ const GraficoVendaPorHora = ({ dados }) => {
       <ReactApexChart
         options={options}
         series={series}
-        type="bar"
+        type="line"
         height={350}
         width="100%"
       />

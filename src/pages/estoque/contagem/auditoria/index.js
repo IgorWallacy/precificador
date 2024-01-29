@@ -102,7 +102,7 @@ const AuditoriaInventario = ( {id} ) => {
             density: "compact",
             expanded: true, //expand all groups by default
             grouping: ["produto"], //an array of columns to group by by default (can be multiple)
-            pagination: { pageIndex: 0, pageSize: 10 },
+            pagination: { pageIndex: 0, pageSize: 100 },
             sorting: [{ id: "produto", desc: false }], //sort by state by default
           }}
           localization={MRT_Localization_PT_BR}

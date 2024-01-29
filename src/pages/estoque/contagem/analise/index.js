@@ -5,6 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../.././../components/header";
 import Footer from "../../../../components/footer";
 
+import { classNames } from "primereact/utils";
+import { TriStateCheckbox } from "primereact/tristatecheckbox";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
@@ -23,6 +25,7 @@ import moment from "moment";
 
 export default function AnaliseInventario() {
   let { id } = useParams();
+  const dt = useRef(null)
 
   const toast = useRef(null);
 
@@ -54,6 +57,8 @@ export default function AnaliseInventario() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
 
   const [produto, setProduto] = useState([]);
+  const [produtoFilter, setProdutoFilter] = useState([]);
+  const [produtoSelecionados, setProdutoSelecionados] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [inventario, setInventario] = useState([]);
@@ -65,6 +70,7 @@ export default function AnaliseInventario() {
     produto: { value: null, matchMode: FilterMatchMode.CONTAINS },
 
     ean: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    recontagem: { value: null, matchMode: FilterMatchMode.EQUALS },
   });
 
   const header = () => {
@@ -88,6 +94,15 @@ export default function AnaliseInventario() {
             placeholder="Pesquisar"
           />
         </span>
+        <Button
+          onClick={() => marcarRecontagem()}
+          disabled={produtoSelecionados?.length === 0}
+          icon="pi pi-sync"
+          label={`Marcar recontagem de ${
+            produtoSelecionados?.length ? produtoSelecionados?.length : 0
+          } produto(s) selecionado(s)`}
+          className="p-button p-button-rounded p-button-secondary"
+        />
       </div>
     );
   };
@@ -107,7 +122,7 @@ export default function AnaliseInventario() {
       .get(`/api/produto/contagem/porInventario/${id}`)
       .then((r) => {
         setProduto(r.data);
-        //  console.log(r.data);
+       
       })
       .catch((e) => {
         toast.current.show({
@@ -204,7 +219,10 @@ export default function AnaliseInventario() {
           <Tag value="Corrigido" severity="success" />
         ) : (
           <Tag value="Precisa recontar" severity="danger" />
+          
         )}
+        <br/>
+        {row?.recontar ? <> <Tag style={{marginTop:'10px'}} value="Em processo de recontagem" severity="warning" /> </> : <></>}
       </>
     );
   };
@@ -273,6 +291,31 @@ export default function AnaliseInventario() {
       </>
     );
   };
+  const verifiedBodyTemplate = (row) => {
+    produto.forEach((p) => {
+      p.recontagem = p.quantidadeLida !== p.quantidadeEstoque;
+    });
+    //console.log(produto);
+    return (
+      <i
+        className={classNames("pi", {
+          "false-icon pi-times-circle":
+            row?.quantidadeLida -
+              (row?.quantidadeVendidaDurante
+                ? row?.quantidadeVendidaDurante
+                : 0) ===
+            row?.quantidadeEstoque,
+          "true-icon pi-check-circle":
+            row?.quantidadeLida -
+              (row?.quantidadeVendidaDurante
+                ? row?.quantidadeVendidaDurante
+                : 0) !=
+            row?.quantidadeEstoque,
+        })}
+      ></i>
+    );
+  };
+
   const converterParaCSV = (jsonData) => {
     const separator = ";";
     const keys = Object.keys(jsonData[0]);
@@ -304,6 +347,46 @@ export default function AnaliseInventario() {
       moment(inventario?.inicio).format("DD-MM-YYYY");
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const verifiedRowFilterTemplate = (options) => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <TriStateCheckbox
+          value={options.value}
+          onChange={(e) => options.filterApplyCallback(e.value)}
+        />
+      </div>
+    );
+  };
+
+  const marcarRecontagem = () => {
+    produtoSelecionados.map((m) => {
+      api
+        .put(`/api/produto/contagem/recontar/item/${m?.idproduto}/inventario/${m?.idinventario}`)
+        .then((r) => {
+          toast.current.show({
+            severity: "success",
+            summary: "Sucesso ",
+            detail: "Produto remarcado para recontagem"
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally((f) => {
+          dt.current.reset()
+          setProdutoSelecionados([])
+          getItens()
+          
+        });
+    });
   };
 
   useEffect(() => {
@@ -410,7 +493,11 @@ export default function AnaliseInventario() {
         />
 
         <DataTable
+          ref={dt}
+          onValueChange={(filteredData) => setProdutoFilter(filteredData)}
           removableSort
+          selection={produtoSelecionados}
+          onSelectionChange={(e) => setProdutoSelecionados(e.value)}
           paginator
           rows={linhas}
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
@@ -424,8 +511,26 @@ export default function AnaliseInventario() {
           globalFilterFields={["produto", "ean", "divergencia"]}
           style={{ width: "100%" }}
           header={header}
-          footer={`Existem ${produto?.length} produtos para análise`}
+          footer={
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Existem {produto.length} produto(s) para análise /{" "}
+              {produtoFilter?.length === produto?.length
+                ? 0
+                : produtoFilter?.length}{" "}
+              produto(s) filtrado(s)
+            </div>
+          }
         >
+          <Column
+            selectionMode="multiple"
+            headerStyle={{ width: "3em" }}
+          ></Column>
           <Column sortable field="ean" header="Código"></Column>
           <Column sortable field="produto" header="Produto"></Column>
           <Column
@@ -458,13 +563,23 @@ export default function AnaliseInventario() {
             body={levantamentoFinalTemplate}
             header="Levantamento de estoque"
           ></Column>
+
+          <Column
+            field="recontagem"
+            header="Recontar ?"
+            dataType="boolean"
+            style={{ minWidth: "6rem" }}
+            body={verifiedBodyTemplate}
+            filter
+            filterElement={verifiedRowFilterTemplate}
+          />
         </DataTable>
       </div>
 
       <Dialog
         modal={false}
         maximizable
-        header={`Auditoria do inventário ${id}`}
+        header={`Auditoria do inventário ${id} - ${inventario?.nome}`}
         visible={dialogAuditoria}
         onHide={() => setDialogAuditoria(false)}
       >

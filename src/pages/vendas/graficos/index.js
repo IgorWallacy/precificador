@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { ProgressBar } from "primereact/progressbar";
 import { Calendar } from "primereact/calendar";
@@ -20,6 +20,8 @@ import Footer from "../../../components/footer";
 import moment from "moment";
 import TicketMedioGrafico from "./ticket-medio";
 import GraficoMeioDePagamento from "./por-meio-de-pagamento";
+
+import { useReactToPrint } from "react-to-print";
 
 const GraficosIndex = () => {
   addLocale("pt-BR", {
@@ -67,6 +69,9 @@ const GraficosIndex = () => {
     clear: " Limpar ",
   });
 
+  const tabelaRef = useRef();
+  const tabelaMeioPagamentoRef = useRef();
+
   const [headers, setHeaders] = useState();
   const [vendas, setVendas] = useState([]);
   const [ticketMedio, setTicketMedio] = useState([]);
@@ -97,7 +102,7 @@ const GraficosIndex = () => {
 
   const [resumoVendas, setResumoVendas] = useState([]);
   const [loadingResumoVendas, setLoadingResumoVendas] = useState(false);
-  const [lojaResumoSelecionada , setLojaResumoSelecionada] = useState(null)
+  const [lojaResumoSelecionada, setLojaResumoSelecionada] = useState(null);
 
   const { RangePicker } = DatePicker;
   const { Option } = Select;
@@ -161,7 +166,7 @@ const GraficosIndex = () => {
       .get("/api/filial")
       .then((r) => {
         setLojaList(r.data);
-       // console.log(r.data);
+        // console.log(r.data);
       })
       .catch((e) => {
         console.log(e);
@@ -169,11 +174,14 @@ const GraficosIndex = () => {
   };
 
   const geTResumoVendas = () => {
-   
     setLoadingResumoVendas(true);
     return api
       .get(
-        `/api/vendas/resumo/${moment(ResumoData?.[0]?.$d).format("YYYY-MM-DD")}/${moment(ResumoData?.[1]?.$d).format("YYYY-MM-DD")}/${lojaResumoSelecionada?lojaResumoSelecionada : 0}`
+        `/api/vendas/resumo/${moment(ResumoData?.[0]?.$d).format(
+          "YYYY-MM-DD"
+        )}/${moment(ResumoData?.[1]?.$d).format("YYYY-MM-DD")}/${
+          lojaResumoSelecionada ? lojaResumoSelecionada : 0
+        }`
       )
       .then((r) => {
         //console.table(r.data)
@@ -245,7 +253,7 @@ const GraficosIndex = () => {
       .then((r) => {
         setVendas(r.data);
         setLoading(false);
-      //  console.log(r.data);
+        //  console.log(r.data);
       })
       .catch((e) => {
         console.log(e);
@@ -254,6 +262,13 @@ const GraficosIndex = () => {
         setLoading(false);
       });
   };
+
+  const handlePrint = useReactToPrint({
+    content: () => tabelaRef.current,
+  });
+  const handlePrintMeioPagamento = useReactToPrint({
+    content: () => tabelaMeioPagamentoRef.current,
+  });
 
   useEffect(() => {
     pegarTokenLocalStorage();
@@ -274,14 +289,15 @@ const GraficosIndex = () => {
           display: "flex",
           flexDirection: "column",
           flexWrap: "wrap",
-          padding:'10px',
-          gap: "10px",
-          margin: "10px",
-          width: "99%",
+          padding: "5px",
+          gap: "5px",
+          //margin: "1px",
+          width: "100%",
           justifyContent: "center",
         }}
       >
         <div
+          ref={tabelaRef}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -290,43 +306,80 @@ const GraficosIndex = () => {
             width: "100%",
             justifyContent: "center",
             border: "1px solid #FFFF",
+            backgroundColor: "#9C9BDE",
           }}
         >
-          <div style={{ display: "flex", gap: "10px", flexWrap:'wrap', justifyContent : 'center', alignItems:'center' }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <RangePicker
+              disabled={loadingResumoVendas}
               format={"DD/MM/YYYY"}
               locale={locale}
               showToday
               onChange={(e) => setResumoData(e)}
             />
-            <Select placeholder="Selecione uma loja" allowClear defaultActiveFirstOption={false} style={{ width: 240 }} onChange={(e) => setLojaResumoSelecionada(e)}>
+            <Select
+              disabled={loadingResumoVendas}
+              placeholder="Selecione uma loja"
+              allowClear
+              defaultActiveFirstOption={false}
+              style={{ width: 240 }}
+              onChange={(e) => setLojaResumoSelecionada(e)}
+            >
               {lojaList.map((option) => (
                 <Option key={option.id} value={option.codigo}>
                   {option.nome}
                 </Option>
               ))}
             </Select>
-            <Button style={{margin : '5px'}}
+            <Button
+              style={{ margin: "5px" }}
               icon="pi pi-search"
-              onClick={()=> geTResumoVendas()}
-              label={loadingResumoVendas ? 'Gerando...' : 'Gerar'}
+              onClick={() => geTResumoVendas()}
+              label={loadingResumoVendas ? "Gerando..." : "Gerar"}
               loading={loadingResumoVendas}
               className="p-button p-button-rounded p-button-success"
             />
-            <h4 style={{ color: "#ffff" }}>
+            <Button
+              style={{ margin: "0px 5px" }}
+              label="Imprimir"
+              className="p-button p-button-rounded p-button-warning"
+              onClick={() => handlePrint()}
+              icon="pi pi-print"
+            />
+
+            <h4 style={{ color: "#f2f2f2" }}>
               {" "}
               Exibindo os dados de{" "}
               {moment(ResumoData?.[0]?.$d).format("DD/MM/YYYY")} até{" "}
               {moment(ResumoData?.[1]?.$d).format("DD/MM/YYYY")}{" "}
             </h4>
           </div>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" , width:'100%' }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+              width: "100%",
+            }}
+          >
             <Card bordered={true} title="Cupons">
               <Statistic
                 groupSeparator="."
                 decimalSeparator=","
                 title="Total"
-                value={resumoVendas?.quantidade_cupom}
+                value={
+                  resumoVendas?.quantidade_cupom
+                    ? resumoVendas?.quantidade_cupom
+                    : 0
+                }
                 loading={loadingResumoVendas}
               />
             </Card>
@@ -335,14 +388,22 @@ const GraficosIndex = () => {
                 groupSeparator="."
                 decimalSeparator=","
                 title="Cancelados"
-                value={resumoVendas?.quantidade_cupom_cancelado}
+                value={
+                  resumoVendas?.quantidade_cupom_cancelado
+                    ? resumoVendas?.quantidade_cupom_cancelado
+                    : 0
+                }
                 loading={loadingResumoVendas}
               />
               <Statistic
                 groupSeparator="."
                 decimalSeparator=","
                 title="Total Cancelado"
-                value={resumoVendas?.venda_cancelada_cupom}
+                value={
+                  resumoVendas?.venda_cancelada_cupom
+                    ? resumoVendas?.venda_cancelada_cupom
+                    : 0
+                }
                 precision={2}
                 prefix="R$"
                 loading={loadingResumoVendas}
@@ -353,14 +414,22 @@ const GraficosIndex = () => {
                 groupSeparator="."
                 decimalSeparator=","
                 title="Cancelados"
-                value={resumoVendas?.quantidade_item_cancelado}
+                value={
+                  resumoVendas?.quantidade_item_cancelado
+                    ? resumoVendas?.quantidade_item_cancelado
+                    : 0
+                }
                 loading={loadingResumoVendas}
               />
               <Statistic
                 groupSeparator="."
                 decimalSeparator=","
                 title="Total Cancelado"
-                value={resumoVendas?.venda_cancelada_item}
+                value={
+                  resumoVendas?.venda_cancelada_item
+                    ? resumoVendas?.venda_cancelada_item
+                    : 0
+                }
                 precision={2}
                 prefix="R$"
                 loading={loadingResumoVendas}
@@ -406,7 +475,7 @@ const GraficosIndex = () => {
                 groupSeparator="."
                 decimalSeparator=","
                 title="Total de Descontos"
-                value={resumoVendas?.descontos}
+                value={resumoVendas?.descontos ? resumoVendas?.descontos : 0}
                 precision={2}
                 prefix="R$"
                 loading={loadingResumoVendas}
@@ -417,7 +486,7 @@ const GraficosIndex = () => {
                 groupSeparator="."
                 decimalSeparator=","
                 title="Total Líquido"
-                value={resumoVendas?.venda_liquida - resumoVendas?.descontos }
+                value={resumoVendas?.venda_bruta - resumoVendas?.descontos}
                 precision={2}
                 prefix="R$"
                 loading={loadingResumoVendas}
@@ -432,11 +501,11 @@ const GraficosIndex = () => {
             flexDirection: "column",
             flexWrap: "wrap",
             gap: "5px",
-            width : '98%',
-            margin:'5px',
-            padding: "1px",
+            width: "100%",
+
             justifyContent: "flex-start",
             border: "1px solid #FFFF",
+            backgroundColor: "#f2f2f2",
           }}
         >
           <div
@@ -499,8 +568,8 @@ const GraficosIndex = () => {
             justifyContent: "flex-start",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-            width:'98%',
-            padding: "1px",
+            width: "100%",
+            backgroundColor: "#9C9BDE",
           }}
         >
           <div
@@ -519,7 +588,6 @@ const GraficosIndex = () => {
                 alignContent: "center",
                 flexWrap: "wrap",
                 gap: "1px",
-               
               }}
             >
               <Calendar
@@ -567,15 +635,17 @@ const GraficosIndex = () => {
         <div
           style={{
             display: "flex",
-            flexDirection: "row",
+            flexDirection: "column",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-            width:'98%',
-            margin: "2px",
-            padding: "10px",
+            width: "100%",
+            gap:'10px',
+            padding: "5px",
             justifyContent: "flex-start",
             alignItems: "center",
+            backgroundColor: "#9C9BDE",
           }}
+          ref={tabelaMeioPagamentoRef}
         >
           <h1
             style={{
@@ -622,20 +692,28 @@ const GraficosIndex = () => {
             />
 
             <Button
-              style={{ margin: "5px" }}
+              style={{ margin: "0px 5px" }}
               label="Gerar"
               loading={loadingMeioPagamento}
               className="p-button p-button-rounded"
               icon="pi pi-chart-bar"
               onClick={getVendasMeioPagamento}
             />
+            <Button
+              label="Imprimir"
+              className="p-button p-button-rounded p-button-warning"
+              onClick={() => handlePrintMeioPagamento()}
+              icon="pi pi-print"
+            />
           </div>
 
           <div
             style={{
               display: "flex",
-              justifyContent: "center",
-              flexDirection: "row",
+              flexDirection : 'column-reverse',
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+              gap: "10px",
               flexWrap: "wrap",
             }}
           >
@@ -645,7 +723,7 @@ const GraficosIndex = () => {
               id="PivotView"
               dataSourceSettings={dataSourceSettings}
               enableValueSorting={true}
-              width="100%"
+              width="95%"
               height={500}
               gridSettings={{ columnWidth: 10 }}
             ></PivotViewComponent>

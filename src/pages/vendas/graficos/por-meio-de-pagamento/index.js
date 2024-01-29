@@ -26,7 +26,7 @@ const GraficoMeioDePagamento = ({ dados }) => {
           options={state.options}
           series={state.series}
           height={400}
-          width="100%"
+          width="95%"
           type="pie"
         />
       </div>

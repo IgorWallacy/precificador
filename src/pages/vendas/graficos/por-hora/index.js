@@ -21,16 +21,21 @@ const GraficoVendaPorHora = ({ dados }) => {
   });
 
   const resultsArray = Object.entries(results).flatMap(([filial, horas]) => {
-    return Object.entries(horas).sort().map(([hora, total]) => {
-      return {
-        filial,
-        hora,
-        total,
-      };
-    });
+    return Object.entries(horas)
+      .sort()
+      .map(([hora, total]) => {
+        return {
+          filial,
+          hora,
+          total,
+        };
+      });
   });
   const options = {
     chart: {
+      toolbar: {
+        show: false,
+      },
       type: "line",
       height: 350,
       background: "#FCF6F532",
@@ -57,7 +62,7 @@ const GraficoVendaPorHora = ({ dados }) => {
           style: "decimal",
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        //  currency : 'BRL',
+          //  currency : 'BRL',
           useGrouping: false,
         }).format(total)
       );
@@ -73,6 +78,7 @@ const GraficoVendaPorHora = ({ dados }) => {
         type="line"
         height={350}
         width="100%"
+        expo
       />
     </>
   );

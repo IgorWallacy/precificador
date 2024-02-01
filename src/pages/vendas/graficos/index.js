@@ -22,6 +22,7 @@ import TicketMedioGrafico from "./ticket-medio";
 import GraficoMeioDePagamento from "./por-meio-de-pagamento";
 
 import { useReactToPrint } from "react-to-print";
+import RecebimentoPorData from "../../recebimento/porPagamento";
 
 const GraficosIndex = () => {
   addLocale("pt-BR", {
@@ -71,6 +72,7 @@ const GraficosIndex = () => {
 
   const tabelaRef = useRef();
   const tabelaMeioPagamentoRef = useRef();
+  const tabelaRecebimentoRef = useRef();
 
   const [headers, setHeaders] = useState();
   const [vendas, setVendas] = useState([]);
@@ -269,6 +271,9 @@ const GraficosIndex = () => {
   const handlePrintMeioPagamento = useReactToPrint({
     content: () => tabelaMeioPagamentoRef.current,
   });
+  const handlePrintRecebimento = useReactToPrint({
+    content: () => tabelaRecebimentoRef.current,
+  });
 
   useEffect(() => {
     pegarTokenLocalStorage();
@@ -294,8 +299,27 @@ const GraficosIndex = () => {
           //margin: "1px",
           width: "100%",
           justifyContent: "center",
+        
         }}
       >
+        <div 
+       
+        style={{
+          display : 'flex',
+          flexDirection : 'column',
+            width: '100%',
+            gap:'5px',
+            padding : '5px',
+            margin : '1px',
+            border: "1px solid #FFFF",
+            backgroundColor: "#9C9BDE",
+        }}>
+            
+            <RecebimentoPorData  />
+
+        </div>
+        
+       
         <div
           ref={tabelaRef}
           style={{
@@ -318,6 +342,7 @@ const GraficosIndex = () => {
               alignItems: "center",
             }}
           >
+            <h1 style={{color:'#f2f2f2'}}>Vendas e cancelamentos </h1>
             <RangePicker
               disabled={loadingResumoVendas}
               format={"DD/MM/YYYY"}
@@ -639,7 +664,7 @@ const GraficosIndex = () => {
             flexWrap: "wrap",
             border: "1px solid #FFFF",
             width: "100%",
-            gap:'10px',
+            gap: "10px",
             padding: "5px",
             justifyContent: "flex-start",
             alignItems: "center",
@@ -710,7 +735,7 @@ const GraficosIndex = () => {
           <div
             style={{
               display: "flex",
-              flexDirection : 'column-reverse',
+              flexDirection: "column-reverse",
               justifyContent: "flex-start",
               alignItems: "flex-start",
               gap: "10px",

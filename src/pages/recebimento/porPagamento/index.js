@@ -1,22 +1,23 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { DatePicker, Statistic, Select } from "antd";
+import { useReactToPrint } from "react-to-print";
+
 import locale from "antd/es/date-picker/locale/pt_BR";
 
 import { Button } from "primereact/button";
 import { ProgressBar } from "primereact/progressbar";
-
-import { useReactToPrint } from "react-to-print";
-
-import { MaterialReactTable } from "material-react-table";
-import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { DataTable } from "primereact/datatable";
+import {InputText} from 'primereact/inputtext'
+import { Column } from "primereact/column";
 
 import api from "../../../services/axios";
 import moment from "moment";
 
 const RecebimentoPorData = () => {
   const tabelaRef = useRef(null);
+  const [globalFilterValue2, setGlobalFilterValue2] = useState('');
   const [recebimentos, setRecebimentos] = useState([]);
-  const rowVirtualizerInstanceRef = useRef(null);
 
   const { RangePicker } = DatePicker;
 
@@ -28,6 +29,22 @@ const RecebimentoPorData = () => {
 
   const { Option } = Select;
   const [loja, setLoja] = useState(0);
+
+  const [filters2, setFilters2] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    nomeCliente: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    usuariomovimentacao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    loja: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
+
+  const onGlobalFilterChange2 = (e) => {
+    const value = e.target.value;
+    let _filters2 = { ...filters2 };
+    _filters2["global"].value = value;
+
+    setFilters2(_filters2);
+    setGlobalFilterValue2(value);
+  };
 
   const getFilial = () => {
     return api
@@ -62,283 +79,153 @@ const RecebimentoPorData = () => {
       });
   };
 
-  const imprime = useReactToPrint({
+  const somarValorPago = (row) => {
+    let total = 0;
+
+    if (recebimentos) {
+      for (let r of recebimentos) {
+        if (r.nomeCliente === row.nomeCliente) {
+          total += r.valorPago;
+        }
+      }
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }).format(total);
+  };
+
+  const somarValorComprado = (row) => {
+    let total = 0;
+
+    if (recebimentos) {
+      for (let r of recebimentos) {
+        if (r.nomeCliente === row.nomeCliente) {
+          total += r.valor;
+        }
+      }
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }).format(total);
+  };
+  const somarTotalDeJuros = (row) => {
+    let total = 0;
+
+    if (recebimentos) {
+      for (let r of recebimentos) {
+        if (r.nomeCliente === row.nomeCliente) {
+          total += r.jurosPago;
+        }
+      }
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }).format(total);
+  };
+
+  const somarTotalDeMulta = (row) => {
+    let total = 0;
+
+    if (recebimentos) {
+      for (let r of recebimentos) {
+        if (r.nomeCliente === row.nomeCliente) {
+          total += r.multaPaga;
+        }
+      }
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }).format(total);
+  };
+
+  const somarTotalDeDesconto = (row) => {
+    let total = 0;
+
+    if (recebimentos) {
+      for (let r of recebimentos) {
+        if (r.nomeCliente === row.nomeCliente) {
+          total += r.desconto;
+        }
+      }
+    }
+
+    return Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }).format(total);
+  };
+
+  const headerTemplate = (data) => {
+    return (
+      <>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            gap: "10px",
+
+            flexWrap: "wrap",
+          }}
+        >
+          <h4 style={{ fontWeight: "bold" }}>{data?.nomeCliente}</h4>
+          <h4 style={{ fontWeight: "bold" }}>CNPJ ou CPF - {data?.cnpjcpf}</h4>
+
+          <h4 style={{ textAlign: "center", color: "red", fontWeight: "bold" }}>
+            Total comprado {somarValorComprado(data)}
+          </h4>
+
+          <h4
+            style={{ textAlign: "center", color: "green", fontWeight: "bold" }}
+          >
+            Total de juros {somarTotalDeJuros(data)}
+          </h4>
+          <h4
+            style={{ textAlign: "center", color: "green", fontWeight: "bold" }}
+          >
+            Total de multa {somarTotalDeMulta(data)}
+          </h4>
+          <h4 style={{ textAlign: "center", color: "red", fontWeight: "bold" }}>
+            Total de descontos {somarTotalDeDesconto(data)}
+          </h4>
+          <h4
+            style={{ textAlign: "center", color: "green", fontWeight: "bold" }}
+          >
+            Total pago {somarValorPago(data)}
+          </h4>
+        </div>
+      </>
+    );
+  };
+
+  const handlePrint = useReactToPrint({
+    pageStyle: `@media print {
+      @page {
+        size: 500mm 500mm;
+        margin: 5;
+      }
+    }`,
     content: () => tabelaRef.current,
   });
-
-  const sumValorPago = useMemo(
-    () => recebimentos.reduce((acc, curr) => acc + curr.valorPago, 0),
-    [recebimentos]
-  );
-
-  const sumValorDivida = useMemo(
-    () => recebimentos.reduce((acc, curr) => acc + curr.valor, 0),
-    [recebimentos]
-  );
-
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "loja", //access nested data with dot notation
-        header: "Loja",
-        size: 150,
-      },
-      {
-        accessorKey: "nomeCliente", //access nested data with dot notation
-        header: "Nome do cliente",
-        size: 400,
-      },
-
-      {
-        accessorKey: "numeronfce", //normal accessorKey
-        header: "Nº NFC-e ",
-        size: 150,
-      },
-      {
-        accessorKey: "emissao",
-        accessorFn: (row) => moment(row.emissao).format("DD/MM/YYYY"),
-        header: "Emissão",
-        size: 150,
-      },
-      {
-        accessorKey: "vencimento",
-        accessorFn: (row) => moment(row.vencimento).format("DD/MM/YYYY"),
-        header: "Vencimento",
-        size: 150,
-      },
-      {
-        accessorKey: "valor",
-        header: "Valor da divída",
-        size: 150,
-        aggregationFn: "sum", //calc total points for each team by adding up all the points for each player on the team
-        AggregatedCell: ({ cell }) => (
-          <div style={{ backgroundColor: "red", color: "#f2f2f2" }}>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </div>
-        ),
-        Cell: ({ cell }) => (
-          <>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </>
-        ),
-        Footer: () => (
-          <>
-            <div style={{ color: "red" }}>
-              {" "}
-              Total devido {"  "}
-              <h4>
-                {sumValorDivida?.toLocaleString?.("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </h4>
-            </div>
-          </>
-        ),
-      },
-      {
-        accessorKey: "pagamento",
-        accessorFn: (row) => moment(row.pagamento).format("DD/MM/YYYY"),
-        header: "Pagamento",
-        size: 150,
-      },
-      {
-        accessorKey: "jurosPago",
-        header: "Juros pago",
-        size: 150,
-        aggregationFn: "sum", //calc total points for each team by adding up all the points for each player on the team
-        AggregatedCell: ({ cell }) => (
-          <div style={{ backgroundColor: "green", color: "#f2f2f2" }}>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </div>
-        ),
-        Cell: ({ cell }) => (
-          <>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </>
-        ),
-      },
-      {
-        accessorKey: "multaPaga",
-        header: "Multa paga",
-        size: 150,
-        AggregatedCell: ({ cell }) => (
-          <div style={{ backgroundColor: "green", color: "#f2f2f2" }}>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </div>
-        ),
-        Cell: ({ cell }) => (
-          <>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </>
-        ),
-      },
-      {
-        accessorKey: "desconto",
-        header: "Desconto",
-        size: 150,
-        aggregationFn: "sum", //calc total points for each team by adding up all the points for each player on the team
-        AggregatedCell: ({ cell }) => (
-          <div style={{ backgroundColor: "green", color: "#f2f2f2" }}>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </div>
-        ),
-        Cell: ({ cell }) => (
-          <>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </>
-        ),
-      },
-
-      {
-        accessorKey: "valorPago",
-        header: "Valor do pagamento",
-        size: 150,
-        aggregationFn: "sum", //calc total points for each team by adding up all the points for each player on the team
-
-        AggregatedCell: ({ cell }) => (
-          <div style={{ backgroundColor: "green", color: "#f2f2f2" }}>
-            <h4>
-              {" "}
-              {cell.getValue()?.toLocaleString?.("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </h4>
-          </div>
-        ),
-        Cell: ({ cell }) => (
-          <>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </>
-        ),
-        Footer: () => (
-          <>
-            <div style={{ color: "green" }}>
-              {" "}
-              Total recebido {"  "}
-              {sumValorPago?.toLocaleString?.("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </div>
-          </>
-        ),
-      },
-      {
-        accessorKey: "saldo",
-        header: "Falta receber",
-        size: 150,
-        aggregationFn: "sum", //calc total points for each team by adding up all the points for each player on the team
-
-        AggregatedCell: ({ cell }) => (
-          <div
-            style={{
-              backgroundColor: cell?.getValue() <= 0 ? "green " : "red",
-              color: "#f2f2f2",
-            }}
-          >
-            <h4>
-              {" "}
-              {cell.getValue()?.toLocaleString?.("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </h4>
-          </div>
-        ),
-        Cell: ({ cell }) => (
-          <>
-            {cell.getValue()?.toLocaleString?.("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </>
-        ),
-      },
-
-      {
-        accessorKey: "usuariomovimentacao",
-        header: "Baixado por",
-        size: 150,
-        Footer: () => (
-          <>
-            <Button
-              label="Imprimir"
-              icon="pi pi-print"
-              className="p-button p-button-rounded"
-              onClick={() => imprime()}
-            />
-          </>
-        ),
-      },
-    ],
-    [sumValorPago, sumValorDivida]
-  );
-
-  useEffect(() => {
-    //scroll to the top of the table when the sorting changes
-    try {
-      rowVirtualizerInstanceRef.current?.scrollToIndex?.(0);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [loading, sumValorDivida, sumValorPago]);
 
   useEffect(() => {
     getFilial();
@@ -347,26 +234,12 @@ const RecebimentoPorData = () => {
 
   return (
     <>
-      <div ref={tabelaRef} style={{ padding: "5px", margin: "5px" }}>
-        {loading ? (
-          <>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                color: "#f2f2f2",
-              }}
-            >
-              <h4>Consultando recebimentos, Aguarde por favor ...</h4>
-              <ProgressBar mode="indeterminate" />
-            </div>
-          </>
-        ) : (
-          <>
+      <div ref={tabelaRef} style={{ padding: "1px", margin: "1px" }}>
+      
+          
             <div
               style={{
                 width: "100%",
-
                 display: "flex",
                 flexDirection: "row",
                 gap: "5px",
@@ -374,8 +247,7 @@ const RecebimentoPorData = () => {
                 alignItems: "center",
                 flexWrap: "wrap",
                 color: "#f2f2f2",
-                margin: "5px",
-                padding: "5px",
+                height: "150px",
                 backgroundColor: "#ec3b83",
               }}
             >
@@ -408,9 +280,17 @@ const RecebimentoPorData = () => {
                 className="p-btton p-button-secondary p-button-rounded"
                 onClick={() => getRecebimentos()}
               />
+              <Button
+                style={{ margin: "2px" }}
+                label="Imprimir recebimentos"
+                icon="pi pi-print"
+                className="p-btton p-button-warning p-button-rounded"
+                onClick={() => handlePrint()}
+              />
               Exibindo os dados de{" "}
               {moment(resumoData?.[0]?.$d).format("DD/MM/YYYY")} até{" "}
               {moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}{" "}
+             
             </div>
 
             <>
@@ -422,55 +302,202 @@ const RecebimentoPorData = () => {
                   alignItems: "center",
                   color: "black",
                   width: "100%",
-                  backgroundColor: "#f2f2f2",
+                  padding: "1px",
                 }}
               >
-                {recebimentos?.length > 0 ? (
-                  <>
-                    <MaterialReactTable
-                      style={{ with: "100%", margin: "10px", height: "100 vh" }}
-                      localization={MRT_Localization_PT_BR}
-                      columns={columns}
-                      data={recebimentos}
-                      enableFilters={false}
-                      enableRowVirtualization
-                      enablePagination={false}
-                      enableGrouping={true}
-                      enablePinning
-                      enableColumnResizing
-                      enableStickyFooter={true}
-                      enableStickyHeader={true}
-                      enableTopToolbar={true}
-                      rowVirtualizerInstanceRef={rowVirtualizerInstanceRef} //optional
-                      rowVirtualizerProps={{ overscan: 8 }} //optionally customize the virtualizer
-                      state={{ loading }}
-                      initialState={{
-                        grouping: ["nomeCliente"],
-                        expanded: true,
-                        density: "compact",
-                        columnPinning: { left: ["nomeCliente"] },
-                        columnVisibility: {
-                          numeronfce: false,
-                          jurosPago: true,
-                          multaPaga: true,
-                          desconto: true,
-                        },
-                      }} //group by location and department by default
-                      muiTableContainerProps={{ sx: { maxHeight: "1366 px" } }}
-                      defaultColumn={{
-                        minSize: 20, //allow columns to get smaller than default
-                        maxSize: 9001, //allow columns to get larger than default
-                        size: 260, //make columns wider by default
+               
+                    <DataTable
+                      size="large"
+                      loading={loading}
+                      style={{ width: "100%" }}
+                      value={recebimentos}
+                      selectionMode="single"
+                      emptyMessage="Sem recebimentos"
+                      header={(row) => {
+                        return (
+                          <div style={{display : 'flex', justifyContent:'center', alignContent:'center', flexWrap:'wrap'}}>
+                            <span className="p-input-icon-left">
+                              <i className="pi pi-search" />
+                              <InputText
+                                value={globalFilterValue2}
+                                onChange={onGlobalFilterChange2}
+                                placeholder="Pesquisa "
+                              />
+                            </span>
+                          </div>
+                        );
                       }}
-                    />
-                  </>
-                ) : (
-                  <></>
-                )}
+                      stripedRows
+                      rowGroupMode="rowspan"
+                      groupRowsBy="nomeCliente"
+                      sortMode="single"
+                      sortField="nomeCliente"
+                      sortOrder={1}
+                      responsiveLayout="stack"
+                      breakpoint="968px"
+                      globalFilterFields={[
+                        "nomeCliente",
+                        "usuariomovimentacao",
+                      ]}
+                      filters={filters2}
+                      rowGroupHeaderTemplate={headerTemplate}
+                      footer={`Exibindo os dados pela data de recebimento de ${moment(
+                        resumoData?.[0]?.$d
+                      ).format("DD/MM/YYYY")} até 
+                      ${moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}`}
+                    >
+                      
+                      <Column
+                        field="nomeCliente"
+                        header="Cliente"
+                        body={headerTemplate}
+                      ></Column>
+                     
+                      <Column
+                        header="Loja"
+                       
+                        field="loja"
+                      ></Column>
+                      <Column
+                        field="emissao"
+                        body={(row) => {
+                          return (
+                            <>{moment(row?.emissao).format("DD/MM/YYYY")}</>
+                          );
+                        }}
+                        header="Data da compra"
+                      ></Column>
+                      <Column
+                        field="valor"
+                        body={(row) => {
+                          return (
+                            <div style={{ color: "red" }}>
+                              {Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2,
+                              }).format(row?.valor)}
+                            </div>
+                          );
+                        }}
+                        header="Valor da compra"
+                      ></Column>
+                      <Column
+                        field="vencimento"
+                        body={(row) => {
+                          return (
+                            <>{moment(row?.vencimento).format("DD/MM/YYYY")}</>
+                          );
+                        }}
+                        header="Vencimento"
+                      ></Column>
+                      <Column
+                        field="jurosPago"
+                        header="Juros"
+                        body={(row) => {
+                          return (
+                            <>
+                              {Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2,
+                              }).format(row?.jurosPago)}
+                            </>
+                          );
+                        }}
+                      ></Column>
+                      <Column
+                        field="multaPaga"
+                        header="Multa"
+                        body={(row) => {
+                          return (
+                            <>
+                              {Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2,
+                              }).format(row?.multaPaga)}
+                            </>
+                          );
+                        }}
+                      ></Column>
+                      <Column
+                        field="desconto"
+                        header="Desconto"
+                        body={(row) => {
+                          return (
+                            <>
+                              {Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2,
+                              }).format(row?.desconto)}
+                            </>
+                          );
+                        }}
+                      ></Column>
+                      <Column
+                        field="pagamento"
+                        header="Data do pagamento"
+                        body={(row) => {
+                          return (
+                            <>{moment(row?.pagamento).format("DD/MM/YYYY")}</>
+                          );
+                        }}
+                      ></Column>
+                      <Column
+                        field="valorPago"
+                        header="Valor do pagamento"
+                        body={(row) => {
+                          return (
+                            <div style={{ color: "green" }}>
+                              {Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2,
+                              }).format(row?.valorPago)}
+                            </div>
+                          );
+                        }}
+                      ></Column>
+
+                      <Column
+                        field="saldo"
+                        header="Falta"
+                        body={(row) => {
+                          return (
+                            <>
+                              <div
+                                style={{
+                                  color: `${row.saldo === 0 ? "green" : "red"}`,
+                                }}
+                              >
+                                {Intl.NumberFormat("pt-BR", {
+                                  style: "currency",
+                                  currency: "BRL",
+                                  maximumFractionDigits: 2,
+                                  minimumFractionDigits: 2,
+                                }).format(row?.saldo)}
+                              </div>
+                            </>
+                          );
+                        }}
+                      ></Column>
+                      <Column
+                        field="usuariomovimentacao"
+                        header="Recebido por"
+                      ></Column>
+                    </DataTable>
+                
               </div>
             </>
-          </>
-        )}
+          
+    
       </div>
     </>
   );

@@ -268,12 +268,8 @@ const GraficosIndex = () => {
   const handlePrint = useReactToPrint({
     content: () => tabelaRef.current,
   });
-  const handlePrintMeioPagamento = useReactToPrint({
-    content: () => tabelaMeioPagamentoRef.current,
-  });
-  const handlePrintRecebimento = useReactToPrint({
-    content: () => tabelaRecebimentoRef.current,
-  });
+
+
 
   useEffect(() => {
     pegarTokenLocalStorage();
@@ -294,7 +290,7 @@ const GraficosIndex = () => {
           display: "flex",
           flexDirection: "column",
           flexWrap: "wrap",
-          padding: "5px",
+          
           gap: "5px",
           //margin: "1px",
           width: "100%",
@@ -303,19 +299,19 @@ const GraficosIndex = () => {
         }}
       >
         <div 
-       
+        
         style={{
           display : 'flex',
           flexDirection : 'column',
             width: '100%',
-            gap:'5px',
-            padding : '5px',
-            margin : '1px',
+          
             border: "1px solid #FFFF",
             backgroundColor: "#9C9BDE",
         }}>
+
+           
             
-            <RecebimentoPorData  />
+            <RecebimentoPorData   />
 
         </div>
         
@@ -724,12 +720,7 @@ const GraficosIndex = () => {
               icon="pi pi-chart-bar"
               onClick={getVendasMeioPagamento}
             />
-            <Button
-              label="Imprimir"
-              className="p-button p-button-rounded p-button-warning"
-              onClick={() => handlePrintMeioPagamento()}
-              icon="pi pi-print"
-            />
+          
           </div>
 
           <div

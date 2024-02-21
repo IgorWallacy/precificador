@@ -24,11 +24,13 @@ import PrecosAlteradosComponent from "../pages/produto/precos-alterados";
 import CadastrarValidade from "../pages/produto/validade/novo";
 import AjusteEstoque from "../pages/estoque";
 import ContagemInventario from "../pages/estoque/contagem";
+import ResumoVendas from "../pages/vendas/resumo";
 
 import EstoquePorEmpresa from "../pages/compras/estoquePorEmpresa";
 import ConsultaLote from "../pages/produto/validade/consulta";
 import MaterialReactComponent from "../pages/bi/material-react";
 import AnaliseInventario from "../pages/estoque/contagem/analise";
+import RecebimentoPorData from "../pages/recebimento/porPagamento";
 
 
 export default function Router() {
@@ -48,6 +50,7 @@ export default function Router() {
   return (
     <Context.Provider
       value={{ logado, setLogado, usuarioLogado, setUsuarioLogado }}
+    
     >
       <Routes>
         <Route path="/" element={<Login />} />
@@ -77,8 +80,10 @@ export default function Router() {
             element={<PrecosAlteradosComponent />}
           />
           <Route path="vendas/indicadores" element={<GraficosIndex />} />
+          <Route path="vendas/resumo" element={<ResumoVendas />} />
           <Route path="vendas/metas" element={<MetasComponent />} />
           <Route path="bi/pivot" element={<Pivot />} />
+          <Route path="recebimentos/consulta" element={<RecebimentoPorData />} />
           <Route
             path="bi/material-react"
             element={<MaterialReactComponent />}

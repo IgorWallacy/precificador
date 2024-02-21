@@ -1,5 +1,7 @@
 import ReactApexChart from "react-apexcharts";
 import moment from "moment";
+import { Statistic } from 'antd';
+
 
 const TicketMedioGrafico = ({ dados }) => {
   const results = {};
@@ -65,8 +67,37 @@ const TicketMedioGrafico = ({ dados }) => {
     }, {})
   ).map(([_, { name, data }]) => ({ name, data }));
 
+  const ticketMedio = () => {
+    let quantidade = 0;
+    let valor = 0;
+    let total = 0;
+
+    if (dados) {
+      for (let r of dados) {
+        quantidade += r?.quantidadeVendas;
+        valor += r?.valorLiquido;
+        total = valor / quantidade;
+      }
+    }
+
+    return total;
+  };
+
   return (
     <>
+    <div style={{display:'flex', justifyContent: 'center' ,backgroundColor:'#f1f1f1' ,margin:'1px'}}>
+    <Statistic
+        title="Ticket Médio"
+        value={Intl.NumberFormat("pt-BR", {
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+          style: "currency",
+          currency: "BRL",
+        }).format(ticketMedio())}
+        
+      />
+    </div>
+     
       <ReactApexChart
         options={options}
         series={series}

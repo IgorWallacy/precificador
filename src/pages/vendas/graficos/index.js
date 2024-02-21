@@ -22,7 +22,6 @@ import TicketMedioGrafico from "./ticket-medio";
 import GraficoMeioDePagamento from "./por-meio-de-pagamento";
 
 import { useReactToPrint } from "react-to-print";
-import RecebimentoPorData from "../../recebimento/porPagamento";
 
 const GraficosIndex = () => {
   addLocale("pt-BR", {
@@ -269,8 +268,6 @@ const GraficosIndex = () => {
     content: () => tabelaRef.current,
   });
 
-
-
   useEffect(() => {
     pegarTokenLocalStorage();
     getVendas();
@@ -288,45 +285,27 @@ const GraficosIndex = () => {
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           flexWrap: "wrap",
-          
-          gap: "5px",
-          //margin: "1px",
-          width: "100%",
+          gap: "10px",
+          width: "99%",
           justifyContent: "center",
-        
+          alignItems:'center'
         }}
       >
-        <div 
-        
-        style={{
-          display : 'flex',
-          flexDirection : 'column',
-            width: '100%',
-          
-            border: "1px solid #FFFF",
-            backgroundColor: "#9C9BDE",
-        }}>
-
-           
-            
-            <RecebimentoPorData   />
-
-        </div>
-        
-       
         <div
           ref={tabelaRef}
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             flexWrap: "wrap",
             padding: "10px",
-            width: "100%",
+            width: "99%",
             justifyContent: "center",
+            alignItems:'center',
             border: "1px solid #FFFF",
-            backgroundColor: "#9C9BDE",
+            backgroundColor : '#F3F4F9',
+            
           }}
         >
           <div
@@ -338,7 +317,7 @@ const GraficosIndex = () => {
               alignItems: "center",
             }}
           >
-            <h1 style={{color:'#f2f2f2'}}>Vendas e cancelamentos </h1>
+            <h1 style={{ color: "#f2f2f2" }}>Vendas e cancelamentos </h1>
             <RangePicker
               disabled={loadingResumoVendas}
               format={"DD/MM/YYYY"}
@@ -389,9 +368,13 @@ const GraficosIndex = () => {
               gap: "10px",
               flexWrap: "wrap",
               width: "100%",
+              justifyContent: "space-around",
+              padding: "5px",
+             
             }}
           >
             <Card bordered={true} title="Cupons">
+              
               <Statistic
                 groupSeparator="."
                 decimalSeparator=","
@@ -522,7 +505,7 @@ const GraficosIndex = () => {
             flexDirection: "column",
             flexWrap: "wrap",
             gap: "5px",
-            width: "100%",
+            width: "99%",
 
             justifyContent: "flex-start",
             border: "1px solid #FFFF",
@@ -589,7 +572,7 @@ const GraficosIndex = () => {
             justifyContent: "flex-start",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-            width: "100%",
+            width: "99%",
             backgroundColor: "#9C9BDE",
           }}
         >
@@ -659,7 +642,7 @@ const GraficosIndex = () => {
             flexDirection: "column",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
-            width: "100%",
+            width: "99%",
             gap: "10px",
             padding: "5px",
             justifyContent: "flex-start",
@@ -720,7 +703,6 @@ const GraficosIndex = () => {
               icon="pi pi-chart-bar"
               onClick={getVendasMeioPagamento}
             />
-          
           </div>
 
           <div

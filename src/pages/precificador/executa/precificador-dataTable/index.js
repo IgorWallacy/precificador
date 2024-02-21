@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import "./styless.css";
 import ImagemDestque from "../../../../assets/img/undraw_transfer_money_re_6o1h.svg";
@@ -28,28 +28,33 @@ import { classNames } from "primereact/utils";
 import { useReactToPrint } from "react-to-print";
 
 import api from "../../../../services/axios";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import Context from "../../../../contexts";
 
 import moment from "moment";
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { Card } from "antd";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const PrecificadorExecuta = () => {
-  //  const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const tabelaRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => tabelaRef.current,
   });
-
+  const [produtoStatusPendente, setProdutoStatusPendente] = useState([]);
+  const [usuario, SetUsuario] = useState(null);
+  const context = useContext(Context);
   const [modoPesquisa, setModoPesquisa] = useState(0);
   const [filiaisSelect, setFiliaisSelect] = useState(0);
   const [etiquetaSelecionada, setEtiquetaSelecionada] = useState("");
   const toast = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
-  const [headers, setHeaders] = useState();
+
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
@@ -85,7 +90,8 @@ const PrecificadorExecuta = () => {
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
   useEffect(() => {
-    pegarTokenLocalStorage();
+    buscarUsuarioPorCodigo();
+
     usarTabelaFormacaoPreecoProduto();
     // eslint-disable-next-line
   }, []);
@@ -134,28 +140,6 @@ const PrecificadorExecuta = () => {
     today: " Hoje ",
     clear: " Limpar ",
   });
-
-  const pegarTokenLocalStorage = () => {
-    let token = localStorage.getItem("access_token");
-    let a = JSON.parse(token);
-    var headers = {
-      Authorization: "Bearer " + a.access_token,
-      "Content-Type": "application/x-www-form-urlencoded",
-    };
-    setHeaders(headers);
-
-    api.interceptors.request.use(
-      (config) => {
-        // Do something before request is sent
-
-        config.headers["Authorization"] = "bearer " + a.access_token;
-        return config;
-      },
-      (error) => {
-        Promise.reject(error);
-      }
-    );
-  };
 
   const margem = (rowData) => {
     //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
@@ -374,7 +358,7 @@ const PrecificadorExecuta = () => {
       </>
     );
   };
- 
+
   const sugestaoVenda = (rowData) => {
     let sugestao =
       (rowData.precocusto * rowData.percentualmarkup) / 100 +
@@ -503,7 +487,7 @@ const PrecificadorExecuta = () => {
 
   const usarTabelaFormacaoPreecoProduto = () => {
     api
-      .get("/api/filial", { headers: headers })
+      .get("/api/filial")
       .then((response) => {
         setQuantidadeFilial(response.data);
 
@@ -527,8 +511,6 @@ const PrecificadorExecuta = () => {
 
     _products2[index] = newData;
 
-    pegarTokenLocalStorage();
-
     setProdutoSelecionado(null);
 
     let intFamilia = 0;
@@ -540,7 +522,7 @@ const PrecificadorExecuta = () => {
     await api
       .put(
         `/api_precificacao/produtos/precificar/${_products2[index].idproduto}/${intFamilia}/${_products2[index].precoagendado}/${_products2[index].idfilial}/${replicarPreco}`,
-        { headers: headers }
+        { produtos: _products2 }
       )
       .then((response) => {
         //   toast.current.show({severity: 'success', summary: 'Success Message', detail: 'Order submitted'});
@@ -584,18 +566,57 @@ const PrecificadorExecuta = () => {
             placeholder="Pesquisa "
           />
         </span>
+
         <div>
           <h4>
-            Exibindo dados de {moment(dataInicial).format("DD/MM/YYYY HH:mm:ss")} até{" "}
+            Exibindo dados de{" "}
+            {moment(dataInicial).format("DD/MM/YYYY HH:mm:ss")} até{" "}
             {moment(dataFinal).format("DD/MM/YYYY HH:mm:ss")}{" "}
           </h4>
           <h3>
-            
-            { quantidadeFilial.length > 1 ? replicarPreco
-              ? <h4 style={{color:'green'}}> Replicando preços para todas as lojas</h4>
-              : <h4 style={{color:'red'}}> Não replicando preços para todas as lojas</h4>  : ''}
+            {quantidadeFilial.length > 1 ? (
+              replicarPreco ? (
+                <h4 style={{ color: "green" }}>
+                  {" "}
+                  Replicando preços para todas as lojas
+                </h4>
+              ) : (
+                <h4 style={{ color: "red" }}>
+                  {" "}
+                  Não replicando preços para todas as lojas
+                </h4>
+              )
+            ) : (
+              ""
+            )}
           </h3>
         </div>
+        <Card
+          style={{
+            backgroundColor:
+              produtoStatusPendente?.length > 0 ? "red" : "green",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              color: "white",
+            }}
+          >
+            <h1>
+              {produtoStatusPendente?.length
+                ? produtoStatusPendente?.length
+                : ""}
+            </h1>
+            <h4>
+              {produtoStatusPendente?.length > 0
+                ? " produtos com preço divergente do agendado"
+                : "Todos os preços estão atualizados"}
+            </h4>
+          </div>
+        </Card>
       </div>
     );
   };
@@ -604,8 +625,8 @@ const PrecificadorExecuta = () => {
     if (rowData.ean) {
       return (
         <>
-          {rowData.ean} 
-         {/* <div>
+          {rowData.ean}
+          {/* <div>
             <img
               style={{
                 width: "75px",
@@ -1100,7 +1121,13 @@ const PrecificadorExecuta = () => {
   const familiaIcone = (rowData) => {
     if (rowData.idfamilia > 0) {
       return (
-        <React.Fragment>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
           {rowData.descricao}
           <Button
             className="p-button-rounded p-button-secondary p-button-sm"
@@ -1108,15 +1135,10 @@ const PrecificadorExecuta = () => {
             style={{ width: "1rem", margin: "5px" }}
             icon="pi pi-users"
           />
-        </React.Fragment>
+        </div>
       );
     } else {
-      return (
-        <React.Fragment>
-          
-         {rowData.descricao}
-        </React.Fragment>
-      );
+      return <React.Fragment>{rowData.descricao}</React.Fragment>;
     }
   };
 
@@ -1128,9 +1150,8 @@ const PrecificadorExecuta = () => {
   };
 
   async function buscarProdutos() {
-    pegarTokenLocalStorage();
-
     usarTabelaFormacaoPreecoProduto();
+    getProdutosPendentePreco();
 
     if (replicarPreco === undefined) {
       toast.current.show({
@@ -1160,10 +1181,7 @@ const PrecificadorExecuta = () => {
                 dataFinal
               ).format(
                 "YYYY-MM-DD HH:mm:ss [GMT]Z"
-              )}/${filialId}/${modoPesquisa}`,
-              {
-                headers: headers,
-              }
+              )}/${filialId}/${modoPesquisa}`
             )
             .then((response) => {
               setProdutos(response.data);
@@ -1180,7 +1198,9 @@ const PrecificadorExecuta = () => {
             })
             .catch((error) => {
               if (error?.response?.status === 401) {
-                //   navigate("/");
+                alert("Token expirado! Por favor faça login novamente!");
+                navigate("/");
+                localStorage.clear();
               }
 
               toast.current.show({
@@ -1214,6 +1234,23 @@ const PrecificadorExecuta = () => {
       default:
         break;
     }
+  };
+
+  const getProdutosPendentePreco = () => {
+    return api
+      .get(
+        `/api_precificacao/produtos/pendentes/${moment(dataInicial).format(
+          "YYYY-MM-DD HH:mm:ss [GMT]Z"
+        )}/${moment(dataFinal).format(
+          "YYYY-MM-DD HH:mm:ss [GMT]Z"
+        )}/${modoPesquisa}`
+      )
+      .then((r) => {
+        setProdutoStatusPendente(r.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   const botaovoltar = (
@@ -1371,9 +1408,7 @@ const PrecificadorExecuta = () => {
     if (quantidadeFilial.length > 1) {
       return (
         <>
-          <div>
-            <h4>Loja</h4>
-          </div>
+          Loja
           <Dropdown
             showClear
             onChange={(e) => setFiliaisSelect(e.value)}
@@ -1391,9 +1426,20 @@ const PrecificadorExecuta = () => {
     }
   };
 
+  const buscarUsuarioPorCodigo = () => {
+    return api
+      .get(`/api/usuarios/logado/${context?.usuarioLogado}`)
+      .then((r) => {
+        SetUsuario(r.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   const atualizarProdutosSelecionados = () => {
     let _products = produtos.filter((val) => produtoSelecionado.includes(val));
-
+    console.log(_products);
     _products.forEach((element) => {
       let intFamilia = 0;
 
@@ -1403,16 +1449,23 @@ const PrecificadorExecuta = () => {
 
       api
         .put(
-          `/api_precificacao/produtos/precificar/${element.idproduto}/${intFamilia}/${element.precoagendado}/${element.idfilial}/${replicarPreco}`,
-          { headers: headers }
+          `/api_precificacao/produtos/precificar/${element.idproduto}/${intFamilia}/${element.precoagendado}/${element.idfilial}/${replicarPreco}/${usuario?.id}`,
+          {
+            idproduto: element?.idproduto,
+            idfamilia: intFamilia,
+            precoAgendado: element?.precoagendado,
+            precoAtual: element?.precoAtual,
+            idfilial: element?.idfilial,
+            idusuario: usuario?.id,
+          }
         )
         .then((r) => {})
         .catch((e) => {
-          toast.current.show({
+          /*  toast.current.show({
             severity: "error",
             summary: "Erro",
             detail: ` ${e.message}  `,
-          });
+          }); */
         })
         .finally((f) => {
           buscarProdutos();
@@ -1571,13 +1624,27 @@ const PrecificadorExecuta = () => {
 
       {produtos.length < 1 ? (
         <>
-          <div className="form-precificador">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              color: "#f2f2f2",
+              margin: "5px",
+              justifyContent: "center",
+              alignContent: "center",
+              flexWrap: "wrap",
+              gap: "5px",
+            }}
+          >
             <div
               style={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 alignContent: "center",
                 flexWrap: "wrap",
+
+                gap: "5px",
               }}
             >
               Pesquisar por
@@ -1590,11 +1657,8 @@ const PrecificadorExecuta = () => {
                 }}
                 options={modosDePesquisa}
               />
-            </div>
-            <div className="form-precificador-input">
-              <div>
-                <h5>Período</h5>
-              </div>
+           
+              Período
 
               <Calendar
                 selectOtherMonths
@@ -1614,11 +1678,8 @@ const PrecificadorExecuta = () => {
                 showTime={modoPesquisa}
                 //  showSeconds
               />
-            </div>
-            <div className="form-precificador-input">
-              <div>
-                <h5>até</h5>
-              </div>
+          
+             até
 
               <Calendar
                 selectOtherMonths
@@ -1637,9 +1698,7 @@ const PrecificadorExecuta = () => {
                 showTime={modoPesquisa}
                 //  showSeconds
               />
-            </div>
-
-            <div className="form-precificador-input">
+           
               <MostraListaFilial />
             </div>
           </div>

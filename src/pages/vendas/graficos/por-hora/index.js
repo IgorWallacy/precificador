@@ -76,7 +76,7 @@ const GraficoVendaPorHora = ({ dados }) => {
         options={options}
         series={series}
         type="line"
-        height={350}
+        height={400}
         width="100%"
         expo
       />

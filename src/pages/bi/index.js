@@ -145,8 +145,9 @@ const Pivot = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              margin: "1rem",
-              padding: "1rem",
+             
+             
+              width : '100%'
             }}
           >
             <h4 style={{ color: "#f2f2f2" }}>
@@ -170,6 +171,7 @@ const Pivot = () => {
               // margin: "1rem",
               //  padding: "1rem",
               border: "1px solid #f2f2f2",
+            
             }}
           >
             <SyncfusionPivot
@@ -203,6 +205,7 @@ const Pivot = () => {
                   flexWrap: "wrap",
                   flexDirection: "row",
                   gap: "2em",
+                  width : '95%'
                 }}
               >
                 <div

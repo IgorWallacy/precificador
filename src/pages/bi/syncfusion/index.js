@@ -111,7 +111,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
         type: "CalculatedField",
       },
 
-      { name: "valorTotal", caption: "Valor Total" },
+      { name: "valorTotal", caption: "Total vendido" },
       { name: "lucrototalrs", caption: "R$ Lucro Total" },
 
       { name: "metapercent", caption: "% Meta ", type: "Avg" },
@@ -254,14 +254,15 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
         style={{
           backgroundColor: "#f2f2f2",
           display: "flex",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
+          justifyContent: "center",
+          alignItems: "center",
           flexWrap: "wrap",
-          flexDirection: "column",
-          // margin: "2rem",
+          flexDirection: "row",
+         // padding: "2rem",
+          width:'100%'
         }}
       >
-        <div className="control-section">
+        <div style={{width : '100%'}} className="control-section">
           <TabView className="tabview-header-icon">
             <TabPanel header="Tabela" leftIcon="pi pi-table">
               <div>

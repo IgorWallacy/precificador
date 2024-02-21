@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import "./styless.css";
+import { addLocale } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
@@ -13,7 +14,6 @@ import { Dropdown } from "primereact/dropdown";
 import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
-import { addLocale } from "primereact/api";
 import { Tag } from "primereact/tag";
 import { Dialog } from "primereact/dialog";
 import { ToggleButton } from "primereact/togglebutton";
@@ -31,86 +31,6 @@ import { useNavigate } from "react-router-dom";
 
 const PrecificadorAgenda = () => {
   moment.locale("pt-br");
-
-  const tabelaRef = useRef();
-
-  const navigate = useNavigate();
-
-  const [produtoFilter, setProdutoFilter] = useState([]);
-
-  const [agrupadoPorFornecedor, setAgrupadoPorFornecedor] = useState(1);
-
-  const inputPreco = useRef(null);
-
-  const [linhas, setLinhas] = useState(5);
-
-  const [dialogFamilia, setDialogFamilia] = useState(false);
-  const [produtosFamilia, setProdutosFamilia] = useState([]);
-  const [filiaisSelect, setFiliaisSelect] = useState(0);
-  const toast = useRef(null);
-  const toast2 = useRef(null);
-  const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
-  const [headers, setHeaders] = useState();
-  const [produtos, setProdutos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingFamilia, setLoadingFamilia] = useState(false);
-  const [globalFilterValue2, setGlobalFilterValue2] = useState("");
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [dataInicial, setDataInicial] = useState();
-  const [dataFinal, setDataFinal] = useState();
-  const [agendar, setAgendar] = useState(new Date());
-  const [replicarPreco, setReplicarPreco] = useState(0);
-  const [expandedRows, setExpandedRows] = useState([]);
-  const [exibirDialogPesquisa, setExibirDialogPesquisa] = useState(false);
-  const [exibirdialogSugestao, setExibirDialogSugestao] = useState(false);
-  const [exibirDialogSugestaoMarDown, setExibirDialogSugestaoMarDown] =
-    useState(false);
-  const [produtoEmExibicaoSugestaoDialog, setprodutoEmExibicaoSugestaoDialog] =
-    useState("");
-  const [
-    produtoEmExibicaoSugestaoDialogMarDownDialog,
-    setprodutoEmExibicaoSugestaoMarDownDialog,
-  ] = useState("");
-  const novoPercentualMarkupMinimo = useRef(null);
-
-  const [novoPercentualMarkDownMinimo, setNovoPercentualMarkDownMinimo] =
-    useState(null);
-
-  const [filters2, setFilters2] = useState({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    razaosocial: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    revisado: { value: null, matchMode: FilterMatchMode.EQUALS },
-  });
-  const [filters, setFilters] = useState({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    nome: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    codigo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  });
-
-  const [usarMarkup, setUsarMarkup] = useState(true);
-  const options = [
-    { name: "Markup", value: true },
-    { name: "Markdown", value: false },
-  ];
-
-  const [usuarioLogado, setUsuarioLogado] = useState(null);
-
-  //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
-
-  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
-
-  useEffect(() => {
-    // window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-
-    pegarTokenLocalStorage();
-    usarTabelaFormacaoPreecoProduto();
-
-    // eslint-disable-next-line
-  }, []);
 
   addLocale("pt-BR", {
     firstDayOfWeek: 0,
@@ -153,9 +73,91 @@ const PrecificadorAgenda = () => {
       "Nov",
       "Dez",
     ],
-    today: " Agora ",
+    now: "Agora",
+    today: "Hoje",
     clear: " Limpar ",
   });
+
+  const tabelaRef = useRef();
+
+  const navigate = useNavigate();
+
+  const [produtoFilter, setProdutoFilter] = useState([]);
+
+  const [agrupadoPorFornecedor, setAgrupadoPorFornecedor] = useState(1);
+
+  const inputPreco = useRef(null);
+
+  const [linhas, setLinhas] = useState(5);
+
+  const [dialogFamilia, setDialogFamilia] = useState(false);
+  const [produtosFamilia, setProdutosFamilia] = useState([]);
+  const [filiaisSelect, setFiliaisSelect] = useState(0);
+  const toast = useRef(null);
+  const toast2 = useRef(null);
+  const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
+  const [headers, setHeaders] = useState();
+  const [produtos, setProdutos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingFamilia, setLoadingFamilia] = useState(false);
+  const [globalFilterValue2, setGlobalFilterValue2] = useState("");
+  const [globalFilterValue, setGlobalFilterValue] = useState("");
+  const [dataInicial, setDataInicial] = useState();
+  const [dataFinal, setDataFinal] = useState();
+  const [agendar, setAgendar] = useState(new Date());
+  const [replicarPreco, setReplicarPreco] = useState(0);
+  const [expandedRows, setExpandedRows] = useState([]);
+  const [exibirDialogPesquisa, setExibirDialogPesquisa] = useState(false);
+  const [exibirdialogSugestao, setExibirDialogSugestao] = useState(false);
+  const [exibirDialogSugestaoMarDown, setExibirDialogSugestaoMarDown] =
+    useState(false);
+  const [produtoEmExibicaoSugestaoDialog, setprodutoEmExibicaoSugestaoDialog] =
+    useState("");
+  const [
+    produtoEmExibicaoSugestaoDialogMarDownDialog,
+    setprodutoEmExibicaoSugestaoMarDownDialog,
+  ] = useState("");
+  const [novoPercentualMarkupMinimo, setNovoPercentualMarkupMinimo] =
+    useState(null);
+
+  const [novoPercentualMarkDownMinimo, setNovoPercentualMarkDownMinimo] =
+    useState(null);
+
+  const [filters2, setFilters2] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    razaosocial: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    revisado: { value: null, matchMode: FilterMatchMode.EQUALS },
+  });
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    ean: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    nome: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    codigo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
+
+  const [usarMarkup, setUsarMarkup] = useState(true);
+  const options = [
+    { name: "Markup", value: true },
+    { name: "Markdown", value: false },
+  ];
+
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
+
+  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
+
+  useEffect(() => {
+    // window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
+    pegarTokenLocalStorage();
+    usarTabelaFormacaoPreecoProduto();
+
+    // eslint-disable-next-line
+  }, []);
 
   const imprime = () => {
     if (linhas === 9999) {
@@ -173,8 +175,7 @@ const PrecificadorAgenda = () => {
 
   const handlePrint = useReactToPrint({
     content: () => tabelaRef.current,
-    onAfterPrint : () => setLinhas(5)
-   
+    onAfterPrint: () => setLinhas(5),
   });
 
   const renderHeaderFamilia = () => {
@@ -227,7 +228,7 @@ const PrecificadorAgenda = () => {
         .finally(() => {
           setExibirDialogSugestao(false);
           setLoading(false);
-          novoPercentualMarkupMinimo.current = null;
+          setNovoPercentualMarkupMinimo(null);
           buscarProdutos();
         });
     } else {
@@ -908,20 +909,21 @@ const PrecificadorAgenda = () => {
           )}
 
           <InputNumber
-            ref={inputPreco}
+           ref={inputPreco}
             //autoFocus
+           
             tooltip={
               rowData?.precoagendado ? "" : "Pressione Enter para salvar"
             }
             tooltipOptions={{ position: "bottom" }}
             prefix="R$ "
             placeholder={`Sugestão ${sf}`}
-            value={rowData?.value}
-            onValueChange={(e) => (inputPreco.current = e.value)}
+          //  value={rowData?.value}
+            onChange={(e) => inputPreco.current = e.value}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-
+              //  console.log(inputPreco.current)
                 onRowEditComplete(rowData, inputPreco.current);
               }
             }}
@@ -960,7 +962,8 @@ const PrecificadorAgenda = () => {
     }
 
     let usuarioFormatado = usuarioLogado.replace("/", "");
-    if (value) {
+    
+    if (value>0) {
       await api
         .put(
           `/api_precificacao/produtos/precificar/agenda/${
@@ -995,7 +998,7 @@ const PrecificadorAgenda = () => {
         })
         .finally((e) => {
           buscarProdutos();
-          inputPreco.current = null;
+        inputPreco.current = null
         });
     } else {
       toast.current.show({
@@ -1402,11 +1405,11 @@ const PrecificadorAgenda = () => {
           <span className="p-inputgroup-addon">Agendar para</span>
           <Calendar
             dateFormat="dd/mm/yy"
-            locale="pt-BR"
             showIcon
             value={agendar}
             onChange={(e) => setAgendar(e.target.value)}
             showButtonBar
+            locale="pt-BR"
           />
         </div>
       </div>
@@ -1516,6 +1519,7 @@ const PrecificadorAgenda = () => {
                 <h5>Período</h5>
               </div>
               <Calendar
+                locale="pt-BR"
                 selectOtherMonths
                 required
                 showIcon
@@ -1525,7 +1529,6 @@ const PrecificadorAgenda = () => {
                 hideOnDateTimeSelect
                 value={dataInicial}
                 onChange={(e) => setDataInicial(e.target.value)}
-                locale="pt-BR"
                 showTime
                 showButtonBar
               />
@@ -1536,6 +1539,7 @@ const PrecificadorAgenda = () => {
               </div>
 
               <Calendar
+              locale="pt-BR"
                 selectOtherMonths
                 viewDate={new Date(new Date().setHours(23, 59, 59, 59))}
                 required
@@ -1548,7 +1552,6 @@ const PrecificadorAgenda = () => {
                   setDataFinal(e.value);
                   dataFinal?.setUTCHours(dataFinal.getUTCHours());
                 }}
-                locale="pt-BR"
                 showTime
                 showButtonBar
                 position="bottom"
@@ -1568,7 +1571,9 @@ const PrecificadorAgenda = () => {
             }}
           >
             {" "}
-            <h4 style={{ marginRight: "1rem " }}>Clique para escolher um layout </h4>
+            <h4 style={{ marginRight: "1rem " }}>
+              Clique para escolher um layout{" "}
+            </h4>
             <ToggleButton
               onLabel="Fornecedor"
               offLabel="Produto"
@@ -1630,23 +1635,21 @@ const PrecificadorAgenda = () => {
 
               <div style={{ marginTop: "5px" }}>
                 <InputNumber
-                  suffix="%"
-                  ref={novoPercentualMarkupMinimo}
+                  value={novoPercentualMarkDownMinimo}
+                  mode="decimal"
+                  minFractionDigits={2}
+                  maxFracionDigits={2}
+                  onChange={(e) => setNovoPercentualMarkupMinimo(e.value)}
                   autoFocus
-                  // value={rowData?.value}
-                  onValueChange={(e) =>
-                    (novoPercentualMarkupMinimo.current = e.value)
-                  }
+                  style={{ margin: "1rem" }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-
-                      atualizarmarkupminimo(novoPercentualMarkupMinimo.current);
+                    
+                      atualizarmarkupminimo(novoPercentualMarkupMinimo);
                     }
                   }}
                   placeholder="0,00%"
-                  mode="decimal"
-                  minFractionDigits={2}
                   maxFractionDigits={2}
                   locale="pt-BR"
                 />
@@ -1721,7 +1724,10 @@ const PrecificadorAgenda = () => {
                   }}
                 >
                   Existem {produtos.length} produto(s) para análise /{" "}
-                  {produtoFilter?.length === produtos?.length ? 0 : produtoFilter?.length} produto(s) filtrado(s)
+                  {produtoFilter?.length === produtos?.length
+                    ? 0
+                    : produtoFilter?.length}{" "}
+                  produto(s) filtrado(s)
                 </div>
               }
               value={produtos}
@@ -1740,7 +1746,6 @@ const PrecificadorAgenda = () => {
               ]}
               filters={filters2}
               filterDisplay="row"
-              
               style={{
                 backgroundColor: "#f2f2f2",
                 width: "100%",

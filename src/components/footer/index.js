@@ -13,9 +13,12 @@ import moment from "moment/moment";
 
 const Footer = () => {
   const [statusApi, setStatusApi] = useState("Online");
+  const [statusRede, setStatusRede]= useState(navigator.onLine)
   const [nome, setNome] = useState(null);
   const [headers, setHeaders] = useState();
   const [saudacao , setSaudacao] = useState(null)
+
+  
 
   const greetingMessage = () => {
     //let h = new Date().toLocaleTimeString('pt-BR', { hour: 'numeric', hour12: false });
@@ -37,6 +40,8 @@ const Footer = () => {
       .get("/actuator/health")
       .then((r) => {
         setStatusApi(r.data.status);
+        
+        
       })
       .catch((error) => {
         setStatusApi(error.message);
@@ -67,6 +72,9 @@ const Footer = () => {
   };
 
   useEffect(() => {
+    
+   
+
     getStatus();
     greetingMessage()
     pegarTokenLocalStorage();
@@ -80,12 +88,25 @@ const Footer = () => {
     }, 3000);
   }, []);
 
+  useEffect(()=> {
+   // console.log(statusRede)
+     // event listeners to update the state 
+     window.addEventListener('online', () => {
+      setStatusRede(true)
+      
+  });
+
+  window.addEventListener('offline', () => {
+      setStatusRede(false)
+  });
+  },[statusApi])
+
   return (
     <>
       <Dialog
         header={`Aplicativo ` + statusApi}
         closable={false}
-        visible={statusApi === "Network Error"}
+        visible={statusApi === "Network Error" || statusRede === false }
       >
         <div
           style={{
@@ -102,10 +123,11 @@ const Footer = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              width: "65%",
+              width: "50%",
             }}
           />
           <h1>Tentando restabelecer a conexão com o servidor </h1>
+          <h2>Seu dispositivo está {statusRede ? 'conectado a rede porém não conseguimos localizar o servidor' : 'desconectado da rede'}</h2>
           <h4>
             {" "}
             caso o problema persista, verifique sua conexão com a internet ou

@@ -4,6 +4,7 @@ body {
 	font-family: var(--font-family);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	
 }
 
 .status-api {
@@ -38,6 +39,7 @@ body {
 	justify-content: center;
 	flex-direction: column;
 	color: #DDD;
+
 }
 
 
@@ -53,7 +55,7 @@ body {
 
 	background-color: #8ea3e3;
 
-
+	
 }
 
 .logo-login {

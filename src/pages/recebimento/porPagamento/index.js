@@ -13,6 +13,8 @@ import { Column } from "primereact/column";
 
 import api from "../../../services/axios";
 import moment from "moment";
+import  Header  from "../../../components/header";
+import Footer from "../../../components/footer";
 
 const RecebimentoPorData = () => {
   const tabelaRef = useRef(null);
@@ -104,7 +106,12 @@ const RecebimentoPorData = () => {
     if (recebimentos) {
       for (let r of recebimentos) {
         if (r.nomeCliente === row.nomeCliente) {
-          total += r.valor;
+          if(r.documento === row.documento) {
+            total = r.valor;
+          } else{
+            total += r.valor;
+          }
+         
         }
       }
     }
@@ -179,12 +186,12 @@ const RecebimentoPorData = () => {
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-start",
+            flexDirection: "row",
+            justifyContent: "center",
             alignItems: "flex-start",
-            gap: "10px",
-
-            flexWrap: "wrap",
+            flexWrap:'wrap',
+            gap:'5px'
+    
           }}
         >
           <h4 style={{ fontWeight: "bold" }}>{data?.nomeCliente}</h4>
@@ -234,11 +241,14 @@ const RecebimentoPorData = () => {
 
   return (
     <>
+    <Header />
+    <Footer />
       <div ref={tabelaRef} style={{ padding: "1px", margin: "1px" }}>
       
           
             <div
               style={{
+               
                 width: "100%",
                 display: "flex",
                 flexDirection: "row",
@@ -295,19 +305,11 @@ const RecebimentoPorData = () => {
 
             <>
               <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  color: "black",
-                  width: "100%",
-                  padding: "1px",
-                }}
+               
               >
                
                     <DataTable
-                      size="large"
+                      size="normal"
                       loading={loading}
                       style={{ width: "100%" }}
                       value={recebimentos}
@@ -327,7 +329,7 @@ const RecebimentoPorData = () => {
                           </div>
                         );
                       }}
-                      stripedRows
+                    //  stripedRows
                       rowGroupMode="rowspan"
                       groupRowsBy="nomeCliente"
                       sortMode="single"
@@ -357,6 +359,11 @@ const RecebimentoPorData = () => {
                         header="Loja"
                        
                         field="loja"
+                      ></Column>
+                       <Column
+                        header="Documento"
+                       
+                        field="documento"
                       ></Column>
                       <Column
                         field="emissao"

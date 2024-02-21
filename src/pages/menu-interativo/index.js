@@ -14,6 +14,7 @@ import {
   faUserTie,
   faCalendar,
   faBarcode,
+  faFileInvoice,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./menu-interativo.css";
@@ -114,30 +115,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/precificar-executar")}
             />
           </div>
-          { filial.length > 1   ? (
-            <>
-              {" "}
-              <div className="opcoes-menu">
-                <div>
-                  <h1>Produtos</h1>
-                </div>
-                <Button
-                  label="Agendar preços"
-                  icon="pi pi-calendar"
-                  className="p-button-rounded p-button-help p-button-lg"
-                  onClick={() => navigate("/produtos/precificar-agendar")}
-                />
-                <Button
-                  label="Conferir e atualizar preços"
-                  icon="pi pi-sync"
-                  className="p-button-rounded p-button-help p-button-lg"
-                  onClick={() => navigate("/produtos/precificar-executar")}
-                />
-              </div>
-            </>
-          ) : (
-            <> </>
-          )}
+         
         </div>
         <div className="menu-categoria">
           {" "}
@@ -151,6 +129,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/estoque/lista-inventario")}
             />
           </div>
+
          
         </div>
         <div className="menu-categoria">
@@ -163,6 +142,14 @@ const MenuInterativo = () => {
               icon="pi pi-shopping-cart"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/vendas")}
+            />
+          </div>
+          <div className="opcoes-menu">
+            <Button
+              label="Resumo de vendas"
+              icon="pi pi-prime"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/vendas/resumo")}
             />
           </div>
           <div className="opcoes-menu">
@@ -202,6 +189,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/bi/material-react")}
             />
           </div>
+         
           <div className="opcoes-menu">
             <Button
               label="Metas"
@@ -225,6 +213,20 @@ const MenuInterativo = () => {
             <></>
           )}
         </div>
+        <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faFileInvoice} size="2x" />
+          <h1>Recebimentos</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="Consultar recebimentos"
+              icon="pi pi-dollar"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/recebimentos/consulta")}
+            />
+          </div>
+        </div>
+        
         <div className="menu-categoria">
           {" "}
           <FontAwesomeIcon icon={faGlobe} size="2x" />

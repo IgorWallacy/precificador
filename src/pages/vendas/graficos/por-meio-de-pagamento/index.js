@@ -21,7 +21,7 @@ const GraficoMeioDePagamento = ({ dados }) => {
 
   return (
     <>
-      <div style={{ width: "100%" }}>
+      <div style={{ width: "45%" }}>
         <Chart
           options={state.options}
           series={state.series}

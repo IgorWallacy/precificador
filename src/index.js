@@ -14,8 +14,7 @@ import App from "./App";
 
 // Registering Syncfusion license key
 registerLicense(
-  "ORg4AjUWIQA/Gnt2V1hiQlhPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9gSH5ScERrXXtec3FXRWY="
-
+  "ORg4AjUWIQA/Gnt2UVhiQlZPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9nSXxRdERgWXled3BdTmY="
 );
 const root = document.getElementById('root');
 

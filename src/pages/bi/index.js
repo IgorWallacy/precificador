@@ -16,8 +16,7 @@ import { ProgressBar } from "primereact/progressbar";
 import { addLocale } from "primereact/api";
 
 import moment from "moment/moment";
-import DevExpressComponentPivot from "./devexpress";
-
+import { SelectButton } from "primereact/selectbutton";
 
 const Pivot = () => {
   addLocale("pt-BR", {
@@ -78,9 +77,15 @@ const Pivot = () => {
     { name: "Preço de compra na venda (Sem impostos)", value: 0 },
     { name: "Preço de custo na venda (Com impostos)", value: 1 },
   ];
+  const options = [
+    { value: 0, label: "Não" },
+    { value: 1, label: "Sim" },
+  ];
+  const [expandido, SetExpandido] = useState(0);
 
   const getDados = () => {
     setLoading(true);
+  //  console.log(expandido);
     api
       .get(
         `/api_vendas/bi/sync/${moment(date1).format("yyyy-MM-DD")}/${moment(
@@ -145,9 +150,8 @@ const Pivot = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-             
-             
-              width : '100%'
+
+              width: "100%",
             }}
           >
             <h4 style={{ color: "#f2f2f2" }}>
@@ -171,18 +175,16 @@ const Pivot = () => {
               // margin: "1rem",
               //  padding: "1rem",
               border: "1px solid #f2f2f2",
-            
             }}
           >
             <SyncfusionPivot
               date1={date1}
               date2={date2}
               data={data}
-              
-          ></SyncfusionPivot> 
+              expandido={expandido}
+            ></SyncfusionPivot>
 
-        {/*  <DevExpressComponentPivot data ={ data} /> */}
-         
+            {/*  <DevExpressComponentPivot data ={ data} /> */}
           </div>
         </>
       ) : (
@@ -205,7 +207,7 @@ const Pivot = () => {
                   flexWrap: "wrap",
                   flexDirection: "row",
                   gap: "2em",
-                  width : '95%'
+                  width: "95%",
                 }}
               >
                 <div
@@ -269,6 +271,16 @@ const Pivot = () => {
                     options={modocalculoList}
                     optionLabel="name"
                     placeholder="Selecione o modo de cálculo do custo "
+                  />
+                </div>
+                <div>
+                  <label style={{ color: "#F2f2f2" }}>
+                    Exibir a tabela de forma expandida ?
+                  </label>
+                  <SelectButton
+                    value={expandido}
+                    onChange={(e) => SetExpandido(e.value)}
+                    options={options}
                   />
                 </div>
 

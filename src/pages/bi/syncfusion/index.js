@@ -29,7 +29,7 @@ import "./styless.css";
 
 import ptBR from "./ptBR.json";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import moment from "moment";
 
@@ -40,8 +40,10 @@ loadCldr(currencies, numbers);
 setCulture("pt");
 setCurrencyCode("BRL");
 
-const SyncfusionPivot = ({ data, date1, date2 }) => {
+const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
   const ref = useRef();
+
+  const [expandirTudo,setExpandirTudo] = useState(expandido)
 
   const trend = () => {
     //  ref.current.grid.autoFitColumns();
@@ -76,7 +78,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
     columns: [],
     dataSource: data,
     excludeFields: ["id", "codigo", "promocao", "dataEmissao", "codigoFilial"],
-    expandAll: false,
+    expandAll: expandirTudo,
     filters: [
       { name: "nomeFilial", caption: "Loja" },
       { name: "promocaoNome", caption: "Nome da promoção" },
@@ -273,6 +275,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                   label="Exportar Excel"
                   onClick={() => ref.current.excelExport(excelExportProperties)}
                 />
+               
                 {/* <Button
                   icon="pi pi-file-pdf"
                   className="p-button p-button-rounded p-button-secondary"
@@ -369,6 +372,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                 ref={ref}
                 locale="pt"
                 currencyCode="BRL"
+              
                 allowLabelFilter={true}
                 allowValueFilter={true}
                 allowNumberFormatting={true}
@@ -379,7 +383,7 @@ const SyncfusionPivot = ({ data, date1, date2 }) => {
                 allowDataCompression={false}
                 enableFieldSearching={true}
                 enableValueSorting={true}
-                enableVirtualization={false}
+                enableVirtualization={true}
                 enableSorting={true}
                 showGroupingBar={true}
                 showTooltip={true}

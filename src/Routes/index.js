@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 import Login from "../pages/login";
 
@@ -32,18 +32,62 @@ import MaterialReactComponent from "../pages/bi/material-react";
 import AnaliseInventario from "../pages/estoque/contagem/analise";
 import RecebimentoPorData from "../pages/recebimento/porPagamento";
 
+import { jwtDecode } from "jwt-decode"; 
+
+
+
 
 export default function Router() {
   const [logado, setLogado] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState();
+ 
 
   const PrivateRoutes = () => {
     const location = useLocation();
+   
+    const [haveToken , setHaveToken] = useState(localStorage.getItem('access_token'));
 
-    return logado ? (
-      <Outlet />
+    useEffect(() => {
+      setHaveToken(localStorage.getItem('access_token'));
+    },[])
+
+    useEffect(()=> {
+
+      const token = localStorage.getItem('access_token');
+      if(token){
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000; // convertendo milissegundos para segundos
+        if (decodedToken.exp > currentTime) {
+          // Token ainda é válido
+          setLogado(true)
+          
+        } else {
+          setHaveToken(null)
+          setLogado(false)
+         // navigation('/')
+          
+         
+          
+
+         
+        }
+      }
+  
+    },[location])
+
+    return haveToken ? (
+      <>
+       <Outlet />
+      
+      </>
+     
     ) : (
+      <>
+      
       <Navigate to="/" replace state={{ from: location }} />
+     
+      </>
+      
     );
   };
 

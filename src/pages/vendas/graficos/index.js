@@ -317,7 +317,7 @@ const GraficosIndex = () => {
               alignItems: "center",
             }}
           >
-            <h1 style={{ color: "#f2f2f2" }}>Vendas e cancelamentos </h1>
+            <h1 style={{ color: "#000" }}>Vendas e cancelamentos </h1>
             <RangePicker
               disabled={loadingResumoVendas}
               format={"DD/MM/YYYY"}
@@ -639,13 +639,13 @@ const GraficosIndex = () => {
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             flexWrap: "wrap",
             border: "1px solid #FFFF",
             width: "99%",
             gap: "10px",
             padding: "5px",
-            justifyContent: "flex-start",
+            justifyContent: "center",
             alignItems: "center",
             backgroundColor: "#9C9BDE",
           }}
@@ -662,7 +662,7 @@ const GraficosIndex = () => {
           >
             Resumo de vendas ( SOMENTE PDV )
           </h1>
-          <div style={{ width: "100%" }}>
+          
             <Calendar
               selectOtherMonths
               style={{ margin: "5px" }}
@@ -703,30 +703,38 @@ const GraficosIndex = () => {
               icon="pi pi-chart-bar"
               onClick={getVendasMeioPagamento}
             />
-          </div>
+          
 
           <div
             style={{
               display: "flex",
-              flexDirection: "column-reverse",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
               gap: "10px",
               flexWrap: "wrap",
+              width:'100%'
             }}
           >
-            <GraficoMeioDePagamento dados={vendasMeioPagamento} />
-
-            <PivotViewComponent
+          
+           <GraficoMeioDePagamento dados={vendasMeioPagamento} />
+          
+           <PivotViewComponent
               id="PivotView"
               dataSourceSettings={dataSourceSettings}
               enableValueSorting={true}
-              width="95%"
+              width="100%"
               height={500}
               gridSettings={{ columnWidth: 10 }}
             ></PivotViewComponent>
+          
+           
+            
           </div>
+          
+          
         </div>
+        
       </div>
     </>
   );

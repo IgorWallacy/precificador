@@ -65,10 +65,6 @@ export default function Router() {
           setHaveToken(null)
           setLogado(false)
          // navigation('/')
-          
-         
-          
-
          
         }
       }

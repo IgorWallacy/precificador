@@ -71,22 +71,22 @@ const ImprimirPedido = ({
           // headers are automatically repeated if the table spans over multiple pages
           // you can declare how many rows should be treated as headers
           headerRows: 0,
-          widths: [20, 66, 140, 40, 40, 40, "*"],
+          widths: [20, 66, 140, 40, 40,  "*"],
 
           body: [
-            ["", "", "", "", "", "", ""],
+            ["", "", "", "", "", ""],
 
             [
               { text: i + 1 },
 
               {
-                text: item.idproduto.ean
-                  ? item.idproduto.ean
-                  : item.idproduto.codigo,
+                text: item?.idproduto.ean
+                  ? item?.idproduto.ean
+                  : item?.idproduto.codigo,
                 style: "ean",
               },
               {
-                text: item.idproduto.nome.substring(0, 35),
+                text: item?.idproduto.nome.substring(0, 35),
                 style: "descricao",
               },
 
@@ -104,7 +104,7 @@ const ImprimirPedido = ({
                 text:
                   item.quantidade +
                   ` ${item.unidadeCompra ? item.unidadeCompra.codigo : ""} (${
-                    item.fatorConversao === 0 ? 1 : item.fatorConversao
+                    item?.fatorConversao === 0 ? 1 : item?.fatorConversao
                   })`,
               },
 
@@ -112,11 +112,9 @@ const ImprimirPedido = ({
                 text: Intl.NumberFormat("pt-BR", {
                   style: "currency",
                   currency: "BRL",
-                }).format(item.preco * item.quantidade),
+                }).format(item?.preco * item?.quantidade),
               },
-              {
-                text: item.filial.id + "-" + item.filial.nome,
-              },
+             
             ],
           ],
         },

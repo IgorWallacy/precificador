@@ -25,21 +25,24 @@ const ListaCompras = () => {
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    codigo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     dataEmissao: {
       value: null,
       matchMode: FilterMatchMode.DATE_IS,
     },
 
     "fornecedor.nome": { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    "comprador.nome": { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   });
 
   const getPedidos = () => {
+    setLoading(true);
     api
       .get(`/api/pedido/compra/todos`)
       .then((r) => {
         //  console.log(r.data);
         setPedidos(r.data);
-        setLoading(true);
+       
       })
       .catch((e) => {
         //  console.log(e);
@@ -61,7 +64,9 @@ const ListaCompras = () => {
           icon="pi pi-eye"
           className="p-button-rounded p-button-info"
           onClick={() =>
-            navigate(`/compras/analise/fornecedor/pedido/${data?.id}`)
+            navigate(`/compras/analise/fornecedor/pedido/${data?.id}`, { state : {
+              data
+            }})
           }
         />
       </>
@@ -72,9 +77,7 @@ const ListaCompras = () => {
     return <> {data?.condicaoPagamento?.descricao} </>;
   };
 
-  const prazoEntregaTemplate = (data) => {
-    return moment(data?.prazoEntrega).format("DD/MM/YYYY");
-  };
+
 
   const totalTemplate = (data) => {
     return formataMoeda(data?.total);
@@ -150,10 +153,16 @@ const ListaCompras = () => {
             responsiveLayout="stack"
           >
             <Column
-              field="id"
+              field="codigo"
               header="Número"
               filter
               filterPlaceholder="Pesquisar por número"
+            ></Column>
+              <Column
+              field="comprador.nome"
+              header="Comprador"
+              filter
+              filterPlaceholder="Pesquisar por comprador"
             ></Column>
             <Column
               field="fornecedor.nome"
@@ -167,7 +176,10 @@ const ListaCompras = () => {
               body={dataEmissaoTemplate}
             />
             <Column
-              field={prazoEntregaTemplate}
+              field="prazoEntrega"
+              body={(row) => {
+                return row.prazoEntrega ? moment(row?.prazoEntrega).format("DD/MM/YYYY") : '';
+              }}
               header="Prazo de entrega"
             ></Column>
             <Column

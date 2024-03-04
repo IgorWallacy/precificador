@@ -85,6 +85,8 @@ const PedidoListaSidebar = ({
   const [editMode, setEditMode] = useState(false);
   const [quantidade, setQuantidade] = useState(null);
   const [precoVenda, setPrecoVenda] = useState(null);
+  const custoEmbalagem = useRef(null);
+  const [quantidadeEmbalagem, setQuantidadeEmbalagem] = useState(null);
   const [preco, setPreco] = useState(0);
   const [fator, setFator] = useState(null);
   const [unCompra, setUnCompra] = useState(0);
@@ -413,7 +415,7 @@ const PedidoListaSidebar = ({
 
   const adicionarProduto = (row) => {
     setDialogNovoProduto(true);
-    setPreco(row?.precocusto);
+    setPreco(null);
     setPrecoVenda(row?.preco);
     setNovoProduto(row);
     setQuantidade(null);
@@ -537,7 +539,10 @@ const PedidoListaSidebar = ({
                   label="emb"
                   size={1}
                   value={fator}
-                  onChange={(e) => setFator(e.value)}
+                  onChange={(e) => {
+                    setFator(e.value);
+                    setPreco(preco / e.value);
+                  }}
                 />
 
                 <h4>Custo / Preço unitário</h4>
@@ -647,6 +652,7 @@ const PedidoListaSidebar = ({
             onSelectionChange={(e) => setSelectedProductsPedido(e.value)}
             onRowEditComplete={onRowEditComplete}
             sortField="idproduto.nome"
+            rowsPerPageOptions={[5, 10, 25, 50,100,200]}
           >
             <Column
               selectionMode="multiple"
@@ -686,43 +692,46 @@ const PedidoListaSidebar = ({
               sortable
               header="Produto"
             ></Column>
-            <Column
-              field="quantidade"
-              style={{ minWidth: "150px" }}
-              filterMatchModeOptions={[
-                {
-                  label: "Maior ou igual a ",
-                  value: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO,
-                },
-                {
-                  label: "Menor ou igual a ",
-                  value: FilterMatchMode.LESS_THAN_OR_EQUAL_TO,
-                },
-                { label: "Igual a ", value: FilterMatchMode.EQUALS },
-              ]}
-              sortable
-              header="Quantidade"
-            ></Column>
+           
 
             <Column
               style={{ minWidth: "150px" }}
-              field="unidadeCompra.codigo"
+           
               body={(data) => (
                 <>
-                  {data.unidadeCompra.codigo} ( {data?.fatorConversao})
+                  {Intl.NumberFormat("pt-BR", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 3,
+                    style: "decimal",
+                  }).format(data?.quantidade / data?.fatorConversao)}{" "}
+                  {data.unidadeCompra.codigo} ( {data?.fatorConversao} )
                 </>
               )}
-              sortable
+             
               header="UN"
             ></Column>
-           
+             <Column
+              field="quantidade"
+              style={{ minWidth: "150px" }}
+              body={(row) => {
+                return Intl.NumberFormat("pt-BR", {
+                  maximumFractionDigits: 3,
+                  minimumFractionDigits: 2,
+                  style: "decimal",
+                }).format(row?.quantidade);
+              }}
+            
+              header="Quantidade total"
+            ></Column>
+
             <Column
               field="preco"
               body={precoPedido}
               sortable
               header="Custo unitário"
             ></Column>
-             <Column
+            <Column
+              
               body={(row) => {
                 return (
                   <>
@@ -730,7 +739,27 @@ const PedidoListaSidebar = ({
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                       style: "decimal",
-                    }).format(((row.precoVenda - row.preco) / row.preco) * 100)} %
+                    }).format(row.preco * row?.fatorConversao)}
+                  </>
+                );
+              }}
+            
+              header="Custo total"
+            ></Column>
+            <Column
+              body={(row) => {
+                return (
+                  <>
+                    {Intl.NumberFormat("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      style: "decimal",
+                    }).format(
+                      ((row.precoVenda - row.preco * row?.fatorConversao) /
+                        (row.preco * row?.fatorConversao)) *
+                        100
+                    )}{" "}
+                    %
                   </>
                 );
               }}
@@ -883,19 +912,29 @@ const PedidoListaSidebar = ({
       <Dialog
         header={
           "Código " + novoProduto?.ean
-            ? novoProduto?.ean + "- Produto " + novoProduto?.nome
-            : novoProduto?.codigo + "- Produto " + novoProduto?.nome
+            ? novoProduto?.ean + " - " + novoProduto?.nome
+            : novoProduto?.codigo + " - " + novoProduto?.nome
         }
+        draggable={false}
         visible={dialogNovoProduto}
         onHide={() => setDialogNovoProduto(false)}
         footer={
           <>
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "5px" }}
+              style={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                gap: "5px",
+                justifyContent: "space-between",
+                alignContent: "center",
+              }}
             >
-              <h3>Total</h3>
-              <h1>{formataMoeda(quantidade * preco)}</h1>
-
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "5px" }}
+              >
+                <h3>Total comprado</h3>
+                <h1>{formataMoeda(quantidade * preco)}</h1>
+              </div>
               <div>
                 <Button
                   label="Gravar"
@@ -914,69 +953,139 @@ const PedidoListaSidebar = ({
             justifyContent: "center",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: "5px",
+            gap: "15px",
           }}
         >
-          <h4>Quantidade</h4>
-          <InputNumber
-            minFractionDigits={2}
-            maxFractionDigits={3}
-            size={3}
-            required
-            autoFocus
-            label="Quantidade"
-            value={quantidade}
-            onChange={(e) => {
-              setQuantidade(e.value);
-              setTotal(quantidade * preco);
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "5px",
             }}
-          />
-          <h4>UN</h4>
-          <Dropdown
-            value={unCompra}
-            options={unidadeMedidaLista}
-            optionLabel="nome"
-            onChange={(e) => setUnCompra(e.value)}
-            placeholder="Selecione a unidade de compra"
-          />
-          <h4>Emb C/</h4>
+          >
+            <h4 style={{ color: "red" }}>Custo atual</h4>
 
-          <InputNumber
-            label="emb"
-            size={1}
-            value={fator}
-            onChange={(e) => setFator(e.value)}
-          />
+            <InputNumber
+              disabled
+              prefix="R$ "
+              size={12}
+              mode="decimal"
+              locale="pt-BR"
+              minFractionDigits={2}
+              value={novoProduto?.precocusto}
+            />
 
-          <h4>Custo / Un</h4>
-          <InputNumber
-            prefix="R$ "
-            label="preco"
-            size={12}
-            mode="decimal"
-            locale="pt-BR"
-            minFractionDigits={2}
-            value={preco}
-            onChange={(e) => {
-              setPreco(e.value);
-              setTotal(quantidade * preco);
+            <h4 style={{ color: "green" }}>Venda atual </h4>
+            <InputNumber
+              disabled
+              prefix="R$ "
+              label="Preço de venda"
+              size={12}
+              mode="decimal"
+              locale="pt-BR"
+              minFractionDigits={2}
+              value={precoVenda}
+              onChange={(e) => {
+                setPrecoVenda(e.value);
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "5px",
             }}
-          />
+          >
+             <h4>EMBALAGEM</h4>
+            <Dropdown
+              autoFocus
+              value={unCompra}
+              options={unidadeMedidaLista}
+              optionLabel="nome"
+              onChange={(e) => setUnCompra(e.value)}
+              placeholder="Selecione a unidade de compra"
+            />
 
-          <h4>Venda / Un</h4>
-          <InputNumber
-            disabled
-            prefix="R$ "
-            label="Preço de venda"
-            size={12}
-            mode="decimal"
-            locale="pt-BR"
-            minFractionDigits={2}
-            value={precoVenda}
-            onChange={(e) => {
-              setPrecoVenda(e.value);
-            }}
-          />
+            <h4>Quantidade de {unCompra ? unCompra?.nome : "Embalagem"}</h4>
+
+            <InputNumber
+              size={1}
+              value={quantidadeEmbalagem}
+              onChange={(e) => {
+                setQuantidadeEmbalagem(e.value);
+                setQuantidade(e?.value * fator);
+              }}
+            />
+           
+            <h4>COM </h4>
+
+            <InputNumber
+              label="emb"
+              size={1}
+              value={fator}
+              onChange={(e) => {
+                setFator(e.value);
+
+                custoEmbalagem.current = e.value * preco;
+                setQuantidade(e?.value * quantidadeEmbalagem);
+              }}
+            />
+            <h4>Quantidade total do produto</h4>
+            <InputNumber
+              minFractionDigits={2}
+              maxFractionDigits={3}
+              size={3}
+              required
+            
+              label="Quantidade"
+              value={quantidade}
+              onChange={(e) => {
+                setQuantidade(e.value);
+                setQuantidadeEmbalagem(e?.value / fator);
+                setTotal(quantidade * preco);
+              }}
+            />
+
+            <h4>Custo unitário </h4>
+            <InputNumber
+              prefix="R$ "
+              label="preco"
+              size={12}
+              mode="decimal"
+              locale="pt-BR"
+              minFractionDigits={2}
+              value={preco}
+              onChange={(e) => {
+                setPreco(e.value);
+                setTotal(quantidade * preco);
+                custoEmbalagem.current = e.value * fator;
+              }}
+            />
+
+            <h3>Custo</h3>
+            <InputNumber
+              prefix="R$ "
+              size={12}
+              mode="decimal"
+              locale="pt-BR"
+              minFractionDigits={2}
+              value={custoEmbalagem.current}
+              onChange={(e) => {
+                custoEmbalagem.current = e?.value;
+                setPreco(
+                  custoEmbalagem ? custoEmbalagem.current / fator : null
+                );
+              }}
+            />
+          </div>
         </div>
       </Dialog>
     </>

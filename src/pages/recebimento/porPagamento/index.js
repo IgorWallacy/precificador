@@ -6,19 +6,19 @@ import locale from "antd/es/date-picker/locale/pt_BR";
 
 import { Button } from "primereact/button";
 import { ProgressBar } from "primereact/progressbar";
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
-import {InputText} from 'primereact/inputtext'
+import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 
 import api from "../../../services/axios";
 import moment from "moment";
-import  Header  from "../../../components/header";
+import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
 const RecebimentoPorData = () => {
   const tabelaRef = useRef(null);
-  const [globalFilterValue2, setGlobalFilterValue2] = useState('');
+  const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [recebimentos, setRecebimentos] = useState([]);
 
   const { RangePicker } = DatePicker;
@@ -26,11 +26,6 @@ const RecebimentoPorData = () => {
   const [resumoData, setResumoData] = useState(null);
 
   const [loading, setLoading] = useState(false);
-
-  const [lojaList, setLojaList] = useState([]);
-
-  const { Option } = Select;
-  const [loja, setLoja] = useState(0);
 
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -48,27 +43,13 @@ const RecebimentoPorData = () => {
     setGlobalFilterValue2(value);
   };
 
-  const getFilial = () => {
-    return api
-      .get("/api/filial")
-      .then((r) => {
-        setLojaList(r.data);
-        // console.log(r.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
   const getRecebimentos = () => {
     setLoading(true);
     return api
       .get(
         `/api/recebimento/porPagamento/${moment(resumoData?.[0]?.$d).format(
           "YYYY-MM-DD"
-        )}/${moment(resumoData?.[1]?.$d).format("YYYY-MM-DD")}/${
-          loja ? loja : 0
-        }`
+        )}/${moment(resumoData?.[1]?.$d).format("YYYY-MM-DD")}/${0}`
       )
       .then((r) => {
         setRecebimentos(r.data);
@@ -106,12 +87,11 @@ const RecebimentoPorData = () => {
     if (recebimentos) {
       for (let r of recebimentos) {
         if (r.nomeCliente === row.nomeCliente) {
-          if(r.documento === row.documento) {
+          if (r.documento === row.documento) {
             total = r.valor;
-          } else{
+          } else {
             total += r.valor;
           }
-         
         }
       }
     }
@@ -189,9 +169,8 @@ const RecebimentoPorData = () => {
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "flex-start",
-            flexWrap:'wrap',
-            gap:'5px'
-    
+            flexWrap: "wrap",
+            gap: "5px",
           }}
         >
           <h4 style={{ fontWeight: "bold" }}>{data?.nomeCliente}</h4>
@@ -235,276 +214,241 @@ const RecebimentoPorData = () => {
   });
 
   useEffect(() => {
-    getFilial();
+    
     getRecebimentos();
   }, []);
 
   return (
     <>
-    <Header />
-    <Footer />
+      <Header />
+      <Footer />
       <div ref={tabelaRef} style={{ padding: "1px", margin: "1px" }}>
-      
-          
-            <div
-              style={{
-               
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                gap: "5px",
-                justifyContent: "center",
-                alignItems: "center",
-                flexWrap: "wrap",
-                color: "#f2f2f2",
-                height: "150px",
-                backgroundColor: "#ec3b83",
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row",
+            gap: "5px",
+            justifyContent: "center",
+            alignItems: "center",
+            flexWrap: "wrap",
+            color: "#f2f2f2",
+            height: "150px",
+            backgroundColor: "#ec3b83",
+          }}
+        >
+          <h1>Recebimentos por data do pagamento</h1>
+          <RangePicker
+            disabled={loading}
+            format={"DD/MM/YYYY"}
+            locale={locale}
+            showToday
+            onChange={(e) => setResumoData(e)}
+          />
+          <Button
+            style={{ margin: "2px" }}
+            label="Pesquisar recebimentos"
+            icon="pi pi-search"
+            className="p-btton p-button-secondary p-button-rounded"
+            onClick={() => getRecebimentos()}
+          />
+          <Button
+            style={{ margin: "2px" }}
+            label="Imprimir recebimentos"
+            icon="pi pi-print"
+            className="p-btton p-button-warning p-button-rounded"
+            onClick={() => handlePrint()}
+          />
+          Exibindo os dados de{" "}
+          {moment(resumoData?.[0]?.$d).format("DD/MM/YYYY")} até{" "}
+          {moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}{" "}
+        </div>
+
+        <>
+          <div>
+            <DataTable
+              size="normal"
+              loading={loading}
+              style={{ width: "100%" }}
+              value={recebimentos}
+              selectionMode="single"
+              emptyMessage="Sem recebimentos"
+              header={(row) => {
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignContent: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span className="p-input-icon-left">
+                      <i className="pi pi-search" />
+                      <InputText
+                        value={globalFilterValue2}
+                        onChange={onGlobalFilterChange2}
+                        placeholder="Pesquisa "
+                      />
+                    </span>
+                  </div>
+                );
               }}
-            >
-              <h1>Recebimentos por data do pagamento</h1>
-              <RangePicker
-                disabled={loading}
-                format={"DD/MM/YYYY"}
-                locale={locale}
-                showToday
-                onChange={(e) => setResumoData(e)}
-              />
-              <Select
-                disabled={loading}
-                placeholder="Selecione uma loja"
-                allowClear
-                defaultActiveFirstOption={false}
-                style={{ width: 240 }}
-                onChange={(e) => setLoja(e)}
-              >
-                {lojaList.map((option) => (
-                  <Option key={option.id} value={option.codigo}>
-                    {option.nome}
-                  </Option>
-                ))}
-              </Select>
-              <Button
-                style={{ margin: "2px" }}
-                label="Pesquisar recebimentos"
-                icon="pi pi-search"
-                className="p-btton p-button-secondary p-button-rounded"
-                onClick={() => getRecebimentos()}
-              />
-              <Button
-                style={{ margin: "2px" }}
-                label="Imprimir recebimentos"
-                icon="pi pi-print"
-                className="p-btton p-button-warning p-button-rounded"
-                onClick={() => handlePrint()}
-              />
-              Exibindo os dados de{" "}
-              {moment(resumoData?.[0]?.$d).format("DD/MM/YYYY")} até{" "}
-              {moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}{" "}
-             
-            </div>
-
-            <>
-              <div
-               
-              >
-               
-                    <DataTable
-                      size="normal"
-                      loading={loading}
-                      style={{ width: "100%" }}
-                      value={recebimentos}
-                      selectionMode="single"
-                      emptyMessage="Sem recebimentos"
-                      header={(row) => {
-                        return (
-                          <div style={{display : 'flex', justifyContent:'center', alignContent:'center', flexWrap:'wrap'}}>
-                            <span className="p-input-icon-left">
-                              <i className="pi pi-search" />
-                              <InputText
-                                value={globalFilterValue2}
-                                onChange={onGlobalFilterChange2}
-                                placeholder="Pesquisa "
-                              />
-                            </span>
-                          </div>
-                        );
-                      }}
-                    //  stripedRows
-                      rowGroupMode="rowspan"
-                      groupRowsBy="nomeCliente"
-                      sortMode="single"
-                      sortField="nomeCliente"
-                      sortOrder={1}
-                      responsiveLayout="stack"
-                      breakpoint="968px"
-                      globalFilterFields={[
-                        "nomeCliente",
-                        "usuariomovimentacao",
-                      ]}
-                      filters={filters2}
-                      rowGroupHeaderTemplate={headerTemplate}
-                      footer={`Exibindo os dados pela data de recebimento de ${moment(
-                        resumoData?.[0]?.$d
-                      ).format("DD/MM/YYYY")} até 
+              //  stripedRows
+              rowGroupMode="rowspan"
+              groupRowsBy="nomeCliente"
+              sortMode="single"
+              sortField="nomeCliente"
+              sortOrder={1}
+              responsiveLayout="stack"
+              breakpoint="968px"
+              globalFilterFields={["nomeCliente", "usuariomovimentacao"]}
+              filters={filters2}
+              rowGroupHeaderTemplate={headerTemplate}
+              footer={`Exibindo os dados pela data de recebimento de ${moment(
+                resumoData?.[0]?.$d
+              ).format("DD/MM/YYYY")} até 
                       ${moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}`}
-                    >
-                      
-                      <Column
-                        field="nomeCliente"
-                        header="Cliente"
-                        body={headerTemplate}
-                      ></Column>
-                     
-                      <Column
-                        header="Loja"
-                       
-                        field="loja"
-                      ></Column>
-                       <Column
-                        header="Documento"
-                       
-                        field="documento"
-                      ></Column>
-                      <Column
-                        field="emissao"
-                        body={(row) => {
-                          return (
-                            <>{moment(row?.emissao).format("DD/MM/YYYY")}</>
-                          );
-                        }}
-                        header="Data da compra"
-                      ></Column>
-                      <Column
-                        field="valor"
-                        body={(row) => {
-                          return (
-                            <div style={{ color: "red" }}>
-                              {Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                                maximumFractionDigits: 2,
-                                minimumFractionDigits: 2,
-                              }).format(row?.valor)}
-                            </div>
-                          );
-                        }}
-                        header="Valor da compra"
-                      ></Column>
-                      <Column
-                        field="vencimento"
-                        body={(row) => {
-                          return (
-                            <>{moment(row?.vencimento).format("DD/MM/YYYY")}</>
-                          );
-                        }}
-                        header="Vencimento"
-                      ></Column>
-                      <Column
-                        field="jurosPago"
-                        header="Juros"
-                        body={(row) => {
-                          return (
-                            <>
-                              {Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                                maximumFractionDigits: 2,
-                                minimumFractionDigits: 2,
-                              }).format(row?.jurosPago)}
-                            </>
-                          );
-                        }}
-                      ></Column>
-                      <Column
-                        field="multaPaga"
-                        header="Multa"
-                        body={(row) => {
-                          return (
-                            <>
-                              {Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                                maximumFractionDigits: 2,
-                                minimumFractionDigits: 2,
-                              }).format(row?.multaPaga)}
-                            </>
-                          );
-                        }}
-                      ></Column>
-                      <Column
-                        field="desconto"
-                        header="Desconto"
-                        body={(row) => {
-                          return (
-                            <>
-                              {Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                                maximumFractionDigits: 2,
-                                minimumFractionDigits: 2,
-                              }).format(row?.desconto)}
-                            </>
-                          );
-                        }}
-                      ></Column>
-                      <Column
-                        field="pagamento"
-                        header="Data do pagamento"
-                        body={(row) => {
-                          return (
-                            <>{moment(row?.pagamento).format("DD/MM/YYYY")}</>
-                          );
-                        }}
-                      ></Column>
-                      <Column
-                        field="valorPago"
-                        header="Valor do pagamento"
-                        body={(row) => {
-                          return (
-                            <div style={{ color: "green" }}>
-                              {Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                                maximumFractionDigits: 2,
-                                minimumFractionDigits: 2,
-                              }).format(row?.valorPago)}
-                            </div>
-                          );
-                        }}
-                      ></Column>
+            >
+              <Column
+                field="nomeCliente"
+                header="Cliente"
+                body={headerTemplate}
+              ></Column>
 
-                      <Column
-                        field="saldo"
-                        header="Falta"
-                        body={(row) => {
-                          return (
-                            <>
-                              <div
-                                style={{
-                                  color: `${row.saldo === 0 ? "green" : "red"}`,
-                                }}
-                              >
-                                {Intl.NumberFormat("pt-BR", {
-                                  style: "currency",
-                                  currency: "BRL",
-                                  maximumFractionDigits: 2,
-                                  minimumFractionDigits: 2,
-                                }).format(row?.saldo)}
-                              </div>
-                            </>
-                          );
+              <Column header="Loja" field="loja"></Column>
+              <Column header="Documento" field="documento"></Column>
+              <Column
+                field="emissao"
+                body={(row) => {
+                  return <>{moment(row?.emissao).format("DD/MM/YYYY")}</>;
+                }}
+                header="Data da compra"
+              ></Column>
+              <Column
+                field="valor"
+                body={(row) => {
+                  return (
+                    <div style={{ color: "red" }}>
+                      {Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                      }).format(row?.valor)}
+                    </div>
+                  );
+                }}
+                header="Valor da compra"
+              ></Column>
+              <Column
+                field="vencimento"
+                body={(row) => {
+                  return <>{moment(row?.vencimento).format("DD/MM/YYYY")}</>;
+                }}
+                header="Vencimento"
+              ></Column>
+              <Column
+                field="jurosPago"
+                header="Juros"
+                body={(row) => {
+                  return (
+                    <>
+                      {Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                      }).format(row?.jurosPago)}
+                    </>
+                  );
+                }}
+              ></Column>
+              <Column
+                field="multaPaga"
+                header="Multa"
+                body={(row) => {
+                  return (
+                    <>
+                      {Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                      }).format(row?.multaPaga)}
+                    </>
+                  );
+                }}
+              ></Column>
+              <Column
+                field="desconto"
+                header="Desconto"
+                body={(row) => {
+                  return (
+                    <>
+                      {Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                      }).format(row?.desconto)}
+                    </>
+                  );
+                }}
+              ></Column>
+              <Column
+                field="pagamento"
+                header="Data do pagamento"
+                body={(row) => {
+                  return <>{moment(row?.pagamento).format("DD/MM/YYYY")}</>;
+                }}
+              ></Column>
+              <Column
+                field="valorPago"
+                header="Valor do pagamento"
+                body={(row) => {
+                  return (
+                    <div style={{ color: "green" }}>
+                      {Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                      }).format(row?.valorPago)}
+                    </div>
+                  );
+                }}
+              ></Column>
+
+              <Column
+                field="saldo"
+                header="Falta"
+                body={(row) => {
+                  return (
+                    <>
+                      <div
+                        style={{
+                          color: `${row.saldo === 0 ? "green" : "red"}`,
                         }}
-                      ></Column>
-                      <Column
-                        field="usuariomovimentacao"
-                        header="Recebido por"
-                      ></Column>
-                    </DataTable>
-                
-              </div>
-            </>
-          
-    
+                      >
+                        {Intl.NumberFormat("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 2,
+                        }).format(row?.saldo)}
+                      </div>
+                    </>
+                  );
+                }}
+              ></Column>
+              <Column
+                field="usuariomovimentacao"
+                header="Recebido por"
+              ></Column>
+            </DataTable>
+          </div>
+        </>
       </div>
     </>
   );

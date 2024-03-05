@@ -3,11 +3,9 @@ import { useLocation } from "react-router-dom";
 
 import "./styles.css";
 import TextTransition, { presets } from "react-text-transition";
-
-import { exibirPedido } from "./imprimir-pedido";
 import { PedidoListaSidebar } from "./lista-pedidos-sidebar";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProgressBar } from "primereact/progressbar";
+import { Card } from "primereact/card";
 import { InputTextarea } from "primereact/inputtextarea";
 
 import { Messages } from "primereact/messages";
@@ -37,11 +35,11 @@ import api from "../../../../services/axios";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
+import { useReactToPrint } from "react-to-print";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function AnaliseFornecedor() {
-  let i = 0;
-  let d = [];
   const location = useLocation();
   const pedidoData = location.state;
 
@@ -107,7 +105,6 @@ export default function AnaliseFornecedor() {
   const [pedidoCodigo, setPedidoCodigo] = useState(null);
   const [comprador, setComprador] = useState(null);
 
- 
   const [loading, setLoading] = useState(false);
   const [loading3, setLoading3] = useState(false);
   const [dataInicialCompra, setDataInicialCompra] = useState(
@@ -139,10 +136,6 @@ export default function AnaliseFornecedor() {
   const toast2 = useRef(null);
   const toast3 = useRef(null);
 
-  const [tempoDiasPedido, setTempoDiasPedido] = useState(30);
-  const [tempoDiasEntrega, settempoDiasEntrega] = useState(0);
-  const [margemErroDiasEntrega, setMargemErroDiasEntrega] = useState(0);
-
   const [idPedido, setIdPedido] = useState(null);
 
   const [totalPedido, setTotalPedido] = useState(0);
@@ -154,16 +147,42 @@ export default function AnaliseFornecedor() {
   const [checked, setChecked] = useState(false);
   const [dataEmissao, setDataEmissao] = useState(null);
 
-  const [dialogSelectedProducts, setDialogSelectedProducts] = useState(false);
+  const linhas = useRef(5);
 
   const [dialogSelectedProductsAtualizar, setDialogSelectedProductsAtualizar] =
     useState(false);
 
-  const [produtoMassaResponse, setProdutoMassaResponse] = useState(0);
-
   let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 
   let params = useParams();
+
+  const tabelaRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    pageStyle: `@media print {
+      @page {
+        size: 500mm 500mm;
+        margin: 5;
+      }
+    }`,
+    onBeforeGetContent: () => (linhas.current = 9999),
+    content: () => tabelaRef.current,
+    onAfterPrint : () => (linhas.current = 5)
+  });
+
+  const imprimir = () => {
+    if (linhas.current === 9999) {
+      handlePrint();
+    } else {
+      linhas.current = 9999;
+      toast.current.show({
+        severity: "info",
+        summary: "Aviso",
+        detail: "Tabela ajustada, Imprima novamente! ",
+        life: 3000,
+      });
+    }
+  };
 
   const getPedidos = () => {
     if (pedidoData?.data) {
@@ -392,7 +411,7 @@ export default function AnaliseFornecedor() {
           style={{ margin: "5px" }}
           icon="pi pi-cloud-upload"
           className="p-button p-button-success p-button-rounded"
-          label="Finalizar"
+          label="Gravar pedido"
           onClick={() => finalizarPedido()}
         />
       </>
@@ -412,6 +431,13 @@ export default function AnaliseFornecedor() {
               icon="pi pi-times"
               style={{ marginRight: "10px" }}
               onClick={() => deletarProdutoPedidoMassa(selectedProductsPedido)}
+            />
+            <Button
+              label="Imprimir"
+              className="p-button p-button-rounded p-button-secondary"
+              icon="pi pi-print"
+              style={{ marginRight: "10px" }}
+              onClick={() => imprimir()}
             />
           </>
         ) : (
@@ -458,7 +484,6 @@ export default function AnaliseFornecedor() {
       prazoEntrega === null ||
       filial === null ||
       comprador === null
-
     ) {
       toast.current.show({
         severity: "warn",
@@ -708,513 +733,437 @@ export default function AnaliseFornecedor() {
         onClick={() => setVisibleLeft(true)}
       />
   */}
-      {displayDialog ? (
-        <>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignContent: "center",
-              justifyContent: "space-evenly",
-              gap: "10px",
-              color: "#FFF",
-              flexWrap: "wrap",
-            }}
-          >
-            {fornecedor?.leadttimecompra ? (
-              <>
-                <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
-              </>
-            ) : (
-              <></>
-            )}
-            <div className="fornecedor-input">
-              <h4>Selecione uma loja </h4>
-              <Dropdown
-                //  disabled={idPedido ? true : false}
-                required
-                style={{ width: "100%", margin: "10px 0px" }}
-                placeholder={pedidoData?.data?.idfilial}
-                value={filial}
-                options={lojas}
-                optionLabel="nome"
-                itemTemplate={itemTemplate}
-                filter
-                showClear
-                filterBy="nome,codigo"
-                onChange={(e) => {
-                  console.log(e.target.value);
-                  setFilial(e.target.value);
-                }}
-              />
-            </div>
-            <div className="fornecedor-input">
-              <h4>Selecione um comprador </h4>
-              <Dropdown
-                //  disabled={idPedido ? true : false}
-                required
-                style={{ width: "100%", margin: "10px 0px" }}
-                placeholder="Selecione um comprador"
-                value={comprador}
-                options={compradores}
-                optionLabel="nome"
-                //   itemTemplate={itemTemplate}
-                filter
-                showClear
-                filterBy="nome,codigo"
-                onChange={(e) => {
-                  setComprador(e.target.value);
-                }}
-              />
-            </div>
-            <div className="fornecedor-input">
-              <h4>Selecione um fornecedor </h4>
-              <Dropdown
-                //  disabled={idPedido ? true : false}
-                required
-                style={{ width: "100%", margin: "10px 0px" }}
-                placeholder="Selecione um fornecedor"
-                value={fornecedor}
-                options={fornecedores}
-                optionLabel="nome"
-                itemTemplate={itemTemplate}
-                filter
-                showClear
-                filterBy="nome,codigo"
-                onChange={(e) => {
-                  setFornecedor(e.target.value);
-                }}
-              />
-            </div>
-            <div className="fornecedor-input">
-              <h4>Informe um prazo para entrega</h4>
-              <Calendar
-                placeholder={moment(prazoEntrega).format("DD/MM/YYYY")}
-                //  mask="99/99/9999"
-                showIcon
-                showButtonBar
-                locale="pt-BR"
-                dateFormat="dd/mm/yy"
-                style={{ width: "100%", margin: "10px 0px" }}
-                value={prazoEntrega}
-                onChange={(e) => setPrazoEntrega(e.value)}
-              />
-            </div>
-            <div className="fornecedor-input">
-              <h4>Informe uma condição de pagamento</h4>
-              <Dropdown
-                style={{ width: "100%", margin: "10px 0px" }}
-                filter
-                value={condicaoPagamento}
-                // optionValue="id"
-                options={condicoesPagamento}
-                optionLabel="descricao"
-                onChange={(e) => setCondicaoPagamento(e.value)}
-                placeholder="Selecione uma condição de pagamento"
-              />
-            </div>
-            <div className="fornecedor-input">
-              <Button
-                // disabled={idPedido ? true : false}
-                style={{ width: "100%", margin: "10px 0px" }}
-                icon="pi pi-save"
-                className="p-button p-button-success p-button-rounded p-button-md"
-                label={idPedido ? `Alterar pedido ` + idPedido : "Gravar"}
-                onClick={() => alterarPedido(pedidoData?.data)}
-              />
-              <Button
-                style={{ margin: "5px" }}
-                label="Cancelar alteração"
-                icon="pi pi-times"
-                className="p-button p-button-rounded p-button-danger"
-                onClick={() => {
-                  setDisplayDialog(false);
-                }}
-              />
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px",
-            }}
-          ></div>
-          <div className="container-fornecedor">
-            <h1
+      <div
+        style={{ backgroundColor: "#969FE0", borderRadius: "50px" }}
+        ref={tabelaRef}
+      >
+        {displayDialog ? (
+          <>
+            <div
               style={{
-                width: "100%",
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                fontFamily: "cabin-sketch-regular",
-                fontWeight: "400",
-                fontSize: "50px",
+                flexDirection: "row",
+                alignContent: "center",
+                justifyContent: "space-evenly",
+                gap: "10px",
+                color: "#FFF",
+                flexWrap: "wrap",
               }}
             >
-              Pedido de compra
-              {idPedido ? (
+              {fornecedor?.leadttimecompra ? (
                 <>
-                  #{pedidoCodigo} - Fornecedor {fornecedor?.codigo} -{" "}
-                  {fornecedor?.nome}{" "}
-                  <Button
-                    style={{ margin: "5px" }}
-                    label="Alterar"
-                    icon="pi pi-pencil"
-                    className="p-button p-button-rounded p-button-primary"
-                    onClick={() => {
-                      setDisplayDialog(true);
-                      setFornecedor(fornecedor);
-                      getLojasSelecionada();
-                    }}
-                  />
+                  <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
                 </>
               ) : (
                 <></>
               )}
-            </h1>
-
-            <Dialog
-              visible={loading}
-              closable={false}
-              header="Aguarde por favor"
+              <div className="fornecedor-input">
+                <h4>Selecione uma loja </h4>
+                <Dropdown
+                  //  disabled={idPedido ? true : false}
+                  required
+                  style={{ width: "100%", margin: "10px 0px" }}
+                  placeholder={pedidoData?.data?.idfilial}
+                  value={filial}
+                  options={lojas}
+                  optionLabel="nome"
+                  itemTemplate={itemTemplate}
+                  filter
+                  showClear
+                  filterBy="nome,codigo"
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    setFilial(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="fornecedor-input">
+                <h4>Selecione um comprador </h4>
+                <Dropdown
+                  //  disabled={idPedido ? true : false}
+                  required
+                  style={{ width: "100%", margin: "10px 0px" }}
+                  placeholder="Selecione um comprador"
+                  value={comprador}
+                  options={compradores}
+                  optionLabel="nome"
+                  //   itemTemplate={itemTemplate}
+                  filter
+                  showClear
+                  filterBy="nome,codigo"
+                  onChange={(e) => {
+                    setComprador(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="fornecedor-input">
+                <h4>Selecione um fornecedor </h4>
+                <Dropdown
+                  //  disabled={idPedido ? true : false}
+                  required
+                  style={{ width: "100%", margin: "10px 0px" }}
+                  placeholder="Selecione um fornecedor"
+                  value={fornecedor}
+                  options={fornecedores}
+                  optionLabel="nome"
+                  itemTemplate={itemTemplate}
+                  filter
+                  showClear
+                  filterBy="nome,codigo"
+                  onChange={(e) => {
+                    setFornecedor(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="fornecedor-input">
+                <h4>Informe um prazo para entrega</h4>
+                <Calendar
+                  placeholder={moment(prazoEntrega).format("DD/MM/YYYY")}
+                  //  mask="99/99/9999"
+                  showIcon
+                  showButtonBar
+                  locale="pt-BR"
+                  dateFormat="dd/mm/yy"
+                  style={{ width: "100%", margin: "10px 0px" }}
+                  value={prazoEntrega}
+                  onChange={(e) => setPrazoEntrega(e.value)}
+                />
+              </div>
+              <div className="fornecedor-input">
+                <h4>Informe uma condição de pagamento</h4>
+                <Dropdown
+                  style={{ width: "100%", margin: "10px 0px" }}
+                  filter
+                  value={condicaoPagamento}
+                  // optionValue="id"
+                  options={condicoesPagamento}
+                  optionLabel="descricao"
+                  onChange={(e) => setCondicaoPagamento(e.value)}
+                  placeholder="Selecione uma condição de pagamento"
+                />
+              </div>
+              <div className="fornecedor-input">
+                <Button
+                  // disabled={idPedido ? true : false}
+                  style={{ width: "100%", margin: "10px 0px" }}
+                  icon="pi pi-save"
+                  className="p-button p-button-success p-button-rounded p-button-md"
+                  label={idPedido ? `Alterar pedido ` + idPedido : "Gravar"}
+                  onClick={() => alterarPedido(pedidoData?.data)}
+                />
+                <Button
+                  style={{ margin: "5px" }}
+                  label="Cancelar alteração"
+                  icon="pi pi-times"
+                  className="p-button p-button-rounded p-button-danger"
+                  onClick={() => {
+                    setDisplayDialog(false);
+                  }}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              style={{
+                padding: "1rem",
+                color: "#ffff",
+              }}
             >
               <h1
                 style={{
-                  fontFamily: "cabin-sketch-bold",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontFamily: "cabin-sketch-regular",
                   fontWeight: "400",
-                  fontSize: "45px",
+                  fontSize: "50px",
                 }}
               >
-                <TextTransition springConfig={presets.wobbly}>
-                  {TEXTS[index % TEXTS.length]}
-                </TextTransition>
-              </h1>
-            </Dialog>
-
-            {idPedido ? (
-              <>
-                <div>
-                  {fornecedor?.leadttimecompra ? (
-                    <>
-                      <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignContent: "center",
-                    justifyContent: "space-evenly",
-                    gap: "15px",
-                    color: "#FFF",
-                  }}
-                >
-                  {fornecedor?.leadttimecompra ? (
-                    <>
-                      <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      gap: "10px",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <div className="fornecedor-input">
-                      <h4>Selecione uma loja </h4>
-
-                      <Dropdown
-                        //  disabled={idPedido ? true : false}
-                        required
-                        style={{ width: "100%", margin: "10px 0px" }}
-                        placeholder="Selecione uma loja"
-                        value={filial}
-                        options={lojas}
-                        optionLabel="nome"
-                        itemTemplate={itemTemplate}
-                        filter
-                        showClear
-                        filterBy="nome,codigo"
-                        onChange={(e) => {
-                          setFilial(e.target.value);
-                        }}
-                      />
-                    </div>
-                    <div className="fornecedor-input">
-                      <h4>Selecione o comprador </h4>
-                      <Dropdown
-                        disabled={idPedido ? true : false}
-                        required
-                        style={{ width: "100%", margin: "10px 0px" }}
-                        placeholder="Selecione o comprador"
-                        value={comprador}
-                        options={compradores}
-                        optionLabel="nome"
-                        // itemTemplate={itemTemplate}
-                        filter
-                        showClear
-                        filterBy="nome,codigo"
-                        onChange={(e) => {
-                          setComprador(e.target.value);
-                        }}
-                      />
-                    </div>
-                    <div className="fornecedor-input">
-                      <h4>Selecione um fornecedor </h4>
-                      <Dropdown
-                        disabled={idPedido ? true : false}
-                        required
-                        style={{ width: "100%", margin: "10px 0px" }}
-                        placeholder="Selecione um fornecedor"
-                        value={fornecedor}
-                        options={fornecedores}
-                        optionLabel="nome"
-                        itemTemplate={itemTemplate}
-                        filter
-                        showClear
-                        filterBy="nome,codigo"
-                        onChange={(e) => {
-                          setFornecedor(e.target.value);
-                        }}
-                      />
-                    </div>
-                    <div className="fornecedor-input">
-                      <h4>Informe um prazo para entrega</h4>
-                      <Calendar
-                        placeholder="Informe o prazo para entrega"
-                        // mask="99/99/9999"
-                        showIcon
-                        showButtonBar
-                        locale="pt-BR"
-                        dateFormat="dd/mm/yy"
-                        style={{ width: "100%", margin: "10px 0px" }}
-                        value={prazoEntrega}
-                        onChange={(e) => {
-                          setPrazoEntrega(e.target.value);
-                        }}
-                      />
-                    </div>
-                    <div className="fornecedor-input">
-                      <h4>Informe uma condição de pagamento</h4>
-                      <Dropdown
-                        style={{ width: "100%", margin: "10px 0px" }}
-                        filter
-                        value={condicaoPagamento}
-                        // optionValue="id"
-                        options={condicoesPagamento}
-                        optionLabel="descricao"
-                        onChange={(e) => setCondicaoPagamento(e.value)}
-                        placeholder="Selecione uma condição de pagamento"
-                      />
-                    </div>
-                    <div className="fornecedor-input">
-                      <Button
-                        disabled={idPedido ? true : false}
-                        style={{ width: "100%", margin: "10px 0px" }}
-                        icon="pi pi-save"
-                        className="p-button p-button-success p-button-rounded p-button-md"
-                        label={
-                          idPedido
-                            ? `Pedido número ` +
-                              idPedido +
-                              ` criado, adicione os itens a lista do pedido`
-                            : "Gravar "
-                        }
-                        onClick={() => gravarPedido()}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          <Dialog
-            closable={false}
-            header="Aguarde por favor "
-            visible={dialogSelectedProducts}
-            onHide={() => setDialogSelectedProducts(false)}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignContent: "center",
-                gap: "20px",
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                {produtoMassaResponse <= selectedProductsPedido.length &&
-                produtoMassaResponse > 0 ? (
+                Pedido de compra
+                {idPedido ? (
                   <>
-                    <h3>
-                      <p>
-                        Adicionando {produtoMassaResponse} de{" "}
-                        {selectedProductsPedido.length}
-                      </p>
-                    </h3>
-                    <ProgressBar
-                      value={(
-                        (parseInt(produtoMassaResponse) /
-                          selectedProductsPedido.length) *
-                        100
-                      ).toFixed()}
+                    #{pedidoCodigo} - Fornecedor {fornecedor?.codigo} -{" "}
+                    {fornecedor?.nome}{" "}
+                    <Button
+                      style={{ margin: "5px" }}
+                      label="Alterar"
+                      icon="pi pi-pencil"
+                      className="p-button p-button-rounded p-button-primary"
+                      onClick={() => {
+                        setDisplayDialog(true);
+                        setFornecedor(fornecedor);
+                        getLojasSelecionada();
+                      }}
                     />
                   </>
                 ) : (
                   <></>
                 )}
-              </div>
+              </h1>
+
+              <Dialog
+                visible={loading}
+                closable={false}
+                header="Aguarde por favor"
+              >
+                <h1
+                  style={{
+                    fontFamily: "cabin-sketch-bold",
+                    fontWeight: "400",
+                    fontSize: "45px",
+                  }}
+                >
+                  <TextTransition springConfig={presets.wobbly}>
+                    {TEXTS[index % TEXTS.length]}
+                  </TextTransition>
+                </h1>
+              </Dialog>
+
+              {idPedido ? (
+                <>
+                  <div>
+                    {fornecedor?.leadttimecompra ? (
+                      <>
+                        <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignContent: "center",
+                      justifyContent: "space-evenly",
+                      gap: "15px",
+                      color: "#FFF",
+                    }}
+                  >
+                    {fornecedor?.leadttimecompra ? (
+                      <>
+                        <h1>Lead Time {fornecedor.leadttimecompra} dias </h1>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "10px",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div className="fornecedor-input">
+                        <h4>Selecione uma loja </h4>
+
+                        <Dropdown
+                          //  disabled={idPedido ? true : false}
+                          required
+                          style={{ width: "100%", margin: "10px 0px" }}
+                          placeholder="Selecione uma loja"
+                          value={filial}
+                          options={lojas}
+                          optionLabel="nome"
+                          itemTemplate={itemTemplate}
+                          filter
+                          showClear
+                          filterBy="nome,codigo"
+                          onChange={(e) => {
+                            setFilial(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <div className="fornecedor-input">
+                        <h4>Selecione o comprador </h4>
+                        <Dropdown
+                          disabled={idPedido ? true : false}
+                          required
+                          style={{ width: "100%", margin: "10px 0px" }}
+                          placeholder="Selecione o comprador"
+                          value={comprador}
+                          options={compradores}
+                          optionLabel="nome"
+                          // itemTemplate={itemTemplate}
+                          filter
+                          showClear
+                          filterBy="nome,codigo"
+                          onChange={(e) => {
+                            setComprador(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <div className="fornecedor-input">
+                        <h4>Selecione um fornecedor </h4>
+                        <Dropdown
+                          disabled={idPedido ? true : false}
+                          required
+                          style={{ width: "100%", margin: "10px 0px" }}
+                          placeholder="Selecione um fornecedor"
+                          value={fornecedor}
+                          options={fornecedores}
+                          optionLabel="nome"
+                          itemTemplate={itemTemplate}
+                          filter
+                          showClear
+                          filterBy="nome,codigo"
+                          onChange={(e) => {
+                            setFornecedor(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <div className="fornecedor-input">
+                        <h4>Informe um prazo para entrega</h4>
+                        <Calendar
+                          placeholder="Informe o prazo para entrega"
+                          // mask="99/99/9999"
+                          showIcon
+                          showButtonBar
+                          locale="pt-BR"
+                          dateFormat="dd/mm/yy"
+                          style={{ width: "100%", margin: "10px 0px" }}
+                          value={prazoEntrega}
+                          onChange={(e) => {
+                            setPrazoEntrega(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <div className="fornecedor-input">
+                        <h4>Informe uma condição de pagamento</h4>
+                        <Dropdown
+                          style={{ width: "100%", margin: "10px 0px" }}
+                          filter
+                          value={condicaoPagamento}
+                          // optionValue="id"
+                          options={condicoesPagamento}
+                          optionLabel="descricao"
+                          onChange={(e) => setCondicaoPagamento(e.value)}
+                          placeholder="Selecione uma condição de pagamento"
+                        />
+                      </div>
+                      <div className="fornecedor-input">
+                        <Button
+                          disabled={idPedido ? true : false}
+                          style={{ width: "100%", margin: "10px 0px" }}
+                          icon="pi pi-save"
+                          className="p-button p-button-success p-button-rounded p-button-md"
+                          label={
+                            idPedido
+                              ? `Pedido número ` +
+                                idPedido +
+                                ` criado, adicione os itens a lista do pedido`
+                              : "Gravar "
+                          }
+                          onClick={() => gravarPedido()}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignContent: "center",
-                gap: "20px",
-                flexWrap: "wrap",
-              }}
-            ></div>
-          </Dialog>
-        </>
-      )}
+          </>
+        )}
 
-      <Toast ref={toast2} position="bottom-center" />
-      <Messages ref={msgs1} />
-      <div style={{ width: "100%" }}>
-        <Toolbar right={leftContents} left={rightContents} />
-        <div style={{ width: "100%" }}>
-          {idPedido ? (
-            <>
-              <TabView>
-                <TabPanel header="Itens do pedido">
-                  <PedidoListaSidebar
-                    idPedido={idPedido}
-                    filial={filial}
-                    editDialog={editDialog}
-                    setEditDialog={setEditDialog}
-                    checked={checked}
-                    dialogSelectedProductsAtualizar={
-                      dialogSelectedProductsAtualizar
-                    }
-                    setDialogSelectedProductsAtualizar={
-                      setDialogSelectedProductsAtualizar
-                    }
-                    selectedProductsPedido={selectedProductsPedido}
-                    setSelectedProductsPedido={setSelectedProductsPedido}
-                    setLoadingLojas={setLoadingLojas}
-                    fornecedor={fornecedor}
-                    dataInicialCompra={dataInicialCompra}
-                    dataFinalCompra={dataFinalCompra}
-                    dataFinalVenda={dataFinalVenda}
-                    tempoDiasPedido={tempoDiasPedido}
-                    tempoDiasEntrega={tempoDiasEntrega}
-                    margemErroDiasEntrega={margemErroDiasEntrega}
-                    msgs1={msgs1}
-                    loadingLojas={loadingLojas}
-                    produtoPorFilialLista={produtoPorFilialLista}
-                    totalPedido={totalPedido}
-                    diasVenda={diasVenda}
-                    total_template={total_template}
-                    lojas={lojas}
-                    getItensPedido={getItensPedido}
-                    pedidos={pedidos}
-                    footerGroupPedido={footerGroupPedido}
-                    loading3={loading3}
-                    EanOrCodigoPedido={EanOrCodigoPedido}
-                    precoPedido={precoPedido}
-                    precoPedidoLinhaTotal={precoPedidoLinhaTotal}
-                    deletarItemPedido={deletarItemPedido}
-                    unidadeMedidaLista={unidadeMedidaLista}
-                  />
-                </TabPanel>
-                <TabPanel header="Observação">
+        <Toast ref={toast2} position="bottom-center" />
+        <Messages ref={msgs1} />
+        <div
+          //ref={tabelaRef}
+          style={{ width: "100%", backgroundColor: "#f2f2f2" }}
+        >
+          <Toolbar right={leftContents} left={rightContents} />
+          <div style={{ width: "100%" }}>
+            {idPedido ? (
+              <>
+                <TabView>
+                  <TabPanel header="Itens do pedido">
+                    <PedidoListaSidebar
+                      linhas={linhas}
+                      idPedido={idPedido}
+                      filial={filial}
+                      editDialog={editDialog}
+                      setEditDialog={setEditDialog}
+                      checked={checked}
+                      dialogSelectedProductsAtualizar={
+                        dialogSelectedProductsAtualizar
+                      }
+                      setDialogSelectedProductsAtualizar={
+                        setDialogSelectedProductsAtualizar
+                      }
+                      selectedProductsPedido={selectedProductsPedido}
+                      setSelectedProductsPedido={setSelectedProductsPedido}
+                      setLoadingLojas={setLoadingLojas}
+                      fornecedor={fornecedor}
+                      dataInicialCompra={dataInicialCompra}
+                      dataFinalCompra={dataFinalCompra}
+                      dataFinalVenda={dataFinalVenda}
+                      msgs1={msgs1}
+                      loadingLojas={loadingLojas}
+                      produtoPorFilialLista={produtoPorFilialLista}
+                      totalPedido={totalPedido}
+                      diasVenda={diasVenda}
+                      total_template={total_template}
+                      lojas={lojas}
+                      getItensPedido={getItensPedido}
+                      pedidos={pedidos}
+                      footerGroupPedido={footerGroupPedido}
+                      loading3={loading3}
+                      EanOrCodigoPedido={EanOrCodigoPedido}
+                      precoPedido={precoPedido}
+                      precoPedidoLinhaTotal={precoPedidoLinhaTotal}
+                      deletarItemPedido={deletarItemPedido}
+                      unidadeMedidaLista={unidadeMedidaLista}
+                    />
+                  </TabPanel>
+                  <TabPanel header="Observação">
+                    <InputTextarea
+                      autoResize
+                      value={observacao}
+                      onChange={(e) => setObservacao(e.target.value)}
+                      rows={10}
+                      cols={50}
+                    />
+                  </TabPanel>
+                </TabView>
+                {linhas.current >= 9999 ? (
+                  <>
+                  <Card>
                   <InputTextarea
-                    autoResize
-                    value={observacao}
-                    onChange={(e) => setObservacao(e.target.value)}
-                    rows={10}
-                    cols={50}
-                  />
-                </TabPanel>
-              </TabView>
-            </>
-          ) : (
-            <></>
-          )}
+                     style={{width : '100%'}}
+                      autoResize
+                      value={observacao}
+                      onChange={(e) => setObservacao(e.target.value)}
+                      rows={10}
+                      cols={50}
+                    />
+                  </Card>
+                    
+                    
+                    <Card >
 
-          {/*
-              <AdicionarProduto
-                indexP={indexP}
-                eanUrl={eanUrl}
-                produto={produto}
-                displayDialog={displayDialog}
-                hideDialog={hideDialog}
-                fecharTemplateRight={fecharTemplateRight}
-                fecharTemplateLeft={fecharTemplateLeft}
-                lojaSelecionada={lojaSelecionada}
-                editarItemPedido={editarItemPedido}
-                produtoSelecionado={produtoSelecionado}
-                data_inclusao_template={data_inclusao_template}
-                saldo_estoque_template={saldo_estoque_template}
-                sugestao_quantidade_compra={sugestao_quantidade_compra}
-                valor_unitario_template={valor_unitario_template}
-                preco_media_venda_template={preco_media_venda_template}
-                quantidade_vendida_template={quantidade_vendida_template}
-                quantidade_vendida_template2={quantidade_vendida_template2}
-                quantidade_vendida_template3={quantidade_vendida_template3}
-                venda_diaria_template={venda_diaria_template}
-                total_template={total_template}
-                dialogProdutoPorFilial={dialogProdutoPorFilial}
-                itemPorPedido={itemPorPedido}
-                footerGroupPedidoProduto={footerGroupPedidoProduto}
-                loading2={loading2}
-                precoPedido={precoPedido}
-                precoPedidoLinhaTotal={precoPedidoLinhaTotal}
-                deletarItemPedido={deletarItemPedido}
-                quantidade_comprada_template_02={
-                  quantidade_comprada_template_02
-                }
-                total_comprado_template_02={total_comprado_template_02}
-                quantidade={quantidade}
-                preco={preco}
-                unidadeMedida={unidadeMedida}
-                loadingLojas={loadingLojas}
-                produtoPorFilialLista={produtoPorFilialLista}
-                fator={fator}
-                setFator={setFator}
-                diasVenda={diasVenda}
-                setQuantidade={setQuantidade}
-                setTotal={setTotal}
-                unidadeMedidaLista={unidadeMedidaLista}
-                setUnidadeMedida={setUnidadeMedida}
-                toast3={toast3}
-                lojas={lojas}
-                loadinglojas={loadingLojas}
-              />
-              */}
+                    <hr/>
+                    <h4>Comprador</h4>
+                    </Card>
+                   
+                   
+                   
+                  </>
+                ) : (
+                  <></>
+                )}
+              </>
+            ) : (
+              <></>
+            )}
+          </div>
         </div>
       </div>
     </>

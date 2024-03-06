@@ -520,10 +520,11 @@ const PedidoListaSidebar = ({
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
           tableStyle={{ width: "100vh" }}
           header={renderHeader}
+          filterDisplay="row"
         >
-          <Column field="codigo" header="Código"></Column>
-          <Column field="ean" header="Código de barras"></Column>
-          <Column field="nome" header="Nome"></Column>
+          <Column filter field="codigo" filterPlaceholder="Pesquisar por código" header="Código"></Column>
+          <Column filter field="ean" filterPlaceholder="Pesquisar por código de barras" header="Código de barras"></Column>
+          <Column filter field="nome" filterPlaceholder="Pesquisar por nome" header="Nome"></Column>
           <Column
             field="precocusto"
             header="Preço de custo"

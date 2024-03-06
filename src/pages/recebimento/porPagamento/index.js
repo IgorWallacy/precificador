@@ -5,7 +5,7 @@ import { useReactToPrint } from "react-to-print";
 import locale from "antd/es/date-picker/locale/pt_BR";
 
 import { Button } from "primereact/button";
-import { ProgressBar } from "primereact/progressbar";
+import { Dropdown } from "primereact/dropdown";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
@@ -25,13 +25,15 @@ const RecebimentoPorData = () => {
 
   const [resumoData, setResumoData] = useState(null);
 
+  const [lojas, setLojas] = useState([]);
+
   const [loading, setLoading] = useState(false);
 
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     nomeCliente: { value: null, matchMode: FilterMatchMode.CONTAINS },
     usuariomovimentacao: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    loja: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    loja: { value: null, matchMode: FilterMatchMode.EQUALS },
   });
 
   const onGlobalFilterChange2 = (e) => {
@@ -213,8 +215,40 @@ const RecebimentoPorData = () => {
     content: () => tabelaRef.current,
   });
 
+
+
+
+
+  const lojaRowFilterTemplate = (options) => {
+    return (
+      <Dropdown
+        value={options.value}
+        options={lojas}
+        onChange={(e) => options.filterApplyCallback(e.value)}
+      //  itemTemplate={lojaItemTemplate}
+        placeholder="Selecione uma loja"
+        optionLabel="nome"
+        optionValue="nome"
+        className="p-column-filter"
+        showClear
+      />
+    );
+  };
+
+  const getlojas = () => {
+    return api
+      .get("/api/filial")
+      .then((r) => {
+        setLojas(r.data);
+       
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   useEffect(() => {
-    
+    getlojas();
     getRecebimentos();
   }, []);
 
@@ -304,6 +338,7 @@ const RecebimentoPorData = () => {
               breakpoint="968px"
               globalFilterFields={["nomeCliente", "usuariomovimentacao"]}
               filters={filters2}
+              filterDisplay="row"
               rowGroupHeaderTemplate={headerTemplate}
               footer={`Exibindo os dados pela data de recebimento de ${moment(
                 resumoData?.[0]?.$d
@@ -316,7 +351,16 @@ const RecebimentoPorData = () => {
                 body={headerTemplate}
               ></Column>
 
-              <Column header="Loja" field="loja"></Column>
+              <Column
+                field="loja"
+                header="Loja"
+                showFilterMenu={false}
+            //    filterMenuStyle={{ width: "14rem" }}
+                style={{ minWidth: "12rem" }}
+                filter
+               
+                filterElement={lojaRowFilterTemplate}
+              />
               <Column header="Documento" field="documento"></Column>
               <Column
                 field="emissao"

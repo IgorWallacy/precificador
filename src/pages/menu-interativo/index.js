@@ -114,6 +114,7 @@ const MenuInterativo = () => {
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/precificar-executar")}
             />
+            
           </div>
          
         </div>

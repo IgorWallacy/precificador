@@ -167,7 +167,7 @@ export default function AnaliseFornecedor() {
     }`,
     onBeforeGetContent: () => (linhas.current = 9999),
     content: () => tabelaRef.current,
-    onAfterPrint : () => (linhas.current = 5)
+    onAfterPrint: () => (linhas.current = 5),
   });
 
   const imprimir = () => {
@@ -1083,82 +1083,86 @@ export default function AnaliseFornecedor() {
           <div style={{ width: "100%" }}>
             {idPedido ? (
               <>
-                <TabView>
-                  <TabPanel header="Itens do pedido">
-                    <PedidoListaSidebar
-                      linhas={linhas}
-                      idPedido={idPedido}
-                      filial={filial}
-                      editDialog={editDialog}
-                      setEditDialog={setEditDialog}
-                      checked={checked}
-                      dialogSelectedProductsAtualizar={
-                        dialogSelectedProductsAtualizar
-                      }
-                      setDialogSelectedProductsAtualizar={
-                        setDialogSelectedProductsAtualizar
-                      }
-                      selectedProductsPedido={selectedProductsPedido}
-                      setSelectedProductsPedido={setSelectedProductsPedido}
-                      setLoadingLojas={setLoadingLojas}
-                      fornecedor={fornecedor}
-                      dataInicialCompra={dataInicialCompra}
-                      dataFinalCompra={dataFinalCompra}
-                      dataFinalVenda={dataFinalVenda}
-                      msgs1={msgs1}
-                      loadingLojas={loadingLojas}
-                      produtoPorFilialLista={produtoPorFilialLista}
-                      totalPedido={totalPedido}
-                      diasVenda={diasVenda}
-                      total_template={total_template}
-                      lojas={lojas}
-                      getItensPedido={getItensPedido}
-                      pedidos={pedidos}
-                      footerGroupPedido={footerGroupPedido}
-                      loading3={loading3}
-                      EanOrCodigoPedido={EanOrCodigoPedido}
-                      precoPedido={precoPedido}
-                      precoPedidoLinhaTotal={precoPedidoLinhaTotal}
-                      deletarItemPedido={deletarItemPedido}
-                      unidadeMedidaLista={unidadeMedidaLista}
-                    />
-                  </TabPanel>
-                  <TabPanel header="Observação">
-                    <InputTextarea
-                      autoResize
-                      value={observacao}
-                      onChange={(e) => setObservacao(e.target.value)}
-                      rows={10}
-                      cols={50}
-                    />
-                  </TabPanel>
-                </TabView>
-                {linhas.current >= 9999 ? (
-                  <>
-                  <Card>
-                  <InputTextarea
-                     style={{width : '100%'}}
-                      autoResize
-                      value={observacao}
-                      onChange={(e) => setObservacao(e.target.value)}
-                      rows={10}
-                      cols={50}
-                    />
-                  </Card>
-                    
-                    
-                    <Card >
+                <PedidoListaSidebar
+                  linhas={linhas}
+                  idPedido={idPedido}
+                  filial={filial}
+                  editDialog={editDialog}
+                  setEditDialog={setEditDialog}
+                  checked={checked}
+                  dialogSelectedProductsAtualizar={
+                    dialogSelectedProductsAtualizar
+                  }
+                  setDialogSelectedProductsAtualizar={
+                    setDialogSelectedProductsAtualizar
+                  }
+                  selectedProductsPedido={selectedProductsPedido}
+                  setSelectedProductsPedido={setSelectedProductsPedido}
+                  setLoadingLojas={setLoadingLojas}
+                  fornecedor={fornecedor}
+                  dataInicialCompra={dataInicialCompra}
+                  dataFinalCompra={dataFinalCompra}
+                  dataFinalVenda={dataFinalVenda}
+                  msgs1={msgs1}
+                  loadingLojas={loadingLojas}
+                  produtoPorFilialLista={produtoPorFilialLista}
+                  totalPedido={totalPedido}
+                  diasVenda={diasVenda}
+                  total_template={total_template}
+                  lojas={lojas}
+                  getItensPedido={getItensPedido}
+                  pedidos={pedidos}
+                  footerGroupPedido={footerGroupPedido}
+                  loading3={loading3}
+                  EanOrCodigoPedido={EanOrCodigoPedido}
+                  precoPedido={precoPedido}
+                  precoPedidoLinhaTotal={precoPedidoLinhaTotal}
+                  deletarItemPedido={deletarItemPedido}
+                  unidadeMedidaLista={unidadeMedidaLista}
+                />
 
-                    <hr/>
-                    <h4>Comprador</h4>
-                    </Card>
-                   
-                   
-                   
-                  </>
-                ) : (
-                  <></>
-                )}
+                <Card
+                  header={
+                    <>
+                      <h4>Observação</h4>
+                    </>
+                  }
+                  style={{ margin: "1rem", padding: "10px" }}
+                >
+                  <InputTextarea
+                    style={{ width: "100%" }}
+                    autoResize
+                    value={observacao}
+                    onChange={(e) => setObservacao(e.target.value)}
+                    rows={10}
+                    cols={50}
+                  />
+                </Card>
+
+                <Card  footer={<h4>Pedido emitido em {moment(pedidoData?.data?.dataEmissao).format("DD/MM/YYYY")}</h4>} style={{ padding: "1rem", margin: "10px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems:'center',
+                      justifyContent:'space-evenly',
+                      padding: "1rem",
+                      margin: "10px",
+                      gap : '20px'
+                    }}
+                  >
+                    <div style={{width:'45%'}}>
+                      <hr />
+                      <h4>Comprador</h4>
+                    </div>
+                    <div style={{width:'45%'}}>
+                      <hr />
+                      <h4>Vendedor</h4>
+                    </div>
+                    
+                  </div>
+                 
+                </Card>
               </>
             ) : (
               <></>

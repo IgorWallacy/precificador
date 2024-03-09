@@ -59,6 +59,11 @@
     "xlsx": "^0.18.5",
     "yup": "^1.2.0"
   },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts  build",

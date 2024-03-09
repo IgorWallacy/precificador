@@ -22,6 +22,7 @@ import axios from "../../../services/axios";
 import moment from "moment";
 
 import "./style.css";
+import api from "../../../services/axios";
 
 const ConsultaProduto = () => {
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
@@ -47,6 +48,8 @@ const ConsultaProduto = () => {
   const [diasVendaFiltro, setDiasVendaFiltro] = useState(30);
   const [diasCompraFiltro, setDiasCompraFiltro] = useState(90);
 
+  const fs = require('fs');
+
   useEffect(() => {
     pesquisarMultEmpresa();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -59,6 +62,8 @@ const ConsultaProduto = () => {
     setFiltro(_filters2);
     setGlobalFilterValue(value);
   };
+
+
 
   const pesquisarMultEmpresa = () => {
     setLoading(true);
@@ -315,11 +320,19 @@ const ConsultaProduto = () => {
     }
   };
 
+ 
+
+
+  
+
+
   return (
     <>
       <Toast ref={toast} />
       <Header />
       <Footer />
+
+    
 
       <Button
         className="btn-atualizar-fixo p-button-sucess p-button-lg p-button-rounded"

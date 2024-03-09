@@ -435,9 +435,9 @@ const PedidoListaSidebar = ({
             }).format(row?.precoVenda);
           }}
           sortable
-          header="Preço de venda"
+          header="Venda atual"
         ></Column>
-        <Column field={precoPedidoLinhaTotal} header="Preço Total "></Column>
+        <Column field={precoPedidoLinhaTotal} header="Total "></Column>
 
         <Column field={deletarItemPedido}></Column>
       </DataTable>

@@ -31,6 +31,7 @@ import ConsultaLote from "../pages/produto/validade/consulta";
 import MaterialReactComponent from "../pages/bi/material-react";
 import AnaliseInventario from "../pages/estoque/contagem/analise";
 import RecebimentoPorData from "../pages/recebimento/porPagamento";
+import ConsultaProduto from "../pages/produto/consulta";
 
 import { jwtDecode } from "jwt-decode"; 
 
@@ -114,6 +115,7 @@ export default function Router() {
             path="produtos/validade/novo"
             element={<CadastrarValidade />}
           />
+          <Route path="produtos/consulta" element={<ConsultaProduto />} />
           <Route path="produtos/validade/consulta" element={<ConsultaLote />} />
           <Route
             path="produtos/precos-alterados"

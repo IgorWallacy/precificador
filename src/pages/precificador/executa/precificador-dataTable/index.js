@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 
 import "./styless.css";
-import ImagemDestque from "../../../../assets/img/undraw_transfer_money_re_6o1h.svg";
+import DestaqueImg from "../../../../assets/img/animaccao_check.json";
+import { Player } from "@lottiefiles/react-lottie-player";
 
 import { SelectButton } from "primereact/selectbutton";
 import Header from "../../../../components/header";
@@ -591,6 +592,8 @@ const PrecificadorExecuta = () => {
             )}
           </h3>
         </div>
+
+       
         <Card
           style={{
             backgroundColor:
@@ -1580,7 +1583,7 @@ const PrecificadorExecuta = () => {
 
       <div className="agenda-label">
         <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-          Pesquisar agendamentos de preços,{" "}
+          {produtos?.length < 1 ? "Pesquisar agendamentos de preços," : ""}
         </h1>
 
         <h4
@@ -1591,10 +1594,9 @@ const PrecificadorExecuta = () => {
             fontFamily: "cabin-sketch-bold",
           }}
         >
-          Atualizar os preços de venda
+          {produtos?.length < 1 ? "Atualizar os preços de venda" : ""}
         </h4>
 
-        <img style={{ width: "250px" }} src={ImagemDestque} />
         {quantidadeFilial.length > 1 ? (
           <>
             {replicarPreco ? (
@@ -1657,9 +1659,7 @@ const PrecificadorExecuta = () => {
                 }}
                 options={modosDePesquisa}
               />
-           
               Período
-
               <Calendar
                 selectOtherMonths
                 required
@@ -1678,9 +1678,7 @@ const PrecificadorExecuta = () => {
                 showTime={modoPesquisa}
                 //  showSeconds
               />
-          
-             até
-
+              até
               <Calendar
                 selectOtherMonths
                 required
@@ -1698,7 +1696,6 @@ const PrecificadorExecuta = () => {
                 showTime={modoPesquisa}
                 //  showSeconds
               />
-           
               <MostraListaFilial />
             </div>
           </div>
@@ -1717,6 +1714,16 @@ const PrecificadorExecuta = () => {
         </>
       ) : (
         <>
+          {produtoStatusPendente?.length > 0 ? (
+            <></>
+          ) : (
+            <Player
+              src={DestaqueImg}
+              loop
+              autoplay
+              style={{ width: "350px" }}
+            />
+          )}
           <div
             style={{
               border: "1px solid #F2f2f2",

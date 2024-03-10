@@ -1,14 +1,18 @@
 import "./index.css";
 import ImagemDestque from "../../assets/img/undraw_login_re_4vu2.svg";
+import DestaqueImagem from "../../assets/img/login.json";
+import QrCode from "../../assets/img/qrCode.png";
+import GooglePlay from '../../assets/img/google_play.json'
 import ImagemOffline from "../../assets/img/undraw_monitor_iqpq.svg";
-import ImagemFundo from '../../assets/img/icones-tela-login.svg'
+
+import { Player } from "@lottiefiles/react-lottie-player";
 
 import React, { useState, useContext, useRef, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
 
 import Context from "../../contexts";
-import { ProgressBar } from 'primereact/progressbar';
+import { ProgressBar } from "primereact/progressbar";
 import { Avatar } from "primereact/avatar";
 import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
@@ -30,7 +34,6 @@ const Login = () => {
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   const [statusApi, setStatusApi] = useState(null);
 
@@ -144,7 +147,7 @@ const Login = () => {
   const handleKeyDown = (e, nextElementRef) => {
     if (e.key === "Enter") {
       e.preventDefault(); // Evita o comportamento padrão do Enter
-     
+
       // Simula pressionar Tab focando no próximo elemento
       nextElementRef.current.focus();
     }
@@ -159,11 +162,10 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if(localStorage.getItem("ultimoLogado")) {
-      input2Ref?.current?.focus()
-
+    if (localStorage.getItem("ultimoLogado")) {
+      input2Ref?.current?.focus();
     } else {
-      input1Ref?.current?.focus()
+      input1Ref?.current?.focus();
     }
     getStatus();
     verificaUltimoLogado();
@@ -174,23 +176,24 @@ const Login = () => {
 
   return (
     <>
-    <Dialog
-        header={loading? 'Acessando ...' : ''}
+      <Dialog
+        header={loading ? "Acessando ..." : ""}
         closable={false}
         modal
         visible={loading}
         position="bottom"
-        style={{width:'50%', height:'250px'}}
+        style={{ width: "50%", height: "250px" }}
       >
-       <div style={{display:'flex', justifyContent:'center'}}>
-       <h1> ... Acessando o servidor ... </h1>
-         
+        <div
+          style={{ display: "flex", justifyContent: "center", height: "100vh" }}
+        >
+          <h1> ... Acessando o servidor ... </h1>
+        </div>
 
-       </div>
-         
-       <ProgressBar mode="indeterminate" style={{ height: '6px' }}></ProgressBar>
-         
-       
+        <ProgressBar
+          mode="indeterminate"
+          style={{ height: "6px" }}
+        ></ProgressBar>
       </Dialog>
       <Dialog
         header={`Aplicativo ` + statusApi}
@@ -230,30 +233,58 @@ const Login = () => {
         </div>
       </Dialog>
       <Toast ref={toast} position="bottom-center" />
-     
       <div
         style={{
           display: "flex",
-          flexDirection :'column',
+          flexDirection: "row",
           alignItems: "center",
-          gap:'5px',
-          flexWrap : 'wrap',
-          minHeight: '100vh',
-          padding:'1rem',
-          
-          backgroundImage: `url(${ImagemFundo})`,
-          backgroundRepeat : 'no-repeat',
-          backgroundPosition:'bottom' 
+          justifyContent:'center',
+          flexWrap:'wrap',
+         
+          padding:'10px'
         }}
       >
-         <div
+        <div style={{display:'flex' , flexWrap:'wrap',  gap:'5px', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
+         <h1 style={{ fontFamily: "cabin-sketch-bold", color:'#ffff' }}>
+                {" "}
+                Inventário {" "}
+                <b style={{ color: "red" }}>
+                  <u>descomplicado</u>
+                </b>{" "}
+                para sua loja
+              </h1>
+              <img
+              src={QrCode}
+              alt="inventario"
+              style={{
+                width: "250px",
+                
+              }}
+            />
+        <Player src={GooglePlay} loop autoplay style={{ width: "150px" }} />
+        
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width:'50%',
+            gap: "5px",
+            flexWrap: "wrap",
+           
+
+          
+          }}
+        >
+          <div
             style={{
               backgroundColor: "#FFFF",
-              borderRadius : '50px',
-              width:'250px',
-             padding:'10px',
-              height:'250px',
-              border : '1px solid #FFFF'
+              borderRadius: "50px",
+              width: "250px",
+              padding: "10px",
+              height: "250px",
+              border: "1px solid #FFFF",
             }}
           >
             <img
@@ -265,119 +296,120 @@ const Login = () => {
               }}
             />
           </div>
-         <h4
-                style={{
-                  fontSize: "20px",
-                  margin: "15px",
-                  color: "#FFF",
-                }}
-              >
-                <Typing speed={50}>
-                  <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-                    {" "}
-                    Utilize sua conta <b style={{color:'red'}}><u>uniplus</u></b> para acesso ao sistema
-                  </h1>
-                </Typing>{" "}
-              </h4>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            flexWrap: "wrap",
-            gap:'20px'
-          }}
-        >
-         
+          <h4
+            style={{
+              fontSize: "20px",
+              margin: "15px",
+              color: "#FFF",
+            }}
+          >
+           
+              <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
+                {" "}
+                Utilize sua conta{" "}
+                <b style={{ color: "red" }}>
+                  <u>uniplus</u>
+                </b>{" "}
+                para acesso ao sistema
+              </h1>
+           
+          </h4>
 
-          <section>
-            <div className="form-login">
-              {localStorage.getItem("ultimoLogado") ? (
-                <Avatar
-                  label={localStorage.getItem("ultimoLogado")}
-                  size="xlarge"
-                  shape="circle"
-                />
-              ) : (
-                <img style={{ width: "250px" }} src={ImagemDestque} />
-              )}
-              <div></div>
-             
-              <Badge
-              style={{margin:'5px'}}
-                severity={statusApi === "UP" ? "success" : "danger"}
-                value={
-                  statusApi === "UP"
-                    ? "Aplicativo On-line "
-                    : "Aplicativo Off-line"
-                }
-              ></Badge>
-              <form onSubmit={login}>
-                <div >
-                  {localStorage.getItem("ultimoLogado") ? (
-                    <>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "5px",
-                          color: "#ffff",
-                          margin: "5px",
-                          flexDirection: "column",
-                        }}
-                      >
-                        <h1>Bem vindo(a) de volta </h1>
-                        <h2>
-                          {
-                            JSON.parse(localStorage.getItem("access_token"))
-                              ?.nome
-                          }
-                        </h2>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <InputText
-                        
-                        inputMode="text"
-                        type="text"
-                        value={usuario}
-                        style={{ width: "100%", margin: "5px" }}
-                        placeholder="Código"
-                        onChange={(e) => setUsuario(e.target.value)}
-                        ref={input1Ref}
-                        onKeyDown={(e) => handleKeyDown(e, input2Ref)}
-                      />
-                    </>
-                  )}
-                </div>
-                <div>
-                  <InputText
-                    
-                    type="password"
-                    inputMode="text"
-                    value={senha}
-                    style={{ width: "100%", margin: "5px" }}
-                    placeholder="Senha"
-                    onChange={(e) => setSenha(e.target.value)}
-                    ref={input2Ref}
-                     
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              flexWrap: "wrap",
+              gap: "20px",
+            }}
+          >
+            <section>
+              <div className="form-login">
+                {localStorage.getItem("ultimoLogado") ? (
+                  <Avatar
+                    label={localStorage.getItem("ultimoLogado")}
+                    size="xlarge"
+                    shape="circle"
                   />
-                </div>
-                <div style={{ textAlign: "center" }}>
-                  <Button
-                    icon="pi pi-sign-in"
-                    iconPos="right"
-                    loading={loading}
-                    disabled={loading}
-                    type="submit"
-                    className=" p-button p-button-rounded p-button-secondary p-button-md botao-login"
-                    label={loading ? "Autenticando ... " : "Entrar"}
-                  ></Button>
-                </div>
-              </form>
-            </div>
-          </section>
+                ) : (
+                  <img style={{ width: "250px" }} src={ImagemDestque} />
+                )}
+                <div></div>
+
+                <Badge
+                  style={{ margin: "5px" }}
+                  severity={statusApi === "UP" ? "success" : "danger"}
+                  value={
+                    statusApi === "UP"
+                      ? "Aplicativo On-line "
+                      : "Aplicativo Off-line"
+                  }
+                ></Badge>
+                <form onSubmit={login}>
+                  <div>
+                    {localStorage.getItem("ultimoLogado") ? (
+                      <>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "5px",
+                            color: "#ffff",
+                            margin: "5px",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <h1>Bem vindo(a) de volta </h1>
+                          <h2>
+                            {
+                              JSON.parse(localStorage.getItem("access_token"))
+                                ?.nome
+                            }
+                          </h2>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <InputText
+                          inputMode="text"
+                          type="text"
+                          value={usuario}
+                          style={{ width: "100%", margin: "5px" }}
+                          placeholder="Código"
+                          onChange={(e) => setUsuario(e.target.value)}
+                          ref={input1Ref}
+                          onKeyDown={(e) => handleKeyDown(e, input2Ref)}
+                        />
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <InputText
+                      type="password"
+                      inputMode="text"
+                      value={senha}
+                      style={{ width: "100%", margin: "5px" }}
+                      placeholder="Senha"
+                      onChange={(e) => setSenha(e.target.value)}
+                      ref={input2Ref}
+                    />
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <Button
+                      icon="pi pi-sign-in"
+                      iconPos="right"
+                      loading={loading}
+                      disabled={loading}
+                      type="submit"
+                      className=" p-button p-button-rounded p-button-secondary p-button-md botao-login"
+                      label={loading ? "Autenticando ... " : "Entrar"}
+                    ></Button>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </>

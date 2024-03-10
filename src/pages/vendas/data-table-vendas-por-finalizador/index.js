@@ -3,11 +3,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { faCashRegister, faStore } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import ImagemDestaque from "../../../assets/img/vendas.json";
+import { Player } from "@lottiefiles/react-lottie-player";
+
 import Footer from "../../../components/footer";
 
 import "./index.css";
 
-import ImagemDestque from "../../../assets/img/undraw_data_reports_706v.svg";
+
 
 import Header from "../../../components/header";
 
@@ -520,7 +523,7 @@ function VendasDataTableComponent() {
             gap: "1em",
           }}
         >
-          <img style={{ width: "250px" }} src={ImagemDestque} />
+         <Player src={ImagemDestaque} loop autoplay style={{ width: "250px" }} />
           <AppChart
             vendas={vendas}
             vendasECF={vendasECF}

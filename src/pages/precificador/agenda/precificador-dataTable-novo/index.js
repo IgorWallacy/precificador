@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import DestaqueImg from "../../../../assets/img/price_analise.json";
+import LoadingNotas from "../../../../assets/img/notas_loading.json";
 
+import Header from "../../../../components/header";
+import Footer from "../../../../components/footer";
 import "./styless.css";
+import { Player } from "@lottiefiles/react-lottie-player";
 import { addLocale } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -909,21 +914,21 @@ const PrecificadorAgenda = () => {
           )}
 
           <InputNumber
-           ref={inputPreco}
+            ref={inputPreco}
             //autoFocus
-           
+
             tooltip={
               rowData?.precoagendado ? "" : "Pressione Enter para salvar"
             }
             tooltipOptions={{ position: "bottom" }}
             prefix="R$ "
             placeholder={`Sugestão ${sf}`}
-          //  value={rowData?.value}
-            onChange={(e) => inputPreco.current = e.value}
+            //  value={rowData?.value}
+            onChange={(e) => (inputPreco.current = e.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-              //  console.log(inputPreco.current)
+                //  console.log(inputPreco.current)
                 onRowEditComplete(rowData, inputPreco.current);
               }
             }}
@@ -962,8 +967,8 @@ const PrecificadorAgenda = () => {
     }
 
     let usuarioFormatado = usuarioLogado.replace("/", "");
-    
-    if (value>0) {
+
+    if (value > 0) {
       await api
         .put(
           `/api_precificacao/produtos/precificar/agenda/${
@@ -998,7 +1003,7 @@ const PrecificadorAgenda = () => {
         })
         .finally((e) => {
           buscarProdutos();
-        inputPreco.current = null
+          inputPreco.current = null;
         });
     } else {
       toast.current.show({
@@ -1511,6 +1516,42 @@ const PrecificadorAgenda = () => {
       <Toast ref={toast} position="bottom-center" />
       <Toast ref={toast2} position="center" />
 
+      <Header />
+      <Footer />
+
+      <div className="agenda-label">
+        <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
+          {produtos?.length < 1 ? 'Pesquisar notas de entrada e' : ' Agendar os preços de vendas'}
+        </h1>
+
+        <h4
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "cabin-sketch-bold",
+          }}
+        >
+         {produtos?.length < 1 ? ' Agendar os preços de venda' : 'Informe os preços abaixo'}
+        </h4>
+        {loading ? (
+          <Player src={LoadingNotas} loop autoplay style={{ width: "350px" }} />
+        ) : (
+          <>
+            {produtos.length < 1 ? (
+              <Player
+                src={DestaqueImg}
+                loop
+                autoplay
+                style={{ width: "350px" }}
+              />
+            ) : (
+              <></>
+            )}
+          </>
+        )}
+      </div>
+
       {produtos.length < 1 ? (
         <>
           <div className="form-precificador">
@@ -1539,7 +1580,7 @@ const PrecificadorAgenda = () => {
               </div>
 
               <Calendar
-              locale="pt-BR"
+                locale="pt-BR"
                 selectOtherMonths
                 viewDate={new Date(new Date().setHours(23, 59, 59, 59))}
                 required
@@ -1645,7 +1686,7 @@ const PrecificadorAgenda = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-                    
+
                       atualizarmarkupminimo(novoPercentualMarkupMinimo);
                     }
                   }}

@@ -3,7 +3,11 @@ import React, { useState, useRef } from "react";
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
+import DestaqueImg from "../../../assets/img/package.json";
+import { Player } from "@lottiefiles/react-lottie-player";
+
 import { DataTable } from "primereact/datatable";
+import { FilterMatchMode} from 'primereact/api';
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
@@ -34,6 +38,23 @@ export default function ContagemInventario() {
   const [nome, setNome] = useState(null);
   const [loja, setLoja] = useState(null);
   const [filiais, setFiliais] = useState([]);
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [filters, setFilters] = useState({
+    'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'id': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    'nome': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    'loja': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+   
+});
+
+const onGlobalFilterChange2 = (e) => {
+  const value = e.target.value;
+  let _filters = { ...filters };
+  _filters['global'].value = value;
+
+  setFilters(_filters);
+  setGlobalFilterValue(value);
+}
 
   const getInvenaritos = () => {
     setLoading(true);
@@ -234,6 +255,7 @@ export default function ContagemInventario() {
         <h1 style={{ color: "#f2f2f2", margin: "10px" }}>
           Lista de inventários
         </h1>
+        <Player src={DestaqueImg} loop autoplay style={{ width: "350px" }} />
         <Toolbar
           left={
             <>
@@ -270,12 +292,14 @@ export default function ContagemInventario() {
           value={inventariosList}
           tableStyle={{ width: "100%" }}
           removableSort
+          filterDisplay="row"
+          globalFilterFields={['nome', 'id', 'loja']}
         >
           <Column field="inicio" header="Abertura" body={inicioTemplate} />
-          <Column field="id" header="Código"></Column>
+          <Column field="id" filter filterPlaceholder="Procurar por código"  header="Código"></Column>
            
-          <Column field="nome" header="Nome"></Column>
-          <Column field="loja" header="Loja"></Column>
+          <Column field="nome" filter filterPlaceholder="Procurar por nome"  header="Nome"></Column>
+          <Column field="loja" filter filterPlaceholder="Procurar por loja"  header="Loja"></Column>
           <Column
              
             sortable

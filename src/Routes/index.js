@@ -18,7 +18,7 @@ import PrecificaProduto from "../pages/produto/precifica";
 import ProdutoPrecificadorExecuta from "../pages/produto/executa-precificacao/executa/precificador-dataTable";
 import ProdutosSemVendas from "../pages/vendas/produtos/sem-vendas";
 import GraficosIndex from "../pages/vendas/graficos";
-import Main from "../components/main";
+import PrecificadorAgenda from "../pages/precificador/agenda/precificador-dataTable-novo";
 import MetasComponent from "../pages/vendas/produtos/metas";
 import PrecosAlteradosComponent from "../pages/produto/precos-alterados";
 import CadastrarValidade from "../pages/produto/validade/novo";
@@ -107,7 +107,7 @@ export default function Router() {
             element={<ProdutoPrecificadorExecuta />}
           />
           <Route path="menu" element={<MenuInterativo />} />
-          <Route path="precificar-agendar" element={<Main />} />
+          <Route path="precificar-agendar" element={<PrecificadorAgenda />} />
           <Route path="precificar-executar" element={<PrecificadorExecuta />} />
           <Route path="vendas" element={<VendasDataTableComponent />} />
           <Route path="produtos/sem-vendas" element={<ProdutosSemVendas />} />

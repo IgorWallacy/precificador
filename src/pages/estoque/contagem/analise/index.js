@@ -58,7 +58,7 @@ export default function AnaliseInventario() {
 
   const [produto, setProduto] = useState([]);
   const [produtoFilter, setProdutoFilter] = useState([]);
-  const [produtoSelecionados, setProdutoSelecionados] = useState(null);
+  const [produtoSelecionados, setProdutoSelecionados] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [inventario, setInventario] = useState([]);
@@ -96,7 +96,7 @@ export default function AnaliseInventario() {
         </span>
         <Button
           onClick={() => marcarRecontagem()}
-          disabled={produtoSelecionados?.length === 0}
+          disabled={produtoSelecionados?.length === 0 }
           icon="pi pi-sync"
           label={`Marcar recontagem de ${
             produtoSelecionados?.length ? produtoSelecionados?.length : 0

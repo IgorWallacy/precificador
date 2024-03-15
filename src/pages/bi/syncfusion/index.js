@@ -1,3 +1,4 @@
+import { useReactToPrint } from "react-to-print";
 import {
   PivotViewComponent,
   Inject,
@@ -9,6 +10,7 @@ import {
   ExcelExport,
   PDFExport,
   PivotChart,
+  DrillThrough,
 } from "@syncfusion/ej2-react-pivotview";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import {
@@ -40,10 +42,20 @@ loadCldr(currencies, numbers);
 setCulture("pt");
 setCurrencyCode("BRL");
 
-const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
+const SyncfusionPivot = ({
+  data,
+  date1,
+  date2,
+  expandido,
+  modocalculo,
+  somenteVendasPdv,
+}) => {
   const ref = useRef();
 
-  const [expandirTudo,setExpandirTudo] = useState(expandido)
+  const [expandirTudo, setExpandirTudo] = useState(expandido);
+
+  let chartInstance = useRef(null);
+  let chartInstance2 = useRef(null);
 
   const trend = () => {
     //  ref.current.grid.autoFitColumns();
@@ -61,12 +73,12 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
     allowTextWrap: true,
     selectionSettings: {
       mode: "Row",
-      type: "Multiple",
+      type: "Single",
       cellSelectionMode: "Box",
     },
 
-    columnWidth: 125,
-    rowHeight: 45,
+    columnWidth: 40,
+    rowHeight: 40,
     gridLines: "Both",
     clipMode: "EllipsisWithTooltip",
   };
@@ -77,18 +89,24 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
     enableSorting: true,
     columns: [],
     dataSource: data,
-    excludeFields: ["id", "codigo", "promocao", "dataEmissao", "codigoFilial"],
+    excludeFields: [
+      "id",
+      "codigo",
+      "promocao",
+      "dataEmissao",
+      "codigoFilial",
+      "desconto",
+      "meta",
+    ],
     expandAll: expandirTudo,
     filters: [
       { name: "nomeFilial", caption: "Loja" },
       { name: "promocaoNome", caption: "Nome da promoção" },
       { name: "codigo", caption: "Código do produto" },
-      { name: "meta", caption: "% Meta" },
-      { name: "fornecedor", caption: "Fornecedor" },
     ],
 
     rows: [
-      { name: "grupoPai", caption: "Seção I", showValueTypeIcon: true },
+      { name: "grupoPai", caption: "Seção I", showValueTypeIcon: false },
       { name: "grupoFilho", caption: "Seção II", showValueTypeIcon: false },
       { name: "grupoNeto", caption: "Seção III", showValueTypeIcon: false },
       { name: "descricao", caption: "Produto", showValueTypeIcon: false },
@@ -107,17 +125,18 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
       { name: "quantidade", caption: "Quantidade", type: "Sum" },
 
       { name: "precounitario", caption: "Preço Médio", type: "Avg" },
+
       {
         name: "lucrounitario",
         caption: "Lucro Unitário",
         type: "CalculatedField",
       },
 
-      { name: "valorTotal", caption: "Total vendido" },
-      { name: "lucrototalrs", caption: "R$ Lucro Total" },
+      { name: "valorTotal", caption: "Total vendido (Líquido)" },
+      { name: "lucrototalrs", caption: "R$ Lucro Total (Líquido)" },
 
       { name: "metapercent", caption: "% Meta ", type: "Avg" },
-      { name: "lucrototalpercent", caption: "% Lucro Total" },
+      { name: "lucrototalpercent", caption: "% Lucro Total(Líquido)" },
       {
         name: "metacalculo",
         caption: "Atingiu % da meta ",
@@ -155,6 +174,7 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
       { name: "quantidade", format: "N2" },
       { name: "lucrounitario", format: "C2" },
       { name: "precounitario", format: "C2" },
+
       { name: "precoultimacompra", format: "C2" },
       { name: "precoultimacompratotal", format: "C2" },
       { name: "lucrototalrs", format: "C2" },
@@ -166,50 +186,9 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
   };
 
   const excelExportProperties = {
-    fileName: `anlise_de_custo_x_venda_de_${moment(date1).format(
+    fileName: `analise_de_custo_x_venda_de_${moment(date1).format(
       "DD_MM_YY"
     )}_a_${moment(date2).format("DD_MM_YY")}.xlsx`,
-  };
-
-  const pdfExportProperties = {
-    fileName: `anlise_de_custo_x_venda_de_${moment(date1).format(
-      "DD_MM_YY"
-    )}_a_${moment(date2).format("DD_MM_YY")}.pdf`,
-    pageOrientation: "Landscape",
-    pageSize: "Ledger",
-    header: {
-      fromTop: 0,
-      height: 150,
-
-      contents: [
-        {
-          type: "Text",
-          value: ` Análise custo x venda ${moment(date1).format(
-            "DD/MM/YY"
-          )} a ${moment(date2).format("DD/MM/YY")} `,
-          position: { x: 0, y: 100 },
-          style: {
-            textBrushColor: "#000000",
-            fontSize: 20,
-            dashStyle: "Solid",
-            hAlign: "Center",
-          },
-        },
-      ],
-    },
-    footer: {
-      fromBottom: 160,
-      height: 150,
-      contents: [
-        {
-          type: "PageNumber",
-          pageNumberType: "Arabic",
-          format: "Pag {$current} de {$total}",
-          position: { x: 0, y: 25 },
-          style: { textBrushColor: "#02007a", fontSize: 15 },
-        },
-      ],
-    },
   };
 
   const chartOnLoad = (args) => {
@@ -223,36 +202,24 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
   let chartTypes = [
     { value: "Column", text: "Coluna" },
     { value: "Bar", text: "Barra" },
-    { value: "Line", text: "Linha" },
-    { value: "Spline", text: "Spline" },
-    { value: "Area", text: "Area" },
-    { value: "SplineArea", text: "SplineArea" },
-    { value: "StepLine", text: "StepLine" },
-    { value: "StepArea", text: "StepArea" },
-    { value: "StackingColumn", text: "StackingColumn" },
-    { value: "StackingBar", text: "StackingBar" },
-    { value: "StackingArea", text: "StackingArea" },
-    { value: "StackingColumn100", text: "StackingColumn100" },
-    { value: "StackingBar100", text: "StackingBar100" },
-    { value: "StackingArea100", text: "StackingArea100" },
-    { value: "Scatter", text: "Scatter" },
-    { value: "Bubble", text: "Bolha" },
-    { value: "Polar", text: "Polar" },
-    { value: "Radar", text: "Radar" },
-    { value: "Pareto", text: "Pareto" },
     { value: "Pie", text: "Pizza" },
     { value: "Doughnut", text: "Doughnut" },
-    { value: "Funnel", text: "Funil" },
-    { value: "Pyramid", text: "Pirâmide" },
+    
   ];
 
   function ddlOnChange(args) {
-    ref.current.chartSettings.chartSeries.type = args.value;
+    chartInstance.current.chartSettings.chartSeries.type = args.value;
   }
+
+  const handlePrint = useReactToPrint({
+    content: () => chartInstance2.current,
+    documentTitle: "Análise de vendas",
+  });
 
   return (
     <>
       <div
+        ref={chartInstance2}
         style={{
           backgroundColor: "#f2f2f2",
           display: "flex",
@@ -260,11 +227,27 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
           alignItems: "center",
           flexWrap: "wrap",
           flexDirection: "row",
-         // padding: "2rem",
-          width:'100%'
+          // padding: "2rem",
+          width: "100%",
         }}
       >
-        <div style={{width : '100%'}} className="control-section">
+        <div
+          style={{ width: "100%", height: "100vh" }}
+          className="control-section"
+        >
+          <div style={{ display: "flex", flexDirection:'column', alignItems: "center" }}>
+            <h2 style={{ color: "#000" }}>
+              {" "}
+              Exibindo o custo{" "}
+              {modocalculo === 0
+                ? "pela compra ( SEM IMPOSTOS )"
+                : "pelo preço de aquisição ( COM IMPOSTOS)"}{" "}
+              no momento da venda
+            </h2>
+          
+            <p>{somenteVendasPdv ? 'Exibindo somente as vendas do PDV' : 'Exibindo todas as vendas ( NFE, NFCE, ECF)'}</p>
+          </div>
+
           <TabView className="tabview-header-icon">
             <TabPanel header="Tabela" leftIcon="pi pi-table">
               <div>
@@ -275,7 +258,6 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                   label="Exportar Excel"
                   onClick={() => ref.current.excelExport(excelExportProperties)}
                 />
-               
                 {/* <Button
                   icon="pi pi-file-pdf"
                   className="p-button p-button-rounded p-button-secondary"
@@ -283,7 +265,13 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                   label="Exportar PDF"
                   onClick={() => ref.current.pdfExport(pdfExportProperties)}
       /> */}
+               
               </div>
+              <div style={{display:'flex', alignItems:'center', justifyContent:'center'}}> 
+              <h1>Exibindo dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
+                {moment(date2).format("DD/MM/YYYY")}</h1> 
+              </div>
+
               <PivotViewComponent
                 spinnerTemplate={
                   '<div class="custom-texto "> <h1>Calculando vendas, Aguarde por favor </h1> </div>'
@@ -291,7 +279,7 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                 ref={ref}
                 locale="pt"
                 currencyCode="BRL"
-              
+                allowDrillThrough={false}
                 allowLabelFilter={true}
                 allowValueFilter={true}
                 allowNumberFormatting={true}
@@ -301,9 +289,8 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                 allowRepeatHeader={false}
                 allowDataCompression={false}
                 enableFieldSearching={true}
-                enableValueSorting={true}
-               
-                enableSorting={true}
+                enableValueSorting={false}
+                enableSorting={false}
                 showGroupingBar={true}
                 showTooltip={false}
                 id="PivotView"
@@ -314,7 +301,7 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                 allowCalculatedField={true}
                 dataBound={trend.bind()}
                 width={"100%"}
-                height={700}
+                height={800}
                 displayOption={{ view: "Table" }}
                 chartSettings={{
                   title: "Análise de vendas",
@@ -328,7 +315,7 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                     FieldList,
                     GroupingBar,
                     Toolbar,
-                  
+                    DrillThrough,
                     ExcelExport,
                     PDFExport,
                     PivotChart,
@@ -348,6 +335,7 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                     <tr style={{ height: "50px" }}>
                       <td>
                         <div>
+                          <h1>Escolha um gráfico</h1>
                           <DropDownListComponent
                             placeholder={"Escolha um gráfico"}
                             floatLabelType={"Auto"}
@@ -364,15 +352,31 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                   </tbody>
                 </table>
               </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  margin: "5px",
+                }}
+              >
+                <Button
+                  label="Imprimir"
+                  className="p-button p-button-rounded "
+                  icon="pi pi-print"
+                  onClick={() => {
+                    handlePrint();
+                  }}
+                />
+              </div>
 
               <PivotViewComponent
                 spinnerTemplate={
-                  '<div class="custom-texto "> <h1>Calculando vendas, Aguarde por favor </h1> </div>'
+                  '<div class="custom-texto "> <h1>Montando gráfico, Aguarde por favor </h1> </div>'
                 }
-                ref={ref}
+                ref={chartInstance}
                 locale="pt"
                 currencyCode="BRL"
-              
+                allowDrillThrough={false}
                 allowLabelFilter={true}
                 allowValueFilter={true}
                 allowNumberFormatting={true}
@@ -386,16 +390,16 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                 enableVirtualization={true}
                 enableSorting={true}
                 showGroupingBar={true}
-                showTooltip={true}
-                id="PivotView2"
+                showTooltip={false}
                 showFieldList={true}
+                id="PivotView2"
                 gridSettings={gridSettings}
                 groupingBarSettings={groupSettings}
                 dataSourceSettings={dataSourceSettings}
                 allowCalculatedField={true}
                 dataBound={trend.bind()}
-                width={1300}
-                height={480}
+                width="100%"
+                height={800}
                 displayOption={{ view: "Chart" }}
                 chartSettings={{
                   title: "Análise de vendas",
@@ -405,6 +409,7 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
               >
                 <Inject
                   services={[
+                    DrillThrough,
                     CalculatedField,
                     FieldList,
                     GroupingBar,
@@ -416,6 +421,18 @@ const SyncfusionPivot = ({ data, date1, date2 , expandido }) => {
                   ]}
                 />
               </PivotViewComponent>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  margin: "2rem",
+                }}
+              >
+                <h1>
+                  Exibindo os dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
+                  {moment(date2).format("DD/MM/YYYY")}
+                </h1>
+              </div>
             </TabPanel>
           </TabView>
         </div>

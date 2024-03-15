@@ -176,20 +176,15 @@ const MenuInterativo = () => {
           <h1>B.I</h1>
           <div className="opcoes-menu">
             <Button
-              label="Business Intelligence"
+              label="Análise de Custo e Preço"
               icon="pi pi-prime"
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/bi/pivot")}
             />
           </div>
-          <div className="opcoes-menu">
-            <Button
-              label="Raio-X de vendas"
-              icon="pi pi-prime"
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/bi/material-react")}
-            />
-          </div>
+
+         
+         
          
           <div className="opcoes-menu">
             <Button

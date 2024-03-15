@@ -6,7 +6,7 @@ import Header from "../../components/header";
 import Footer from "../../components/footer";
 
 import api from "../../services/axios";
-
+import { Player } from "@lottiefiles/react-lottie-player";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
@@ -14,6 +14,8 @@ import { Calendar } from "primereact/calendar";
 import { Toolbar } from "primereact/toolbar";
 import { ProgressBar } from "primereact/progressbar";
 import { addLocale } from "primereact/api";
+
+import ImagemDestque from '../../assets/img/analisando.json'
 
 import moment from "moment/moment";
 import { SelectButton } from "primereact/selectbutton";
@@ -82,15 +84,16 @@ const Pivot = () => {
     { value: 1, label: "Sim" },
   ];
   const [expandido, SetExpandido] = useState(0);
+  const [somenteVendasPdv,setSomenteVendasPdv] = useState(0);
 
   const getDados = () => {
     setLoading(true);
-  //  console.log(expandido);
+    //  console.log(expandido);
     api
       .get(
         `/api_vendas/bi/sync/${moment(date1).format("yyyy-MM-DD")}/${moment(
           date2
-        ).format("yyyy-MM-DD")}/${modocalculo}`
+        ).format("yyyy-MM-DD")}/${modocalculo}/${somenteVendasPdv}`
       )
       .then((r) => {
         //console.log(r.data);
@@ -154,16 +157,7 @@ const Pivot = () => {
               width: "100%",
             }}
           >
-            <h4 style={{ color: "#f2f2f2" }}>
-              {" "}
-              Exibindo o custo{" "}
-              {modocalculo === 0
-                ? "pela compra ( SEM IMPOSTOS )"
-                : "pelo preco de custo ( COM IMPOSTOS)"}{" "}
-              na data da venda <br />
-              Exibindo dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
-              {moment(date2).format("DD/MM/YYYY")}
-            </h4>
+           
           </div>
 
           <div
@@ -182,6 +176,8 @@ const Pivot = () => {
               date2={date2}
               data={data}
               expandido={expandido}
+              somenteVendasPdv={somenteVendasPdv}
+              modocalculo={modocalculo}
             ></SyncfusionPivot>
 
             {/*  <DevExpressComponentPivot data ={ data} /> */}
@@ -191,11 +187,16 @@ const Pivot = () => {
         <>
           {loading ? (
             <>
-              {" "}
-              <ProgressBar
+            <div style={{display:'flex', alignItems:'center', justifyContent:'center'}}>
+            <h1 style={{color:'#f2f2f2'}}>Buscando dados, aguarde por favor</h1>
+            </div>
+            <ProgressBar
                 mode="indeterminate"
                 style={{ height: "6px" }}
-              ></ProgressBar>
+              ></ProgressBar> 
+             <Player src={ImagemDestque} loop autoplay style={{ width: "350px" }} />
+             
+              
             </>
           ) : (
             <>
@@ -224,6 +225,7 @@ const Pivot = () => {
                     Informe a data inicial
                   </label>
                   <Calendar
+                    selectOtherMonths
                     showButtonBar
                     locale="pt-BR"
                     dateFormat="dd/mm/yy"
@@ -245,6 +247,7 @@ const Pivot = () => {
                     Informe a data final
                   </label>
                   <Calendar
+                    selectOtherMonths
                     showButtonBar
                     locale="pt-BR"
                     dateFormat="dd/mm/yy"
@@ -280,6 +283,17 @@ const Pivot = () => {
                   <SelectButton
                     value={expandido}
                     onChange={(e) => SetExpandido(e.value)}
+                    options={options}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ color: "#F2f2f2" }}>
+                    Exibir somente as vendas do PDV ?
+                  </label>
+                  <SelectButton
+                    value={somenteVendasPdv}
+                    onChange={(e) => setSomenteVendasPdv(e.value)}
                     options={options}
                   />
                 </div>

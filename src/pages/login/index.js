@@ -2,7 +2,7 @@ import "./index.css";
 import ImagemDestque from "../../assets/img/undraw_login_re_4vu2.svg";
 import DestaqueImagem from "../../assets/img/login.json";
 import QrCode from "../../assets/img/qrCode.png";
-import GooglePlay from '../../assets/img/google_play.json'
+import GooglePlay from "../../assets/img/google_play.json";
 import ImagemOffline from "../../assets/img/undraw_monitor_iqpq.svg";
 
 import { Player } from "@lottiefiles/react-lottie-player";
@@ -182,10 +182,10 @@ const Login = () => {
         modal
         visible={loading}
         position="bottom"
-        style={{ width: "50%", height: "250px" }}
+        style={{ width: "100%", height: "50vh" }}
       >
         <div
-          style={{ display: "flex", justifyContent: "center", height: "100vh" }}
+          style={{ display: "flex", justifyContent: "center" }}
         >
           <h1> ... Acessando o servidor ... </h1>
         </div>
@@ -238,72 +238,62 @@ const Login = () => {
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          justifyContent:'center',
-          flexWrap:'wrap',
-         
-          padding:'10px'
+          justifyContent: "center",
+          flexWrap: "wrap",
+          width: "100%",
+          padding: "10px",
+          gap:'10px'
         }}
       >
-        <div style={{display:'flex' , flexWrap:'wrap',  gap:'5px', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
-         <h1 style={{ fontFamily: "cabin-sketch-bold", color:'#ffff' }}>
-                {" "}
-                Inventário {" "}
-                <b style={{ color: "red" }}>
-                  <u>descomplicado</u>
-                </b>{" "}
-                para sua loja
-              </h1>
-              <img
-              src={QrCode}
-              alt="inventario"
-              style={{
-                width: "250px",
-                
-              }}
-            />
-        <Player src={GooglePlay} loop autoplay style={{ width: "150px" }} />
-        
-        </div>
+       
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width:'50%',
+            width: "72%",
             gap: "5px",
             flexWrap: "wrap",
            
-
-          
           }}
         >
           <div
             style={{
-              backgroundColor: "#FFFF",
-              borderRadius: "50px",
-              width: "250px",
-              padding: "10px",
-              height: "250px",
-              border: "1px solid #FFFF",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+              gap: "5px",
+              flexWrap: "wrap",
+              width: "100%",
             }}
           >
-            <img
-              src={Logo}
-              alt="logo-sistema"
+            <div
               style={{
-                width: "100%",
-                height: "100%",
+                backgroundColor: "#FFFF",
+                borderRadius: "50px",
+                width: "250px",
+                padding: "10px",
+                height: "250px",
+                border: "1px solid #FFFF",
               }}
-            />
-          </div>
-          <h4
-            style={{
-              fontSize: "20px",
-              margin: "15px",
-              color: "#FFF",
-            }}
-          >
-           
+            >
+              <img
+                src={Logo}
+                alt="logo-sistema"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            </div>
+            <h4
+              style={{
+                fontSize: "20px",
+                margin: "15px",
+                color: "#FFF",
+              }}
+            >
               <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
                 {" "}
                 Utilize sua conta{" "}
@@ -312,104 +302,130 @@ const Login = () => {
                 </b>{" "}
                 para acesso ao sistema
               </h1>
-           
-          </h4>
+            </h4>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              flexWrap: "wrap",
-              gap: "20px",
-            }}
-          >
-            <section>
-              <div className="form-login">
-                {localStorage.getItem("ultimoLogado") ? (
-                  <Avatar
-                    label={localStorage.getItem("ultimoLogado")}
-                    size="xlarge"
-                    shape="circle"
-                  />
-                ) : (
-                  <img style={{ width: "250px" }} src={ImagemDestque} />
-                )}
-                <div></div>
-
-                <Badge
-                  style={{ margin: "5px" }}
-                  severity={statusApi === "UP" ? "success" : "danger"}
-                  value={
-                    statusApi === "UP"
-                      ? "Aplicativo On-line "
-                      : "Aplicativo Off-line"
-                  }
-                ></Badge>
-                <form onSubmit={login}>
-                  <div>
-                    {localStorage.getItem("ultimoLogado") ? (
-                      <>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "5px",
-                            color: "#ffff",
-                            margin: "5px",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <h1>Bem vindo(a) de volta </h1>
-                          <h2>
-                            {
-                              JSON.parse(localStorage.getItem("access_token"))
-                                ?.nome
-                            }
-                          </h2>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <InputText
-                          inputMode="text"
-                          type="text"
-                          value={usuario}
-                          style={{ width: "100%", margin: "5px" }}
-                          placeholder="Código"
-                          onChange={(e) => setUsuario(e.target.value)}
-                          ref={input1Ref}
-                          onKeyDown={(e) => handleKeyDown(e, input2Ref)}
-                        />
-                      </>
-                    )}
-                  </div>
-                  <div>
-                    <InputText
-                      type="password"
-                      inputMode="text"
-                      value={senha}
-                      style={{ width: "100%", margin: "5px" }}
-                      placeholder="Senha"
-                      onChange={(e) => setSenha(e.target.value)}
-                      ref={input2Ref}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                flexWrap: "wrap",
+                gap: "20px",
+              }}
+            >
+              <section>
+                <div className="form-login">
+                  {localStorage.getItem("ultimoLogado") ? (
+                    <Avatar
+                      label={localStorage.getItem("ultimoLogado")}
+                      size="xlarge"
+                      shape="circle"
                     />
-                  </div>
-                  <div style={{ textAlign: "center" }}>
-                    <Button
-                      icon="pi pi-sign-in"
-                      iconPos="right"
-                      loading={loading}
-                      disabled={loading}
-                      type="submit"
-                      className=" p-button p-button-rounded p-button-secondary p-button-md botao-login"
-                      label={loading ? "Autenticando ... " : "Entrar"}
-                    ></Button>
-                  </div>
-                </form>
-              </div>
-            </section>
+                  ) : (
+                    <img style={{ width: "250px" }} src={ImagemDestque} />
+                  )}
+
+                  <Badge
+                    style={{ margin: "5px" }}
+                    severity={statusApi === "UP" ? "success" : "danger"}
+                    value={
+                      statusApi === "UP"
+                        ? "Aplicativo On-line "
+                        : "Aplicativo Off-line"
+                    }
+                  ></Badge>
+                  <form onSubmit={login}>
+                    <div>
+                      {localStorage.getItem("ultimoLogado") ? (
+                        <>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "5px",
+                              color: "#ffff",
+                              margin: "5px",
+                              flexDirection: "column",
+                            }}
+                          >
+                            <h1>Bem vindo(a) de volta </h1>
+                            <h2>
+                              {
+                                JSON.parse(localStorage.getItem("access_token"))
+                                  ?.nome
+                              }
+                            </h2>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <InputText
+                            inputMode="text"
+                            type="text"
+                            value={usuario}
+                            style={{ width: "100%", margin: "5px" }}
+                            placeholder="Código"
+                            onChange={(e) => setUsuario(e.target.value)}
+                            ref={input1Ref}
+                            onKeyDown={(e) => handleKeyDown(e, input2Ref)}
+                          />
+                        </>
+                      )}
+                    </div>
+                    <div>
+                      <InputText
+                        type="password"
+                        inputMode="text"
+                        value={senha}
+                        style={{ width: "100%", margin: "5px" }}
+                        placeholder="Senha"
+                        onChange={(e) => setSenha(e.target.value)}
+                        ref={input2Ref}
+                      />
+                    </div>
+                    <div style={{ textAlign: "center" }}>
+                      <Button
+                        icon="pi pi-sign-in"
+                        iconPos="right"
+                        loading={loading}
+                        disabled={loading}
+                        type="submit"
+                        className=" p-button p-button-rounded p-button-secondary p-button-md botao-login"
+                        label={loading ? "Autenticando ... " : "Entrar"}
+                      ></Button>
+                    </div>
+                  </form>
+                </div>
+              </section>
+            </div>
           </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "5px",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <h1 style={{ fontFamily: "cabin-sketch-bold", color: "#ffff" }}>
+            {" "}
+            Inventário{" "}
+            <b style={{ color: "red" }}>
+              <u>descomplicado</u>
+            </b>{" "}
+            para sua loja
+          </h1>
+          <img
+            src={QrCode}
+            alt="inventario"
+            style={{
+              width: "250px",
+            }}
+          />
+          <Player src={GooglePlay} loop autoplay style={{ width: "150px" }} />
         </div>
       </div>
     </>

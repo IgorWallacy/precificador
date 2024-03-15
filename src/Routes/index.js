@@ -28,7 +28,7 @@ import ResumoVendas from "../pages/vendas/resumo";
 
 import EstoquePorEmpresa from "../pages/compras/estoquePorEmpresa";
 import ConsultaLote from "../pages/produto/validade/consulta";
-import MaterialReactComponent from "../pages/bi/material-react";
+
 import AnaliseInventario from "../pages/estoque/contagem/analise";
 import RecebimentoPorData from "../pages/recebimento/porPagamento";
 import ConsultaProduto from "../pages/produto/consulta";
@@ -126,10 +126,7 @@ export default function Router() {
           <Route path="vendas/metas" element={<MetasComponent />} />
           <Route path="bi/pivot" element={<Pivot />} />
           <Route path="recebimentos/consulta" element={<RecebimentoPorData />} />
-          <Route
-            path="bi/material-react"
-            element={<MaterialReactComponent />}
-          />
+        
           <Route
             path="compras/analise/fornecedor"
             element={<AnaliseFornecedor />}

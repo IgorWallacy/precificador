@@ -96,7 +96,7 @@ const SyncfusionPivot = ({
       "dataEmissao",
       "codigoFilial",
       "desconto",
-      "meta",
+    
     ],
     expandAll: expandirTudo,
     filters: [

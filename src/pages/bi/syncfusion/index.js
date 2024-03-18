@@ -83,6 +83,121 @@ const SyncfusionPivot = ({
     clipMode: "EllipsisWithTooltip",
   };
 
+  const dataSourceSettingsGrafico = {
+    allowLabelFilter: true,
+    allowValueFilter: true,
+    enableSorting: true,
+    columns: [],
+    dataSource: data,
+    excludeFields: [
+      "id",
+      "codigo",
+      "promocao",
+      "dataEmissao",
+      "codigoFilial",
+      "desconto",
+      "condicaopagamento",
+    ],
+    expandAll: false,
+    filters: [
+      { name: "nomeFilial", caption: "Loja" },
+      { name: "promocaoNome", caption: "Nome da promoção" },
+      { name: "codigo", caption: "Código do produto" },
+    ],
+
+    rows: [
+      { name: "grupoPai", caption: "Seção I", showValueTypeIcon: false },
+      { name: "grupoFilho", caption: "Seção II", showValueTypeIcon: false },
+      { name: "grupoNeto", caption: "Seção III", showValueTypeIcon: false },
+      { name: "descricao", caption: "Produto", showValueTypeIcon: false },
+    ],
+    values: [
+      { name: "valorTotal", caption: "Total vendido (Líquido)" },
+      { name: "lucrototalrs", caption: "R$ Lucro Total (Líquido)" },
+
+      {
+        name: "lucrounitario",
+        caption: "Lucro Unitário",
+        type: "CalculatedField",
+      },
+      { name: "lucrototalpercent", caption: "% Lucro Total(Líquido)" },
+      { name: "quantidade", caption: "Quantidade", type: "Sum" },
+      { name: "metapercent", caption: "% Meta ", type: "Avg" },
+
+      
+
+      {
+        name: "precoultimacompratotal",
+        caption: "Custo Total",
+        type: "Sum",
+      },
+      {
+        name: "precoultimacompra",
+        caption: "Custo Médio",
+        type: "Avg",
+      },
+    
+
+      {
+        name: "quantidadeDevolvida",
+        caption: "Quantidade devolvida",
+        type: "Sum",
+      },
+
+      { name: "precounitario", caption: "Preço Médio", type: "Avg" },
+
+      { name: "devolucao", caption: "Devolução", type: "Sum" },
+
+      {
+        name: "metacalculo",
+        caption: "Atingiu % da meta ",
+        type: "Avg",
+      },
+    ],
+    calculatedFieldSettings: [
+      {
+        name: "metapercent",
+        formula: '"Avg(meta)" / 100',
+      },
+      {
+        name: "lucrounitario",
+        formula: '"Avg(precounitario)"-"Avg(precoultimacompra)"',
+      },
+
+      {
+        name: "lucrototalrs",
+        formula: '"Sum(valorTotal)"-"Sum(precoultimacompratotal)"',
+      },
+
+      {
+        name: "metacalculo",
+
+        formula:
+          ' (("Sum(valorTotal)"-"Sum(precoultimacompratotal)") / "Sum(valorTotal)") / ("Avg(meta)" / 100 )  ',
+      },
+      {
+        name: "lucrototalpercent",
+        formula:
+          ' ("Sum(valorTotal)"-"Sum(precoultimacompratotal)") / "Sum(valorTotal)" ',
+      },
+    ],
+    formatSettings: [
+      { name: "quantidade", format: "N2" },
+      { name: "quantidadeDevolvida", format: "N2" },
+      { name: "lucrounitario", format: "C2" },
+      { name: "precounitario", format: "C2" },
+
+      { name: "devolucao", format: "C2" },
+      { name: "precoultimacompra", format: "C2" },
+      { name: "precoultimacompratotal", format: "C2" },
+      { name: "lucrototalrs", format: "C2" },
+      { name: "lucrototalpercent", format: "P2" },
+      { name: "metapercent", format: "P2" },
+      { name: "metacalculo", format: "P2" },
+      { name: "valorTotal", format: "C2" },
+    ],
+  };
+
   const dataSourceSettings = {
     allowLabelFilter: true,
     allowValueFilter: true,
@@ -96,7 +211,7 @@ const SyncfusionPivot = ({
       "dataEmissao",
       "codigoFilial",
       "desconto",
-    
+      "condicaopagamento",
     ],
     expandAll: expandirTudo,
     filters: [
@@ -124,7 +239,15 @@ const SyncfusionPivot = ({
       },
       { name: "quantidade", caption: "Quantidade", type: "Sum" },
 
+      {
+        name: "quantidadeDevolvida",
+        caption: "Quantidade devolvida",
+        type: "Sum",
+      },
+
       { name: "precounitario", caption: "Preço Médio", type: "Avg" },
+
+      { name: "devolucao", caption: "Devolução", type: "Sum" },
 
       {
         name: "lucrounitario",
@@ -172,9 +295,11 @@ const SyncfusionPivot = ({
     ],
     formatSettings: [
       { name: "quantidade", format: "N2" },
+      { name: "quantidadeDevolvida", format: "N2" },
       { name: "lucrounitario", format: "C2" },
       { name: "precounitario", format: "C2" },
 
+      { name: "devolucao", format: "C2" },
       { name: "precoultimacompra", format: "C2" },
       { name: "precoultimacompratotal", format: "C2" },
       { name: "lucrototalrs", format: "C2" },
@@ -183,6 +308,66 @@ const SyncfusionPivot = ({
       { name: "metacalculo", format: "P2" },
       { name: "valorTotal", format: "C2" },
     ],
+  };
+
+  const dataSourceSettings2 = {
+    allowLabelFilter: true,
+    allowValueFilter: true,
+    enableSorting: true,
+
+    filters: [{ name: "nomeFilial", caption: "Loja" }],
+
+    excludeFields: [
+      "id",
+      "codigo",
+      "promocao",
+      "dataEmissao",
+      "codigoFilial",
+      "desconto",
+      "meta",
+      "precounitario",
+      "precoultimacompra",
+      "precoultimacompratotal",
+      "quantidadeDevolvida",
+      "devolucao",
+      "quantidade",
+      "descricao",
+      "grupoPai",
+      "grupoFilho",
+      "grupoNeto",
+      "promocaoNome",
+    ],
+
+    valueSortSettings: {
+      headerText: "TotalVendido",
+      headerDelimiter: "-",
+      sortOrder: "Ascending",
+    },
+    values: [
+      {
+        name: "valorTotal2",
+        caption: "Total vendido",
+        type: "CalculatedField",
+      },
+      {
+        name: "valorTotal",
+        caption: "Total vendido %",
+        type: "PercentageOfColumnTotal",
+      },
+    ],
+    calculatedFieldSettings: [
+      { name: "valorTotal2", formula: '"Sum(valorTotal)"' },
+    ],
+    dataSource: data,
+    rows: [{ name: "condicaopagamento", caption: "Condição de pagamento" }],
+    formatSettings: [
+      { name: "valorTotal", format: "P2" },
+      { name: "valorTotal2", format: "C2" },
+    ],
+    expandAll: false,
+
+    showGrandTotals: true,
+    grandTotalsPosition: "Bottom",
   };
 
   const excelExportProperties = {
@@ -204,7 +389,6 @@ const SyncfusionPivot = ({
     { value: "Bar", text: "Barra" },
     { value: "Pie", text: "Pizza" },
     { value: "Doughnut", text: "Doughnut" },
-    
   ];
 
   function ddlOnChange(args) {
@@ -235,7 +419,13 @@ const SyncfusionPivot = ({
           style={{ width: "100%", height: "100vh" }}
           className="control-section"
         >
-          <div style={{ display: "flex", flexDirection:'column', alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             <h2 style={{ color: "#000" }}>
               {" "}
               Exibindo o custo{" "}
@@ -244,12 +434,16 @@ const SyncfusionPivot = ({
                 : "pelo preço de aquisição ( COM IMPOSTOS)"}{" "}
               no momento da venda
             </h2>
-          
-            <p>{somenteVendasPdv ? 'Exibindo somente as vendas do PDV' : 'Exibindo todas as vendas ( NFE, NFCE, ECF)'}</p>
+
+            <p>
+              {somenteVendasPdv
+                ? "Exibindo somente as vendas do PDV"
+                : "Exibindo todas as vendas ( NFE, NFCE, ECF)"}
+            </p>
           </div>
 
           <TabView className="tabview-header-icon">
-            <TabPanel header="Tabela" leftIcon="pi pi-table">
+            <TabPanel header="Tabela por seção" leftIcon="pi pi-table">
               <div>
                 <Button
                   icon="pi pi-file-excel"
@@ -265,11 +459,18 @@ const SyncfusionPivot = ({
                   label="Exportar PDF"
                   onClick={() => ref.current.pdfExport(pdfExportProperties)}
       /> */}
-               
               </div>
-              <div style={{display:'flex', alignItems:'center', justifyContent:'center'}}> 
-              <h1>Exibindo dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
-                {moment(date2).format("DD/MM/YYYY")}</h1> 
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <h1>
+                  Exibindo dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
+                  {moment(date2).format("DD/MM/YYYY")}
+                </h1>
               </div>
 
               <PivotViewComponent
@@ -282,7 +483,7 @@ const SyncfusionPivot = ({
                 allowDrillThrough={false}
                 allowLabelFilter={true}
                 allowValueFilter={true}
-                allowNumberFormatting={true}
+                allowNumberFormatting={false}
                 allowExcelExport={true}
                 exportAllPages={true}
                 allowPdfExport={true}
@@ -294,11 +495,11 @@ const SyncfusionPivot = ({
                 showGroupingBar={true}
                 showTooltip={false}
                 id="PivotView"
-                showFieldList={true}
+                showFieldList={false}
                 gridSettings={gridSettings}
                 groupingBarSettings={groupSettings}
                 dataSourceSettings={dataSourceSettings}
-                allowCalculatedField={true}
+                allowCalculatedField={false}
                 dataBound={trend.bind()}
                 width={"100%"}
                 height={800}
@@ -323,8 +524,9 @@ const SyncfusionPivot = ({
                 />
               </PivotViewComponent>
             </TabPanel>
-            <TabPanel header="Gráficos" rightIcon="pi pi-chart-bar">
-              <div className="col-lg-3 property-section">
+
+            <TabPanel header="Gráficos por seção" rightIcon="pi pi-chart-bar">
+              <div className="col-lg-2 property-section">
                 <table
                   id="property"
                   title="Properties"
@@ -335,10 +537,223 @@ const SyncfusionPivot = ({
                     <tr style={{ height: "50px" }}>
                       <td>
                         <div>
-                          <h1>Escolha um gráfico</h1>
+                          <h4>Informe um modelo</h4>
                           <DropDownListComponent
                             placeholder={"Escolha um gráfico"}
                             floatLabelType={"Auto"}
+                            fields={fields}
+                            change={ddlOnChange.bind()}
+                            id="charttypes"
+                            index={0}
+                            enabled={true}
+                            dataSource={chartTypes}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  margin: "1px",
+                }}
+              >
+                <Button
+                  label="Imprimir"
+                  className="p-button p-button-rounded "
+                  icon="pi pi-print"
+                  onClick={() => {
+                    handlePrint();
+                  }}
+                />
+              </div>
+
+              <PivotViewComponent
+                spinnerTemplate={
+                  '<div class="custom-texto "> <h1>Montando gráfico, Aguarde por favor </h1> </div>'
+                }
+                ref={chartInstance}
+                locale="pt"
+                currencyCode="BRL"
+                allowDrillThrough={false}
+                allowLabelFilter={true}
+                allowValueFilter={true}
+                allowNumberFormatting={true}
+                allowExcelExport={true}
+                exportAllPages={true}
+                allowPdfExport={true}
+                allowRepeatHeader={false}
+                allowDataCompression={false}
+                enableFieldSearching={true}
+                enableValueSorting={true}
+                enableVirtualization={true}
+                enableSorting={true}
+                showGroupingBar={true}
+                showTooltip={false}
+                showFieldList={false}
+                id="PivotView3"
+                gridSettings={gridSettings}
+                groupingBarSettings={groupSettings}
+                dataSourceSettings={dataSourceSettingsGrafico}
+                allowCalculatedField={true}
+                dataBound={trend.bind()}
+                width="100%"
+                height={1000}
+                displayOption={{ view: "Chart" }}
+                chartSettings={{
+                  title: "Análise de vendas",
+                  chartSeries: { type: "Column" },
+                  load: chartOnLoad.bind(),
+                }}
+              >
+                <Inject
+                  services={[
+                    DrillThrough,
+                    CalculatedField,
+                    FieldList,
+                    GroupingBar,
+                    Toolbar,
+                    VirtualScroll,
+                    ExcelExport,
+                    PDFExport,
+                    PivotChart,
+                  ]}
+                />
+              </PivotViewComponent>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <h4>
+                  Exibindo os dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
+                  {moment(date2).format("DD/MM/YYYY")}
+                </h4>
+              </div>
+            </TabPanel>
+
+            <TabPanel
+              header="Tabela por condição de pagamento"
+              leftIcon="pi pi-table"
+            >
+              <div>
+                <Button
+                  icon="pi pi-file-excel"
+                  className="p-button p-button-rounded p-button-success"
+                  style={{ margin: "1em" }}
+                  label="Exportar Excel"
+                  onClick={() => ref.current.excelExport(excelExportProperties)}
+                />
+                {/* <Button
+                  icon="pi pi-file-pdf"
+                  className="p-button p-button-rounded p-button-secondary"
+                  style={{ margin: "1em" }}
+                  label="Exportar PDF"
+                  onClick={() => ref.current.pdfExport(pdfExportProperties)}
+      /> */}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  margin: "5px",
+                }}
+              >
+                <Button
+                  label="Imprimir"
+                  className="p-button p-button-rounded "
+                  icon="pi pi-print"
+                  onClick={() => {
+                    handlePrint();
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <h1>
+                  Exibindo dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
+                  {moment(date2).format("DD/MM/YYYY")}
+                </h1>
+              </div>
+
+              <PivotViewComponent
+                spinnerTemplate={
+                  '<div class="custom-texto "> <h1>Calculando vendas, Aguarde por favor </h1> </div>'
+                }
+                ref={ref}
+                allowDrillThrough={false}
+                allowLabelFilter={true}
+                allowValueFilter={true}
+                allowNumberFormatting={true}
+                allowExcelExport={true}
+                exportAllPages={true}
+                allowPdfExport={true}
+                allowRepeatHeader={false}
+                allowDataCompression={false}
+                enableFieldSearching={true}
+                enableValueSorting={true}
+                enableSorting={true}
+                showGroupingBar={true}
+                showTooltip={false}
+                id="PivotView4"
+                showFieldList={false}
+                gridSettings={gridSettings}
+                groupingBarSettings={groupSettings}
+                dataSourceSettings={dataSourceSettings2}
+                allowCalculatedField={false}
+                dataBound={trend.bind()}
+                width={"100%"}
+                height={800}
+                displayOption={{ view: "Table" }}
+                chartSettings={{
+                  title: "Análise de vendas",
+                  chartSeries: { type: "Column" },
+                  load: chartOnLoad.bind(),
+                }}
+              >
+                <Inject
+                  services={[
+                    CalculatedField,
+                    FieldList,
+                    GroupingBar,
+                    Toolbar,
+                    DrillThrough,
+                    ExcelExport,
+                    PDFExport,
+                    PivotChart,
+                  ]}
+                />
+              </PivotViewComponent>
+            </TabPanel>
+
+            <TabPanel
+              header="Gráficos por condições de pagamentos"
+              rightIcon="pi pi-chart-bar"
+            >
+              <div className="col-lg-2 property-section">
+                <table
+                  id="property"
+                  title="Properties"
+                  className="property-panel-table"
+                  style={{ width: "100%" }}
+                >
+                  <tbody>
+                    <tr style={{ height: "1px" }}>
+                      <td>
+                        <div>
+                          <h4>Informe um modelo</h4>
+                          <DropDownListComponent
+                            placeholder={"Escolha um gráfico"}
+                            floatLabelType={"Always"}
                             fields={fields}
                             change={ddlOnChange.bind()}
                             id="charttypes"
@@ -391,11 +806,11 @@ const SyncfusionPivot = ({
                 enableSorting={true}
                 showGroupingBar={true}
                 showTooltip={false}
-                showFieldList={true}
+                showFieldList={false}
                 id="PivotView2"
                 gridSettings={gridSettings}
                 groupingBarSettings={groupSettings}
-                dataSourceSettings={dataSourceSettings}
+                dataSourceSettings={dataSourceSettings2}
                 allowCalculatedField={true}
                 dataBound={trend.bind()}
                 width="100%"
@@ -425,13 +840,12 @@ const SyncfusionPivot = ({
                 style={{
                   display: "flex",
                   justifyContent: "center",
-                  margin: "2rem",
                 }}
               >
-                <h1>
+                <h4>
                   Exibindo os dados de {moment(date1).format("DD/MM/YYYY")} até{" "}
                   {moment(date2).format("DD/MM/YYYY")}
-                </h1>
+                </h4>
               </div>
             </TabPanel>
           </TabView>

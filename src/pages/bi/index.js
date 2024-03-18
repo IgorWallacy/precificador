@@ -96,7 +96,7 @@ const Pivot = () => {
         ).format("yyyy-MM-DD")}/${modocalculo}/${somenteVendasPdv}`
       )
       .then((r) => {
-        //console.log(r.data);
+      //  console.log(r.data);
         setData(r.data);
         setLoading(false);
       })

@@ -37,6 +37,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import { useReactToPrint } from "react-to-print";
 
+import { ImprimirPedido } from "./imprimir-pedido";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function AnaliseFornecedor() {
@@ -161,28 +163,14 @@ export default function AnaliseFornecedor() {
   const handlePrint = useReactToPrint({
     pageStyle: `@media print {
       @page {
-        size: 500mm 500mm;
-        margin: 5;
+        
+        margin: 0;
       }
     }`,
     onBeforeGetContent: () => (linhas.current = 9999),
     content: () => tabelaRef.current,
     onAfterPrint: () => (linhas.current = 5),
   });
-
-  const imprimir = () => {
-    if (linhas.current === 9999) {
-      handlePrint();
-    } else {
-      linhas.current = 9999;
-      toast.current.show({
-        severity: "info",
-        summary: "Aviso",
-        detail: "Tabela ajustada, Imprima novamente! ",
-        life: 3000,
-      });
-    }
-  };
 
   const getPedidos = () => {
     if (pedidoData?.data) {
@@ -700,6 +688,10 @@ export default function AnaliseFornecedor() {
     getItensPedido(params.id);
   };
 
+  const imprimir = () => {
+    ImprimirPedido({ loja: filial, pedido: pedidoData.data, itens: pedidos });
+  };
+
   useEffect(() => {
     getIdPedidoUrl();
     getCompradores();
@@ -772,7 +764,7 @@ export default function AnaliseFornecedor() {
                   showClear
                   filterBy="nome,codigo"
                   onChange={(e) => {
-                    console.log(e.target.value);
+                    //  console.log(e.target.value);
                     setFilial(e.target.value);
                   }}
                 />
@@ -1139,30 +1131,17 @@ export default function AnaliseFornecedor() {
                   />
                 </Card>
 
-                <Card  footer={<h4>Pedido emitido em {moment(pedidoData?.data?.dataEmissao).format("DD/MM/YYYY")}</h4>} style={{ padding: "1rem", margin: "10px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems:'center',
-                      justifyContent:'space-evenly',
-                      padding: "1rem",
-                      margin: "10px",
-                      gap : '20px'
-                    }}
-                  >
-                    <div style={{width:'45%'}}>
-                      <hr />
-                      <h4>Comprador</h4>
-                    </div>
-                    <div style={{width:'45%'}}>
-                      <hr />
-                      <h4>Vendedor</h4>
-                    </div>
-                    
-                  </div>
-                 
-                </Card>
+                <Card
+                  footer={
+                    <h4>
+                      Pedido emitido em{" "}
+                      {moment(pedidoData?.data?.dataEmissao).format(
+                        "DD/MM/YYYY"
+                      )}
+                    </h4>
+                  }
+                  style={{ padding: "1rem", margin: "10px" }}
+                ></Card>
               </>
             ) : (
               <></>

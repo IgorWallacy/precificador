@@ -141,12 +141,14 @@ const SyncfusionPivot = ({
       {
         name: "quantidadeDevolvida",
         caption: "Quantidade devolvida",
-        type: "Sum",
+        type: "Avg",
       },
 
       { name: "precounitario", caption: "Preço Médio", type: "Avg" },
 
-      { name: "devolucao", caption: "Devolução", type: "Sum" },
+      { name: "devolucao", caption: "Devolução", type: "Avg" },
+
+      { name: "devolucaototal", caption: "Devolução Total", type: "Sum" },
 
       {
         name: "metacalculo",
@@ -167,6 +169,11 @@ const SyncfusionPivot = ({
       {
         name: "lucrototalrs",
         formula: '"Sum(valorTotal)"-"Sum(precoultimacompratotal)"',
+      },
+
+      {
+        name: "devolucaototal",
+        formula: '"Avg(devolucao)" * "Avg(quantidadeDevolvida)"',
       },
 
       {
@@ -192,6 +199,7 @@ const SyncfusionPivot = ({
       { name: "precoultimacompratotal", format: "C2" },
       { name: "lucrototalrs", format: "C2" },
       { name: "lucrototalpercent", format: "P2" },
+      { name: "devolucaototal", format: "C2" },
       { name: "metapercent", format: "P2" },
       { name: "metacalculo", format: "P2" },
       { name: "valorTotal", format: "C2" },
@@ -212,6 +220,8 @@ const SyncfusionPivot = ({
       "codigoFilial",
       "desconto",
       "condicaopagamento",
+      "devolucao",
+      "quantidadeDevolvida"
     ],
     expandAll: expandirTudo,
     filters: [
@@ -239,15 +249,12 @@ const SyncfusionPivot = ({
       },
       { name: "quantidade", caption: "Quantidade", type: "Sum" },
 
-      {
-        name: "quantidadeDevolvida",
-        caption: "Quantidade devolvida",
-        type: "Sum",
-      },
-
+     
       { name: "precounitario", caption: "Preço Médio", type: "Avg" },
 
-      { name: "devolucao", caption: "Devolução", type: "Sum" },
+    
+      
+     
 
       {
         name: "lucrounitario",
@@ -271,6 +278,7 @@ const SyncfusionPivot = ({
         name: "metapercent",
         formula: '"Avg(meta)" / 100',
       },
+      
       {
         name: "lucrounitario",
         formula: '"Avg(precounitario)"-"Avg(precoultimacompra)"',
@@ -292,6 +300,8 @@ const SyncfusionPivot = ({
         formula:
           ' ("Sum(valorTotal)"-"Sum(precoultimacompratotal)") / "Sum(valorTotal)" ',
       },
+     
+     
     ],
     formatSettings: [
       { name: "quantidade", format: "N2" },
@@ -303,6 +313,7 @@ const SyncfusionPivot = ({
       { name: "precoultimacompra", format: "C2" },
       { name: "precoultimacompratotal", format: "C2" },
       { name: "lucrototalrs", format: "C2" },
+    
       { name: "lucrototalpercent", format: "P2" },
       { name: "metapercent", format: "P2" },
       { name: "metacalculo", format: "P2" },
@@ -480,7 +491,7 @@ const SyncfusionPivot = ({
                 ref={ref}
                 locale="pt"
                 currencyCode="BRL"
-                allowDrillThrough={false}
+                allowDrillThrough={true}
                 allowLabelFilter={true}
                 allowValueFilter={true}
                 allowNumberFormatting={false}

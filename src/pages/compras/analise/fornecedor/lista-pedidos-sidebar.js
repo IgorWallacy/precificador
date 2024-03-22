@@ -341,6 +341,8 @@ const PedidoListaSidebar = ({
               header="Cód.Loja"
               /> */}
 
+            
+
         <Column
           field="idproduto.ean"
           filter
@@ -422,8 +424,9 @@ const PedidoListaSidebar = ({
               </>
             );
           }}
-          header="Markup"
+          header="Markup Atual"
         ></Column>
+        
         <Column
           field="precoVenda"
           body={(row) => {
@@ -434,11 +437,39 @@ const PedidoListaSidebar = ({
               currency: "BRL",
             }).format(row?.precoVenda);
           }}
-          sortable
+          
           header="Venda atual"
         ></Column>
-        <Column field={precoPedidoLinhaTotal} header="Total "></Column>
+        <Column
+          field="sugestaoMarkup"
+          body={(row) => {
+            return Intl.NumberFormat("pt-BR", {
+              maximumFractionDigits: 2,
+              minimumFractionDigits: 2,
+              style: "decimal",
+           
+            }).format(row?.percentualmarkupminimo) + " % ";
+          }}
+          
+          header="Sugestão de Markup"
+        ></Column>
 
+
+            <Column
+          field="sugestao"
+          body={(row) => {
+            return Intl.NumberFormat("pt-BR", {
+              maximumFractionDigits: 2,
+              minimumFractionDigits: 2,
+              style: "currency",
+              currency: "BRL",
+            }).format(((row?.percentualmarkupminimo / 100) * row?.preco ) + row?.preco);
+          }}
+          
+          header="Sugestão de venda"
+        ></Column>
+        <Column field={precoPedidoLinhaTotal} header="Total "></Column>
+         
         <Column field={deletarItemPedido}></Column>
       </DataTable>
 

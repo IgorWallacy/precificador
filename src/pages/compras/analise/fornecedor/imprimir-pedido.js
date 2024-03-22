@@ -1,127 +1,178 @@
 import { formataMoeda } from "../../../../util";
 import pdfMake from "pdfmake/build/pdfmake";
-
 import moment from "moment";
 
-const exibirPedido = ({
-  selectedProductsPedido,
-  idPedido,
-  fornecedor,
-  condicaoPagamento,
-  prazoEntrega,
-  totalPedido,
-}) => {
-  ImprimirPedido({
-    selectedProductsPedido,
-    idPedido,
-    fornecedor,
-    condicaoPagamento,
-    prazoEntrega,
-    totalPedido,
-  });
-};
-const ImprimirPedido = ({
-  selectedProductsPedido,
-  idPedido,
-  fornecedor,
-  condicaoPagamento,
-  prazoEntrega,
-  totalPedido,
-}) => {
-  // console.log(pedidos);
+const ImprimirPedido = ({ loja, pedido, itens }) => {
+  console.log(pedido);
+  // Ordenando os itens por descrição em ordem alfabética crescente
+  itens.sort((a, b) => a.idproduto.nome.localeCompare(b.idproduto.nome));
+
   var dd = {
     styles: {
       header: {
-        fontSize: 12,
+        fontSize: 10,
         alignment: "center",
-        marginTop: 5,
+        marginTop: 10,
+      },
+      tableHeader: {
+        bold: true,
+        fontSize: 9,
+        color: "black",
+        alignment: "center",
+        fillColor: "#f2f2f2",
+      },
+      tableRow: {
+        fontSize: 10,
+        alignment: "center",
+        lineHeight: 2.0,
       },
     },
-    //   pageSize: {width : 1001 , height : 200},
     pageSize: "A4",
-    pageMargins: [5, 80, 5, 5],
-    fontSize: 12,
-    // by default we use portrait, you can change it to landscape if you wish
-    pageOrientation: "portrait",
-    header: [
+    pageMargins: [10, 80, 10, 40],
+    fontSize: 14,
+    pageOrientation: "landscape",
+    footer: function (currentPage, pageCount) {
+      return [
+        {
+          text: "Página " + currentPage.toString() + " de " + pageCount + `
+          Total do pedido: ${formataMoeda(pedido?.total)}
+          ` , alignment: 'center' , style : 'header',
+        },
+      ];
+    },
+    header: function (currentPage, pageCount) {
+      return [
+        {
+          text: ` Pedido da loja ${loja?.codigo} - ${loja?.nome}
+          Pedido de compra N° ${pedido?.codigo}  - Fornecedor: ${
+            pedido?.fornecedor?.codigo
+          } - ${pedido?.fornecedor?.nome} -
+            Emissão do pedido em ${moment(pedido?.dataEmissao).format(
+              "DD/MM/YYYY"
+            )} Comprador: ${
+            pedido?.comprador ? pedido?.comprador : "Não preenchido"
+          }
+            Condição de pagamento : ${
+              pedido?.condicaoPagamento
+                ? pedido?.condicaoPagamento
+                : " Não preenchido "
+            } - Prazo para entrega : ${
+            pedido?.prazoEntrega
+              ? moment(pedido?.prazoEntrega).format("DD/MM/YYYY")
+              : "Não preenchido"
+          }
+          Total do pedido: ${formataMoeda(pedido?.total)}
+          Observação ${pedido?.observacao} 
+    `,
+          style: "header",
+          margin: [1, 1],
+        },
+      ];
+    },
+
+    content: [
       {
-        text: `Pedido de compra N° ${idPedido} - Fornecedor : ${
-          fornecedor?.codigo
-        } - ${fornecedor?.nome} -
-          Emissão ${moment(selectedProductsPedido?.dataEmissao).format(
-            "DD/MM/YYYY"
-          )}
-        Condição de pagamento : ${
-          condicaoPagamento?.descricao
-        }  - Prazo para entrega : ${moment(prazoEntrega).format("DD/MM/YYYY")}
-       Total do pedido: ${formataMoeda(totalPedido)}
-`,
-
-        style: "header",
-        margin: [5, 5],
-      },
-    ],
-
-    content: selectedProductsPedido.map(function (item, i) {
-      return {
-        layout: "lightHorizontalLines", // optional
-        lineHeight: 1,
-        fontSize: 9,
+        style: "tableRow",
+        layout: "lightHorizontalLines",
         table: {
-          // headers are automatically repeated if the table spans over multiple pages
-          // you can declare how many rows should be treated as headers
-          headerRows: 0,
-          widths: [20, 66, 140, 40, 40,  "*"],
-
+          headerRows: 1,
+          widths: [20, 80, 180, 47, 30, 40, 40, 40, 40, 40, 40, "*"],
           body: [
-            ["", "", "", "", "", ""],
-
             [
-              { text: i + 1 },
-
-              {
-                text: item?.idproduto.ean
-                  ? item?.idproduto.ean
-                  : item?.idproduto.codigo,
-                style: "ean",
-              },
-              {
-                text: item?.idproduto.nome.substring(0, 35),
-                style: "descricao",
-              },
-
-              {
-                text: Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                  minimumFractionDigits: "2",
-                  maximumFractionDigits: "2",
-                }).format(item.preco),
-                style: "preco",
-              },
-
-              {
-                text:
-                  item.quantidade +
-                  ` ${item.unidadeCompra ? item.unidadeCompra.codigo : ""} (${
-                    item?.fatorConversao === 0 ? 1 : item?.fatorConversao
-                  })`,
-              },
-
-              {
-                text: Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(item?.preco * item?.quantidade),
-              },
-             
+              { text: "N°", style: "tableHeader" },
+              { text: "EAN ou código", style: "tableHeader" },
+              { text: "Descrição", style: "tableHeader" },
+              { text: "Quantidade", style: "tableHeader" },
+              { text: "Quantidade total", style: "tableHeader" },
+              { text: "Custo unitário", style: "tableHeader" },
+              { text: "Custo da embalagem", style: "tableHeader" },
+              { text: "Markup atual", style: "tableHeader" },
+              { text: "Preço atual", style: "tableHeader" },
+              { text: "Markup sugestão", style: "tableHeader" },
+              { text: "Sugestão de venda", style: "tableHeader" },
+              { text: "Total", style: "tableHeader" },
             ],
+            ...itens?.map(function (item, i) {
+              let row = [
+                { text: i + 1, style: "tableRow" },
+                {
+                  text: item?.idproduto.ean
+                    ? item?.idproduto.ean
+                    : item?.idproduto.codigo,
+                  style: "tableRow",
+                },
+                {
+                  text: item?.idproduto.nome.substring(0, 100),
+                  style: "tableRow",
+                },
+                {
+                  text:
+                    item.quantidade +
+                    ` ${item.unidadeCompra ? item.unidadeCompra.codigo : ""} (${
+                      item?.fatorConversao === 0 ? 1 : item?.fatorConversao
+                    })`,
+                  style: "tableRow",
+                },
+                {
+                  text: new Intl.NumberFormat("pt-BR", {
+                    maximumFractionDigits: 3,
+                    minimumFractionDigits: 0,
+                    style: "decimal",
+                  }).format(item.quantidade * item.fatorConversao),
+                  style: "tableRow",
+                },
+                { text: formataMoeda(item.preco), style: "tableRow" },
+                {
+                  text: formataMoeda(item?.preco * item?.fatorConversao),
+                  style: "tableRow",
+                },
+                {
+                  text:
+                    new Intl.NumberFormat("pt-BR", {
+                      style: "decimal",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    }).format(
+                      ((item?.precoVenda - item?.preco) / item?.preco) * 100
+                    ) + " %",
+                  style: "tableRow",
+                },
+                { text: formataMoeda(item?.precoVenda), style: "tableRow" },
+                {
+                  text:
+                    new Intl.NumberFormat("pt-BR", {
+                      style: "decimal",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    }).format(item?.percentualmarkupminimo) + " %",
+                  style: "tableRow",
+                },
+                {
+                  text: formataMoeda(
+                    (item?.percentualmarkupminimo / 100) * item?.preco +
+                      item?.preco
+                  ),
+                  style: "tableRow",
+                },
+                {
+                  text: formataMoeda(item?.preco * item?.quantidade),
+                  style: "tableRow",
+                },
+              ];
+
+              // Adicione uma cor de fundo alternativa para linhas pares
+              if (i % 2 === 0) {
+                row = row.map((cell) => ({ ...cell, fillColor: "#f0f0f0" }));
+              }
+              return row;
+            }),
           ],
         },
-      };
-    }),
+      },
+    ],
   };
 
   pdfMake.createPdf(dd).open();
 };
-export { ImprimirPedido, exibirPedido };
+
+export { ImprimirPedido };

@@ -34,6 +34,7 @@ import RecebimentoPorData from "../pages/recebimento/porPagamento";
 import ConsultaProduto from "../pages/produto/consulta";
 
 import { jwtDecode } from "jwt-decode"; 
+import Metabase from "../pages/metabase";
 
 
 
@@ -97,6 +98,10 @@ export default function Router() {
         <Route path="/" element={<Login />} />
 
         <Route path="/" element={<PrivateRoutes />}>
+        <Route
+            path="metabase"
+            element={<Metabase />}
+          />
           <Route
             path="produtos/precificar-agendar"
             element={<PrecificaProduto />}

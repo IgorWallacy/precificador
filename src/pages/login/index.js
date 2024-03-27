@@ -1,6 +1,6 @@
 import "./index.css";
 import ImagemDestque from "../../assets/img/undraw_login_re_4vu2.svg";
-import DestaqueImagem from "../../assets/img/login.json";
+
 import QrCode from "../../assets/img/qrCode.png";
 import GooglePlay from "../../assets/img/google_play.json";
 import ImagemOffline from "../../assets/img/undraw_monitor_iqpq.svg";
@@ -100,7 +100,7 @@ const Login = () => {
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("ultimoLogado", usuario?.toUpperCase());
 
-        navigate("/menu");
+        navigate("/metabase");
       })
       .catch((error) => {
         setLoading(false);

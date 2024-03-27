@@ -50,11 +50,11 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
             Emissão do pedido em ${moment(pedido?.dataEmissao).format(
               "DD/MM/YYYY"
             )} Comprador: ${
-            pedido?.comprador ? pedido?.comprador : "Não preenchido"
+            pedido?.comprador ? pedido?.comprador?.nome : "Não preenchido"
           }
             Condição de pagamento : ${
               pedido?.condicaoPagamento
-                ? pedido?.condicaoPagamento
+                ? pedido?.condicaoPagamento?.descricao
                 : " Não preenchido "
             } - Prazo para entrega : ${
             pedido?.prazoEntrega
@@ -76,7 +76,7 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
         layout: "lightHorizontalLines",
         table: {
           headerRows: 1,
-          widths: [20, 80, 180, 47, 30, 40, 40, 40, 40, 40, 40, "*"],
+          widths: [20, 80, 180, 50, 30, 40, 40, 40, 40, 40, 40, "*"],
           body: [
             [
               { text: "N°", style: "tableHeader" },
@@ -107,7 +107,7 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
                 },
                 {
                   text:
-                    item.quantidade +
+                    Intl.NumberFormat("pt-BR", { minimumFractionDigits : 0 , maximumFractionDigits : 3}).format(item.quantidade) +
                     ` ${item.unidadeCompra ? item.unidadeCompra.codigo : ""} (${
                       item?.fatorConversao === 0 ? 1 : item?.fatorConversao
                     })`,

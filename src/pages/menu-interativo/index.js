@@ -163,6 +163,14 @@ const MenuInterativo = () => {
           </div>
           <div className="opcoes-menu">
             <Button
+              label="Dashboard"
+              icon="pi  pi-chart-line   "
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/metabase")}
+            />
+          </div>
+          <div className="opcoes-menu">
+            <Button
               label="Indicadores"
               icon="pi  pi-chart-line   "
               className="p-button-rounded p-button-help p-button-lg"

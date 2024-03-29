@@ -110,6 +110,7 @@ const Menu = () => {
           command: () => navigate("/vendas/indicadores"),
           template: itemRenderer,
         },
+        
       ],
     },
 

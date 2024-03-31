@@ -1,3 +1,16 @@
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 50px;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 997;
+    background-image: linear-gradient(to left top, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
+  
+}
+
 .expira {
     display: flex;
     flex-direction: column;

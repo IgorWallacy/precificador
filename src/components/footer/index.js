@@ -1,5 +1,5 @@
 import { Badge } from "primereact/badge";
-
+import Logo from "../../assets/img/logo_jj.png";
 import "./styless.css";
 
 import api from "../../services/axios";
@@ -13,25 +13,23 @@ import moment from "moment/moment";
 
 const Footer = () => {
   const [statusApi, setStatusApi] = useState("Online");
-  const [statusRede, setStatusRede]= useState(navigator.onLine)
+  const [statusRede, setStatusRede] = useState(navigator.onLine);
   const [nome, setNome] = useState(null);
   const [headers, setHeaders] = useState();
-  const [saudacao , setSaudacao] = useState(null)
-
-  
+  const [saudacao, setSaudacao] = useState(null);
 
   const greetingMessage = () => {
     //let h = new Date().toLocaleTimeString('pt-BR', { hour: 'numeric', hour12: false });
     let h = new Date().getHours();
     switch (true) {
       case h <= 5:
-        return setSaudacao("Bom dia")
+        return setSaudacao("Bom dia");
       case h < 12:
-        return setSaudacao("Bom dia")
+        return setSaudacao("Bom dia");
       case h < 18:
-        return setSaudacao("Boa tarde")
+        return setSaudacao("Boa tarde");
       default:
-        return setSaudacao("Boa noite")
+        return setSaudacao("Boa noite");
     }
   };
 
@@ -40,8 +38,6 @@ const Footer = () => {
       .get("/actuator/health")
       .then((r) => {
         setStatusApi(r.data.status);
-        
-        
       })
       .catch((error) => {
         setStatusApi(error.message);
@@ -72,11 +68,8 @@ const Footer = () => {
   };
 
   useEffect(() => {
-    
-   
-
     getStatus();
-    greetingMessage()
+    greetingMessage();
     pegarTokenLocalStorage();
     let token = localStorage.getItem("access_token");
     let a = JSON.parse(token);
@@ -88,25 +81,42 @@ const Footer = () => {
     }, 3000);
   }, []);
 
-  useEffect(()=> {
-   // console.log(statusRede)
-     // event listeners to update the state 
-     window.addEventListener('online', () => {
-      setStatusRede(true)
-      
-  });
+  useEffect(() => {
+    // console.log(statusRede)
+    // event listeners to update the state
+    window.addEventListener("online", () => {
+      setStatusRede(true);
+    });
 
-  window.addEventListener('offline', () => {
-      setStatusRede(false)
-  });
-  },[statusApi])
+    window.addEventListener("offline", () => {
+      setStatusRede(false);
+    });
+  }, [statusApi]);
 
   return (
     <>
+      <div className="logo-rodape">
+        <img src={Logo} width="120px" height="120px" alt="logo do sistema" />
+      </div>
+      <footer
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+        }}
+        className="footer"
+      >
+         <img src={Logo} width="20px" height="20px" alt="logo do sistema" />
+         <p>Powered by JJ</p>
+       
+       
+      </footer>
+
       <Dialog
         header={`Aplicativo ` + statusApi}
         closable={false}
-        visible={statusApi === "Network Error" || statusRede === false }
+        visible={statusApi === "Network Error" || statusRede === false}
       >
         <div
           style={{
@@ -127,7 +137,12 @@ const Footer = () => {
             }}
           />
           <h1>Tentando restabelecer a conexão com o servidor </h1>
-          <h2>Seu dispositivo está {statusRede ? 'conectado a rede porém não conseguimos localizar o servidor' : 'desconectado da rede'}</h2>
+          <h2>
+            Seu dispositivo está{" "}
+            {statusRede
+              ? "conectado a rede porém não conseguimos localizar o servidor"
+              : "desconectado da rede"}
+          </h2>
           <h4>
             {" "}
             caso o problema persista, verifique sua conexão com a internet ou
@@ -136,7 +151,7 @@ const Footer = () => {
         </div>
       </Dialog>
 
-      <div style={{ position: "absolute", top: "2%", right: "2%" }}>
+      <div style={{ position: "fixed", top: "2%", right: "2%", zIndex: "998" }}>
         <Badge
           severity={statusApi === "UP" ? "success" : "danger"}
           value={
@@ -144,8 +159,22 @@ const Footer = () => {
           }
         ></Badge>
       </div>
-      <div style={{ position: "absolute", top: "5rem", left: "2%" }}>
-        <Badge  size="normal" severity="primary" value={`${saudacao} ${nome}, hoje é ${moment(new Date()).format("dddd - DD/MM/yyyy ")}`}></Badge>
+      <div
+        style={{
+          position: "fixed",
+          top: "20px",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 999,
+        }}
+      >
+        <Badge
+          size="normal"
+          severity="warning"
+          value={`${saudacao} ${nome}, hoje é ${moment(new Date()).format(
+            "dddd - DD/MM/yyyy "
+          )}`}
+        ></Badge>
       </div>
     </>
   );

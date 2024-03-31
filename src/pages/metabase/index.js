@@ -52,6 +52,7 @@ const Metabase = () => {
         <>
           <div
             style={{
+              marginTop:'-40px',
               height: "100vh",
               width: "100%",
 

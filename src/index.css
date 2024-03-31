@@ -109,7 +109,7 @@ body {
   right: 0;
   overflow: auto;
   background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-
+  margin-top: 50px;
 }
 
 
@@ -124,7 +124,7 @@ body {
   border-top-right-radius: 50px;
   flex-wrap: wrap;
   margin-top: 50px;
-
+  margin-bottom: 5px;
 
 
 }
@@ -132,7 +132,7 @@ body {
 
 .btn-topo {
   position: fixed;
-  top: 10px;
+  top: 5px;
   right: 10px;
   overflow: visible;
   z-index: 4;
@@ -192,18 +192,7 @@ body {
   margin: 5px;
 }
 
-.form-precificador-btn {
 
-  display: flex;
-  flex-direction: column;
-  color: #FFF;
-  align-items: center;
-  justify-content: center;
-  margin: 25px;
-  flex-wrap: wrap;
-
-
-}
 
 .pesquisa-rapida {
   display: flex;

@@ -1521,7 +1521,9 @@ const PrecificadorAgenda = () => {
 
       <div className="agenda-label">
         <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-          {produtos?.length < 1 ? 'Pesquisar notas de entrada e' : ' Agendar os preços de vendas'}
+          {produtos?.length < 1
+            ? "Pesquisar notas de entrada e"
+            : " Agendar os preços de vendas"}
         </h1>
 
         <h4
@@ -1532,7 +1534,9 @@ const PrecificadorAgenda = () => {
             fontFamily: "cabin-sketch-bold",
           }}
         >
-         {produtos?.length < 1 ? ' Agendar os preços de venda' : 'Informe os preços abaixo'}
+          {produtos?.length < 1
+            ? " Agendar os preços de venda"
+            : "Informe os preços abaixo"}
         </h4>
         {loading ? (
           <Player src={LoadingNotas} loop autoplay style={{ width: "350px" }} />
@@ -1554,8 +1558,28 @@ const PrecificadorAgenda = () => {
 
       {produtos.length < 1 ? (
         <>
-          <div className="form-precificador">
-            <div className="form-precificador-input">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "#000",
+              gap: "10px",
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "#000",
+                flexDirection: "column",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
               <div>
                 <h5>Período</h5>
               </div>
@@ -1574,7 +1598,17 @@ const PrecificadorAgenda = () => {
                 showButtonBar
               />
             </div>
-            <div className="form-precificador-input">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "#000",
+                flexDirection: "column",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
               <div>
                 <h5>até</h5>
               </div>
@@ -1599,7 +1633,17 @@ const PrecificadorAgenda = () => {
               />
             </div>
 
-            <div className="form-precificador-input">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "#000",
+                flexDirection: "column",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
               <MostraListaFilial />
             </div>
           </div>
@@ -1608,11 +1652,23 @@ const PrecificadorAgenda = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              color: "#f2f2f2",
+              color: "#000",
+              flexDirection: "column",
+              flexWrap: "wrap",
             }}
           >
-            {" "}
-            <h4 style={{ marginRight: "1rem " }}>
+            <h4
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "#000",
+                flexDirection: "column",
+                flexWrap: "wrap",
+                gap: "10px",
+                margin:'10px'
+              }}
+            >
               Clique para escolher um layout{" "}
             </h4>
             <ToggleButton
@@ -1624,9 +1680,20 @@ const PrecificadorAgenda = () => {
               onChange={(e) => setAgrupadoPorFornecedor(e.value)}
             />
           </div>
-          <div className="form-precificador-btn"></div>
-          <div className="form-precificador-btn">
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "#000",
+              flexDirection: "column",
+              flexWrap: "wrap",
+              margin: "20px",
+            }}
+          >
             <Button
+            style={{margin:'5px'}}
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
               label={
                 loading ? " Pesquisando ..." : " Pesquisar notas fiscais  "

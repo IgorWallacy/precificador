@@ -593,7 +593,6 @@ const PrecificadorExecuta = () => {
           </h3>
         </div>
 
-       
         <Card
           style={{
             backgroundColor:
@@ -1699,10 +1698,27 @@ const PrecificadorExecuta = () => {
               <MostraListaFilial />
             </div>
           </div>
-          <div className="form-precificador-btn">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "wrap",
+              flexDirection:'column',
+              margin:'10px'
+            }}
+          >
+            
             <MostraSelectReplicarPrecoFilial />
           </div>
-          <div className="form-precificador-btn">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
             <Button
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
               label={loading ? "Pesquisando ..." : " Pesquisar agendamento(s) "}
@@ -1739,7 +1755,7 @@ const PrecificadorExecuta = () => {
           </div>
           <div ref={tabelaRef}>
             <DataTable
-              style={{ padding: "1px", margin: "1px" }}
+              style={{ padding: "1px", margin: "1px", marginBottom: "10px" }}
               footer={"Existem " + produtos.length + " produto(s) para análise"}
               loading={loading}
               stripedRows

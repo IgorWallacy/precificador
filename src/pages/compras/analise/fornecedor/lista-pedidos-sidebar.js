@@ -297,13 +297,14 @@ const PedidoListaSidebar = ({
         // resizableColumns
         // columnResizeMode="fit"
         size="small"
+
         showGridlines
         //  scrollHeight="650px"
-        responsiveLayout="stack"
+        responsiveLayout="scroll"
         footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras - Produtos selecionados ${selectedProductsPedido.length}`}
         footerColumnGroup={footerGroupPedido}
         value={pedidos}
-        breakpoint="968px"
+        breakpoint="1739px"
         rows={linhas?.current}
         stripedRows
         loading={loading3}

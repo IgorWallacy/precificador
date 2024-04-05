@@ -1666,7 +1666,7 @@ const PrecificadorAgenda = () => {
                 flexDirection: "column",
                 flexWrap: "wrap",
                 gap: "10px",
-                margin:'10px'
+                margin: "10px",
               }}
             >
               Clique para escolher um layout{" "}
@@ -1693,7 +1693,7 @@ const PrecificadorAgenda = () => {
             }}
           >
             <Button
-            style={{margin:'5px'}}
+              style={{ margin: "5px" }}
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
               label={
                 loading ? " Pesquisando ..." : " Pesquisar notas fiscais  "

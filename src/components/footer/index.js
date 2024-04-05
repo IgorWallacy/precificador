@@ -95,9 +95,7 @@ const Footer = () => {
 
   return (
     <>
-      <div className="logo-rodape">
-        <img src={Logo} width="120px" height="120px" alt="logo do sistema" />
-      </div>
+     
       <footer
         style={{
           display: "flex",

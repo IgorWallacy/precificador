@@ -16,11 +16,13 @@
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
  
+ 
  }
 
 /* Estilizando a barra de rolagem */
 ::-webkit-scrollbar {
   width: 8px; /* Largura da barra de rolagem */
+ 
 }
 
 /* Estilizando o fundo da barra de rolagem */
@@ -64,6 +66,8 @@ body {
   background-image: url('./assets/img/icones-tela-login.svg');
   background-position: bottom;
   background-repeat: no-repeat;
+  margin-top: 100px;
+  margin-bottom: 10px;
 }
 
 @media screen and (max-width: 960px) {
@@ -109,7 +113,7 @@ body {
   right: 0;
   overflow: auto;
   background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-  margin-top: 50px;
+
 }
 
 
@@ -123,9 +127,9 @@ body {
   border-top-left-radius: 50px;
   border-top-right-radius: 50px;
   flex-wrap: wrap;
-  margin-top: 50px;
   margin-bottom: 5px;
-
+ 
+ 
 
 }
 

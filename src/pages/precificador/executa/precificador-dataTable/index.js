@@ -4,6 +4,8 @@ import "./styless.css";
 import DestaqueImg from "../../../../assets/img/animaccao_check.json";
 import { Player } from "@lottiefiles/react-lottie-player";
 
+import { Messages } from "primereact/messages";
+import { Message } from "primereact/message";
 import { SelectButton } from "primereact/selectbutton";
 import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
@@ -29,6 +31,7 @@ import { classNames } from "primereact/utils";
 import { useReactToPrint } from "react-to-print";
 
 import api from "../../../../services/axios";
+import api_uniplus from "../../../../services/axios/axios_uniplus";
 import { useNavigate } from "react-router-dom";
 
 import Context from "../../../../contexts";
@@ -37,11 +40,14 @@ import moment from "moment";
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { Card } from "antd";
+import { Card, message } from "antd";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const PrecificadorExecuta = () => {
   const navigate = useNavigate();
+
+  const messages = useRef(null);
 
   const tabelaRef = useRef();
   const handlePrint = useReactToPrint({
@@ -55,6 +61,10 @@ const PrecificadorExecuta = () => {
   const [etiquetaSelecionada, setEtiquetaSelecionada] = useState("");
   const toast = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
+
+  const [produtosAtualizarApiList, setProdutosAtualizarApiList] = useState([]);
+
+  const [erroProductMessage, setErroProductMessage] = useState([]);
 
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -91,6 +101,7 @@ const PrecificadorExecuta = () => {
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
 
   useEffect(() => {
+    pegarTokenLocalStorageUniplus();
     buscarUsuarioPorCodigo();
 
     usarTabelaFormacaoPreecoProduto();
@@ -141,6 +152,31 @@ const PrecificadorExecuta = () => {
     today: " Hoje ",
     clear: " Limpar ",
   });
+
+  const pegarTokenLocalStorageUniplus = () => {
+    let token = localStorage.getItem("access_token_uniplus");
+    let a = JSON.parse(token);
+
+    var headers = {
+      Authorization: "Bearer " + a?.access_token,
+      "Content-Type": "application/x-www-form-urlencoded",
+    };
+
+    // setHeaders(headers);
+
+    api_uniplus.interceptors.request.use(
+      (config) => {
+        // Do something before request is sent
+
+        config.headers["Authorization"] = "bearer " + a?.access_token;
+        return config;
+      },
+
+      (error) => {
+        Promise.reject(error);
+      }
+    );
+  };
 
   const margem = (rowData) => {
     //Margem em %: (Preço de venda - Preço de compra) / Preço de venda * 100.
@@ -1439,9 +1475,78 @@ const PrecificadorExecuta = () => {
       });
   };
 
+  const buscarProdutosSelecionadosUniplusApi = () => {
+    pegarTokenLocalStorageUniplus();
+    let _products2 = produtos.filter((val) => produtoSelecionado.includes(val));
+
+    _products2.forEach((element) => {
+      api_uniplus
+        .get(`/public-api/v1/produtos/${element?.codigo}`)
+        .then((r) => {
+          setProdutosAtualizarApiList(r?.data);
+
+          // console.log(r.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally((f) => {
+          atualizarProdutosSelecionadosUniplusApi();
+        });
+    });
+  };
+
+  const atualizarProdutosSelecionadosUniplusApi = () => {
+    if (quantidadeFilial.length === 1) {
+      if (produtosAtualizarApiList.length > 0) {
+        produtosAtualizarApiList.forEach((element) => {
+          api_uniplus
+            .put("/public-api/v1/produtos", {
+              produto: {
+                codigo: element?.codigo,
+                ean: element?.ean,
+                nome: element?.nome,
+                preco: element?.precoagendado,
+                unidadeMedida: element?.unidadeMedida,
+                aliquotaCofins: element?.aliquotaCofins,
+                aliquotaCofinsEntrada: element?.aliquotaCofinsEntrada,
+                aliquotaPis: element?.aliquotaPis,
+                aliquotaPisEntrada: element?.aliquotaPisEntrada,
+                cstPisCofins: element?.cstPisCofins,
+                cstPisCofinsEntrada: element?.cstPisCofinsEntrada,
+              },
+            })
+            .then((response) => {
+              console.log(
+                "Atualizando " + element?.codigo + " " + element?.descricao
+              );
+            })
+            .catch((error) => {
+              let err = JSON.parse(error?.config?.data);
+              setErroProductMessage([...erroProductMessage, err]);
+
+              messages?.current?.show({
+                severity: "error",
+                summary: "Erro",
+                detail: `Erro ao atualizar via API uniplus ${err?.produto?.codigo} - ${err?.produto?.nome}`,
+              });
+            })
+            .finally(() => {
+              if (produtosAtualizarApiList === null) {
+                setProdutosAtualizarApiList([]);
+              }
+              buscarProdutos()
+            });
+        });
+      }
+    }
+  };
+
   const atualizarProdutosSelecionados = () => {
     let _products = produtos.filter((val) => produtoSelecionado.includes(val));
-    console.log(_products);
+
+    //console.log(_products);
+
     _products.forEach((element) => {
       let intFamilia = 0;
 
@@ -1471,7 +1576,9 @@ const PrecificadorExecuta = () => {
         })
         .finally((f) => {
           buscarProdutos();
+          buscarProdutosSelecionadosUniplusApi();
           setProdutoSelecionado(null);
+
           _products = null;
         });
     });
@@ -1704,11 +1811,10 @@ const PrecificadorExecuta = () => {
               justifyContent: "center",
               alignItems: "center",
               flexWrap: "wrap",
-              flexDirection:'column',
-              margin:'10px'
+              flexDirection: "column",
+              margin: "10px",
             }}
           >
-            
             <MostraSelectReplicarPrecoFilial />
           </div>
           <div
@@ -1752,6 +1858,32 @@ const PrecificadorExecuta = () => {
               left={botaovoltar}
               right={botaoatualizar}
             />
+
+            {localStorage.getItem('access_token_uniplus').length > 0 ? (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                ></div>
+
+                {/* <Messages ref={messages} /> */}
+
+                <Tag
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  severity="success"
+                  value="Utilizando a API do uniplus"
+                ></Tag>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
           <div ref={tabelaRef}>
             <DataTable

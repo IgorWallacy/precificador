@@ -59,9 +59,11 @@ const Login = () => {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
+ 
+
   //PRODUCAO
-  const baseURL =
-    window.location.protocol + "//" + window.location.hostname + ":1010";
+  const baseURL = window.location.protocol + "//" + window.location.hostname + ":1010";
+  const baseURLUniplus = window.location.protocol + "//" + window.location.hostname ;
 
   //DESENVOLVIMENTO
   //const baseURL = "http://localhost:2096"
@@ -71,6 +73,41 @@ const Login = () => {
     headers: headers,
     params: params,
   });
+
+
+  var params_uniplus = {
+    // client: "client_credentials",
+    // username: usuario?.toUpperCase(),
+    // password: senha,
+    grant_type: "client_credentials",
+   };
+ 
+   var headers_uniplus = {
+     Authorization: "Basic dW5pcGx1czpsNGd0cjFjazJyc3ByM25nY2wzZW50" ,
+     "Content-Type": "application/x-www-form-urlencoded",
+   };
+ 
+ 
+   const api_uniplus = axios.create({
+     baseURL: baseURLUniplus,
+     headers: headers_uniplus,
+     params: params_uniplus,
+   });
+
+
+  
+   const getToken_uniplus =  async() => {
+  
+    return  await api_uniplus.post("/oauth/token").then((r) => {
+    //  console.log(r.data)
+      const accessToken_uniplus = JSON.stringify(r.data);
+      localStorage.setItem("access_token_uniplus", accessToken_uniplus);
+    }).catch((e) => {
+      console.log(e)
+    })
+  
+  }
+  
 
   const getStatus = () => {
     api
@@ -101,6 +138,16 @@ const Login = () => {
         localStorage.setItem("ultimoLogado", usuario?.toUpperCase());
 
         navigate("/metabase");
+
+        try {
+
+          getToken_uniplus()
+          
+        } catch (error) {
+
+          console.log(error)
+          
+        }
       })
       .catch((error) => {
         setLoading(false);
@@ -141,7 +188,8 @@ const Login = () => {
             life: 3000,
           });
         }
-      });
+      })
+    
   }
 
   const handleKeyDown = (e, nextElementRef) => {
@@ -184,9 +232,7 @@ const Login = () => {
         position="bottom"
         style={{ width: "100%", height: "50vh" }}
       >
-        <div
-          style={{ display: "flex", justifyContent: "center" }}
-        >
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <h1> ... Acessando o servidor ... </h1>
         </div>
 
@@ -242,10 +288,9 @@ const Login = () => {
           flexWrap: "wrap",
           width: "100%",
           padding: "10px",
-          gap:'10px'
+          gap: "10px",
         }}
       >
-       
         <div
           style={{
             display: "flex",
@@ -254,7 +299,6 @@ const Login = () => {
             width: "72%",
             gap: "5px",
             flexWrap: "wrap",
-           
           }}
         >
           <div

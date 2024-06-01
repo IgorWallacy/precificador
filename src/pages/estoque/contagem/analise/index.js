@@ -337,13 +337,40 @@ export default function AnaliseInventario() {
         ),
       }))
     );
-
+    
+    
+    
+  
     const blob = new Blob([csvData.slice(18)], { type: "text/plain" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download =
       "Contagem do inventario do dia " +
+      moment(inventario?.inicio).format("DD-MM-YYYY");
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const exportarContagemOriginal = () => {
+    const csvData = converterParaCSV(
+      produto.map((m) => ({
+        produto: m?.codigo,
+        quantidade: parseFloat(
+          m?.quantidadeLida 
+        ),
+      }))
+    );
+    
+    
+    
+  
+    const blob = new Blob([csvData.slice(18)], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download =
+      "Contagem lida do inventario do dia " +
       moment(inventario?.inicio).format("DD-MM-YYYY");
     a.click();
     window.URL.revokeObjectURL(url);
@@ -475,9 +502,16 @@ export default function AnaliseInventario() {
 
                 <Button
                   style={{ margin: "0px 5px" }}
-                  label="Exportar contagens"
+                  label="Exportar contagem ajustada"
                   className="p-button p-button-rounded p-button-primary"
                   onClick={() => exportarContagem()}
+                  icon="pi pi-file-excel"
+                />
+                 <Button
+                  style={{ margin: "0px 5px" }}
+                  label="Exportar contagem Lida"
+                  className="p-button p-button-rounded p-button-primary"
+                  onClick={() => exportarContagemOriginal()}
                   icon="pi pi-file-excel"
                 />
                 <Button

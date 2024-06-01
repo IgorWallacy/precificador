@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import api from "../../services/axios";
+import api_uniplus from "../../services/axios/axios_uniplus"
+
+
 
 import Footer from "../../components/footer";
 import Header from "../../components/header";
@@ -19,9 +22,9 @@ import {
 
 import "./menu-interativo.css";
 
-import Typing from "react-typing-animation";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
+
 
 const MenuInterativo = () => {
   const [nome, setNome] = useState("");
@@ -29,6 +32,17 @@ const MenuInterativo = () => {
   const [filial, setFilial] = useState(1);
 
   const navigate = useNavigate();
+
+ 
+
+
+
+  
+
+
+
+  
+    
 
   const getFilial = () => {
     return api
@@ -65,8 +79,12 @@ const MenuInterativo = () => {
     );
   };
 
+ 
+
   useEffect(() => {
+   
     pegarTokenLocalStorage();
+    
     getFilial();
     let token = localStorage.getItem("access_token");
     let a = JSON.parse(token);
@@ -80,6 +98,7 @@ const MenuInterativo = () => {
     <>
       <Header />
       <Footer />
+     
       <div
         style={{
           display: "flex",

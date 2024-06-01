@@ -26,6 +26,7 @@
     "babel-runtime": "^6.26.0",
     "chart.js": "^3.9.1",
     "cldr-data": "^36.0.1",
+    "crypto-browserify": "^3.12.0",
     "export-to-csv": "^0.2.1",
     "file-saver": "^2.0.5",
     "iframe-resizer-react": "^1.1.0",
@@ -87,6 +88,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "webpack-cli": "^5.1.4"
   }
 }

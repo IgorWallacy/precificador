@@ -1859,7 +1859,7 @@ const PrecificadorExecuta = () => {
               right={botaoatualizar}
             />
 
-            {localStorage.getItem('access_token_uniplus').length > 0 ? (
+            {localStorage.getItem('access_token_uniplus')?.length > 0 ? (
               <>
                 <div
                   style={{

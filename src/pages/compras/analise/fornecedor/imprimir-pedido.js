@@ -107,18 +107,18 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
                 },
                 {
                   text:
-                    Intl.NumberFormat("pt-BR", { minimumFractionDigits : 0 , maximumFractionDigits : 3}).format(item.quantidade) +
+                    Intl.NumberFormat("pt-BR", { minimumFractionDigits : 0 , maximumFractionDigits : 3}).format(item.quantidade / item?.fatorConversao) +
                     ` ${item.unidadeCompra ? item.unidadeCompra.codigo : ""} (${
                       item?.fatorConversao === 0 ? 1 : item?.fatorConversao
                     })`,
-                  style: "tableRow",
+                  style: "tableRow", 
                 },
                 {
                   text: new Intl.NumberFormat("pt-BR", {
                     maximumFractionDigits: 3,
                     minimumFractionDigits: 0,
                     style: "decimal",
-                  }).format(item.quantidade * item.fatorConversao),
+                  }).format(item.quantidade),
                   style: "tableRow",
                 },
                 { text: formataMoeda(item.preco), style: "tableRow" },

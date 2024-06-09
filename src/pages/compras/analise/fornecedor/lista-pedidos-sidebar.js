@@ -53,6 +53,7 @@ const PedidoListaSidebar = ({
   const [fator, setFator] = useState(null);
   const [unCompra, setUnCompra] = useState(0);
   const [total, setTotal] = useState(0);
+  const [ultimaEmbalagemCompra, setUltimaEmbalagemCompra] = useState([]);
 
   const toast = useRef(null);
 
@@ -130,6 +131,34 @@ const PedidoListaSidebar = ({
     );
   };
 
+  const editarItem = (data, props) => {
+    return (
+      <>
+        <Button
+          className="p-button p-button-primary p-button-rounded p-button-sm"
+          icon="pi pi-pencil"
+          tooltip="Editar"
+          onClick={() => editarItemDialog(data, props)}
+        />
+      </>
+    );
+  };
+
+  const editarItemDialog = (data, props) => {
+    console.log(data);
+    custoEmbalagem.current = data?.total;
+    setDialogNovoProduto(true);
+    setPreco(data?.preco);
+    setPrecoVenda(data?.precoVenda);
+    setNovoProduto(data);
+    setQuantidade(data?.quantidade);
+    setQuantidadeEmbalagem(data?.quantidade / data?.fatorConversao);
+    setFator(data?.fatorConversao);
+    setUnCompra(data?.unidadeCompra);
+    getUltimaEmbalagem(data?.idproduto);
+    setDialogProduto(false);
+  };
+
   const onRowEditComplete = (e) => {
     let data = e;
 
@@ -182,6 +211,7 @@ const PedidoListaSidebar = ({
     setEditDialog(true);
     setProduto(data);
     setQuantidade(data.quantidade);
+
     setFator(data.fatorConversao);
     setPreco(data.preco);
     setUnCompra(data.unidadeCompra);
@@ -197,7 +227,7 @@ const PedidoListaSidebar = ({
       )
       .then((r) => {
         setTodosProdutos(r.data);
-        // console.log(todosProdutos);
+        //  console.log(todosProdutos);
       })
       .catch((e) => {
         console.log(e?.message);
@@ -207,7 +237,19 @@ const PedidoListaSidebar = ({
       });
   };
 
+  const getUltimaEmbalagem = (row) => {
+    return api
+      .get(`/api/pedido/compra/embalagem/${row?.id}`)
+      .then((r) => {
+        setUltimaEmbalagemCompra(r.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   const adicionarProduto = (row) => {
+    //console.log(row);
     setDialogNovoProduto(true);
     setPreco(null);
     setPrecoVenda(row?.preco);
@@ -215,16 +257,17 @@ const PedidoListaSidebar = ({
     setQuantidade(null);
     setFator(null);
     setUnCompra(null);
-
+    getUltimaEmbalagem(row);
     setDialogProduto(false);
   };
   const salvarProduto = (e) => {
+    {console.log(e)}
     if (quantidade > 0 && fator > 0) {
       api
         .post(`/api/pedido/compra/salvar/${idPedido}`, {
-          id: "",
+          id: e?.idpedido ?  e?.id : '',
           idpedido: idPedido,
-          idproduto: { id: e?.id },
+          idproduto: { id: e?.idproduto?.id ? e?.idproduto?.id : e?.id  },
           unidadeCompra: { id: unCompra?.id },
           fatorConversao: fator,
           quantidade: quantidade,
@@ -297,7 +340,6 @@ const PedidoListaSidebar = ({
         // resizableColumns
         // columnResizeMode="fit"
         size="small"
-
         showGridlines
         //  scrollHeight="650px"
         responsiveLayout="scroll"
@@ -341,8 +383,6 @@ const PedidoListaSidebar = ({
               sortable
               header="Cód.Loja"
               /> */}
-
-            
 
         <Column
           field="idproduto.ean"
@@ -427,7 +467,7 @@ const PedidoListaSidebar = ({
           }}
           header="Markup Atual"
         ></Column>
-        
+
         <Column
           field="precoVenda"
           body={(row) => {
@@ -438,25 +478,23 @@ const PedidoListaSidebar = ({
               currency: "BRL",
             }).format(row?.precoVenda);
           }}
-          
           header="Venda atual"
         ></Column>
         <Column
           field="sugestaoMarkup"
           body={(row) => {
-            return Intl.NumberFormat("pt-BR", {
-              maximumFractionDigits: 2,
-              minimumFractionDigits: 2,
-              style: "decimal",
-           
-            }).format(row?.percentualmarkupminimo) + " % ";
+            return (
+              Intl.NumberFormat("pt-BR", {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2,
+                style: "decimal",
+              }).format(row?.percentualmarkupminimo) + " % "
+            );
           }}
-          
           header="Sugestão de Markup"
         ></Column>
 
-
-            <Column
+        <Column
           field="sugestao"
           body={(row) => {
             return Intl.NumberFormat("pt-BR", {
@@ -464,13 +502,15 @@ const PedidoListaSidebar = ({
               minimumFractionDigits: 2,
               style: "currency",
               currency: "BRL",
-            }).format(((row?.percentualmarkupminimo / 100) * row?.preco ) + row?.preco);
+            }).format(
+              (row?.percentualmarkupminimo / 100) * row?.preco + row?.preco
+            );
           }}
-          
           header="Sugestão de venda"
         ></Column>
         <Column field={precoPedidoLinhaTotal} header="Total "></Column>
-         
+
+        <Column field={editarItem}></Column>
         <Column field={deletarItemPedido}></Column>
       </DataTable>
 
@@ -538,7 +578,6 @@ const PedidoListaSidebar = ({
         maximizable
         onHide={() => setDialogProduto(false)}
       >
-       
         <DataTable
           style={{ width: "100%", height: "50vh" }}
           emptyMessage="Sem dados para exibir no momento"
@@ -554,9 +593,24 @@ const PedidoListaSidebar = ({
           header={renderHeader}
           filterDisplay="row"
         >
-          <Column filter field="codigo" filterPlaceholder="Pesquisar por código" header="Código"></Column>
-          <Column filter field="ean" filterPlaceholder="Pesquisar por código de barras" header="Código de barras"></Column>
-          <Column filter field="nome" filterPlaceholder="Pesquisar por nome" header="Nome"></Column>
+          <Column
+            filter
+            field="codigo"
+            filterPlaceholder="Pesquisar por código"
+            header="Código"
+          ></Column>
+          <Column
+            filter
+            field="ean"
+            filterPlaceholder="Pesquisar por código de barras"
+            header="Código de barras"
+          ></Column>
+          <Column
+            filter
+            field="nome"
+            filterPlaceholder="Pesquisar por nome"
+            header="Nome"
+          ></Column>
           <Column
             field="precocusto"
             header="Preço de custo"
@@ -598,11 +652,16 @@ const PedidoListaSidebar = ({
         </DataTable>
       </Dialog>
       <Dialog
-        header={
-          "Código " + novoProduto?.ean
-            ? novoProduto?.ean + " - " + novoProduto?.nome
-            : novoProduto?.codigo + " - " + novoProduto?.nome
-        }
+        header = {
+          novoProduto?.idproduto
+              ? "Código " + (novoProduto?.idproduto?.ean 
+                  ? novoProduto?.idproduto?.ean + " - " + novoProduto?.idproduto?.nome 
+                  : novoProduto?.idproduto?.codigo + " - " + novoProduto?.idproduto?.nome)
+              : "Código " + (novoProduto?.ean 
+                  ? novoProduto?.ean + " - " + novoProduto?.nome 
+                  : novoProduto?.codigo + " - " + novoProduto?.nome)
+      }
+      
         position="bottom"
         draggable={false}
         visible={dialogNovoProduto}
@@ -655,17 +714,35 @@ const PedidoListaSidebar = ({
               gap: "5px",
             }}
           >
-            <h4 style={{ color: "red" }}>Custo atual</h4>
+            <h4 style={{ color: "green" }}>Última(s) embalagem(s) de compra</h4>
 
-            <InputNumber
-              disabled
-              prefix="R$ "
-              size={12}
-              mode="decimal"
-              locale="pt-BR"
-              minFractionDigits={2}
-              value={novoProduto?.precocusto}
-            />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {ultimaEmbalagemCompra?.map((item, index) => (
+                <p key={index}>
+                  {" "}
+                  <i className="pi pi-box" style={{ fontSize: "1em" }}></i>{" "}
+                  {item?.nome} COM ( {item?.fatorConversao} )
+                </p>
+              ))}
+            </div>
+
+            {novoProduto?.precocusto ? (
+              <>
+                <h4 style={{ color: "red" }}>Custo atual (aquisição) </h4>
+
+                <InputNumber
+                  disabled
+                  prefix="R$ "
+                  size={12}
+                  mode="decimal"
+                  locale="pt-BR"
+                  minFractionDigits={2}
+                  value={novoProduto?.precocusto}
+                />
+              </>
+            ) : (
+              <></>
+            )}
 
             <h4 style={{ color: "green" }}>Venda atual </h4>
             <InputNumber
@@ -716,7 +793,10 @@ const PedidoListaSidebar = ({
               }}
             />
 
-            <h4>COM </h4>
+            <h4>
+              {" "}
+              {unCompra ? unCompra?.nome : " "} COM ( Fator de conversão )
+            </h4>
 
             <InputNumber
               minFractionDigits={2}
@@ -761,7 +841,7 @@ const PedidoListaSidebar = ({
               }}
             />
 
-            <h3>Custo</h3>
+            <h3>Custo {unCompra ? " do(a) " + unCompra?.nome : ""} </h3>
             <InputNumber
               prefix="R$ "
               size={12}

@@ -186,6 +186,7 @@ const PrecificadorAgenda = () => {
   const renderHeaderFamilia = () => {
     return (
       <div className="flex justify-content-end">
+       
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -1038,18 +1039,19 @@ const PrecificadorAgenda = () => {
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-around",
             alignItems: "center",
             width: "100%",
           }}
         >
+           <h4>⚠️ Atenção, regravar a nota no uniplus deleta o agendamento aqui ⚠️</h4>
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText
               className="p-inputtext-lg"
               value={globalFilterValue2}
               onChange={onGlobalFilterChange2}
-              placeholder="Pesquisa "
+              placeholder="Pesquisar "
             />
           </span>
         </div>
@@ -1145,6 +1147,7 @@ const PrecificadorAgenda = () => {
 
     return (
       <>
+        
         <DataTable
           showGridlines
           size="small"

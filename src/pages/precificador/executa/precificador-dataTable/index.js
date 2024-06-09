@@ -3,9 +3,6 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 import "./styless.css";
 import DestaqueImg from "../../../../assets/img/animaccao_check.json";
 import { Player } from "@lottiefiles/react-lottie-player";
-
-import { Messages } from "primereact/messages";
-import { Message } from "primereact/message";
 import { SelectButton } from "primereact/selectbutton";
 import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
@@ -15,7 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Toast } from "primereact/toast";
 import { FilterMatchMode } from "primereact/api";
-
+import { ProgressBar } from "primereact/progressbar";
 import { Dropdown } from "primereact/dropdown";
 import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
@@ -47,7 +44,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 const PrecificadorExecuta = () => {
   const navigate = useNavigate();
 
-  const messages = useRef(null);
+  const [mensagens, setMensagens] = useState([]);
 
   const tabelaRef = useRef();
   const handlePrint = useReactToPrint({
@@ -61,10 +58,7 @@ const PrecificadorExecuta = () => {
   const [etiquetaSelecionada, setEtiquetaSelecionada] = useState("");
   const toast = useRef(null);
   const [quantidadeFilial, setQuantidadeFilial] = useState([0]);
-
-  const [produtosAtualizarApiList, setProdutosAtualizarApiList] = useState([]);
-
-  const [erroProductMessage, setErroProductMessage] = useState([]);
+  const [loadingApiUniplus, setloadingApiUniplus] = useState(false);
 
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -73,7 +67,7 @@ const PrecificadorExecuta = () => {
   const [dataFinal, setDataFinal] = useState();
   const [replicarPreco, setReplicarPreco] = useState(0);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
-  const msgs = useRef(null);
+
   //const [expandedRows, setExpandedRows] = useState(null);
   const replicarPrecoOpcoes = [
     { label: "Sim", value: 1 },
@@ -1305,6 +1299,7 @@ const PrecificadorExecuta = () => {
         <Button
           className="p-button-rounded p-button-danger p-button-sm"
           tooltip="Voltar"
+          label="Voltar"
           tooltipOptions={{ position: "bottom" }}
           icon="pi pi-arrow-left"
           style={{
@@ -1316,6 +1311,7 @@ const PrecificadorExecuta = () => {
         <Button
           onClick={() => buscarProdutos()}
           tooltip="Atualizar"
+          label="Recarregar"
           tooltipOptions={{ position: "bottom" }}
           icon="pi pi-refresh"
           className=" p-button-rounded p-button-success p-button-sm"
@@ -1338,6 +1334,7 @@ const PrecificadorExecuta = () => {
         <Button
           onClick={() => imprimePDFPrecosAgendados()}
           tooltip="Imprimir relatório dos preços agendados "
+          label="Relatório de preços agendados"
           tooltipOptions={{ position: "bottom" }}
           icon="pi pi-file-pdf"
           style={{
@@ -1375,6 +1372,7 @@ const PrecificadorExecuta = () => {
             margin: "0px 5px",
           }}
           tooltip="Imprimir etiqueta selecionada "
+          label="Imprimir etiquetas"
           tooltipOptions={{ position: "bottom" }}
           icon="pi pi-print"
           className="p-button-rounded p-button-info"
@@ -1397,7 +1395,7 @@ const PrecificadorExecuta = () => {
         >
           <Button
             onClick={() => handlePrint()}
-            label="Imprimir"
+            label="Imprimir tabela"
             tooltip="Imprimir tabela"
             tooltipOptions={{ position: "bottom" }}
             icon="pi pi-file-pdf"
@@ -1421,7 +1419,7 @@ const PrecificadorExecuta = () => {
       <>
         <Button
           onClick={() => handlePrint()}
-          label="Imprimir "
+          label="Imprimir tabela "
           tooltip="Imprimir tabela"
           tooltipOptions={{ position: "bottom" }}
           icon="pi pi-file-pdf"
@@ -1437,7 +1435,10 @@ const PrecificadorExecuta = () => {
           icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
           disabled={!produtoSelecionado || !produtoSelecionado.length}
           className="p-button-rounded p-button-success"
-          onClick={() => atualizarProdutosSelecionados()}
+          onClick={() => {
+            atualizarProdutosSelecionadosUniplusApi();
+            atualizarProdutosSelecionados();
+          }}
         />
       </>
     );
@@ -1475,70 +1476,43 @@ const PrecificadorExecuta = () => {
       });
   };
 
-  const buscarProdutosSelecionadosUniplusApi = () => {
-    pegarTokenLocalStorageUniplus();
-    let _products2 = produtos.filter((val) => produtoSelecionado.includes(val));
-
-    _products2.forEach((element) => {
-      api_uniplus
-        .get(`/public-api/v1/produtos/${element?.codigo}`)
-        .then((r) => {
-          setProdutosAtualizarApiList(r?.data);
-
-          // console.log(r.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        })
-        .finally((f) => {
-          atualizarProdutosSelecionadosUniplusApi();
-        });
-    });
-  };
-
   const atualizarProdutosSelecionadosUniplusApi = () => {
     if (quantidadeFilial.length === 1) {
-      if (produtosAtualizarApiList.length > 0) {
-        produtosAtualizarApiList.forEach((element) => {
-          api_uniplus
-            .put("/public-api/v1/produtos", {
-              produto: {
-                codigo: element?.codigo,
-                ean: element?.ean,
-                nome: element?.nome,
-                preco: element?.precoagendado,
-                unidadeMedida: element?.unidadeMedida,
-                aliquotaCofins: element?.aliquotaCofins,
-                aliquotaCofinsEntrada: element?.aliquotaCofinsEntrada,
-                aliquotaPis: element?.aliquotaPis,
-                aliquotaPisEntrada: element?.aliquotaPisEntrada,
-                cstPisCofins: element?.cstPisCofins,
-                cstPisCofinsEntrada: element?.cstPisCofinsEntrada,
-              },
-            })
-            .then((response) => {
-              console.log(
-                "Atualizando " + element?.codigo + " " + element?.descricao
-              );
-            })
-            .catch((error) => {
-              let err = JSON.parse(error?.config?.data);
-              setErroProductMessage([...erroProductMessage, err]);
+      let selectedProducts = produtos
+        .filter((val) => produtoSelecionado.includes(val))
+        .map((element) => ({
+          codigo: element?.codigo,
+          preco: element?.precoagendado,
+        }));
 
-              messages?.current?.show({
-                severity: "error",
-                summary: "Erro",
-                detail: `Erro ao atualizar via API uniplus ${err?.produto?.codigo} - ${err?.produto?.nome}`,
-              });
-            })
-            .finally(() => {
-              if (produtosAtualizarApiList === null) {
-                setProdutosAtualizarApiList([]);
-              }
-              buscarProdutos()
-            });
+      //console.log(selectedProducts);
+
+      setMensagens([]);
+      setloadingApiUniplus(true);
+      api_uniplus
+        .post("/public-api/v1/produtos/precos", selectedProducts)
+        .then((response) => {
+         // console.log(response.data);
+          setMensagens([response?.data]);
+        })
+        .catch((error) => {
+          console.log(error);
+          if(error?.code === 'ERR_NETWORK') {
+
+            localStorage.clear()
+            window.location.reload()
+          }
+          /*  toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: ` ${error.message}  `,
+          }); */
+        })
+        .finally(() => {
+          setloadingApiUniplus(false);
+          buscarProdutos();
+          setProdutoSelecionado(null);
         });
-      }
     }
   };
 
@@ -1576,9 +1550,7 @@ const PrecificadorExecuta = () => {
         })
         .finally((f) => {
           buscarProdutos();
-          buscarProdutosSelecionadosUniplusApi();
           setProdutoSelecionado(null);
-
           _products = null;
         });
     });
@@ -1859,7 +1831,7 @@ const PrecificadorExecuta = () => {
               right={botaoatualizar}
             />
 
-            {localStorage.getItem('access_token_uniplus')?.length > 0 ? (
+            {localStorage.getItem("access_token_uniplus")?.length > 0 ? (
               <>
                 <div
                   style={{
@@ -1880,6 +1852,85 @@ const PrecificadorExecuta = () => {
                   severity="success"
                   value="Utilizando a API do uniplus"
                 ></Tag>
+
+                {loadingApiUniplus ? (
+                  <>
+                    <div
+                      style={{
+                        backgroundColor: "#f2f2f2",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h4> Aguarde por favor, Enviando ao PDV !</h4>
+                    </div>
+
+                    <ProgressBar
+                      mode="indeterminate"
+                      style={{ height: "36px" }}
+                    ></ProgressBar>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "stretch",
+                    gap: "1rem",
+                    backgroundColor: "#f2f2f2",
+                  }}
+                >
+                  {mensagens[0]?.mensagens?.length > 0 ? (
+                    <>
+                      <div style={{ color: "green" }}>
+                        <p>
+                          Os seguintes produtos foram enviados ao PDV com
+                          sucesso !{" "}
+                        </p>
+                        {mensagens[0]?.mensagens?.map((m, index) => (
+                          <p key={index}>{m}</p>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+
+                  {mensagens[0]?.erros.length > 0 ? (
+                    <>
+                      <div style={{ color: "red" }}>
+                        <p>
+                          Os seguintes produtos não foram enviados ao PDV devido
+                          aos seguintes erros :{" "}
+                        </p>
+                        {mensagens[0]?.erros?.map((m, index) => (
+                          <p key={index}>{m}</p>
+                        ))}
+                        <p>Corrija os erros e tente novamente</p>
+                      </div>
+                    </>
+                  ) : (
+                    <> </>
+                  )}
+                  {mensagens?.length > 0 ? (
+                    <>
+                      <div style={{ margin: "5px" }}>
+                        <Button
+                          label="Fechar"
+                          onClick={() => setMensagens([])}
+                          icon="pi pi-times"
+                          className="p-button p-button-rounded p-button-danger"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </div>
               </>
             ) : (
               <></>

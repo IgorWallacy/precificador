@@ -23,14 +23,14 @@ import axios from "axios";
 
 import Logo from "../../assets/img/logo_jj.png";
 
-import Typing from "react-typing-animation";
+import { useParams } from "react-router-dom";
 import { Badge } from "primereact/badge";
 
 import "primeflex/primeflex.css";
 
 const Login = () => {
   const toast = useRef(null);
-
+  const { invalid_access } = useParams();
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,11 +59,11 @@ const Login = () => {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
- 
-
   //PRODUCAO
-  const baseURL = window.location.protocol + "//" + window.location.hostname + ":1010";
-  const baseURLUniplus = window.location.protocol + "//" + window.location.hostname ;
+  const baseURL =
+    window.location.protocol + "//" + window.location.hostname + ":1010";
+  const baseURLUniplus =
+    window.location.protocol + "//" + window.location.hostname;
 
   //DESENVOLVIMENTO
   //const baseURL = "http://localhost:2096"
@@ -74,40 +74,36 @@ const Login = () => {
     params: params,
   });
 
-
   var params_uniplus = {
     // client: "client_credentials",
     // username: usuario?.toUpperCase(),
     // password: senha,
     grant_type: "client_credentials",
-   };
- 
-   var headers_uniplus = {
-     Authorization: "Basic dW5pcGx1czpsNGd0cjFjazJyc3ByM25nY2wzZW50" ,
-     "Content-Type": "application/x-www-form-urlencoded",
-   };
- 
- 
-   const api_uniplus = axios.create({
-     baseURL: baseURLUniplus,
-     headers: headers_uniplus,
-     params: params_uniplus,
-   });
+  };
 
+  var headers_uniplus = {
+    Authorization: "Basic dW5pcGx1czpsNGd0cjFjazJyc3ByM25nY2wzZW50",
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
 
-  
-   const getToken_uniplus =  async() => {
-  
-    return  await api_uniplus.post("/oauth/token").then((r) => {
-    //  console.log(r.data)
-      const accessToken_uniplus = JSON.stringify(r.data);
-      localStorage.setItem("access_token_uniplus", accessToken_uniplus);
-    }).catch((e) => {
-      console.log(e)
-    })
-  
-  }
-  
+  const api_uniplus = axios.create({
+    baseURL: baseURLUniplus,
+    headers: headers_uniplus,
+    params: params_uniplus,
+  });
+
+  const getToken_uniplus = async () => {
+    return await api_uniplus
+      .post("/oauth/token")
+      .then((r) => {
+        //  console.log(r.data)
+        const accessToken_uniplus = JSON.stringify(r.data);
+        localStorage.setItem("access_token_uniplus", accessToken_uniplus);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   const getStatus = () => {
     api
@@ -140,13 +136,9 @@ const Login = () => {
         navigate("/metabase");
 
         try {
-
-          getToken_uniplus()
-          
+          getToken_uniplus();
         } catch (error) {
-
-          console.log(error)
-          
+          console.log(error);
         }
       })
       .catch((error) => {
@@ -188,8 +180,7 @@ const Login = () => {
             life: 3000,
           });
         }
-      })
-    
+      });
   }
 
   const handleKeyDown = (e, nextElementRef) => {
@@ -331,6 +322,16 @@ const Login = () => {
                 }}
               />
             </div>
+            {invalid_access ? (
+                  <>
+                    {" "}
+                    <h4>Você foi desconectado porque o token expirou! </h4>{" "}
+                    <br />
+                   
+                  </>
+                ) : (
+                  <></>
+                )}
             <h4
               style={{
                 fontSize: "20px",
@@ -338,8 +339,10 @@ const Login = () => {
                 color: "#FFF",
               }}
             >
+
               <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
                 {" "}
+              
                 Utilize sua conta{" "}
                 <b style={{ color: "red" }}>
                   <u>uniplus</u>

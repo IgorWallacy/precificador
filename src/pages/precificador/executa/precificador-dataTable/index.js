@@ -38,6 +38,7 @@ import moment from "moment";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { Card, message } from "antd";
+import { element } from "prop-types";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -1476,8 +1477,30 @@ const PrecificadorExecuta = () => {
       });
   };
 
-  const atualizarProdutosSelecionadosUniplusApi = () => {
+  const fetchFamilia = async (idFamilia) => {
+    
+    return api
+      .get(`/api/produto/familia/${idFamilia}`)
+      .then((r) => {
+        //console.log(r.data);
+        
+        api_uniplus
+        .post("/public-api/v1/produtos/precos", r.data)
+        .then((response) => {
+          // console.log(response.data);
+         // setMensagens([response?.data]);
+         console.log(response.data)
+        })
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const atualizarProdutosSelecionadosUniplusApi = async () => {
     if (quantidadeFilial.length === 1) {
+      let results = [];
+
       let selectedProducts = produtos
         .filter((val) => produtoSelecionado.includes(val))
         .map((element) => ({
@@ -1485,22 +1508,35 @@ const PrecificadorExecuta = () => {
           preco: element?.precoagendado,
         }));
 
-      //console.log(selectedProducts);
+      let selectedProductsFamilia = produtos
+        .filter((val) => produtoSelecionado.includes(val))
+        .map((element) => ({
+          codigo: element?.codigo,
+          preco: element?.precoAtual,
+          idfamilia: element?.idfamilia,
+        }));
+
+      
+
+      
+
+      
 
       setMensagens([]);
       setloadingApiUniplus(true);
-      api_uniplus
+
+      await api_uniplus
         .post("/public-api/v1/produtos/precos", selectedProducts)
         .then((response) => {
-         // console.log(response.data);
+          // console.log(response.data);
           setMensagens([response?.data]);
         })
         .catch((error) => {
           console.log(error);
-          if(error?.code === 'ERR_NETWORK') {
-
-            localStorage.clear()
-            window.location.reload()
+          if (error?.code === "ERR_NETWORK") {
+            navigate("/login/invalid_access");
+            localStorage.removeItem("access_token_uniplus");
+            window.location.reload();
           }
           /*  toast.current.show({
             severity: "error",
@@ -1513,6 +1549,15 @@ const PrecificadorExecuta = () => {
           buscarProdutos();
           setProdutoSelecionado(null);
         });
+
+        for (const element of selectedProductsFamilia) {
+          if (element.idfamilia != null) {
+            let familiaData = await fetchFamilia(element?.idfamilia);
+            if (familiaData) {
+              results.push(familiaData);
+            }
+          }
+        }
     }
   };
 

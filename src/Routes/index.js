@@ -96,6 +96,7 @@ export default function Router() {
     >
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/login/:invalid_access" element={<Login />} />
 
         <Route path="/" element={<PrivateRoutes />}>
         <Route

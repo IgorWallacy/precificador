@@ -325,7 +325,10 @@ const Login = () => {
             {invalid_access ? (
                   <>
                     {" "}
-                    <h4>Você foi desconectado porque o token expirou! </h4>{" "}
+                      <h4>Por motivos de segurannça você foi desconectado!</h4>{" "}
+                      <p>Motivo : A API de atualização de preços do uniplus expira a cada 60 minutos.</p>
+                      
+                      <p>Por favor faça login novamente!</p>
                     <br />
                    
                   </>

@@ -1533,11 +1533,7 @@ const PrecificadorExecuta = () => {
         })
         .catch((error) => {
           console.log(error);
-          if (error?.code === "ERR_NETWORK") {
-            navigate("/login/invalid_access");
-            localStorage.removeItem("access_token_uniplus");
-            window.location.reload();
-          }
+         
           /*  toast.current.show({
             severity: "error",
             summary: "Erro",

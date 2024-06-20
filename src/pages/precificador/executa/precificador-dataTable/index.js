@@ -1383,66 +1383,19 @@ const PrecificadorExecuta = () => {
     </React.Fragment>
   );
 
-  const botaoatualizar =
-    quantidadeFilial.length > 1 ? (
-      <React.Fragment>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "row",
-            margin: "1rem",
-          }}
-        >
-          <Button
-            onClick={() => handlePrint()}
-            label="Imprimir tabela"
-            tooltip="Imprimir tabela"
-            tooltipOptions={{ position: "bottom" }}
-            icon="pi pi-file-pdf"
-            style={{ margin: "1rem" }}
-            className=" p-button-rounded p-button-info "
-          />
-          <Button
-            style={{ margin: "1rem" }}
-            label={`Gravar ( ${
-              produtoSelecionado ? produtoSelecionado?.length : 0
-            }  ) preços agendados `}
-            // tooltip="Atualizar produtos selecionados"
-            icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
-            disabled={!produtoSelecionado || !produtoSelecionado.length}
-            className="p-button-rounded p-button-success"
-            onClick={() => atualizarProdutosSelecionados()}
-          />
-        </div>
-      </React.Fragment>
-    ) : (
-      <>
-        <Button
-          onClick={() => handlePrint()}
-          label="Imprimir tabela "
-          tooltip="Imprimir tabela"
-          tooltipOptions={{ position: "bottom" }}
-          icon="pi pi-file-pdf"
-          style={{ margin: "1rem" }}
-          className=" p-button-rounded p-button-info"
-        />
-
-        <Button
-          style={{ margin: "1rem" }}
-          label={`Gravar ( ${
-            produtoSelecionado ? produtoSelecionado?.length : 0
-          }  ) preços agendados `}
-          icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
-          disabled={!produtoSelecionado || !produtoSelecionado.length}
-          className="p-button-rounded p-button-success"
-          onClick={() => {
-            atualizarProdutosSelecionadosUniplusApi();
-            atualizarProdutosSelecionados();
-          }}
-        />
-      </>
-    );
+  const botaoatualizar = () => (
+    <>
+      <Button
+        onClick={() => handlePrint()}
+        label="Imprimir tabela "
+        tooltip="Imprimir tabela"
+        tooltipOptions={{ position: "bottom" }}
+        icon="pi pi-file-pdf"
+        style={{ margin: "1rem" }}
+        className=" p-button-rounded p-button-info"
+      />
+    </>
+  );
 
   const MostraListaFilial = () => {
     if (quantidadeFilial.length > 1) {
@@ -1478,23 +1431,122 @@ const PrecificadorExecuta = () => {
   };
 
   const fetchFamilia = async (idFamilia) => {
-    
     return api
       .get(`/api/produto/familia/${idFamilia}`)
       .then((r) => {
         //console.log(r.data);
-        
+
         api_uniplus
-        .post("/public-api/v1/produtos/precos", r.data)
-        .then((response) => {
-          // console.log(response.data);
-         // setMensagens([response?.data]);
-         console.log(response.data)
-        })
+          .post("/public-api/v1/produtos/precos", r.data)
+          .then((response) => {
+            // console.log(response.data);
+            // setMensagens([response?.data]);
+            console.log(response.data);
+          });
       })
       .catch((e) => {
         console.log(e);
       });
+  };
+
+  const fetchFamiliaMultEmpresa = async (idFamilia, idfilial) => {
+    return api
+      .get(`/api/produto/familia/multempresa/${idFamilia}/${idfilial}`)
+      .then((r) => {
+        // console.log(r.data);
+
+        let selectedProductsFamilia = r?.data.map((element) => ({
+          codigo: element?.codigo,
+
+          precos: [
+            {
+              filial: idfilial,
+              preco: element?.preco,
+            },
+          ],
+        }));
+
+        // console.log(selectedProductsFamilia);
+
+        api_uniplus
+          .post("/public-api/v1/produtos/precos", selectedProductsFamilia)
+          .then((response) => {
+            // console.log(response.data);
+            // setMensagens([response?.data]);
+            console.log(response.data);
+          });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const atualizarProdutosSelecionadosUniplusApiMultEmpresa = async () => {
+    if (quantidadeFilial.length > 1) {
+      let results = [];
+
+      let selectedProducts = produtos
+        .filter((val) => produtoSelecionado.includes(val))
+        .map((element) => ({
+          codigo: element?.codigo,
+          precos: [
+            {
+              filial: element.idfilial,
+              preco: element.precoagendado,
+            },
+          ],
+        }));
+
+      let selectedProductsFamilia = produtos
+        .filter((val) => produtoSelecionado.includes(val))
+        .map((element) => ({
+          codigo: element?.codigo,
+          precos: [
+            {
+              filial: element?.idfilial,
+              preco: element?.precoagendado,
+            },
+          ],
+          idfamilia: element?.idfamilia,
+          idfilial: element?.idfilial,
+        }));
+
+      setMensagens([]);
+      setloadingApiUniplus(true);
+
+      await api_uniplus
+        .post("/public-api/v1/produtos/precos", selectedProducts)
+        .then((response) => {
+          // console.log(response.data);
+          setMensagens([response?.data]);
+        })
+        .catch((error) => {
+          console.log(error);
+
+          /*  toast.current.show({
+            severity: "error",
+            summary: "Erro",
+            detail: ` ${error.message}  `,
+          }); */
+        })
+        .finally(() => {
+          setloadingApiUniplus(false);
+          buscarProdutos();
+          setProdutoSelecionado(null);
+        });
+
+      for (const element of selectedProductsFamilia) {
+        if (element.idfamilia != null) {
+          let familiaData = await fetchFamiliaMultEmpresa(
+            element?.idfamilia,
+            element?.idfilial
+          );
+          if (familiaData) {
+            results.push(familiaData);
+          }
+        }
+      }
+    }
   };
 
   const atualizarProdutosSelecionadosUniplusApi = async () => {
@@ -1516,12 +1568,6 @@ const PrecificadorExecuta = () => {
           idfamilia: element?.idfamilia,
         }));
 
-      
-
-      
-
-      
-
       setMensagens([]);
       setloadingApiUniplus(true);
 
@@ -1533,7 +1579,7 @@ const PrecificadorExecuta = () => {
         })
         .catch((error) => {
           console.log(error);
-         
+
           /*  toast.current.show({
             severity: "error",
             summary: "Erro",
@@ -1546,14 +1592,14 @@ const PrecificadorExecuta = () => {
           setProdutoSelecionado(null);
         });
 
-        for (const element of selectedProductsFamilia) {
-          if (element.idfamilia != null) {
-            let familiaData = await fetchFamilia(element?.idfamilia);
-            if (familiaData) {
-              results.push(familiaData);
-            }
+      for (const element of selectedProductsFamilia) {
+        if (element.idfamilia != null) {
+          let familiaData = await fetchFamilia(element?.idfamilia);
+          if (familiaData) {
+            results.push(familiaData);
           }
         }
+      }
     }
   };
 
@@ -1884,7 +1930,7 @@ const PrecificadorExecuta = () => {
 
                 {/* <Messages ref={messages} /> */}
 
-                <Tag
+                {/* <Tag
                   style={{
                     display: "flex",
                     justifyContent: "center",
@@ -1892,7 +1938,7 @@ const PrecificadorExecuta = () => {
                   }}
                   severity="success"
                   value="Utilizando a API do uniplus"
-                ></Tag>
+                ></Tag> */}
 
                 {loadingApiUniplus ? (
                   <>
@@ -1976,6 +2022,28 @@ const PrecificadorExecuta = () => {
             ) : (
               <></>
             )}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                margin: "1rem",
+              }}
+            >
+              <Button
+                label={`Gravar ( ${
+                  produtoSelecionado ? produtoSelecionado?.length : 0
+                }  ) preços agendados `}
+                icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
+                disabled={!produtoSelecionado || !produtoSelecionado.length}
+                className={!produtoSelecionado?.length > 0 ? 'p-button-rounded p-button-danger' : 'p-button-rounded p-button-success'}
+                onClick={() => {
+                  atualizarProdutosSelecionadosUniplusApi();
+                  atualizarProdutosSelecionadosUniplusApiMultEmpresa()
+                  atualizarProdutosSelecionados();
+                }}
+              />
+            </div>
           </div>
           <div ref={tabelaRef}>
             <DataTable

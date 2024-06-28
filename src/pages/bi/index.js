@@ -142,7 +142,7 @@ const Pivot = () => {
         <></>
       ) : (
         <>
-          <Toolbar left={leftContents} />
+          <Toolbar style={{marginTop:'50px'}} left={leftContents} />
         </>
       )}
 

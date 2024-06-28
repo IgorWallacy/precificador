@@ -521,6 +521,7 @@ function VendasDataTableComponent() {
             alignItems: "center",
             flexWrap: "wrap",
             gap: "1em",
+            marginTop:'50px'
           }}
         >
          <Player src={ImagemDestaque} loop autoplay style={{ width: "250px" }} />

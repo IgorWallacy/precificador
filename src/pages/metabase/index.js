@@ -66,6 +66,7 @@ const Metabase = () => {
                 border: "none",
                 overflow: "hidden",
                 backgroundColor: "#ffff",
+                marginTop:'50px'
               }}
               src={`${window.location.protocol}//${window.location.hostname}:3030${url.current}`}
             />

@@ -83,6 +83,7 @@ const AjusteEstoque = () => {
           display: "flex",
           justifyContent: "space-evenly",
           alignItems: "center",
+          
         }}
       >
         <div>
@@ -130,6 +131,7 @@ const AjusteEstoque = () => {
               flexWrap: "wrap",
               gap: "10px",
               padding: "1px",
+              marginTop:'50px'
             }}
           >
             <h1>Exportar arquivo EDI para zerar estoque</h1>
@@ -157,6 +159,7 @@ const AjusteEstoque = () => {
         <>
           {" "}
           <Toolbar
+          style={{marginTop:'50px'}}
             left={
               <Button
                 label="Voltar"

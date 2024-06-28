@@ -35,7 +35,8 @@ import ConsultaProduto from "../pages/produto/consulta";
 
 import { jwtDecode } from "jwt-decode"; 
 import Metabase from "../pages/metabase";
-
+import IncluirContagemInventario from "../pages/estoque/contagem/incluir";
+import IncluirContagemProdutosInventario from '../pages/estoque/contagem/incluir/contagemProdutos'
 
 
 
@@ -139,6 +140,14 @@ export default function Router() {
           />
           <Route path="compras/estoque" element={<EstoquePorEmpresa />} />
           <Route path="estoque/ajustes" element={<AjusteEstoque />} />
+          <Route
+            path="estoque/inventario/incluir-contagem"
+            element={<IncluirContagemInventario />}
+          />
+           <Route
+            path="estoque/inventario/contar"
+            element={<IncluirContagemProdutosInventario />}
+          />
           <Route
             path="estoque/lista-inventario"
             element={<ContagemInventario />}

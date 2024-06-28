@@ -85,11 +85,12 @@ const Header = (data) => {
             gap: "10px",
           }}
         >
+          { /*
           <Button
             icon="pi pi-align-justify"
             className="p-button p-button-rounded p-button-sm p-button-help"
             onClick={() => setVisibleLeft(true)}
-          />
+          /> */}
 
           <Button
             icon="pi pi-home"

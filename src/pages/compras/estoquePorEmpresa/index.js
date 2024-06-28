@@ -632,6 +632,7 @@ const EstoquePorEmpresa = () => {
       ) : (
         <>
           <Toolbar
+          style={{marginTop:'50px'}}
             left={
               <>
                 {" "}

@@ -49,6 +49,7 @@
     "react-icons": "^4.4.0",
     "react-iframe-resizer": "^1.0.1",
     "react-json-to-excel": "^1.0.7",
+    "react-remove-scroll": "^2.5.10",
     "react-router-dom": "6",
     "react-scripts": "5.0.1",
     "react-text-transition": "^3.0.2",

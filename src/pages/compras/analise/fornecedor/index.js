@@ -726,7 +726,7 @@ export default function AnaliseFornecedor() {
       />
   */}
       <div
-        style={{ backgroundColor: "#969FE0", borderRadius: "50px" }}
+        style={{ backgroundColor: "#969FE0", borderRadius: "50px" , marginTop:'50px' }}
         ref={tabelaRef}
       >
         {displayDialog ? (

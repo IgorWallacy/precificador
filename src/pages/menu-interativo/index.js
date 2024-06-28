@@ -139,6 +139,20 @@ const MenuInterativo = () => {
         </div>
         <div className="menu-categoria">
           {" "}
+          <FontAwesomeIcon icon={faGlobe} size="2x" />
+          <h1>Compras</h1>
+         
+          <div className="opcoes-menu">
+            <Button
+              label="Pedido de compra"
+              icon="pi pi-globe"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/compras/consulta")}
+            />
+          </div>
+          </div>  
+        <div className="menu-categoria">
+          {" "}
           <FontAwesomeIcon icon={faBarcode} size="2x" />
           <h1>Inventário</h1>
           <div className="opcoes-menu">
@@ -150,8 +164,27 @@ const MenuInterativo = () => {
             />
           </div>
 
+          <div className="opcoes-menu">
+            <Button
+              label="Iniciar contagem"
+              icon="pi pi-qrcode"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/estoque/inventario/incluir-contagem")}
+            />
+          </div>
+
+          <div className="opcoes-menu">
+            <Button
+              label="Zerar estoque"
+              icon="pi pi-qrcode"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/estoque/ajustes")}
+            />
+          </div>
+
          
         </div>
+        
         <div className="menu-categoria">
           {" "}
           <FontAwesomeIcon icon={faStore} size="2x" />
@@ -164,6 +197,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/vendas")}
             />
           </div>
+          { /*
           <div className="opcoes-menu">
             <Button
               label="Resumo de vendas"
@@ -172,6 +206,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/vendas/resumo")}
             />
           </div>
+          */}
           <div className="opcoes-menu">
             <Button
               label="Produtos sem vendas"
@@ -188,6 +223,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/metabase")}
             />
           </div>
+          {/*
           <div className="opcoes-menu">
             <Button
               label="Indicadores"
@@ -195,7 +231,7 @@ const MenuInterativo = () => {
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/vendas/indicadores")}
             />
-          </div>
+          </div> */}
         </div>
         <div className="menu-categoria">
           {" "}
@@ -263,20 +299,7 @@ const MenuInterativo = () => {
             />
           </div>
         </div>
-        <div className="menu-categoria">
-          {" "}
-          <FontAwesomeIcon icon={faGlobe} size="2x" />
-          <h1>Compras</h1>
-         
-          <div className="opcoes-menu">
-            <Button
-              label="Pedido de compra"
-              icon="pi pi-globe"
-              className="p-button-rounded p-button-help p-button-lg"
-              onClick={() => navigate("/compras/consulta")}
-            />
-          </div>
-          </div>  
+        
       </div>
     </>
   );

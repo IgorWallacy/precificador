@@ -438,6 +438,7 @@ export default function AnaliseInventario() {
           color: "#f2f2f2",
           width: "100%",
           padding: "1rem",
+          marginTop:'50px'
         }}
       >
         <h1

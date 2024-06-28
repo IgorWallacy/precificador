@@ -66,8 +66,8 @@ body {
   background-image: url('./assets/img/icones-tela-login.svg');
   background-position: bottom;
   background-repeat: no-repeat;
-  margin-top: 100px;
-  margin-bottom: 10px;
+  
+ 
 }
 
 @media screen and (max-width: 960px) {

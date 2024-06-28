@@ -76,7 +76,7 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
         layout: "lightHorizontalLines",
         table: {
           headerRows: 1,
-          widths: [20, 80, 180, 50, 30, 40, 40, 40, 40, 40, 40, "*"],
+          widths: [20, 80, 285, 50, 30, 40, 40, 60, 40, "*"],
           body: [
             [
               { text: "N°", style: "tableHeader" },
@@ -86,11 +86,12 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
               { text: "Quantidade total", style: "tableHeader" },
               { text: "Custo unitário", style: "tableHeader" },
               { text: "Custo da embalagem", style: "tableHeader" },
-              { text: "Markup atual", style: "tableHeader" },
-              { text: "Preço atual", style: "tableHeader" },
+             // { text: "Markup atual", style: "tableHeader" },
+             // { text: "Preço atual", style: "tableHeader" },
+              { text: "Valor Total", style: "tableHeader" },
               { text: "Markup sugestão", style: "tableHeader" },
               { text: "Sugestão de venda", style: "tableHeader" },
-              { text: "Total", style: "tableHeader" },
+             
             ],
             ...itens?.map(function (item, i) {
               let row = [
@@ -126,18 +127,22 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
                   text: formataMoeda(item?.preco * item?.fatorConversao),
                   style: "tableRow",
                 },
-                {
-                  text:
-                    new Intl.NumberFormat("pt-BR", {
-                      style: "decimal",
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 2,
-                    }).format(
-                      ((item?.precoVenda - item?.preco) / item?.preco) * 100
-                    ) + " %",
-                  style: "tableRow",
-                },
-                { text: formataMoeda(item?.precoVenda), style: "tableRow" },
+              //  {
+              //    text:
+              //      new Intl.NumberFormat("pt-BR", {
+               //       style: "decimal",
+                 //     minimumFractionDigits: 0,
+                   //   maximumFractionDigits: 2,
+               //     }).format(
+                 //     ((item?.precoVenda - item?.preco) / item?.preco) * 100
+                //    ) + " %",
+              //    style: "tableRow",
+             //   },
+              //  { text: formataMoeda(item?.precoVenda), style: "tableRow" },
+              {
+                text: formataMoeda(item?.preco * item?.quantidade),
+                style: "tableRow",
+              },
                 {
                   text:
                     new Intl.NumberFormat("pt-BR", {
@@ -154,10 +159,7 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
                   ),
                   style: "tableRow",
                 },
-                {
-                  text: formataMoeda(item?.preco * item?.quantidade),
-                  style: "tableRow",
-                },
+               
               ];
 
               // Adicione uma cor de fundo alternativa para linhas pares

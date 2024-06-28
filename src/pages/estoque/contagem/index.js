@@ -250,6 +250,7 @@ const onGlobalFilterChange2 = (e) => {
           flexWrap: "wrap",
           width: "100%",
           padding: "1rem",
+          marginTop:'50px'
         }}
       >
         <h1 style={{ color: "#f2f2f2", margin: "10px" }}>
@@ -316,19 +317,22 @@ const onGlobalFilterChange2 = (e) => {
       <Dialog
         header="Cadastrar novo inventário"
         visible={visible}
-        style={{ width: "50vw" }}
+        style={{ width: "100%" , height:'75vh' }}
         onHide={() => setVisible(false)}
         modal={true}
         position="bottom"
+        draggable={false}
       >
         <Toast ref={toastDialog} position="bottom-center" />
         <div
           style={{
             display: "flex",
+            flexDirection:'column',
             justifyContent: "center",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: "5px",
+            gap: "10px",
+            margin:'25px',
           }}
         >
           <div>

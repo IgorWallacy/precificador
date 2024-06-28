@@ -68,6 +68,7 @@ const StatusPdv = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          marginTop:'50px'
         }}
       >
         <img

@@ -1,0 +1,19 @@
+/* Compatibilidade com navegadores mais antigos */
+.custom-placeholder::-webkit-input-placeholder {
+    color: green;
+  }
+  .custom-placeholder:-moz-placeholder {
+    color: green;
+  }
+  .custom-placeholder::-moz-placeholder {
+    color: green;
+  }
+  .custom-placeholder:-ms-input-placeholder {
+    color: green;
+  }
+
+  .input-retro {
+    font-family: 'Courier New', Courier, monospace; /* Fonte monoespaçada */
+    caret-color: green;
+    text-align: center;
+  }

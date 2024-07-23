@@ -269,6 +269,7 @@ const RecebimentoPorData = () => {
             color: "#f2f2f2",
             height: "150px",
             backgroundColor: "#ec3b83",
+            marginTop:'50px'
           }}
         >
           <h1>Recebimentos por data do pagamento</h1>

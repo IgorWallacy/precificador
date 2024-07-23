@@ -8,15 +8,17 @@ import { Dropdown } from "primereact/dropdown";
 import { addLocale } from "primereact/api";
 import { ProgressBar } from "primereact/progressbar";
 import { Toolbar } from "primereact/toolbar";
-import { InputNumber } from 'primereact/inputnumber';
-        
+import { InputNumber } from "primereact/inputnumber";
 
 import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
 import { Typography } from "@mui/material";
 
 import { exportToExcel } from "react-json-to-excel";
 
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
 
 import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
@@ -33,6 +35,7 @@ const ProdutosSemVendas = () => {
   const [dataFinal, setDataFinal] = useState();
   const [dataUltimaCompra, setDataUltimaCompra] = useState();
   const [diasSemVenda, setDiasSemVenda] = useState(30);
+  const [diasSemVendaIgnorar, setDiasSemVendaIgnorar] = useState(90);
 
   const [selectLojas, setSelectLojas] = useState([]);
   const [lojaSelecionada, setLojaSelecionada] = useState();
@@ -51,8 +54,7 @@ const ProdutosSemVendas = () => {
   const pesquisar = () => {
     setLoading(true);
 
-    let dias = moment(new Date()).subtract(diasSemVenda , 'days')
-    
+    // dias = moment(new Date()).subtract(diasSemVenda , 'days')
 
     return api
 
@@ -61,7 +63,9 @@ const ProdutosSemVendas = () => {
           "YYYY-MM-DD"
         )}/${moment(dataFinal).format("YYYY-MM-DD")}/${
           lojaSelecionada?.id
-        }/${moment(dataUltimaCompra).format("YYYY-MM-DD")}/${moment(dias).format("YYYY-MM-DD")}`
+        }/${moment(dataUltimaCompra).format(
+          "YYYY-MM-DD"
+        )}/${diasSemVenda}/${diasSemVendaIgnorar}`
       )
       .then((r) => {
         //  console.log(r.data);
@@ -157,6 +161,24 @@ const ProdutosSemVendas = () => {
           ean: d.ean,
           produto: d.produto,
           fornecedor: d.fornecedor,
+          custo: new Intl.NumberFormat("pt-BR", {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+            style: "currency",
+            currency:'BRL'
+          }).format(d.precocusto),
+          custo_aquisicao: new Intl.NumberFormat("pt-BR", {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+            style: "currency",
+            currency:'BRL'
+          }).format(d.precocustoaquisicao),
+          venda: new Intl.NumberFormat("pt-BR", {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+            style: "currency",
+            currency:'BRL'
+          }).format(d.precoVenda),
           saldo_estoque: d.saldo_estoque,
           ultima_venda: moment(d.ultima_venda).format("DD/MM/YYYY"),
           ultimacompra: moment(d.ultimacompra).format("DD/MM/YYYY"),
@@ -164,7 +186,7 @@ const ProdutosSemVendas = () => {
         };
       });
 
-      exportToExcel(dados2, "Produtos_sem_venda");
+      exportToExcel(dados2, `Produtos_sem_venda ${lojaSelecionada?.nome} Gerado em ${moment().format("DD-MM-YYYY  HHmmss")}`);
     }
   };
 
@@ -231,7 +253,7 @@ const ProdutosSemVendas = () => {
     <>
       <Header />
       <Footer />
-      <Toolbar style={{marginTop:'50px'}} left={leftContents} />
+      <Toolbar style={{ marginTop: "50px" }} left={leftContents} />
       {loading ? (
         <>
           <ProgressBar mode="indeterminate" />
@@ -277,9 +299,9 @@ const ProdutosSemVendas = () => {
                         <Typography component="span" variant="h5">
                           {lojaSelecionada?.nome}
                           <br />
-                          Produtos sem venda de{" "}
+                          {/*   Produtos sem venda de{" "}
                           {moment(dataInicial).format("DD/MM/YY")} até{" "}
-                          {moment(dataFinal).format("DD/MM/YY")} <br />
+                          {moment(dataFinal).format("DD/MM/YY")} <br /> */}
                           Última compra em{" "}
                           {moment(dataUltimaCompra).format("DD/MM/YY")}
                         </Typography>
@@ -337,7 +359,7 @@ const ProdutosSemVendas = () => {
                     gap: "5px",
                   }}
                 >
-                  <h4>Data de início</h4>
+                  {/*   <h4>Data de início</h4>
                   <Calendar
                     dateFormat="dd/mm/yy"
                     locale="pt-BR"
@@ -346,6 +368,7 @@ const ProdutosSemVendas = () => {
                     value={dataInicial}
                     onChange={(e) => setDataInicial(e.value)}
                   />
+                  */}
                 </div>
 
                 <div
@@ -358,7 +381,7 @@ const ProdutosSemVendas = () => {
                     gap: "5px",
                   }}
                 >
-                  <h4>Data final</h4>
+                  {/* <h4>Data final</h4>
                   <Calendar
                     dateFormat="dd/mm/yy"
                     locale="pt-BR"
@@ -366,7 +389,7 @@ const ProdutosSemVendas = () => {
                     showButtonBar
                     value={dataFinal}
                     onChange={(e) => setDataFinal(e.value)}
-                  />
+                  /> */}
                 </div>
 
                 <div
@@ -399,7 +422,7 @@ const ProdutosSemVendas = () => {
                     gap: "5px",
                   }}
                 >
-                  <h4>Data última compra</h4>
+                  <h4>Data da última compra maior que </h4>
                   <Calendar
                     dateFormat="dd/mm/yy"
                     locale="pt-BR"
@@ -420,11 +443,48 @@ const ProdutosSemVendas = () => {
                     gap: "5px",
                   }}
                 >
-                  <h4>Exibir até {diasSemVenda} dias sem venda(s)</h4>
-                 <InputNumber value={diasSemVenda} onValueChange={(e) => setDiasSemVenda(e.value)} min={1} 
-                 showButtons buttonLayout="horizontal" step={1} 
-                 incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-                 decrementButtonClassName="p-button-danger" incrementButtonClassName="p-button-success"/>
+                  <h4>
+                    Exibir produtos com mais de {diasSemVenda} dias sem venda(s)
+                  </h4>
+                  <InputNumber
+                    value={diasSemVenda}
+                    onValueChange={(e) => setDiasSemVenda(e.value)}
+                    min={1}
+                    showButtons
+                    buttonLayout="horizontal"
+                    step={1}
+                    incrementButtonIcon="pi pi-plus"
+                    decrementButtonIcon="pi pi-minus"
+                    decrementButtonClassName="p-button-danger"
+                    incrementButtonClassName="p-button-success"
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <h4>
+                    Ignorar produtos com mais de {diasSemVendaIgnorar} dias sem
+                    venda(s)
+                  </h4>
+                  <InputNumber
+                    value={diasSemVendaIgnorar}
+                    onValueChange={(e) => setDiasSemVendaIgnorar(e.value)}
+                    min={1}
+                    showButtons
+                    buttonLayout="horizontal"
+                    step={1}
+                    incrementButtonIcon="pi pi-plus"
+                    decrementButtonIcon="pi pi-minus"
+                    decrementButtonClassName="p-button-danger"
+                    incrementButtonClassName="p-button-success"
+                  />
                 </div>
               </div>
               <div

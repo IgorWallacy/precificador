@@ -76,60 +76,12 @@ const PedidoListaSidebar = ({
     "idproduto.ean": { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   });
 
-  const [filters, setFilters] = useState({
+  const [filtersProduto, setFiltersProduto] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    nome: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    nome: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     codigo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     ean: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   });
-
-  const onGlobalFilterChange = (e) => {
-    const value = e.target.value;
-    let _filters = { ...filters };
-
-    _filters["global"].value = value;
-
-    setFilters(_filters);
-    setGlobalFilterValue(value);
-  };
-  const renderHeader = () => {
-    return (
-      <>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "row",
-            gap: "1px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={{ width: "90%" }}>
-            <InputText
-              autoFocus
-              value={globalFilterValue}
-              onChange={onGlobalFilterChange}
-              placeholder="Pesquisar por nome ou código"
-              style={{ width: "100%" }}
-            />
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  const editar = (data, props) => {
-    return (
-      <>
-        <Button
-          className="p-button p-button-primary p-button-rounded p-button-sm"
-          icon="pi pi-pencil"
-          tooltip="Editar"
-          onClick={() => editarDialog(data, props)}
-        />
-      </>
-    );
-  };
 
   const editarItem = (data, props) => {
     return (
@@ -261,13 +213,15 @@ const PedidoListaSidebar = ({
     setDialogProduto(false);
   };
   const salvarProduto = (e) => {
-    {console.log(e)}
+    {
+      console.log(e);
+    }
     if (quantidade > 0 && fator > 0) {
       api
         .post(`/api/pedido/compra/salvar/${idPedido}`, {
-          id: e?.idpedido ?  e?.id : '',
+          id: e?.idpedido ? e?.id : "",
           idpedido: idPedido,
-          idproduto: { id: e?.idproduto?.id ? e?.idproduto?.id : e?.id  },
+          idproduto: { id: e?.idproduto?.id ? e?.idproduto?.id : e?.id },
           unidadeCompra: { id: unCompra?.id },
           fatorConversao: fator,
           quantidade: quantidade,
@@ -309,70 +263,171 @@ const PedidoListaSidebar = ({
     <>
       <Toast ref={toast} position="bottom-center" />
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Button
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "1rem",
-            margin: "1rem",
-          }}
-          icon="pi pi-plus"
-          label="Adicionar produto"
-          className=" p-button-primary p-button-rounded"
-          onClick={() => {
-            getTodosProdutos();
-            setDialogProduto(true);
-          }}
-        />
-      </div>
-      <DataTable
-        style={{ marginTop: "1px", backgroundColor: "#F2F2F2" }}
-        // editMode="row"
-        // scrollable
-        // resizableColumns
-        // columnResizeMode="fit"
-        size="small"
-        showGridlines
-        //  scrollHeight="650px"
-        responsiveLayout="scroll"
-        footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras - Produtos selecionados ${selectedProductsPedido.length}`}
-        footerColumnGroup={footerGroupPedido}
-        value={pedidos}
-        breakpoint="1739px"
-        rows={linhas?.current}
-        stripedRows
-        loading={loading3}
-        paginator
-        //  paginatorTemplate={template1}
-        emptyMessage="Nenhum produto adicionado a lista"
-        dataKey="id"
-        filters={filters2}
-        filterDisplay="row"
-        sortOrder={1}
-        selection={selectedProductsPedido}
-        selectionMode="multiple"
-        onSelectionChange={(e) => setSelectedProductsPedido(e.value)}
-        onRowEditComplete={onRowEditComplete}
-        sortField="idproduto.nome"
-        rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
-      >
-        <Column
-          selectionMode="multiple"
-          headerStyle={{ width: "1px" }}
-        ></Column>
-        <Column
-          header="#"
-          body={(data, props) => <div> {props.rowIndex + 1}</div>}
-        ></Column>
-        {/* <Column
+      {dialogProduto ? (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              gap: "10px",
+              margin: "10px",
+            }}
+          >
+            <Button
+              icon="pi pi-backward"
+              label="Voltar"
+              className="p-button p-button-rounded p-button-danger"
+              onClick={() => setDialogProduto(false)}
+              onKeyUp={(e) => {
+                if (e.key === "Escape") {
+                  setDialogProduto(false);
+                }
+              }}
+            />
+
+            <DataTable
+              header="Informe um produto para adicionar ao pedido"
+              style={{ width: "100%" }}
+              emptyMessage="Sem dados para exibir no momento"
+              value={todosProdutos}
+              loading={loadingTodosProdutos}
+              showGridlines
+              virtualScrollerOptions={{ itemSize: 72 }}
+              filters={filtersProduto}
+              globalFilterFields={["codigo", "nome", "ean"]}
+              scrollable
+              scrollHeight="75vh"
+              tableStyle={{ width: "100vh" }}
+              // header={renderHeader}
+              filterDisplay="row"
+            >
+              <Column
+                filter
+                field="codigo"
+                filterPlaceholder="Pesquisar por código"
+                header="Código"
+              ></Column>
+              <Column
+                filter
+                field="ean"
+                filterPlaceholder="Pesquisar por código de barras"
+                header="Código de barras"
+              ></Column>
+              <Column
+                filter
+                field="nome"
+                filterPlaceholder="Pesquisar por nome"
+                header="Nome"
+              ></Column>
+              <Column
+                field="precocusto"
+                header="Preço de custo"
+                body={(row) => {
+                  return Intl.NumberFormat("pt-BR", {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2,
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(row.precocusto);
+                }}
+              ></Column>
+              <Column
+                field="preco"
+                header="Preço de venda"
+                body={(row) => {
+                  return Intl.NumberFormat("pt-BR", {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2,
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(row?.preco);
+                }}
+              ></Column>
+              <Column
+                body={(row) => {
+                  return (
+                    <>
+                      <Button
+                        label="Adicionar"
+                        className="p-button p-button-rounded p-button-sucesss"
+                        icon="pi pi-plus"
+                        onClick={() => adicionarProduto(row)}
+                      />
+                    </>
+                  );
+                }}
+              ></Column>
+            </DataTable>
+          </div>
+        </>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "1rem",
+                margin: "1rem",
+              }}
+              icon="pi pi-plus"
+              label="Adicionar produto"
+              className=" p-button-primary p-button-rounded"
+              onClick={() => {
+                getTodosProdutos();
+                setDialogProduto(true);
+              }}
+            />
+          </div>
+          <DataTable
+            style={{ marginTop: "1px", backgroundColor: "#F2F2F2" }}
+            // editMode="row"
+            // scrollable
+            // resizableColumns
+            // columnResizeMode="fit"
+            size="small"
+            showGridlines
+            //  scrollHeight="650px"
+            responsiveLayout="scroll"
+            footer={`Existem ${pedidos.length} produto(s) adicionado(s) a lista de compras - Produtos selecionados ${selectedProductsPedido.length}`}
+            footerColumnGroup={footerGroupPedido}
+            value={pedidos}
+            breakpoint="1739px"
+            rows={linhas?.current}
+            stripedRows
+            loading={loading3}
+            paginator
+            //  paginatorTemplate={template1}
+            emptyMessage="Nenhum produto adicionado a lista"
+            dataKey="id"
+            filters={filters2}
+            filterDisplay="row"
+            sortOrder={1}
+            selection={selectedProductsPedido}
+            selectionMode="multiple"
+            onSelectionChange={(e) => setSelectedProductsPedido(e.value)}
+            onRowEditComplete={onRowEditComplete}
+            sortField="idproduto.nome"
+            rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+          >
+            <Column
+              selectionMode="multiple"
+              headerStyle={{ width: "1px" }}
+            ></Column>
+            <Column
+              header="#"
+              body={(data, props) => <div> {props.rowIndex + 1}</div>}
+            ></Column>
+            {/* <Column
               field="filial.id"
               style={{ minWidth: "300px" }}
               //  body={lojaTemplate}
@@ -384,135 +439,139 @@ const PedidoListaSidebar = ({
               header="Cód.Loja"
               /> */}
 
-        <Column
-          field="idproduto.ean"
-          filter
-          body={(row) => {
-            return row?.idproduto?.ean
-              ? row?.idproduto?.ean
-              : row?.idproduto?.codigo;
-          }}
-          header="Código/Ean"
-        ></Column>
+            <Column
+              field="idproduto.ean"
+              filter
+              body={(row) => {
+                return row?.idproduto?.ean
+                  ? row?.idproduto?.ean
+                  : row?.idproduto?.codigo;
+              }}
+              header="Código/Ean"
+                filterPlaceholder="Pesquisar por código e/ou cód.barras"
+            ></Column>
 
-        <Column
-          style={{ minWidth: "600px" }}
-          field="idproduto.nome"
-          filter
-          sortable
-          header="Produto"
-        ></Column>
+            <Column
+              style={{ minWidth: "600px" }}
+              field="idproduto.nome"
+              filter
+              filterPlaceholder="Pesquisar por nome"
+              sortable
+              header="Produto"
+            ></Column>
 
-        <Column
-          style={{ minWidth: "150px" }}
-          body={(data) => (
-            <>
-              {Intl.NumberFormat("pt-BR", {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 3,
-                style: "decimal",
-              }).format(data?.quantidade / data?.fatorConversao)}{" "}
-              {data.unidadeCompra.codigo} ( {data?.fatorConversao} )
-            </>
-          )}
-          header="UN"
-        ></Column>
-        <Column
-          field="quantidade"
-          style={{ minWidth: "150px" }}
-          body={(row) => {
-            return Intl.NumberFormat("pt-BR", {
-              maximumFractionDigits: 3,
-              minimumFractionDigits: 2,
-              style: "decimal",
-            }).format(row?.quantidade);
-          }}
-          header="Quantidade total"
-        ></Column>
-
-        <Column
-          field="preco"
-          body={precoPedido}
-          sortable
-          header="Custo unitário"
-        ></Column>
-        <Column
-          body={(row) => {
-            return (
-              <>
-                {Intl.NumberFormat("pt-BR", {
+            <Column
+              style={{ minWidth: "150px" }}
+              body={(data) => (
+                <>
+                  {Intl.NumberFormat("pt-BR", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 3,
+                    style: "decimal",
+                  }).format(data?.quantidade / data?.fatorConversao)}{" "}
+                  {data.unidadeCompra.codigo} ( {data?.fatorConversao} )
+                </>
+              )}
+              header="UN"
+            ></Column>
+            <Column
+              field="quantidade"
+              style={{ minWidth: "150px" }}
+              body={(row) => {
+                return Intl.NumberFormat("pt-BR", {
+                  maximumFractionDigits: 3,
                   minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
                   style: "decimal",
-                }).format(row.preco * row?.fatorConversao)}
-              </>
-            );
-          }}
-          header="Custo total"
-        ></Column>
-        <Column
-          body={(row) => {
-            return (
-              <>
-                {Intl.NumberFormat("pt-BR", {
+                }).format(row?.quantidade);
+              }}
+              header="Quantidade total"
+            ></Column>
+
+            <Column
+              field="preco"
+              body={precoPedido}
+              sortable
+              header="Custo unitário"
+            ></Column>
+            <Column
+              body={(row) => {
+                return (
+                  <>
+                    {Intl.NumberFormat("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      style: "decimal",
+                    }).format(row.preco * row?.fatorConversao)}
+                  </>
+                );
+              }}
+              header="Custo total"
+            ></Column>
+            <Column
+              body={(row) => {
+                return (
+                  <>
+                    {Intl.NumberFormat("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      style: "decimal",
+                    }).format(
+                      ((row.precoVenda - row.preco) / row.preco) * 100
+                    )}{" "}
+                    %
+                  </>
+                );
+              }}
+              header="Markup Atual"
+            ></Column>
+
+            <Column
+              field="precoVenda"
+              body={(row) => {
+                return Intl.NumberFormat("pt-BR", {
+                  maximumFractionDigits: 2,
                   minimumFractionDigits: 2,
+                  style: "currency",
+                  currency: "BRL",
+                }).format(row?.precoVenda);
+              }}
+              header="Venda atual"
+            ></Column>
+            <Column
+              field="sugestaoMarkup"
+              body={(row) => {
+                return (
+                  Intl.NumberFormat("pt-BR", {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2,
+                    style: "decimal",
+                  }).format(row?.percentualmarkupminimo) + " % "
+                );
+              }}
+              header="Sugestão de Markup"
+            ></Column>
+
+            <Column
+              field="sugestao"
+              body={(row) => {
+                return Intl.NumberFormat("pt-BR", {
                   maximumFractionDigits: 2,
-                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  style: "currency",
+                  currency: "BRL",
                 }).format(
-                  ((row.precoVenda - row.preco) / row.preco) * 100
-                )}{" "}
-                %
-              </>
-            );
-          }}
-          header="Markup Atual"
-        ></Column>
+                  (row?.percentualmarkupminimo / 100) * row?.preco + row?.preco
+                );
+              }}
+              header="Sugestão de venda"
+            ></Column>
+            <Column field={precoPedidoLinhaTotal} header="Total "></Column>
 
-        <Column
-          field="precoVenda"
-          body={(row) => {
-            return Intl.NumberFormat("pt-BR", {
-              maximumFractionDigits: 2,
-              minimumFractionDigits: 2,
-              style: "currency",
-              currency: "BRL",
-            }).format(row?.precoVenda);
-          }}
-          header="Venda atual"
-        ></Column>
-        <Column
-          field="sugestaoMarkup"
-          body={(row) => {
-            return (
-              Intl.NumberFormat("pt-BR", {
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2,
-                style: "decimal",
-              }).format(row?.percentualmarkupminimo) + " % "
-            );
-          }}
-          header="Sugestão de Markup"
-        ></Column>
-
-        <Column
-          field="sugestao"
-          body={(row) => {
-            return Intl.NumberFormat("pt-BR", {
-              maximumFractionDigits: 2,
-              minimumFractionDigits: 2,
-              style: "currency",
-              currency: "BRL",
-            }).format(
-              (row?.percentualmarkupminimo / 100) * row?.preco + row?.preco
-            );
-          }}
-          header="Sugestão de venda"
-        ></Column>
-        <Column field={precoPedidoLinhaTotal} header="Total "></Column>
-
-        <Column field={editarItem}></Column>
-        <Column field={deletarItemPedido}></Column>
-      </DataTable>
+            <Column field={editarItem}></Column>
+            <Column field={deletarItemPedido}></Column>
+          </DataTable>
+        </>
+      )}
 
       <Dialog
         closable={false}
@@ -570,102 +629,26 @@ const PedidoListaSidebar = ({
       </Dialog>
 
       <Dialog
-        visible={dialogProduto}
-        position="bottom"
-        header="Adicionar produto ao pedido"
-        modal={true}
-        style={{ width: "100%", height: "100vh" }}
-        maximizable
-        onHide={() => setDialogProduto(false)}
-      >
-        <DataTable
-          style={{ width: "100%", height: "50vh" }}
-          emptyMessage="Sem dados para exibir no momento"
-          value={todosProdutos}
-          loading={loadingTodosProdutos}
-          showGridlines
-          paginator
-          rows={5}
-          filters={filters}
-          globalFilterFields={["codigo", "nome", "ean"]}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          tableStyle={{ width: "100vh" }}
-          header={renderHeader}
-          filterDisplay="row"
-        >
-          <Column
-            filter
-            field="codigo"
-            filterPlaceholder="Pesquisar por código"
-            header="Código"
-          ></Column>
-          <Column
-            filter
-            field="ean"
-            filterPlaceholder="Pesquisar por código de barras"
-            header="Código de barras"
-          ></Column>
-          <Column
-            filter
-            field="nome"
-            filterPlaceholder="Pesquisar por nome"
-            header="Nome"
-          ></Column>
-          <Column
-            field="precocusto"
-            header="Preço de custo"
-            body={(row) => {
-              return Intl.NumberFormat("pt-BR", {
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2,
-                style: "currency",
-                currency: "BRL",
-              }).format(row.precocusto);
-            }}
-          ></Column>
-          <Column
-            field="preco"
-            header="Preço de venda"
-            body={(row) => {
-              return Intl.NumberFormat("pt-BR", {
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2,
-                style: "currency",
-                currency: "BRL",
-              }).format(row?.preco);
-            }}
-          ></Column>
-          <Column
-            body={(row) => {
-              return (
-                <>
-                  <Button
-                    label="Adicionar"
-                    className="p-button p-button-rounded p-button-sucesss"
-                    icon="pi pi-plus"
-                    onClick={() => adicionarProduto(row)}
-                  />
-                </>
-              );
-            }}
-          ></Column>
-        </DataTable>
-      </Dialog>
-      <Dialog
-        header = {
+        header={
           novoProduto?.idproduto
-              ? "Código " + (novoProduto?.idproduto?.ean 
-                  ? novoProduto?.idproduto?.ean + " - " + novoProduto?.idproduto?.nome 
-                  : novoProduto?.idproduto?.codigo + " - " + novoProduto?.idproduto?.nome)
-              : "Código " + (novoProduto?.ean 
-                  ? novoProduto?.ean + " - " + novoProduto?.nome 
-                  : novoProduto?.codigo + " - " + novoProduto?.nome)
-      }
-      
+            ? "Código " +
+              (novoProduto?.idproduto?.ean
+                ? novoProduto?.idproduto?.ean +
+                  " - " +
+                  novoProduto?.idproduto?.nome
+                : novoProduto?.idproduto?.codigo +
+                  " - " +
+                  novoProduto?.idproduto?.nome)
+            : "Código " +
+              (novoProduto?.ean
+                ? novoProduto?.ean + " - " + novoProduto?.nome
+                : novoProduto?.codigo + " - " + novoProduto?.nome)
+        }
         position="bottom"
         draggable={false}
         visible={dialogNovoProduto}
         onHide={() => setDialogNovoProduto(false)}
+        style={{ height: "100vh", width: "100%" }}
         footer={
           <>
             <div

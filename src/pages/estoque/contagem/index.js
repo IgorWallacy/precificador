@@ -4,6 +4,7 @@ import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
 import DestaqueImg from "../../../assets/img/package.json";
+import DestaqueImg2 from "../../../assets/img/Animation - 1720833923478.json";
 import { Player } from "@lottiefiles/react-lottie-player";
 
 import { DataTable } from "primereact/datatable";
@@ -25,6 +26,7 @@ import moment from "moment";
 
 export default function ContagemInventario() {
   const navigate = useNavigate();
+
 
   const toast = useRef(null);
   const toastDialog = useRef(null);
@@ -313,14 +315,15 @@ const onGlobalFilterChange2 = (e) => {
           <Column header="Finalizar" body={finalizarTemplate} />
         </DataTable>
       </div>
-
+          
       <Dialog
         header="Cadastrar novo inventário"
         visible={visible}
-        style={{ width: "100%" , height:'75vh' }}
+        style={{ width: "450px" , height:'100vh' }}
         onHide={() => setVisible(false)}
-        modal={true}
-        position="bottom"
+        modal={false}
+        position="bottom-left" 
+       
         draggable={false}
       >
         <Toast ref={toastDialog} position="bottom-center" />
@@ -335,6 +338,12 @@ const onGlobalFilterChange2 = (e) => {
             margin:'25px',
           }}
         >
+           <Player
+                src={DestaqueImg2}
+                loop
+                autoplay
+                style={{ width: "350px" }}
+              />
           <div>
             <InputText
               placeholder="Descrição"

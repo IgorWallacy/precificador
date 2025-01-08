@@ -24,6 +24,8 @@ import { Dialog } from "primereact/dialog";
 import { ToggleButton } from "primereact/togglebutton";
 import { TriStateCheckbox } from "primereact/tristatecheckbox";
 
+
+
 import { SelectButton } from "primereact/selectbutton";
 
 import { useReactToPrint } from "react-to-print";
@@ -89,9 +91,14 @@ const PrecificadorAgenda = () => {
 
   const [produtoFilter, setProdutoFilter] = useState([]);
 
+  const [precoMarkupcalculo, setPrecoMarkupCalculo] = useState(0);
+
   const [agrupadoPorFornecedor, setAgrupadoPorFornecedor] = useState(1);
 
   const inputPreco = useRef(null);
+
+  const [produtoCustoComposicao, setProdutosCustoComposicao] = useState([]);
+  const [custoComposicaoDialog, setCustoComposicaoDialog] = useState(false);
 
   const [linhas, setLinhas] = useState(5);
 
@@ -186,7 +193,6 @@ const PrecificadorAgenda = () => {
   const renderHeaderFamilia = () => {
     return (
       <div className="flex justify-content-end">
-       
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -286,6 +292,9 @@ const PrecificadorAgenda = () => {
 
   const abrirDialogSugestao = (rowData) => {
     setExibirDialogSugestao(true);
+    setNovoPercentualMarkupMinimo(rowData?.percentualmarkup);
+    setPrecoMarkupCalculo(null);
+
     setprodutoEmExibicaoSugestaoDialog(rowData);
   };
 
@@ -345,6 +354,14 @@ const PrecificadorAgenda = () => {
               <div>Nota fiscal nº {rowData?.numeronotafiscal}</div>{" "}
             </>
           )}
+          <div>
+            <Button
+              className="p-buuton p-button-rounded"
+              label="Composição"
+              onClick={() => getProdutoCustoComposicao(rowData)}
+            />
+          </div>
+
           <p>CFOP {rowData?.cfop}</p>
           <h3> Custo de {custo}</h3>
         </div>
@@ -374,20 +391,62 @@ const PrecificadorAgenda = () => {
           <>
             <div style={{ color: "green" }}>
               <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+              <Tag 
+                value={
+                  `Lucro de  ` +
+                  Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(rowData.precoagendado - rowData.precocusto)
+                }
+                severity="success"
+              ></Tag >
               <br />
-              {markupFormatado} de markup <br />
-              <b> Agendado a </b> <br />
-              <font size="5"> {precoAgendaFormatado} </font>
+              {rowData.precoagendado > 0 ? (
+                <>
+                  {" "}
+                  {markupFormatado} de markup <br />
+                  <b> Agendado a </b> <br />
+                  <font size="5"> {precoAgendaFormatado} </font>
+                </>
+              ) : (
+                <> </>
+              )}
             </div>
           </>
         ) : (
           <>
             <div style={{ color: "red" }}>
-              <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+             
+              {rowData.precoagendado > 0 ? (
+                <>
+                 <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+                  <Tag 
+                    value={
+                      `Prejuízo de ` +
+                      Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(rowData.precoagendado - rowData.precocusto)
+                    }
+                    severity="danger"
+                  ></Tag >
+                </>
+              ) : (
+                <></>
+              )}
               <br />
-              {markupFormatado} de markup <br />
-              <b> Agendado </b> a <br />
-              <font size="5"> {precoAgendaFormatado} </font>
+              {rowData.precoagendado > 0 ? (
+                <>
+                  {" "}
+                  {markupFormatado} de markup <br />
+                  <b> Agendado </b> a <br />
+                  <font size="5"> {precoAgendaFormatado} </font>
+                </>
+              ) : (
+                <></>
+              )}
+             
             </div>
           </>
         )}
@@ -533,7 +592,7 @@ const PrecificadorAgenda = () => {
             ) : (
               <>
                 <div style={{ color: "green" }}>
-                  <i className="pi pi-tag" style={{ fontSize: "1em" }}></i>
+                  <i className="pi pi-tag " style={{ fontSize: "1em" }}></i>
                   <div> {markupFormatado} de markup </div>
                   <b> Vendendo atualmente </b> a{" "}
                   <div>
@@ -1044,7 +1103,9 @@ const PrecificadorAgenda = () => {
             width: "100%",
           }}
         >
-           <h4>⚠️ Atenção, regravar a nota no uniplus deleta o agendamento aqui ⚠️</h4>
+          <h4>
+            ⚠️ Atenção, regravar a nota no uniplus deleta o agendamento aqui ⚠️
+          </h4>
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText
@@ -1147,7 +1208,6 @@ const PrecificadorAgenda = () => {
 
     return (
       <>
-        
         <DataTable
           showGridlines
           size="small"
@@ -1514,6 +1574,19 @@ const PrecificadorAgenda = () => {
     );
   };
 
+  const getProdutoCustoComposicao = (rowData) => {
+    return api
+      .get(`/api/custo-composicao/listar/${rowData?.id}`)
+      .then((r) => {
+        setProdutosCustoComposicao([r.data]);
+        setCustoComposicaoDialog(true);
+        setprodutoEmExibicaoSugestaoDialog(rowData);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
@@ -1521,6 +1594,366 @@ const PrecificadorAgenda = () => {
 
       <Header />
       <Footer />
+
+      <Dialog
+        header="Composição do Custo"
+        visible={custoComposicaoDialog}
+        position="bottom"
+        style={{ width: "50vw" }}
+        onHide={() => {
+          if (!custoComposicaoDialog) return;
+          setCustoComposicaoDialog(false);
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "15px",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "#333",
+          }}
+        >
+          {/* Informações do Produto */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "100%",
+              alignItems: "flex-start",
+              borderBottom: "1px solid #ddd",
+              paddingBottom: "10px",
+            }}
+          >
+            <p>Produto: {produtoCustoComposicao[0]?.produto}</p>
+            <p>Quantidade: {produtoCustoComposicao[0]?.quantidade}</p>
+            <p>
+              Unidade de Medida: {produtoCustoComposicao[0]?.unidade} -
+              Embalagem com {produtoCustoComposicao[0]?.embalagem}
+            </p>
+          </div>
+
+          {/* Preços */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "100%",
+              alignItems: "flex-start",
+              borderBottom: "1px solid #ddd",
+              paddingBottom: "10px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>Preço de Compra :</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(produtoCustoComposicao[0]?.precodecompra)}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>Preço de Compra UN :</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(
+                  produtoCustoComposicao[0]?.precodecompra /
+                    produtoCustoComposicao[0]?.embalagem
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* Descontos */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "100%",
+              alignItems: "flex-start",
+              borderBottom: "1px solid #ddd",
+              paddingBottom: "10px",
+              color: "red",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( - ) Desconto:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(produtoCustoComposicao[0]?.desconto)}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( - ) Desconto UN:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(
+                  produtoCustoComposicao[0]?.desconto /
+                    produtoCustoComposicao[0]?.quantidade /
+                    produtoCustoComposicao[0]?.embalagem
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* ICMS ST */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "100%",
+              alignItems: "flex-start",
+              borderBottom: "1px solid #ddd",
+              paddingBottom: "10px",
+              color: "green",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) ICMS ST:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(produtoCustoComposicao[0]?.icmsst)}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) ICMS ST UN:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(
+                  produtoCustoComposicao[0]?.icmsst /
+                    produtoCustoComposicao[0]?.quantidade /
+                    produtoCustoComposicao[0]?.embalagem
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* FCP ST */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "100%",
+              alignItems: "flex-start",
+              color: "green",
+              borderBottom: "1px solid #ddd",
+              paddingBottom: "10px",
+             
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) FCP ST:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(produtoCustoComposicao[0]?.fcpst)}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) FCP ST UN:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(
+                  produtoCustoComposicao[0]?.fcpst /
+                    produtoCustoComposicao[0]?.quantidade /
+                    produtoCustoComposicao[0]?.embalagem
+                )}
+              </span>
+            </div>
+          </div>
+          {/* IPI */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "100%",
+              alignItems: "flex-start",
+              color: "green",
+              borderBottom: "1px solid #ddd",
+              paddingBottom: "10px",
+            
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) IPI:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(produtoCustoComposicao[0]?.ipi)}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) IPI UN:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(
+                  produtoCustoComposicao[0]?.ipi /
+                    produtoCustoComposicao[0]?.quantidade /
+                    produtoCustoComposicao[0]?.embalagem
+                )}
+              </span>
+            </div>
+          </div>
+          {/*FREETE */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              width: "100%",
+              alignItems: "flex-start",
+              color: "green",
+              borderBottom: "1px solid #ddd",
+              paddingBottom: "10px",
+             
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) Frete / Outras despesas:</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(produtoCustoComposicao[0]?.frete)}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>( + ) Frete / Outras despesas (UN):</span>
+              <span>
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(
+                  produtoCustoComposicao[0]?.frete /
+                    produtoCustoComposicao[0]?.quantidade /
+                    produtoCustoComposicao[0]?.embalagem
+                )}
+              </span>
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "5px",
+              justifyContent: "flex-end",
+              alignItems: "flex-end",
+              width: "100%",
+            }}
+          >
+            <h1>
+              {Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(produtoEmExibicaoSugestaoDialog?.precocusto)}
+            </h1>
+          </div>
+          <div>
+            <Button
+              icon="pi pi-times"
+              className="p-button p-button-rounded p-button-danger"
+              label="Fechar"
+              onClick={() => setCustoComposicaoDialog(false)}
+            />
+          </div>
+        </div>
+      </Dialog>
 
       <div className="agenda-label">
         <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
@@ -1745,12 +2178,15 @@ const PrecificadorAgenda = () => {
               </div>
 
               <div style={{ marginTop: "5px" }}>
+                %{" "}
                 <InputNumber
-                  value={novoPercentualMarkDownMinimo}
+                  value={novoPercentualMarkupMinimo}
                   mode="decimal"
                   minFractionDigits={2}
                   maxFracionDigits={2}
-                  onChange={(e) => setNovoPercentualMarkupMinimo(e.value)}
+                  onChange={(e) => {
+                    setNovoPercentualMarkupMinimo(e.value);
+                  }}
                   autoFocus
                   style={{ margin: "1rem" }}
                   onKeyDown={(e) => {
@@ -1763,7 +2199,55 @@ const PrecificadorAgenda = () => {
                   placeholder="0,00%"
                   maxFractionDigits={2}
                   locale="pt-BR"
-                />
+                />{" "}
+                {" = "}
+                {Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(
+                  (novoPercentualMarkupMinimo *
+                    produtoEmExibicaoSugestaoDialog?.precocusto) /
+                    100 +
+                    produtoEmExibicaoSugestaoDialog?.precocusto
+                )}
+              </div>
+              <div>
+                R${" "}
+                <InputNumber
+                  value={precoMarkupcalculo}
+                  mode="decimal"
+                  minFractionDigits={2}
+                  maxFracionDigits={2}
+                  onChange={(e) => setPrecoMarkupCalculo(e.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+
+                      atualizarmarkupminimo(
+                        (precoMarkupcalculo /
+                          produtoEmExibicaoSugestaoDialog?.precocusto -
+                          1) *
+                          100
+                      );
+                    }
+                  }}
+                  style={{ margin: "1rem" }}
+                  placeholder="R$ 0,00"
+                  maxFractionDigits={2}
+                  locale="pt-BR"
+                />{" "}
+                ={" "}
+                {Intl.NumberFormat("pt-BR", {
+                  style: "decimal",
+                  maximumFractionDigits: "2",
+                  minimumFractionDigits: "2",
+                }).format(
+                  (precoMarkupcalculo /
+                    produtoEmExibicaoSugestaoDialog?.precocusto -
+                    1) *
+                    100
+                )}{" "}
+                %
               </div>
             </div>
           </Dialog>

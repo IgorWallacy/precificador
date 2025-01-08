@@ -27,6 +27,7 @@
     "chart.js": "^3.9.1",
     "cldr-data": "^36.0.1",
     "crypto-browserify": "^3.12.0",
+    "exceljs": "^4.4.0",
     "export-to-csv": "^0.2.1",
     "file-saver": "^2.0.5",
     "iframe-resizer-react": "^1.1.0",
@@ -55,6 +56,7 @@
     "react-text-transition": "^3.0.2",
     "react-to-print": "^2.14.15",
     "react-typing-animation": "^1.6.2",
+    "update-browserslist-db": "^1.1.1",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5",
     "yup": "^1.2.0"

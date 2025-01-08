@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import api from "../../services/axios";
-import api_uniplus from "../../services/axios/axios_uniplus"
-
-
+import api_uniplus from "../../services/axios/axios_uniplus";
+import { Dialog } from "primereact/dialog";
 
 import Footer from "../../components/footer";
 import Header from "../../components/header";
@@ -18,6 +17,7 @@ import {
   faCalendar,
   faBarcode,
   faFileInvoice,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./menu-interativo.css";
@@ -25,24 +25,13 @@ import "./menu-interativo.css";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 
-
 const MenuInterativo = () => {
   const [nome, setNome] = useState("");
+  const [verificarInativo, setVerificarInativo] = useState(false);
   const [headers, setHeaders] = useState();
   const [filial, setFilial] = useState(1);
 
   const navigate = useNavigate();
-
- 
-
-
-
-  
-
-
-
-  
-    
 
   const getFilial = () => {
     return api
@@ -65,7 +54,7 @@ const MenuInterativo = () => {
     };
     setHeaders(headers);
 
-    api.interceptors.request.use( 
+    api.interceptors.request.use(
       (config) => {
         // Do something before request is sent
 
@@ -79,26 +68,60 @@ const MenuInterativo = () => {
     );
   };
 
- 
-
   useEffect(() => {
-   
     pegarTokenLocalStorage();
-    
+
     getFilial();
     let token = localStorage.getItem("access_token");
     let a = JSON.parse(token);
 
     setNome(a.nome);
+    console.log(a?.inativo);
+    setVerificarInativo(a?.inativo);
   }, []);
-
- 
 
   return (
     <>
       <Header />
       <Footer />
-     
+      {verificarInativo ? (
+        <>
+          <Dialog
+            header="Aviso"
+            visible={verificarInativo}
+            style={{ width: "50vw" }}
+            onHide={() => localStorage.clear()}
+            closable={false}
+            draggable={false}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <FontAwesomeIcon icon={faUserTie} size="3x" />
+              <h1>Usuário inativo</h1>
+              <p>
+                Seu usuário está inativo, favor entrar em contato com o
+                administrador
+              </p>
+              <Button
+                label="Sair"
+                icon="pi pi-sign-out"
+                className="p-button p-button-rounded p-button-danger"
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();}}
+              />
+            </div>
+          </Dialog>
+        </>
+      ) : (
+        <> Ativo</>
+      )}
       <div
         style={{
           display: "flex",
@@ -108,11 +131,7 @@ const MenuInterativo = () => {
           color: "#DDDD",
           padding: "1em",
         }}
-      >
-        
-         
-        
-      </div>
+      ></div>
       <div className="menu-interativo">
         <div className="menu-categoria">
           <FontAwesomeIcon icon={faTags} size="2x" />
@@ -133,15 +152,12 @@ const MenuInterativo = () => {
               className="p-button-rounded p-button-help p-button-lg"
               onClick={() => navigate("/precificar-executar")}
             />
-            
           </div>
-         
         </div>
         <div className="menu-categoria">
           {" "}
           <FontAwesomeIcon icon={faGlobe} size="2x" />
           <h1>Compras</h1>
-         
           <div className="opcoes-menu">
             <Button
               label="Pedido de compra"
@@ -150,7 +166,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/compras/consulta")}
             />
           </div>
-          </div>  
+        </div>
         <div className="menu-categoria">
           {" "}
           <FontAwesomeIcon icon={faBarcode} size="2x" />
@@ -163,7 +179,6 @@ const MenuInterativo = () => {
               onClick={() => navigate("/estoque/lista-inventario")}
             />
           </div>
-
           <div className="opcoes-menu">
             <Button
               label="Iniciar contagem"
@@ -172,7 +187,6 @@ const MenuInterativo = () => {
               onClick={() => navigate("/estoque/inventario/incluir-contagem")}
             />
           </div>
-
           <div className="opcoes-menu">
             <Button
               label="Zerar estoque"
@@ -181,10 +195,8 @@ const MenuInterativo = () => {
               onClick={() => navigate("/estoque/ajustes")}
             />
           </div>
-
-         
         </div>
-        
+
         <div className="menu-categoria">
           {" "}
           <FontAwesomeIcon icon={faStore} size="2x" />
@@ -197,7 +209,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/vendas")}
             />
           </div>
-          { /*
+          {/*
           <div className="opcoes-menu">
             <Button
               label="Resumo de vendas"
@@ -245,10 +257,6 @@ const MenuInterativo = () => {
               onClick={() => navigate("/bi/pivot")}
             />
           </div>
-
-         
-         
-         
           <div className="opcoes-menu">
             <Button
               label="Metas"
@@ -257,7 +265,7 @@ const MenuInterativo = () => {
               onClick={() => navigate("/vendas/metas")}
             />
           </div>{" "}
-          { filial.length > 1 ? (
+          {filial.length > 1 ? (
             <>
               <div className="opcoes-menu">
                 <Button
@@ -284,8 +292,16 @@ const MenuInterativo = () => {
               onClick={() => navigate("/recebimentos/consulta")}
             />
           </div>
+          <div className="opcoes-menu">
+            <Button
+              label="Consultar vendas do crediário"
+              icon="pi pi-dollar"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/vendas/crediario/consulta")}
+            />
+          </div>
         </div>
-        
+
         <div className="menu-categoria">
           {" "}
           <FontAwesomeIcon icon={faGlobe} size="2x" />
@@ -299,7 +315,19 @@ const MenuInterativo = () => {
             />
           </div>
         </div>
-        
+        <div className="menu-categoria">
+          {" "}
+          <FontAwesomeIcon icon={faUser} size="2x" />
+          <h1>Usuários</h1>
+          <div className="opcoes-menu">
+            <Button
+              label="Gerar etiqueta de senha para usuários"
+              icon="pi pi-globe"
+              className="p-button-rounded p-button-help p-button-lg"
+              onClick={() => navigate("/usuarios/etiqueta")}
+            />
+          </div>
+        </div>
       </div>
     </>
   );

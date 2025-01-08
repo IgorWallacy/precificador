@@ -19,7 +19,7 @@ import moment from "moment";
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
-const RecebimentoPorData = () => {
+const VendasCrediarioPorData = () => {
   const tabelaRef = useRef(null);
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [recebimentos, setRecebimentos] = useState([]);
@@ -52,12 +52,14 @@ const RecebimentoPorData = () => {
     setLoading(true);
     return api
       .get(
-        `/api/recebimento/porPagamento/${moment(resumoData?.[0]?.$d).format(
+        `/api/recebimento/vendas/crediario/${moment(resumoData?.[0]?.$d).format(
           "YYYY-MM-DD"
         )}/${moment(resumoData?.[1]?.$d).format("YYYY-MM-DD")}/${0}`
       )
       .then((r) => {
-        setRecebimentos(r.data);
+        const filteredData = r?.data.filter(item => item !== null);
+        setRecebimentos(filteredData);
+       // console.log(filteredData);
       })
       .catch((e) => {
         console.log(e);
@@ -72,8 +74,8 @@ const RecebimentoPorData = () => {
 
     if (recebimentos) {
       for (let r of recebimentos) {
-        if (r.nomeCliente === row.nomeCliente) {
-          total += r.valorPago;
+        if (r?.nomeCliente === row?.nomeCliente) {
+          total += r?.valorPago;
         }
       }
     }
@@ -91,11 +93,11 @@ const RecebimentoPorData = () => {
 
     if (recebimentos) {
       for (let r of recebimentos) {
-        if (r.nomeCliente === row.nomeCliente) {
-          if (r.documento === row.documento) {
-            total = r.valor;
+        if (r?.nomeCliente === row?.nomeCliente) {
+          if (r?.documento === row?.documento) {
+            total = r?.valor;
           } else {
-            total += r.valor;
+            total += r?.valor;
           }
         }
       }
@@ -113,8 +115,8 @@ const RecebimentoPorData = () => {
 
     if (recebimentos) {
       for (let r of recebimentos) {
-        if (r.nomeCliente === row.nomeCliente) {
-          total += r.jurosPago;
+        if (r?.nomeCliente === row?.nomeCliente) {
+          total += r?.jurosPago;
         }
       }
     }
@@ -132,8 +134,8 @@ const RecebimentoPorData = () => {
 
     if (recebimentos) {
       for (let r of recebimentos) {
-        if (r.nomeCliente === row.nomeCliente) {
-          total += r.multaPaga;
+        if (r?.nomeCliente === row?.nomeCliente) {
+          total += r?.multaPaga;
         }
       }
     }
@@ -151,8 +153,8 @@ const RecebimentoPorData = () => {
 
     if (recebimentos) {
       for (let r of recebimentos) {
-        if (r.nomeCliente === row.nomeCliente) {
-          total += r.desconto;
+        if (r?.nomeCliente === row?.nomeCliente) {
+          total += r?.desconto;
         }
       }
     }
@@ -238,26 +240,24 @@ const RecebimentoPorData = () => {
     return api
       .get("/api/filial")
       .then((r) => {
-        setLojas(r.data);
+        setLojas(r?.data);
       })
       .catch((e) => {
         console.log(e);
       });
   };
 
-    const exportToExcel = () => {
+  const exportToExcel = () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Recebimentos");
-  
+
     // Adiciona o título da planilha
     worksheet.mergeCells("A1:N1");
     worksheet.mergeCells("A2:N2");
-    
-    const header = 
-      `Recebimentos por data do pagamento de 
+
+    const header = `Vendas no crediário de 
       ${moment(resumoData?.[0]?.$d).format("DD/MM/YYYY")}
-      até ${moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}`
-    ;
+      até ${moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}`;
     worksheet.addRow(header);
     const titleCell = worksheet.getCell("A2");
     titleCell.value = header;
@@ -271,13 +271,13 @@ const RecebimentoPorData = () => {
     titleCell.border = {
       bottom: { style: "thin", color: { argb: "FF000000" } },
     };
-    
+
     // Adiciona uma linha em branco após o título
     worksheet.addRow({});
-  
+
     // Adiciona os cabeçalhos
     worksheet.columns = [
-      { header: "Nome Cliente", key: "nomeCliente", width: 0 ,hidden: true},
+      { header: "Nome Cliente", key: "nomeCliente", width: 0, hidden: true },
       { header: "Documento", key: "documento", width: 20 },
       { header: "Loja", key: "loja", width: 20 },
       { header: "Data da Compra", key: "emissao", width: 15 },
@@ -321,7 +321,7 @@ const RecebimentoPorData = () => {
       },
       { header: "Recebido por", key: "usuariomovimentacao", width: 20 },
     ];
-  
+
     // Formatação do cabeçalho
     const headerRow = worksheet.addRow(
       Object.keys(worksheet.columns).map((key) => worksheet.columns[key].header)
@@ -339,72 +339,79 @@ const RecebimentoPorData = () => {
         top: { style: "thin", color: { argb: "FF000000" } },
       };
     });
-  
+
     // Fixar o cabeçalho
     worksheet.views = [{ state: "frozen", ySplit: 5 }];
-  
+
     // Agrupa os recebimentos por cliente
     const groupedByClient = recebimentos.reduce((acc, curr) => {
-      const client = acc[curr.nomeCliente] || [];
+      const client = acc[curr?.nomeCliente] || [];
       client.push(curr);
-      acc[curr.nomeCliente] = client;
+      acc[curr?.nomeCliente] = client;
       return acc;
     }, {});
-  
+
     // Variáveis para total geral
     let totalGeralValor = 0;
     let totalGeralJuros = 0;
     let totalGeralMulta = 0;
     let totalGeralDesconto = 0;
     let totalGeralFalta = 0;
-  
+
     // Adiciona os dados ao worksheet
     Object.keys(groupedByClient).forEach((clientName) => {
       const clientRecebimentos = groupedByClient[clientName];
-  
+
       // Adiciona um cabeçalho para o cliente
       worksheet.addRow({ nomeCliente: clientName });
-      const clientRow = worksheet.lastRow;
-      worksheet.mergeCells(`A${clientRow.number}:N${clientRow.number}`);
-      clientRow.getCell(1).value = clientName;
-      clientRow.font = { bold: true };
-      clientRow.fill = {
+      const clientrow = worksheet.lastRow;
+      worksheet.mergeCells(`A${clientrow?.number}:N${clientrow?.number}`);
+      clientrow.getCell(1).value = clientName;
+      clientrow.font = { bold: true };
+      clientrow.fill = {
         type: "pattern",
         pattern: "solid",
         fgColor: { argb: "FFFFE4B5" }, // Amarelo claro
       };
-      clientRow.alignment = { horizontal: "center" };
-  
+      clientrow.alignment = { horizontal: "center" };
+
       let totalValor = 0;
       let totalJuros = 0;
       let totalMulta = 0;
       let totalDesconto = 0;
       let totalFalta = 0;
-  
+
       // Adiciona os dados do cliente e calcula os totais
       clientRecebimentos.forEach((item) => {
         // Formata as datas para o formato brasileiro
-        item.emissao = moment(item.emissao).format("DD/MM/YYYY");
-        item.vencimento = moment(item.vencimento).format("DD/MM/YYYY");
-        item.pagamento = moment(item.pagamento).format("DD/MM/YYYY");
-  
+
+        item.emissao = item?.emissao
+          ? moment(item?.emissao).format("DD/MM/YYYY")
+          : "";
+        item.vencimento = item?.vencimento
+          ? moment(item?.vencimento).format("DD/MM/YYYY")
+          : "";
+        item.pagamento = item?.pagamento
+          ? moment(item?.pagamento).format("DD/MM/YYYY")
+          : "";
+
         worksheet.addRow(item);
-  
+
         // Acumula os totais por cliente
-        totalValor += item.valor || 0;
-        totalJuros += item.jurosPago || 0;
-        totalMulta += item.multaPaga || 0;
-        totalDesconto += item.desconto || 0;
-        totalFalta += item.saldo || 0;
-  
+        totalValor += item?.valor || 0;
+        totalJuros += item?.jurosPago || 0;
+        totalMulta += item?.multaPaga || 0;
+        totalDesconto += item?.desconto || 0;
+        totalFalta += item?.saldo || 0;
+
         // Acumula os totais gerais
-        totalGeralValor += item.valor || 0;
-        totalGeralJuros += item.jurosPago || 0;
-        totalGeralMulta += item.multaPaga || 0;
-        totalGeralDesconto += item.desconto || 0;
-        totalGeralFalta += item.saldo || 0;
+        totalGeralValor += item?.valor || 0;
+        totalGeralJuros += item?.jurosPago || 0;
+        totalGeralMulta += item?.multaPaga || 0;
+        totalGeralDesconto += item?.desconto || 0;
+        totalGeralFalta += item?.saldo || 0;
       });
-  
+
       // Adiciona uma linha de subtotal
       const subtotalRow = {
         nomeCliente: "Subtotal",
@@ -414,7 +421,7 @@ const RecebimentoPorData = () => {
         desconto: totalDesconto,
         saldo: totalFalta,
       };
-  
+
       worksheet.addRow(subtotalRow);
       worksheet.lastRow.font = { bold: true };
       worksheet.lastRow.fill = {
@@ -422,11 +429,11 @@ const RecebimentoPorData = () => {
         pattern: "solid",
         fgColor: { argb: "FFFFE4B5" }, // Amarelo claro
       };
-  
+
       // Adiciona uma linha em branco entre clientes
       worksheet.addRow({});
     });
-  
+
     // Adiciona uma linha para o total geral
     const totalGeralRow = {
       nomeCliente: "Total Geral",
@@ -436,7 +443,7 @@ const RecebimentoPorData = () => {
       desconto: totalGeralDesconto,
       saldo: totalGeralFalta,
     };
-  
+
     worksheet.addRow(totalGeralRow);
     const lastRow = worksheet.lastRow;
     lastRow.font = { bold: true, size: 14 }; // Formatação para destacar
@@ -445,7 +452,7 @@ const RecebimentoPorData = () => {
       pattern: "solid",
       fgColor: { argb: "FFFFE4B5" }, // Amarelo claro
     };
-  
+
     // Formatação das bordas do total geral
     lastRow.eachCell((cell) => {
       cell.border = {
@@ -453,7 +460,7 @@ const RecebimentoPorData = () => {
         bottom: { style: "thin", color: { argb: "FF000000" } },
       };
     });
-  
+
     // Salva o arquivo
     workbook.xlsx.writeBuffer().then((data) => {
       const blob = new Blob([data], { type: "application/octet-stream" });
@@ -486,7 +493,7 @@ const RecebimentoPorData = () => {
             marginTop: "50px",
           }}
         >
-          <h1>Recebimentos por data do pagamento</h1>
+          <h1>Vendas no crediário </h1>
           <RangePicker
             disabled={loading}
             format={"DD/MM/YYYY"}
@@ -496,21 +503,21 @@ const RecebimentoPorData = () => {
           />
           <Button
             style={{ margin: "2px" }}
-            label="Pesquisar recebimentos"
+            label="Pesquisar vendas"
             icon="pi pi-search"
             className="p-btton p-button-secondary p-button-rounded"
             onClick={() => getRecebimentos()}
           />
           <Button
             style={{ margin: "2px" }}
-            label="Imprimir recebimentos"
+            label="Imprimir vendas"
             icon="pi pi-print"
             className="p-btton p-button-warning p-button-rounded"
             onClick={() => handlePrint()}
           />
           <Button
             style={{ margin: "2px" }}
-            label="Exportar recebimentos excel"
+            label="Exportar vendas excel"
             icon="pi pi-file-excel"
             className="p-btton p-button-success p-button-rounded"
             onClick={() => exportToExcel()}
@@ -562,7 +569,7 @@ const RecebimentoPorData = () => {
               filters={filters2}
               filterDisplay="row"
               rowGroupHeaderTemplate={headerTemplate}
-              footer={`Exibindo os dados pela data de recebimento de ${moment(
+              footer={`Exibindo os dados pela data da venda de ${moment(
                 resumoData?.[0]?.$d
               ).format("DD/MM/YYYY")} até 
                       ${moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}`}
@@ -693,7 +700,7 @@ const RecebimentoPorData = () => {
                     <>
                       <div
                         style={{
-                          color: `${row.saldo === 0 ? "green" : "red"}`,
+                          color: `${row?.saldo === 0 ? "green" : "red"}`,
                         }}
                       >
                         {Intl.NumberFormat("pt-BR", {
@@ -719,4 +726,4 @@ const RecebimentoPorData = () => {
   );
 };
 
-export default RecebimentoPorData;
+export default VendasCrediarioPorData;

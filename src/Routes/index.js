@@ -37,7 +37,8 @@ import { jwtDecode } from "jwt-decode";
 import Metabase from "../pages/metabase";
 import IncluirContagemInventario from "../pages/estoque/contagem/incluir";
 import IncluirContagemProdutosInventario from '../pages/estoque/contagem/incluir/contagemProdutos'
-
+import VendasCrediarioPorData from "../pages/vendas/crediario";
+import EtiquetaUsuario from "../pages/usuario/etiqueta";
 
 
 export default function Router() {
@@ -133,6 +134,7 @@ export default function Router() {
           <Route path="vendas/metas" element={<MetasComponent />} />
           <Route path="bi/pivot" element={<Pivot />} />
           <Route path="recebimentos/consulta" element={<RecebimentoPorData />} />
+          <Route path="vendas/crediario/consulta" element={<VendasCrediarioPorData />} />
         
           <Route
             path="compras/analise/fornecedor"
@@ -166,6 +168,7 @@ export default function Router() {
           />
           <Route path="compras/consulta" element={<ListaCompras />} />
           <Route path="pdv/status" element={<StatusPdv />} />
+          <Route path="usuarios/etiqueta" element={<EtiquetaUsuario />} />
         </Route>
       </Routes>
     </Context.Provider>

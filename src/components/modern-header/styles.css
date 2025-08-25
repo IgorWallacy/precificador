@@ -1,0 +1,759 @@
+.modern-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--primary-color);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--primary-light);
+  box-shadow: var(--shadow-md);
+  z-index: 1003;
+  transition: all var(--transition-normal);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 var(--spacing-lg);
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+}
+
+/* Brand Section */
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--white);
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-logo-icon {
+  font-size: 1.5rem;
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.25);
+  padding: 8px;
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
+}
+
+.brand-title {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.brand-subtitle {
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-left: 46px;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Search Section */
+.header-search {
+  flex: 1;
+  max-width: 500px;
+  margin: 0 24px;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.search-container:focus-within {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.search-container:focus-within .search-icon {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.search-input {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
+  padding: 12px 16px 12px 48px !important;
+  font-size: 0.9375rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.01em !important;
+  border-radius: 12px !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 400 !important;
+}
+
+.filter-btn {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  border: none !important;
+  margin-right: 8px;
+  transition: all 0.3s ease !important;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  transform: scale(1.05);
+}
+
+/* Actions Section */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  transition: all 0.2s ease !important;
+  backdrop-filter: blur(8px);
+  position: relative;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification-btn {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #FF4B4B !important;
+  color: #ffffff !important;
+  font-size: 0.6875rem !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  border-radius: 9px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 2px solid #4A2B7D;
+  box-shadow: 0 2px 6px rgba(255, 75, 75, 0.3);
+}
+
+/* User Section */
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 8px 16px;
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease;
+}
+
+.user-info:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.user-role {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease;
+}
+
+.user-role.user-inactive {
+  color: #ef4444 !important;
+  opacity: 1;
+  font-weight: 600;
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.user-avatar-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-avatar {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  width: 48px !important;
+  height: 48px !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-avatar:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.status-indicator.online {
+  background: #10b981;
+  animation: pulse-status 2s infinite;
+}
+
+@keyframes pulse-status {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* User Menu */
+.user-menu {
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95)) !important;
+  backdrop-filter: blur(20px);
+  border-radius: 20px !important;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.15),
+    0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  padding: 20px !important;
+  min-width: 300px;
+  transform-origin: top right;
+  animation: menu-fade-in 0.2s ease-out;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+}
+
+/* Garantir que o menu seja visível em diferentes resoluções */
+@media (max-width: 768px) {
+  .user-menu {
+    min-width: 280px !important;
+    max-width: 90vw !important;
+    right: 16px !important;
+    left: auto !important;
+  }
+}
+
+/* Estilos específicos para o OverlayPanel do PrimeReact */
+.p-component-overlay {
+  z-index: 9998 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.user-menu.p-overlaypanel {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja posicionado corretamente em relação ao avatar */
+.user-avatar-container {
+  position: relative;
+  z-index: 1004;
+}
+
+/* Garantir que o menu seja sempre visível */
+.user-menu {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível acima de outros elementos */
+.p-component-overlay {
+  z-index: 9998 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-panel {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-content {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-arrow {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-close {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-header {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-body {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-footer {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-title {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-icon {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-text {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-badge {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-tooltip {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-popup {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-dialog {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-mask {
+  z-index: 9998 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-backdrop {
+  z-index: 9998 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-overlay {
+  z-index: 9998 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-wrapper {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-container {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-root {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-base {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-element {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-item {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-link {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-button {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-input {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-label {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-required {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-help {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-message {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-error {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-warning {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-info {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-success {
+  z-index: 9999 !important;
+}
+
+/* Garantir que o menu seja sempre visível */
+.p-overlaypanel-danger {
+  z-index: 9999 !important;
+}
+
+@keyframes menu-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0 12px 0;
+  border-bottom: 1px solid rgba(73, 80, 87, 0.1);
+  margin-bottom: 4px;
+}
+
+.menu-avatar {
+  background: linear-gradient(135deg, #495057, #6c757d) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  width: 52px !important;
+  height: 52px !important;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(73, 80, 87, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.menu-avatar:hover {
+  transform: scale(1.05);
+}
+
+.menu-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-user-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #495057;
+  letter-spacing: -0.01em;
+}
+
+.menu-user-email {
+  font-size: 0.85rem;
+  color: #666666;
+  letter-spacing: 0.01em;
+}
+
+.menu-user-role {
+  font-size: 0.8rem;
+  color: #495057;
+  font-weight: 500;
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: rgba(73, 80, 87, 0.08);
+  border-radius: 20px;
+  display: inline-block;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+
+.menu-user-role:hover {
+  background: rgba(73, 80, 87, 0.12);
+  transform: translateY(-1px);
+}
+
+.menu-user-role.inactive {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.08);
+}
+
+.menu-user-role.inactive:hover {
+  background: rgba(220, 53, 69, 0.12);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+}
+
+.menu-item:hover {
+  background: rgba(73, 80, 87, 0.04);
+  transform: translateX(4px);
+  border-color: rgba(73, 80, 87, 0.08);
+}
+
+.menu-item:active {
+  transform: translateX(2px);
+}
+
+.menu-item i {
+  color: #663399;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+.menu-item:hover i {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.menu-item.logout-menu-item {
+  color: #dc3545;
+  margin-top: 4px;
+}
+
+.menu-item.logout-menu-item i {
+  color: #dc3545;
+}
+
+.menu-item.logout-menu-item:hover {
+  background: rgba(220, 53, 69, 0.08);
+  border-color: rgba(220, 53, 69, 0.15);
+}
+
+.menu-separator {
+  border: none;
+  border-top: 1px solid rgba(102, 51, 153, 0.08);
+  margin: 8px 0;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .modern-header {
+    left: 0;
+  }
+  
+  .header-container {
+    padding: 0 24px;
+  }
+  
+  .header-search {
+    max-width: 300px;
+    margin: 0 16px;
+  }
+  
+  .user-info {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-header {
+    height: 64px;
+  }
+  
+  .header-container {
+    padding: 0 16px;
+  }
+  
+  .header-search {
+    display: none;
+  }
+  
+  .brand-subtitle {
+    display: none;
+  }
+  
+  .brand-title {
+    font-size: 1.2rem;
+  }
+  
+  .header-logo-icon {
+    font-size: 1.5rem;
+    padding: 8px;
+  }
+  
+  .quick-actions {
+    gap: 4px;
+  }
+  
+  .action-btn {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .main {
+    padding-top: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-container {
+    padding: 0 12px;
+  }
+  
+  .header-actions {
+    gap: 12px;
+  }
+  
+  .user-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* Header agora ocupa toda a largura disponível */

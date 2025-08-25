@@ -1,4 +1,3 @@
-import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 import { InputText } from "primereact/inputtext";
 import { DataTable } from "primereact/datatable";
@@ -173,7 +172,6 @@ const EtiquetaUsuario = () => {
 
   return (
     <>
-      <Header />
       <Footer />
       <Toast ref={toast} position="bottom-center" />
       <div

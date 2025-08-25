@@ -99,6 +99,8 @@ const Login = () => {
         //  console.log(r.data)
         const accessToken_uniplus = JSON.stringify(r.data);
         localStorage.setItem("access_token_uniplus", accessToken_uniplus);
+
+
       })
       .catch((e) => {
         console.log(e);
@@ -132,6 +134,7 @@ const Login = () => {
 
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("ultimoLogado", usuario?.toUpperCase());
+        localStorage.setItem("nome_logado", JSON.parse(accessToken)?.nome);
 
         navigate("/metabase");
 
@@ -214,24 +217,166 @@ const Login = () => {
   }, []);
 
   return (
-    <>
+
+    <div className="login-container">
+
+      <div className="background-animation">
+        <div className="floating-shape shape-1"></div>
+        <div className="floating-shape shape-2"></div>
+        <div className="floating-shape shape-3"></div>
+        <div className="floating-shape shape-4"></div>
+      </div>
+
+      <div className="login-content">
+        <div className="login-section">
+          <div className="brand-container">
+            <img src={Logo} alt="JJ Logo" className="brand-logo" />
+
+            <p className="brand-slogan">Consultoria em Informática</p>
+            <p className="brand-description">Utilize sua conta do Uniplus para acessar o sistema</p>
+          </div>
+
+          <form onSubmit={login} className="login-form">
+            {invalid_access && (
+              <div className="error-message">
+                <i className="pi pi-exclamation-triangle"></i>
+                <div>
+                  <strong>Por motivos de segurança você foi desconectado!</strong>
+                  <p>A API de atualização de preços do uniplus expira a cada 60 minutos.</p>
+                  <p>Por favor faça login novamente!</p>
+                </div>
+              </div>
+            )}
+
+            {localStorage.getItem("ultimoLogado") ? (
+              <div className="welcome-message">
+                <h2>Bem-vindo(a) de volta</h2>
+                <h1>{(localStorage.getItem("nome_logado"))}</h1>
+              </div>
+            ) : (
+              <div className="form-group">
+                <label className="form-label">
+                  <i className="pi pi-user"></i>
+                  Código
+                </label>
+                <InputText
+                  autoFocus
+                  type="text"
+                  value={usuario}
+                  onChange={(e) => setUsuario(e.target.value)}
+                  placeholder="Digite seu código"
+                  className="form-input"
+                  ref={input1Ref}
+                  onKeyDown={(e) => handleKeyDown(e, input2Ref)}
+                />
+              </div>
+            )}
+
+            <div className="form-group">
+              <label className="form-label">
+                <i className="pi pi-lock"></i>
+                Senha
+              </label>
+              <InputText
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                placeholder="Digite sua senha"
+                className="form-input"
+                ref={input2Ref}
+              />
+            </div>
+
+            <Button
+              label={loading ? "Autenticando..." : "Entrar"}
+              icon={loading ? "pi pi-spin pi-spinner" : "pi pi-sign-in"}
+              iconPos="right"
+              loading={loading}
+              disabled={loading}
+              type="submit"
+              className="login-button"
+            />
+
+
+          </form>
+        </div>
+
+        <div className="landing-section">
+          <div className="landing-content">
+            <h2 className="landing-title">Soluções Inteligentes para Seu Supermercado</h2>
+            <p className="landing-subtitle">Otimize sua gestão com ferramentas poderosas e intuitivas</p>
+
+            <div className="features-grid">
+              <div className="feature-card">
+                <i className="pi pi-tag feature-icon"></i>
+                <h3>Precificação Inteligente</h3>
+                <p>Sugestões automáticas de preços baseadas em markup e markdown para maximizar lucros.</p>
+              </div>
+
+              <div className="feature-card">
+                <i className="pi pi-calendar feature-icon"></i>
+                <h3>Agendamento de Preços</h3>
+                <p>Planeje e automatize mudanças de preços para estratégias de venda eficientes.</p>
+              </div>
+
+              <div className="feature-card">
+                <i className="pi pi-chart-bar feature-icon"></i>
+                <h3>Análise Avançada</h3>
+                <p>Relatórios detalhados e insights para decisões baseadas em dados reais.</p>
+              </div>
+
+              <div className="feature-card">
+                <i className="pi pi-mobile feature-icon"></i>
+                <h3>App de Inventário</h3>
+                <p>Controle de estoque móvel, rápido e preciso para o dia a dia do seu negócio.</p>
+              </div>
+            </div>
+
+            <div className="app-download">
+              <h3>Baixe o App de Inventário</h3>
+              <p>Inventário descomplicado na palma da sua mão</p>
+              <img src={QrCode} alt="QR Code" className="qr-code" />
+              <Player src={GooglePlay} className="google-play" autoplay loop />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Dialog
-        header={loading ? "Acessando ..." : ""}
+        header=""
         closable={false}
         modal
         visible={loading}
-        position="bottom"
-        style={{ width: "100%", height: "50vh" }}
+        position="center"
+        style={{ 
+          width: "400px", 
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(20px)",
+          border: "none",
+          borderRadius: "20px",
+          boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)"
+        }}
+        className="loading-dialog"
       >
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <h1> ... Acessando o servidor ... </h1>
+        <div className="loading-content">
+          <div className="loading-spinner">
+            <div className="spinner-ring"></div>
+            <div className="spinner-ring"></div>
+            <div className="spinner-ring"></div>
+          </div>
+          
+          <h2 className="loading-title">Conectando ao Sistema</h2>
+          <p className="loading-subtitle">Autenticando suas credenciais...</p>
+          
+          <div className="loading-progress">
+            <div className="progress-bar">
+              <div className="progress-fill"></div>
+            </div>
+            <span className="progress-text">Verificando conexão...</span>
+          </div>
         </div>
-
-        <ProgressBar
-          mode="indeterminate"
-          style={{ height: "6px" }}
-        ></ProgressBar>
       </Dialog>
+
       <Dialog
         header={`Aplicativo ` + statusApi}
         closable={false}
@@ -269,216 +414,9 @@ const Login = () => {
           </h3>
         </div>
       </Dialog>
+
       <Toast ref={toast} position="bottom-center" />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          width: "100%",
-          padding: "10px",
-          gap: "10px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "72%",
-            gap: "5px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "100%",
-              gap: "5px",
-              flexWrap: "wrap",
-              width: "100%",
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "#FFFF",
-                borderRadius: "50px",
-                width: "250px",
-                padding: "10px",
-                height: "250px",
-                border: "1px solid #FFFF",
-              }}
-            >
-              <img
-                src={Logo}
-                alt="logo-sistema"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                }}
-              />
-            </div>
-            {invalid_access ? (
-                  <>
-                    {" "}
-                      <h4 style={{color:'red'}}>Por motivos de segurança você foi desconectado!</h4>{" "}
-                      <p>Motivo : A API de atualização de preços do uniplus expira a cada 60 minutos.</p>
-                      
-                      <p>Por favor faça login novamente!</p>
-                    <br />
-                   
-                  </>
-                ) : (
-                  <></>
-                )}
-            <h4
-              style={{
-                fontSize: "20px",
-                margin: "15px",
-                color: "#FFF",
-              }}
-            >
-
-              <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-                {" "}
-              
-                Utilize sua conta{" "}
-                <b style={{ color: "red" }}>
-                  <u>uniplus</u>
-                </b>{" "}
-                para acesso ao sistema
-              </h1>
-            </h4>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                flexWrap: "wrap",
-                gap: "20px",
-              }}
-            >
-              <section>
-                <div className="form-login">
-                  {localStorage.getItem("ultimoLogado") ? (
-                    <Avatar
-                      label={localStorage.getItem("ultimoLogado")}
-                      size="xlarge"
-                      shape="circle"
-                    />
-                  ) : (
-                    <img style={{ width: "250px" }} src={ImagemDestque} />
-                  )}
-
-                  <Badge
-                    style={{ margin: "5px" }}
-                    severity={statusApi === "UP" ? "success" : "danger"}
-                    value={
-                      statusApi === "UP"
-                        ? "Aplicativo On-line "
-                        : "Aplicativo Off-line"
-                    }
-                  ></Badge>
-                  <form onSubmit={login}>
-                    <div>
-                      {localStorage.getItem("ultimoLogado") ? (
-                        <>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "5px",
-                              color: "#ffff",
-                              margin: "5px",
-                              flexDirection: "column",
-                            }}
-                          >
-                            <h1>Bem vindo(a) de volta </h1>
-                            <h2>
-                              {
-                                JSON.parse(localStorage.getItem("access_token"))
-                                  ?.nome
-                              }
-                            </h2>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <InputText
-                            inputMode="text"
-                            type="text"
-                            value={usuario}
-                            style={{ width: "100%", margin: "5px" }}
-                            placeholder="Código"
-                            onChange={(e) => setUsuario(e.target.value)}
-                            ref={input1Ref}
-                            onKeyDown={(e) => handleKeyDown(e, input2Ref)}
-                          />
-                        </>
-                      )}
-                    </div>
-                    <div>
-                      <InputText
-                        type="password"
-                        inputMode="text"
-                        value={senha}
-                        style={{ width: "100%", margin: "5px" }}
-                        placeholder="Senha"
-                        onChange={(e) => setSenha(e.target.value)}
-                        ref={input2Ref}
-                      />
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                      <Button
-                        icon="pi pi-sign-in"
-                        iconPos="right"
-                        loading={loading}
-                        disabled={loading}
-                        type="submit"
-                        className=" p-button p-button-rounded p-button-secondary p-button-md botao-login"
-                        label={loading ? "Autenticando ... " : "Entrar"}
-                      ></Button>
-                    </div>
-                  </form>
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "5px",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <h1 style={{ fontFamily: "cabin-sketch-bold", color: "#ffff" }}>
-            {" "}
-            Inventário{" "}
-            <b style={{ color: "red" }}>
-              <u>descomplicado</u>
-            </b>{" "}
-            para sua loja
-          </h1>
-          <img
-            src={QrCode}
-            alt="inventario"
-            style={{
-              width: "250px",
-            }}
-          />
-          <Player src={GooglePlay} loop autoplay style={{ width: "150px" }} />
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
 

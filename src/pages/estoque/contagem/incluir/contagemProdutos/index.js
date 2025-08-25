@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import Header from "../../../../../components/header";
 import Footer from "../../../../../components/footer";
 
 import { InputNumber } from "primereact/inputnumber";
@@ -11,7 +10,7 @@ import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
 import { FilterMatchMode } from "primereact/api";
 
-import "./styles.css";
+
 import api from "../../../../../services/axios";
 import moment from "moment";
 
@@ -224,7 +223,6 @@ const IncluirContagemProdutosInventario = () => {
 
   return (
     <>
-      <Header />
       <Footer />
       <Toast ref={toast} position="bottom-center" />
       <div

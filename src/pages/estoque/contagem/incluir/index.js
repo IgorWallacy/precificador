@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import Footer from "../../../../components/footer";
-import Header from "../../../../components/header";
 import api from "../../../../services/axios";
 
 import { Toast } from "primereact/toast";
@@ -42,7 +41,6 @@ const IncluirContagemInventario = () => {
   }, []);
   return (
     <>
-      <Header />
       <Footer />
       <Toast ref={toast} />
       <div
@@ -55,9 +53,9 @@ const IncluirContagemInventario = () => {
           width: "100%",
         }}
       >
-        <div style={{ color: "#ffff" }}>
+        
           <h1>Selecione um inventário para iniciar a contagem</h1>
-        </div>
+      
         <div style={{ width: "100%", padding: "1rem" }}>
           <DataTable
             style={{ width: "100%" }}

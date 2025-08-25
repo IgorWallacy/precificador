@@ -14,7 +14,6 @@ import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 
 import api from "../../../../services/axios";
-import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
 
 const MetasComponent = () => {
@@ -158,7 +157,6 @@ const MetasComponent = () => {
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
-      <Header />
       <Footer />
       <Dialog
         modal={false}

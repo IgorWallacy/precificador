@@ -5,7 +5,6 @@ import { FilterMatchMode } from "primereact/api";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 
-import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
 import api from "../../../services/axios";
@@ -127,7 +126,6 @@ const ListaCompras = () => {
 
   return (
     <>
-      <Header />
       <Footer />
 
       <div className="container-pedido">

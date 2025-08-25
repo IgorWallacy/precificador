@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import DestaqueImg from "../../../../assets/img/price_analise.json";
 import LoadingNotas from "../../../../assets/img/notas_loading.json";
 
-import Header from "../../../../components/header";
-import Footer from "../../../../components/footer";
+
 import "./styless.css";
 import { Player } from "@lottiefiles/react-lottie-player";
 import { addLocale } from "primereact/api";
@@ -24,9 +23,10 @@ import { Dialog } from "primereact/dialog";
 import { ToggleButton } from "primereact/togglebutton";
 import { TriStateCheckbox } from "primereact/tristatecheckbox";
 
-
-
 import { SelectButton } from "primereact/selectbutton";
+
+// Componentes customizados
+import CustoComposicaoDialog from "./componentes/CustoComposicaoDialog";
 
 import { useReactToPrint } from "react-to-print";
 
@@ -95,7 +95,33 @@ const PrecificadorAgenda = () => {
 
   const [agrupadoPorFornecedor, setAgrupadoPorFornecedor] = useState(1);
 
+  // Ref para o input que deve receber foco
   const inputPreco = useRef(null);
+
+  // Map para armazenar as refs dos inputs
+  const inputRefs = useRef(new Map());
+
+  // Função para armazenar ref de um input específico
+  const setInputRef = (productId, ref) => {
+    if (ref) {
+      inputRefs.current.set(productId, ref);
+      //console.log('Ref armazenada para produto:', productId);
+    } else {
+      inputRefs.current.delete(productId);
+    }
+  };
+
+  // Função para focar em um input específico
+  const focusInput = (productId) => {
+    const inputRef = inputRefs.current.get(productId);
+    if (inputRef) {
+      //console.log('Focando input para produto:', productId);
+      inputRef.focus();
+      return true;
+    }
+    //console.log('Ref não encontrada para produto:', productId);
+    return false;
+  };
 
   const [produtoCustoComposicao, setProdutosCustoComposicao] = useState([]);
   const [custoComposicaoDialog, setCustoComposicaoDialog] = useState(false);
@@ -150,13 +176,41 @@ const PrecificadorAgenda = () => {
     codigo: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  const [usarMarkup, setUsarMarkup] = useState(true);
+  const [usarMarkup, setUsarMarkup] = useState({ name: "Markup", value: true });
   const options = [
     { name: "Markup", value: true },
     { name: "Markdown", value: false },
   ];
 
   const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  // Estados para o painel de informações do produto
+
+  const [painelExpandido, setPainelExpandido] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [infoPainel, setInfoPainel] = useState({
+    fornecedor: "Selecione um produto",
+    notaFiscal: "-",
+    data: "-",
+    produto: {
+      nome: "-",
+      codigo: "-",
+      custo: 0,
+      precoAtual: 0,
+      precoPromocional: 0,
+      precoPromocionalFamilia: 0,
+      sugestao: 0,
+      precoAgendado: 0,
+      dataAgendada: null,
+      percentualMarkup: 0,
+      percentualMarkdown: 0,
+      revisado: false,
+
+    }
+  });
+  const [linhaEmFoco, setLinhaEmFoco] = useState(null); // Nova: linha em foco
+  const [proximoInputIndex, setProximoInputIndex] = useState(null); // Nova: índice do próximo input
+  const [proximoInputId, setProximoInputId] = useState(null);
 
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 
@@ -221,15 +275,13 @@ const PrecificadorAgenda = () => {
 
       api
         .put(
-          `/api/produto/atualizarmarkupminimo/${
-            produtoEmExibicaoSugestaoDialog.idproduto
-          }/${
-            produtoEmExibicaoSugestaoDialog.idfamilia
-              ? produtoEmExibicaoSugestaoDialog.idfamilia
-              : 0
+          `/api/produto/atualizarmarkupminimo/${produtoEmExibicaoSugestaoDialog.idproduto
+          }/${produtoEmExibicaoSugestaoDialog.idfamilia
+            ? produtoEmExibicaoSugestaoDialog.idfamilia
+            : 0
           }/${data}`
         )
-        .then((r) => {})
+        .then((r) => { })
         .catch((error) => {
           toast.current.show({
             severity: "error",
@@ -259,15 +311,13 @@ const PrecificadorAgenda = () => {
 
       api
         .put(
-          `/api/produto/atualizarmarkdownminimo/${
-            produtoEmExibicaoSugestaoDialogMarDownDialog.idproduto
-          }/${
-            produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
-              ? produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
-              : 0
+          `/api/produto/atualizarmarkdownminimo/${produtoEmExibicaoSugestaoDialogMarDownDialog.idproduto
+          }/${produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
+            ? produtoEmExibicaoSugestaoDialogMarDownDialog.idfamilia
+            : 0
           }/${novoPercentualMarkDownMinimo}`
         )
-        .then((r) => {})
+        .then((r) => { })
         .catch((error) => {
           toast.current.show({
             severity: "error",
@@ -340,7 +390,7 @@ const PrecificadorAgenda = () => {
             display: "flex",
             justifyContent: "center",
             flexDirection: "column",
-            alignItems: "cenetr",
+            alignItems: "center",
             flexWrap: "wrap",
             color: "red",
           }}
@@ -391,7 +441,7 @@ const PrecificadorAgenda = () => {
           <>
             <div style={{ color: "green" }}>
               <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
-              <Tag 
+              <Tag
                 value={
                   `Lucro de  ` +
                   Intl.NumberFormat("pt-BR", {
@@ -417,11 +467,11 @@ const PrecificadorAgenda = () => {
         ) : (
           <>
             <div style={{ color: "red" }}>
-             
+
               {rowData.precoagendado > 0 ? (
                 <>
-                 <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
-                  <Tag 
+                  <i className="pi pi-calendar" style={{ fontSize: "1em" }}></i>{" "}
+                  <Tag
                     value={
                       `Prejuízo de ` +
                       Intl.NumberFormat("pt-BR", {
@@ -446,7 +496,7 @@ const PrecificadorAgenda = () => {
               ) : (
                 <></>
               )}
-             
+
             </div>
           </>
         )}
@@ -457,7 +507,7 @@ const PrecificadorAgenda = () => {
   const marcarRevisao = (rowData, status) => {
     return api
       .put(`/api_precificacao/revisado/${rowData?.id}/${status}`)
-      .then((r) => {})
+      .then((r) => { })
       .catch((e) => {
         toast.current.show({
           severity: "error",
@@ -898,12 +948,20 @@ const PrecificadorAgenda = () => {
     let mup =
       (rowData.precocusto * rowData.percentualmarkup) / 100 +
       rowData.precocusto;
-    let sugestao = usarMarkup ? mup : mdown;
+    let sugestao = usarMarkup.value ? mup : mdown;
 
     let sf = Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(sugestao);
+
+    // Verificar se esta linha deve receber foco automático
+    const deveReceberFoco = (
+      (proximoInputId !== null && String(rowData.id) === String(proximoInputId)) ||
+      (proximoInputIndex !== null && produtos.findIndex(p => String(p.id) === String(rowData.id)) === proximoInputIndex)
+    );
+
+    //console.log('PriceEditor - rowData.id:', rowData.id, 'proximoInputIndex:', proximoInputIndex, 'proximoInputId:', proximoInputId, 'deveReceberFoco:', deveReceberFoco);
 
     return (
       <>
@@ -915,6 +973,9 @@ const PrecificadorAgenda = () => {
             gap: "5px",
             flexDirection: "row",
             flexWrap: "wrap",
+            padding: "8px",
+            borderRadius: "6px",
+            transition: "all 0.3s ease"
           }}
         >
           {rowData.dataagendada ? (
@@ -934,7 +995,7 @@ const PrecificadorAgenda = () => {
                 />
                 <br />
                 {rowData.precoAtual < rowData.precocusto ||
-                rowData.precoagendado < rowData.precocusto ? (
+                  rowData.precoagendado < rowData.precocusto ? (
                   <>
                     <Tag
                       style={{ margin: "1rem" }}
@@ -974,9 +1035,15 @@ const PrecificadorAgenda = () => {
           )}
 
           <InputNumber
-            ref={inputPreco}
-            //autoFocus
+            key={`price-input-${rowData.id}-${deveReceberFoco ? 'focus' : 'nofocus'}`}
+            ref={(ref) => setInputRef(rowData.id, ref)}
+            autoFocus={deveReceberFoco}
+            onFocus={() => {
+              //console.log('Input recebeu foco:', rowData.id);
+              setLinhaEmFoco(rowData);
+              atualizarPainelInfo(rowData);
 
+            }}
             tooltip={
               rowData?.precoagendado ? "" : "Pressione Enter para salvar"
             }
@@ -988,7 +1055,7 @@ const PrecificadorAgenda = () => {
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-                //  console.log(inputPreco.current)
+                //console.log('Enter pressionado para produto:', rowData.id);
                 onRowEditComplete(rowData, inputPreco.current);
               }
             }}
@@ -997,9 +1064,75 @@ const PrecificadorAgenda = () => {
             minFractionDigits={2}
             maxFractionDigits={2}
             locale="pt-BR"
+            style={{
+              backgroundColor: deveReceberFoco ? "#f0f9ff" : "white",
+              borderColor: deveReceberFoco ? "#2563eb" : undefined,
+              boxShadow: deveReceberFoco ? "0 0 0 2px rgba(37, 99, 235, 0.2)" : undefined
+            }}
           />
         </div>
       </>
+    );
+  };
+
+  // Função específica para o editor da coluna Preço Agendado
+  const priceEditorForColumn = (options) => {
+    const rowData = options.rowData || options;
+    let mdown = rowData.precocusto / (1 - rowData.percentualmarkdown / 100);
+    let mup =
+      (rowData.precocusto * rowData.percentualmarkup) / 100 +
+      rowData.precocusto;
+    let sugestao = usarMarkup.value ? mup : mdown;
+
+    let sf = Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(sugestao);
+
+    // Verificar se esta linha deve receber foco automático
+    const deveReceberFoco = (
+      (proximoInputId !== null && String(rowData.id) === String(proximoInputId)) ||
+      (proximoInputIndex !== null && produtos.findIndex(p => String(p.id) === String(rowData.id)) === proximoInputIndex)
+    );
+
+    //console.log('PriceEditorForColumn - rowData.id:', rowData.id, 'proximoInputIndex:', proximoInputIndex, 'proximoInputId:', proximoInputId, 'deveReceberFoco:', deveReceberFoco);
+    //console.log('Comparação de IDs:', produtos.map(p => ({ id: p.id, type: typeof p.id })));
+
+    return (
+      <InputNumber
+        key={`price-input-col-${rowData.id}-${deveReceberFoco ? 'focus' : 'nofocus'}`}
+        ref={(ref) => setInputRef(rowData.id, ref)}
+        autoFocus={deveReceberFoco}
+        onFocus={() => {
+          //console.log('Input da coluna recebeu foco:', rowData.id);
+          setLinhaEmFoco(rowData);
+          atualizarPainelInfo(rowData);
+        }}
+        tooltip={
+          rowData?.precoagendado ? "" : "Pressione Enter para salvar"
+        }
+        tooltipOptions={{ position: "bottom" }}
+        prefix="R$ "
+        placeholder={`Sugestão ${sf}`}
+        onChange={(e) => (inputPreco.current = e.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            //console.log('Enter pressionado na coluna para produto:', rowData.id);
+            onRowEditComplete(rowData, inputPreco.current);
+          }
+        }}
+        currency="BRL"
+        mode="decimal"
+        minFractionDigits={2}
+        maxFractionDigits={2}
+        locale="pt-BR"
+        style={{
+          backgroundColor: deveReceberFoco ? "#f0f9ff" : "white",
+          borderColor: deveReceberFoco ? "#2563eb" : undefined,
+          boxShadow: deveReceberFoco ? "0 0 0 2px rgba(37, 99, 235, 0.2)" : undefined
+        }}
+      />
     );
   };
 
@@ -1014,7 +1147,7 @@ const PrecificadorAgenda = () => {
         } else {
         }
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   async function onRowEditComplete(e, value) {
@@ -1031,8 +1164,7 @@ const PrecificadorAgenda = () => {
     if (value > 0) {
       await api
         .put(
-          `/api_precificacao/produtos/precificar/agenda/${
-            e.idproduto
+          `/api_precificacao/produtos/precificar/agenda/${e.idproduto
           }/${intFamilia}/${e.idnotafiscal}/${value}/${moment(agendar).format(
             "YYYY-MM-DD"
           )}/${usuarioFormatado}`,
@@ -1050,6 +1182,7 @@ const PrecificadorAgenda = () => {
           });
 */
           marcarRevisao(e, 1);
+
         })
         .catch((error) => {
           toast.current.show({
@@ -1061,8 +1194,51 @@ const PrecificadorAgenda = () => {
           if (error.response.status === 401) {
           }
         })
-        .finally((e) => {
-          buscarProdutos();
+        .finally(() => {
+          // Implementar foco automático no próximo input
+          //console.log('=== DEBUG FOCUS AUTOMÁTICO ===');
+          //console.log('Produto atual (e):', e);
+          //console.log('Produtos disponíveis:', produtos);
+          //console.log('ProximoInputIndex atual:', proximoInputIndex);
+
+          // Lista atual visível (respeita filtros/ordenação)
+          const visibleList = (produtoFilter && produtoFilter.length ? produtoFilter : produtos) || [];
+          const currentIndex = visibleList.findIndex(p => String(p.id) === String(e.id));
+          //console.log('Current index (visibleList):', currentIndex, 'Total visíveis:', visibleList.length);
+
+          if (currentIndex !== -1 && currentIndex < visibleList.length - 1) {
+            const nextItem = visibleList[currentIndex + 1];
+            //console.log('Next item:', nextItem);
+            setProximoInputId(nextItem.id);
+            setProximoInputIndex(null);
+            setLinhaEmFoco(nextItem);
+
+            setTimeout(() => {
+              //console.log('Atualizando painel com próximo produto...');
+              atualizarPainelInfo(nextItem);
+              //console.log('Painel atualizado com próximo produto');
+
+              // Scroll suave até a linha focada
+              try {
+                const rowEl = document.querySelector('.DataTable .p-datatable-tbody > tr.row-focused');
+                if (rowEl && typeof rowEl.scrollIntoView === 'function') {
+                  rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              } catch (_) { }
+
+              // Buscar produtos após foco e scroll
+              setTimeout(() => {
+                buscarProdutos();
+              }, 150);
+            }, 200);
+          } else {
+            //console.log('Não há próximo produto ou erro no índice');
+            setProximoInputId(null);
+            setProximoInputIndex(null);
+            setLinhaEmFoco(null);
+            buscarProdutos();
+          }
+
           inputPreco.current = null;
         });
     } else {
@@ -1095,26 +1271,26 @@ const PrecificadorAgenda = () => {
           </span>
         </Dialog>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-around",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <h4>
-            ⚠️ Atenção, regravar a nota no uniplus deleta o agendamento aqui ⚠️
-          </h4>
-          <span className="p-input-icon-left">
-            <i className="pi pi-search" />
-            <InputText
-              className="p-inputtext-lg"
-              value={globalFilterValue2}
-              onChange={onGlobalFilterChange2}
-              placeholder="Pesquisar "
-            />
-          </span>
+        {/* Header principal da página com padrão preto e roxo */}
+        <div className="page-header">
+          <h1>Agendamento de Preços</h1>
+          <p className="subtitle">Gestão e controle de preços agendados para produtos</p>
+        </div>
+
+        {/* Aviso de atenção */}
+        <div className="attention-warning">
+          <i className="pi pi-exclamation-triangle"></i>
+          <span>Atenção, regravar a nota no uniplus deleta o agendamento aqui</span>
+        </div>
+
+        {/* Campo de pesquisa */}
+        <div className="search-container">
+          <i className="pi pi-search"></i>
+          <InputText
+            value={globalFilterValue2}
+            onChange={onGlobalFilterChange2}
+            placeholder="Pesquisar produtos, fornecedores, notas..." 
+          />
         </div>
       </>
     );
@@ -1146,8 +1322,8 @@ const PrecificadorAgenda = () => {
                 }}
                 src={`${eanUrl}/${rowData.ean}`}
                 onError={(e) =>
-                  (e.target.src =
-                    "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
+                (e.target.src =
+                  "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png")
                 }
                 alt={rowData.ean}
               />
@@ -1215,10 +1391,10 @@ const PrecificadorAgenda = () => {
           value={dados}
           responsiveLayout="stack"
           breakpoint="960px"
+          className="DataTable"
           style={{
             width: "100%",
             backgroundColor: data?.precificado ? "#D3D3D3" : "#f1f1f1",
-            padding: "1.5rem",
           }}
         >
           <Column
@@ -1297,7 +1473,7 @@ const PrecificadorAgenda = () => {
         setProdutosFamilia(r.data);
       })
       .catch((e) => {
-        console.log(e);
+        //console.log(e);
       })
       .finally((f) => {
         setLoadingFamilia(false);
@@ -1308,6 +1484,90 @@ const PrecificadorAgenda = () => {
     setExpandedRows(e.data);
   };
 
+  // Função para atualizar o painel de informações
+  const atualizarPainelInfo = (produto) => {
+    try {
+      if (produto && typeof produto === 'object' && produto.id !== undefined && produto.id !== null) {
+        setProdutoSelecionado(produto);
+        const sugestao = usarMarkup.value
+          ? (produto.precocusto * produto.percentualmarkup) / 100 + produto.precocusto
+          : produto.precocusto / (1 - produto.percentualmarkdown / 100);
+
+        setInfoPainel({
+          fornecedor: produto.razaosocial || "Fornecedor não informado",
+          notaFiscal: produto.numeronotafiscal || "N/A",
+          data: produto.dataInclusao ? moment(produto.dataInclusao).format("DD/MM/YYYY - hh:mm") : "N/A",
+          produto: {
+            nome: produto.descricao || "-",
+            codigo: produto.ean || produto.codigo || "-",
+            custo: produto.precocusto || 0,
+            precoAtual: produto.precoAtual || 0,
+            precoPromocional: produto.precopromocional || 0,
+            precoPromocionalFamilia: produto.precopromocionalfamilia || 0,
+            sugestao: sugestao,
+            precoAgendado: produto.precoagendado || 0,
+            dataAgendada: produto.dataagendada ? moment(produto.dataagendada).format("DD/MM/YYYY") : null,
+            percentualMarkup: produto.percentualmarkup || 0,
+            percentualMarkdown: produto.percentualmarkdown || 0,
+            revisado: produto.revisado || false,
+            familia: {
+              id: produto.idfamilia || 0,
+              nome: produto.nomefamilia || "-"
+            }
+          }
+        });
+      } else {
+        setProdutoSelecionado(null);
+        setInfoPainel({
+          fornecedor: "Selecione um produto",
+          notaFiscal: "-",
+          data: "-",
+          produto: {
+            nome: "-",
+            codigo: "-",
+            custo: 0,
+            precoAtual: 0,
+            precoPromocional: 0,
+            precoPromocionalFamilia: 0,
+            sugestao: 0,
+            precoAgendado: 0,
+            dataAgendada: null,
+            percentualMarkup: 0,
+            percentualMarkdown: 0,
+            revisado: false,
+            familia: {
+              id: 0,
+              nome: "-"
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar painel:', error);
+      setProdutoSelecionado(null);
+      setInfoPainel({
+        fornecedor: "Erro ao carregar produto",
+        notaFiscal: "-",
+        data: "-",
+        produto: {
+          nome: "-",
+          codigo: "-",
+          custo: 0,
+          precoAtual: 0,
+          precoPromocional: 0,
+          precoPromocionalFamilia: 0,
+          sugestao: 0,
+          precoAgendado: 0,
+          dataAgendada: null,
+          percentualMarkup: 0,
+          percentualMarkdown: 0,
+          revisado: false,
+
+        }
+      });
+    }
+  };
+
   const finalizarPrecificacao = (rowData) => {
     let status = 1;
     api
@@ -1315,7 +1575,7 @@ const PrecificadorAgenda = () => {
       .then((r) => {
         buscarProdutos();
       })
-      .catch((e) => {});
+      .catch((e) => { });
   };
 
   const reabrirPrecificacao = (rowData) => {
@@ -1325,7 +1585,7 @@ const PrecificadorAgenda = () => {
       .then((r) => {
         buscarProdutos();
       })
-      .catch((e) => {});
+      .catch((e) => { });
   };
 
   const headerDataTable = renderHeader();
@@ -1374,7 +1634,7 @@ const PrecificadorAgenda = () => {
             .then((response) => {
               setProdutos(response.data);
 
-              //  console.log(response.data);
+              //  //console.log(response.data);
 
               setLoading(false);
 
@@ -1399,7 +1659,7 @@ const PrecificadorAgenda = () => {
 
               setLoading(false);
             })
-            .finally((f) => {});
+            .finally((f) => { });
         }
       }
     }
@@ -1412,74 +1672,37 @@ const PrecificadorAgenda = () => {
         tooltip="Voltar"
         tooltipOptions={{ position: "bottom" }}
         icon="pi pi-arrow-left"
-        style={{
-          margin: "0px 10px",
-        }}
         onClick={() => setProdutos([])}
       />
       {agrupadoPorFornecedor ? (
         <></>
       ) : (
         <>
-          {" "}
           <Button
             onClick={() => imprime()}
             label="Imprimir"
             tooltip="Imprimir tabela"
             tooltipOptions={{ position: "bottom" }}
             icon="pi pi-file-pdf"
-            style={{ margin: "1rem" }}
-            className="p-button-rounded p-button-info "
+            className="p-button-rounded p-button-info"
           />
         </>
       )}
-
-      <Button
-        onClick={() => buscarProdutos()}
-        tooltip="Atualizar"
-        tooltipOptions={{ position: "bottom" }}
-        icon={loading ? "pi pi-spin pi-spinner" : "pi pi-refresh"}
-        className=" botao-flutuante-atualizar p-button-rounded p-button-success p-button-sm"
-      />
-      <Button
-        onClick={() => navigate("/precificar-executar")}
-        tooltip="Navegar para carga e atualização de preços agendados"
-        tooltipOptions={{ position: "bottom" }}
-        icon="pi pi-dollar"
-        className=" botao-flutuante-pesquisar p-button-rounded p-button-info p-button-sm"
-      />
-
-      <SelectButton
-        value={usarMarkup}
-        options={options}
-        optionLabel="name"
-        onChange={(e) => setUsarMarkup(e.target.value)}
-        className=" botao-flutuante-up-down p-button-rounded  p-button-sm"
-      />
     </React.Fragment>
   );
 
   const botaoatualizar = (
     <React.Fragment>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "row",
-          color: "#FFF",
-        }}
-      >
-        <div style={{ margin: "15px" }} className="p-inputgroup">
-          <span className="p-inputgroup-addon">Agendar para</span>
-          <Calendar
-            dateFormat="dd/mm/yy"
-            showIcon
-            value={agendar}
-            onChange={(e) => setAgendar(e.target.value)}
-            showButtonBar
-            locale="pt-BR"
-          />
-        </div>
+      <div className="p-inputgroup">
+        <span className="p-inputgroup-addon">Agendar para</span>
+        <Calendar
+          dateFormat="dd/mm/yy"
+          showIcon
+          value={agendar}
+          onChange={(e) => setAgendar(e.target.value)}
+          showButtonBar
+          locale="pt-BR"
+        />
       </div>
     </React.Fragment>
   );
@@ -1488,16 +1711,13 @@ const PrecificadorAgenda = () => {
     if (quantidadeFilial.length > 1) {
       return (
         <>
-          <div>
-            <h4>Loja</h4>
-          </div>
           <Dropdown
             showClear
             onChange={(e) => setFiliaisSelect(e.value)}
             value={filiaisSelect}
             options={quantidadeFilial}
             optionLabel="razaosocial"
-            placeholder="Selecione uma loja "
+            placeholder="Selecione uma loja"
             emptyMessage="Nenhuma loja encontrada."
             dropdownIcon="pi pi-chevron-down"
           />
@@ -1557,6 +1777,56 @@ const PrecificadorAgenda = () => {
     );
   };
 
+  const getProdutoCustoComposicao = (rowData) => {
+    return api
+      .get(`/api/custo-composicao/listar/${rowData?.id}`)
+      .then((r) => {
+        setProdutosCustoComposicao([r.data]);
+        setCustoComposicaoDialog(true);
+        setprodutoEmExibicaoSugestaoDialog(rowData);
+      })
+      .catch((e) => {
+        //console.log(e);
+      });
+  };
+
+  // Templates de filtro para as colunas
+  const codigoFilterTemplate = (options) => {
+    return (
+      <InputText
+        value={options.value}
+        onChange={(e) => options.filterApplyCallback(e.target.value)}
+        placeholder="Buscar por código..."
+        className="p-column-filter"
+        maxLength={20}
+      />
+    );
+  };
+
+  const eanFilterTemplate = (options) => {
+    return (
+      <InputText
+        value={options.value}
+        onChange={(e) => options.filterApplyCallback(e.target.value)}
+        placeholder="Buscar por EAN..."
+        className="p-column-filter"
+        maxLength={13}
+      />
+    );
+  };
+
+  const produtoFilterTemplate = (options) => {
+    return (
+      <InputText
+        value={options.value}
+        onChange={(e) => options.filterApplyCallback(e.target.value)}
+        placeholder="Buscar por produto..."
+        className="p-column-filter"
+        maxLength={100}
+      />
+    );
+  };
+
   const verifiedRowFilterTemplate = (options) => {
     return (
       <div
@@ -1574,568 +1844,225 @@ const PrecificadorAgenda = () => {
     );
   };
 
-  const getProdutoCustoComposicao = (rowData) => {
-    return api
-      .get(`/api/custo-composicao/listar/${rowData?.id}`)
-      .then((r) => {
-        setProdutosCustoComposicao([r.data]);
-        setCustoComposicaoDialog(true);
-        setprodutoEmExibicaoSugestaoDialog(rowData);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
   return (
-    <>
+    <div className="page-container">
       <Toast ref={toast} position="bottom-center" />
       <Toast ref={toast2} position="center" />
 
-      <Header />
-      <Footer />
-
-      <Dialog
-        header="Composição do Custo"
+      <CustoComposicaoDialog
         visible={custoComposicaoDialog}
-        position="bottom"
-        style={{ width: "50vw" }}
-        onHide={() => {
-          if (!custoComposicaoDialog) return;
-          setCustoComposicaoDialog(false);
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "15px",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "#333",
-          }}
-        >
-          {/* Informações do Produto */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "100%",
-              alignItems: "flex-start",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-            }}
-          >
-            <p>Produto: {produtoCustoComposicao[0]?.produto}</p>
-            <p>Quantidade: {produtoCustoComposicao[0]?.quantidade}</p>
-            <p>
-              Unidade de Medida: {produtoCustoComposicao[0]?.unidade} -
-              Embalagem com {produtoCustoComposicao[0]?.embalagem}
-            </p>
-          </div>
+        onHide={() => setCustoComposicaoDialog(false)}
+        produtoCustoComposicao={produtoCustoComposicao}
+        produtoEmExibicaoSugestaoDialog={produtoEmExibicaoSugestaoDialog}
+      />
 
-          {/* Preços */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "100%",
-              alignItems: "flex-start",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>Preço de Compra :</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(produtoCustoComposicao[0]?.precodecompra)}
-              </span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>Preço de Compra UN :</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  produtoCustoComposicao[0]?.precodecompra /
-                    produtoCustoComposicao[0]?.embalagem
-                )}
-              </span>
-            </div>
-          </div>
-
-          {/* Descontos */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "100%",
-              alignItems: "flex-start",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-              color: "red",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( - ) Desconto:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(produtoCustoComposicao[0]?.desconto)}
-              </span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( - ) Desconto UN:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  produtoCustoComposicao[0]?.desconto /
-                    produtoCustoComposicao[0]?.quantidade /
-                    produtoCustoComposicao[0]?.embalagem
-                )}
-              </span>
-            </div>
-          </div>
-
-          {/* ICMS ST */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "100%",
-              alignItems: "flex-start",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-              color: "green",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) ICMS ST:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(produtoCustoComposicao[0]?.icmsst)}
-              </span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) ICMS ST UN:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  produtoCustoComposicao[0]?.icmsst /
-                    produtoCustoComposicao[0]?.quantidade /
-                    produtoCustoComposicao[0]?.embalagem
-                )}
-              </span>
-            </div>
-          </div>
-
-          {/* FCP ST */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "100%",
-              alignItems: "flex-start",
-              color: "green",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-             
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) FCP ST:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(produtoCustoComposicao[0]?.fcpst)}
-              </span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) FCP ST UN:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  produtoCustoComposicao[0]?.fcpst /
-                    produtoCustoComposicao[0]?.quantidade /
-                    produtoCustoComposicao[0]?.embalagem
-                )}
-              </span>
-            </div>
-          </div>
-          {/* IPI */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "100%",
-              alignItems: "flex-start",
-              color: "green",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-            
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) IPI:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(produtoCustoComposicao[0]?.ipi)}
-              </span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) IPI UN:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  produtoCustoComposicao[0]?.ipi /
-                    produtoCustoComposicao[0]?.quantidade /
-                    produtoCustoComposicao[0]?.embalagem
-                )}
-              </span>
-            </div>
-          </div>
-          {/*FREETE */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              width: "100%",
-              alignItems: "flex-start",
-              color: "green",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-             
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) Frete / Outras despesas:</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(produtoCustoComposicao[0]?.frete)}
-              </span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <span>( + ) Frete / Outras despesas (UN):</span>
-              <span>
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(
-                  produtoCustoComposicao[0]?.frete /
-                    produtoCustoComposicao[0]?.quantidade /
-                    produtoCustoComposicao[0]?.embalagem
-                )}
-              </span>
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-              width: "100%",
-            }}
-          >
-            <h1>
-              {Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(produtoEmExibicaoSugestaoDialog?.precocusto)}
-            </h1>
-          </div>
-          <div>
-            <Button
-              icon="pi pi-times"
-              className="p-button p-button-rounded p-button-danger"
-              label="Fechar"
-              onClick={() => setCustoComposicaoDialog(false)}
-            />
-          </div>
+      <div className="page-card">
+        <div className="page-header">
+          <h1>Agendamento de Preços</h1>
+          <p className="subtitle">Gerencie e agende alterações de preços para produtos</p>
         </div>
-      </Dialog>
 
-      <div className="agenda-label">
-        <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-          {produtos?.length < 1
-            ? "Pesquisar notas de entrada e"
-            : " Agendar os preços de vendas"}
-        </h1>
 
-        <h4
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "cabin-sketch-bold",
-          }}
-        >
-          {produtos?.length < 1
-            ? " Agendar os preços de venda"
-            : "Informe os preços abaixo"}
-        </h4>
+
         {loading ? (
-          <Player src={LoadingNotas} loop autoplay style={{ width: "350px" }} />
+          <div className="loading-container">
+            <Player src={LoadingNotas} loop autoplay style={{ width: "350px" }} />
+            <p>Carregando produtos...</p>
+          </div>
         ) : (
           <>
-            {produtos.length < 1 ? (
-              <Player
-                src={DestaqueImg}
-                loop
-                autoplay
-                style={{ width: "350px" }}
-              />
-            ) : (
-              <></>
-            )}
+           
           </>
         )}
       </div>
 
-      {produtos.length < 1 ? (
+      {produtos.length < 1 ? ( 
         <>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#000",
-              gap: "10px",
-              flexDirection: "row",
-              flexWrap: "wrap",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "#000",
-                flexDirection: "column",
-                flexWrap: "wrap",
-                gap: "10px",
-              }}
-            >
-              <div>
-                <h5>Período</h5>
-              </div>
-              <Calendar
-                locale="pt-BR"
-                selectOtherMonths
-                required
-                showIcon
-                placeholder="Data inicial para pesquisa de notas fiscais"
-                dateFormat="dd/mm/yy "
-                viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
-                hideOnDateTimeSelect
-                value={dataInicial}
-                onChange={(e) => setDataInicial(e.target.value)}
-                showTime
-                showButtonBar
-              />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "#000",
-                flexDirection: "column",
-                flexWrap: "wrap",
-                gap: "10px",
-              }}
-            >
-              <div>
-                <h5>até</h5>
-              </div>
+          {/* Container de filtros */}
+          <div className="filters-container">
+            {/* Seção de filtros de data e loja */}
+            <div className="filters-section">
+              <h3 className="section-title">
+                <i className="pi pi-calendar"></i>
+                Filtros de Pesquisa
+              </h3>
+              
+              <div className="filters-grid">
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-calendar-plus"></i>
+                    Data Inicial
+                    {dataInicial && <span className="filter-status active">✓</span>}
+                  </label>
+                  <Calendar
+                    locale="pt-BR"
+                    selectOtherMonths
+                    required
+                    showIcon
+                    placeholder="Data inicial para pesquisa de notas fiscais"
+                    dateFormat="dd/mm/yy"
+                    viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                    hideOnDateTimeSelect
+                    value={dataInicial}
+                    onChange={(e) => setDataInicial(e.target.value)}
+                    showTime
+                    showButtonBar
+                    className="filter-calendar"
+                    maxDate={dataFinal || undefined}
+                  />
+                  {dataInicial && dataFinal && dataInicial > dataFinal && (
+                    <small className="validation-error">
+                      <i className="pi pi-exclamation-triangle"></i>
+                      A data inicial não pode ser maior que a data final
+                    </small>
+                  )}
+                </div>
+                
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-calendar-minus"></i>
+                    Data Final
+                    {dataFinal && <span className="filter-status active">✓</span>}
+                  </label>
+                  <Calendar
+                    locale="pt-BR"
+                    selectOtherMonths
+                    viewDate={new Date(new Date().setHours(23, 59, 59, 59))}
+                    required
+                    showIcon
+                    placeholder="Data final para pesquisa de notas fiscais"
+                    dateFormat="dd/mm/yy"
+                    hideOnDateTimeSelect
+                    value={dataFinal}
+                    onChange={(e) => {
+                      setDataFinal(e.value);
+                      dataFinal?.setUTCHours(dataFinal.getUTCHours());
+                    }}
+                    showTime
+                    showButtonBar
+                    position="bottom"
+                    className="filter-calendar"
+                    minDate={dataInicial || undefined}
+                  />
+                  {dataInicial && dataFinal && dataInicial > dataFinal && (
+                    <small className="validation-error">
+                      <i className="pi pi-exclamation-triangle"></i>
+                      A data final não pode ser menor que a data inicial
+                    </small>
+                  )}
+                </div>
 
-              <Calendar
-                locale="pt-BR"
-                selectOtherMonths
-                viewDate={new Date(new Date().setHours(23, 59, 59, 59))}
-                required
-                showIcon
-                placeholder="Data final para pesquisa de notas fiscais"
-                dateFormat="dd/mm/yy"
-                hideOnDateTimeSelect
-                value={dataFinal}
-                onChange={(e) => {
-                  setDataFinal(e.value);
-                  dataFinal?.setUTCHours(dataFinal.getUTCHours());
-                }}
-                showTime
-                showButtonBar
-                position="bottom"
-              />
+                 { quantidadeFilial > 1 && (
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-building"></i>
+                    Loja
+                  </label>
+                  <div className="store-selector">
+                    <MostraListaFilial />
+                  </div>
+                </div>
+                )}
+              </div>
+              
+              {/* Resumo dos filtros selecionados */}
+              {(dataInicial || dataFinal) && (
+                <div className="filters-summary">
+                  <h4>
+                    <i className="pi pi-info-circle"></i>
+                    Filtros Ativos:
+                  </h4>
+                  <div className="summary-items">
+                    {dataInicial && (
+                      <span className="summary-item">
+                        <i className="pi pi-calendar-plus"></i>
+                        Início: {dataInicial.toLocaleDateString('pt-BR')}
+                      </span>
+                    )}
+                    {dataFinal && (
+                      <span className="summary-item">
+                        <i className="pi pi-calendar-minus"></i>
+                        Fim: {dataFinal.toLocaleDateString('pt-BR')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "#000",
-                flexDirection: "column",
-                flexWrap: "wrap",
-                gap: "10px",
-              }}
-            >
-              <MostraListaFilial />
+            {/* Seção de configuração de agrupamento */}
+            <div className="grouping-section">
+              <h3 className="section-title">
+                <i className="pi pi-sitemap"></i>
+                Configuração de Agrupamento
+              </h3>
+              
+              <div className="grouping-content">
+                <p className="grouping-description">
+                  Escolha como deseja organizar os resultados da pesquisa:
+                </p>
+                
+                <div className="toggle-container">
+                  <ToggleButton
+                    onLabel="Agrupar por Fornecedor"
+                    offLabel="Agrupar por Produto"
+                    onIcon="pi pi-users"
+                    offIcon="pi pi-inbox"
+                    checked={agrupadoPorFornecedor}
+                    onChange={(e) => setAgrupadoPorFornecedor(e.value)}
+                    className="grouping-toggle"
+                  />
+                  
+                  <div className="toggle-info">
+                    <div className={`info-item ${agrupadoPorFornecedor ? 'active' : ''}`} onClick={() => setAgrupadoPorFornecedor(true)}>
+                      <i className="pi pi-users"></i>
+                      <span>Agrupamento por Fornecedor</span>
+                      <small>Organiza os produtos por empresa fornecedora</small>
+                    </div>
+                    <div className={`info-item ${!agrupadoPorFornecedor ? 'active' : ''}`} onClick={() => setAgrupadoPorFornecedor(false)}>
+                      <i className="pi pi-inbox"></i>
+                      <span>Agrupamento por Produto</span>
+                      <small>Organiza os produtos individualmente</small>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Status de preparação */}
+                {dataInicial && dataFinal && !(dataInicial > dataFinal) && (
+                  <div className="ready-status">
+                    <i className="pi pi-check-circle"></i>
+                    <span>Todos os filtros estão configurados corretamente!</span>
+                    <small>Clique em "Pesquisar Notas Fiscais" para continuar</small>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#000",
-              flexDirection: "column",
-              flexWrap: "wrap",
-            }}
-          >
-            <h4
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "#000",
-                flexDirection: "column",
-                flexWrap: "wrap",
-                gap: "10px",
-                margin: "10px",
-              }}
-            >
-              Clique para escolher um layout{" "}
-            </h4>
-            <ToggleButton
-              onLabel="Fornecedor"
-              offLabel="Produto"
-              onIcon="pi pi-users"
-              offIcon="pi pi-inbox"
-              checked={agrupadoPorFornecedor}
-              onChange={(e) => setAgrupadoPorFornecedor(e.value)}
-            />
-          </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#000",
-              flexDirection: "column",
-              flexWrap: "wrap",
-              margin: "20px",
-            }}
-          >
+          {/* Botão de pesquisa */}
+          <div className="search-button-container">
+            <div className="search-info">
+              <div className="filters-count">
+                <i className="pi pi-filter"></i>
+                <span>
+                  {[dataInicial, dataFinal].filter(Boolean).length} de 2 filtros preenchidos
+                </span>
+              </div>
+              {(dataInicial && dataFinal && dataInicial > dataFinal) && (
+                <div className="validation-warning">
+                  <i className="pi pi-exclamation-triangle"></i>
+                  <span>Corrija os erros de validação antes de pesquisar</span>
+                </div>
+              )}
+            </div>
+            
             <Button
-              style={{ margin: "5px" }}
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
               label={
-                loading ? " Pesquisando ..." : " Pesquisar notas fiscais  "
+                loading ? "Pesquisando..." : "Pesquisar Notas Fiscais"
               }
-              disabled={loading}
-              className="p-button-rounded p-button-success p-button-md"
+              disabled={loading || !dataInicial || !dataFinal || (dataInicial && dataFinal && dataInicial > dataFinal)}
+              className="search-button"
               onClick={() => buscarProdutos()}
             />
           </div>
@@ -2143,7 +2070,7 @@ const PrecificadorAgenda = () => {
       ) : (
         <>
           <Toolbar
-            style={{ border: "none" }}
+            className="p-toolbar"
             left={botaovoltar}
             right={botaoatualizar}
           />
@@ -2207,8 +2134,8 @@ const PrecificadorAgenda = () => {
                 }).format(
                   (novoPercentualMarkupMinimo *
                     produtoEmExibicaoSugestaoDialog?.precocusto) /
-                    100 +
-                    produtoEmExibicaoSugestaoDialog?.precocusto
+                  100 +
+                  produtoEmExibicaoSugestaoDialog?.precocusto
                 )}
               </div>
               <div>
@@ -2227,7 +2154,7 @@ const PrecificadorAgenda = () => {
                         (precoMarkupcalculo /
                           produtoEmExibicaoSugestaoDialog?.precocusto -
                           1) *
-                          100
+                        100
                       );
                     }
                   }}
@@ -2245,7 +2172,7 @@ const PrecificadorAgenda = () => {
                   (precoMarkupcalculo /
                     produtoEmExibicaoSugestaoDialog?.precocusto -
                     1) *
-                    100
+                  100
                 )}{" "}
                 %
               </div>
@@ -2300,10 +2227,360 @@ const PrecificadorAgenda = () => {
               </div>
             </div>
           </Dialog>
-          <div ref={tabelaRef}>
+          <div ref={tabelaRef} className="table-container">
+
             <Tooltip target=".export-buttons>button" position="bottom" />
+          </div>
+
+          {/* Painel de informações do produto atual - FIXO NO BOTTOM */}
+          <div className={`product-info-panel ${painelExpandido ? 'expanded' : 'collapsed'}`}>
+              <div className="panel-header">
+                <div className="panel-title">
+                  <div className="header-main">
+                    <h3>📋 {infoPainel?.fornecedor || "Selecione um produto"}</h3>
+                    <div className="header-details">
+                      <span className="detail-item">
+                        <i className="pi pi-file"></i>
+                        NF: {infoPainel?.notaFiscal || "-"}
+                      </span>
+                      <span className="detail-item">
+                        <i className="pi pi-calendar"></i>
+                        {infoPainel?.data || "-"}
+                      </span>
+
+
+                    </div>
+                  </div>
+
+                </div>
+                <div className="panel-controls">
+
+                  <Button
+                    onClick={() => buscarProdutos()}
+                    tooltip="Atualizar"
+                    label="Atualizar"
+                    tooltipOptions={{ position: "bottom" }}
+                    icon={loading ? "pi pi-spin pi-spinner" : "pi pi-refresh"}
+                    className=" p-button-info p-button-sm"
+                  />
+                 
+
+                  <SelectButton
+                    value={usarMarkup}
+                    options={options}
+                    optionLabel="name"
+                    onChange={(e) => setUsarMarkup(e.target.value)}
+
+                  />
+                  <Button
+                    icon={painelExpandido ? 'pi pi-eye-slash' : 'pi pi-eye'}
+                    className="p-button-rounded p-button-text p-button-sm"
+                    onClick={() => setPainelExpandido(!painelExpandido)}
+                    tooltip={painelExpandido ? 'Recolher detalhes' : 'Expandir detalhes'}
+                    tooltipOptions={{ position: 'left' }}
+                  />
+                </div>
+              </div>
+
+              {painelExpandido && produtoSelecionado && infoPainel?.produto && (
+                <>
+
+
+                  <div className="panel-content">
+
+                    {/* Preços Compactos */}
+                    <div className="pricing-compact">
+                      <div className="price-row">
+                        <div className="price-item cost">
+                          <span className="price-label">
+                            <i className="pi pi-dollar" style={{ color: '#dc2626', marginRight: '0.25rem' }}></i>
+                            Custo
+                          </span>
+                          <span className="price-value" style={{ color: '#dc2626' }}>
+                            {Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL"
+                            }).format(infoPainel?.produto?.custo || 0)}
+                          </span>
+                          <span className="price-profit">
+                            <Tag severity="danger" value="Base" icon="pi pi-exclamation-triangle" />
+                          </span>
+                        </div>
+
+                        <div className={`price-item current ${(() => {
+                          const precoAtual = infoPainel?.produto?.precoAtual || 0;
+                          const custo = infoPainel?.produto?.custo || 0;
+                          const lucro = precoAtual - custo;
+                          return lucro < 0 ? 'loss-alert' : '';
+                        })()}`}>
+                          <span className="price-label">
+                            <i className="pi pi-chart-line" style={{ color: '#059669', marginRight: '0.25rem' }}></i>
+                            Atual {(() => {
+                              const precoAtual = infoPainel?.produto?.precoAtual || 0;
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = precoAtual - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                                return `(+${percentualMarkup.toFixed(1)}%)`;
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = precoAtual - custo;
+                                const percentualMarkdown = precoAtual > 0 ? (markdown / precoAtual) * 100 : 0;
+                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                              }
+                            })()}
+                          </span>
+                          <span className="price-value">
+                            {Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL"
+                            }).format(infoPainel?.produto?.precoAtual || 0)}
+                          </span>
+                          <span className="price-profit">
+                            {(() => {
+                              const precoAtual = infoPainel?.produto?.precoAtual || 0;
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = precoAtual - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                                return markup >= 0 ? (
+                                  <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                ) : (
+                                  <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                );
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = precoAtual - custo;
+                                const percentualMarkdown = precoAtual > 0 ? (markdown / precoAtual) * 100 : 0;
+
+                                return markdown >= 0 ? (
+                                  <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                ) : (
+                                  <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                );
+                              }
+                            })()}
+                          </span>
+                        </div>
+
+                        {(infoPainel?.produto?.precoPromocional > 0 || infoPainel?.produto?.precoPromocionalFamilia > 0) && (
+                          <div className={`price-item promotional ${(() => {
+                            const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
+                            const custo = infoPainel?.produto?.custo || 0;
+                            const lucro = precoPromo - custo;
+                            return lucro < 0 ? 'loss-alert' : '';
+                          })()}`}>
+                            <span className="price-label">
+                              <i className="pi pi-tag" style={{ color: '#ea580c', marginRight: '0.25rem' }}></i>
+                              Promoção {(() => {
+                                const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
+                                const custo = infoPainel?.produto?.custo || 0;
+
+                                if (usarMarkup.value) {
+                                  // Cálculo baseado em markup (sobre o custo)
+                                  const markup = precoPromo - custo;
+                                  const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                                  return `(+${percentualMarkup.toFixed(1)}%)`;
+                                } else {
+                                  // Cálculo baseado em markdown (sobre o preço)
+                                  const markdown = precoPromo - custo;
+                                  const percentualMarkdown = precoPromo > 0 ? (markdown / precoPromo) * 100 : 0;
+                                  return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                                }
+                              })()}
+                              {infoPainel?.produto?.precoPromocionalFamilia > 0 ? ' (Família)' : ''}
+                            </span>
+                            <span className="price-value">
+                              {Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL"
+                              }).format(infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0)}
+                            </span>
+                            <span className="price-profit">
+                              {(() => {
+                                const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
+                                const custo = infoPainel?.produto?.custo || 0;
+
+                                if (usarMarkup.value) {
+                                  // Cálculo baseado em markup (sobre o custo)
+                                  const markup = precoPromo - custo;
+                                  const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                                  return markup >= 0 ? (
+                                    <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                  ) : (
+                                    <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                  );
+                                } else {
+                                  // Cálculo baseado em markdown (sobre o preço)
+                                  const markdown = precoPromo - custo;
+                                  const percentualMarkdown = precoPromo > 0 ? (markdown / precoPromo) * 100 : 0;
+
+                                  return markdown >= 0 ? (
+                                    <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                  ) : (
+                                    <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                  );
+                                }
+                              })()}
+                            </span>
+                          </div>
+                        )}
+
+                        <div className={`price-item suggestion ${(() => {
+                          const sugestao = infoPainel?.produto?.sugestao || 0;
+                          const custo = infoPainel?.produto?.custo || 0;
+                          const lucro = sugestao - custo;
+                          return lucro < 0 ? 'loss-alert' : '';
+                        })()}`}>
+                          <span className="price-label">
+                            <i className="pi pi-lightbulb" style={{ color: '#2563eb', marginRight: '0.25rem' }}></i>
+                            Sugestão {(() => {
+                              const sugestao = infoPainel?.produto?.sugestao || 0;
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = sugestao - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                                return `(+${percentualMarkup.toFixed(1)}%)`;
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = sugestao - custo;
+                                const percentualMarkdown = sugestao > 0 ? (markdown / sugestao) * 100 : 0;
+                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                              }
+                            })()}
+                          </span>
+                          <span className="price-value">
+                            {Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL"
+                            }).format(infoPainel?.produto?.sugestao || 0)}
+                          </span>
+                          <span className="price-profit">
+                            {(() => {
+                              const sugestao = infoPainel?.produto?.sugestao || 0;
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = sugestao - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                                return markup >= 0 ? (
+                                  <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                ) : (
+                                  <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                );
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = sugestao - custo;
+                                const percentualMarkdown = sugestao > 0 ? (markdown / sugestao) * 100 : 0;
+                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                              }
+                            })()}
+                          </span>
+                        </div>
+
+                        <div className={`price-item scheduled ${(() => {
+                          const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                          const custo = infoPainel?.produto?.custo || 0;
+                          const lucro = precoAgendado - custo;
+                          return lucro < 0 ? 'loss-alert' : '';
+                        })()}`}>
+                          <span className="price-label">
+                            <i className="pi pi-calendar" style={{ color: '#7c3aed', marginRight: '0.25rem' }}></i>
+                            Agendado {(() => {
+                              const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = precoAgendado - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                                return `(+${percentualMarkup.toFixed(1)}%)`;
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = precoAgendado - custo;
+                                const percentualMarkdown = precoAgendado > 0 ? (markdown / precoAgendado) * 100 : 0;
+                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                              }
+                            })()}
+                          </span>
+                          <span className="price-value">
+                            {(() => {
+                              const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                              if (precoAgendado === null || precoAgendado === 0) {
+                                return (
+                                  <div className="no-schedule-text">
+                                    <i className="pi pi-times-circle" style={{ color: '#6b7280', marginRight: '0.25rem' }}></i>
+                                    Sem agendamento
+                                  </div>
+                                );
+                              }
+                              return Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL"
+                              }).format(precoAgendado);
+                            })()}
+                          </span>
+                          <span className="price-profit">
+                            {(() => {
+                              const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                              if (precoAgendado === null || precoAgendado === 0) {
+                                return <Tag severity="secondary" value="N/A" />;
+                              }
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = precoAgendado - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                                return markup >= 0 ? (
+                                  <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                ) : (
+                                  <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                );
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = precoAgendado - custo;
+                                const percentualMarkdown = precoAgendado > 0 ? (markdown / precoAgendado) * 100 : 0;
+
+                                return markdown >= 0 ? (
+                                  <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                ) : (
+                                  <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                );
+                              }
+                            })()}
+                          </span>
+
+                        </div>
+                        {produtoSelecionado && infoPainel?.produto && (
+                          <div className="product-title">
+                            <h3>{infoPainel?.produto?.nome}</h3>
+                            <span className="product-code">{infoPainel?.produto?.codigo}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+          {/* DataTable principal */}
+          <div className="table-wrapper">
 
             <DataTable
+             
               onValueChange={(filteredData) => setProdutoFilter(filteredData)}
               responsiveLayout="stack"
               breakpoint="960px"
@@ -2325,6 +2602,32 @@ const PrecificadorAgenda = () => {
                   produto(s) filtrado(s)
                 </div>
               }
+              onRowClick={(e) => {
+                const produto = e.data;
+                setInfoPainel({
+                  fornecedor: produto.razaosocial || "Fornecedor não informado",
+                  notaFiscal: produto.numeronotafiscal || "N/A",
+                  data: produto.dataInclusao ? moment(produto.dataInclusao).format("DD/MM/YYYY - hh:mm") : "N/A",
+                  produto: {
+                    nome: produto.descricao || "-",
+                    codigo: produto.ean || produto.codigo || "-",
+                    custo: produto.precocusto || 0,
+                    precoAtual: produto.precoAtual || 0,
+                    precoPromocional: produto.precopromocional || 0,
+                    precoPromocionalFamilia: produto.precopromocionalfamilia || 0,
+                    //sugestao: sugestao,
+                    precoAgendado: produto.precoagendado || 0,
+                    dataAgendada: produto.dataagendada ? moment(produto.dataagendada).format("DD/MM/YYYY") : null,
+                    percentualMarkup: produto.percentualmarkup || 0,
+                    percentualMarkdown: produto.percentualmarkdown || 0,
+                    revisado: produto.revisado || false,
+                    familia: {
+                      id: produto.idfamilia || 0,
+                      nome: produto.nomefamilia || "-"
+                    }
+                  }
+                })
+              }}
               value={produtos}
               selectionMode="single"
               //   reorderableColumns
@@ -2342,9 +2645,7 @@ const PrecificadorAgenda = () => {
               filters={filters2}
               filterDisplay="row"
               style={{
-                backgroundColor: "#f2f2f2",
                 width: "100%",
-                padding: "1.0rem",
               }}
               emptyMessage="Nenhum produto encontrado para precificação"
               showGridlines
@@ -2522,7 +2823,7 @@ const PrecificadorAgenda = () => {
           </Dialog>
         </>
       )}
-    </>
+    </div>
   );
 };
 

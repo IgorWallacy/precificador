@@ -13,7 +13,6 @@ import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
 import { Toolbar } from "primereact/toolbar";
 
-import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
 import moment from "moment";
@@ -325,7 +324,6 @@ const EstoqueComprasFornecedor = () => {
   return (
     <>
       <Toast position="top-center" ref={toast} />
-      <Header />
       <Footer />
 
       {produtos.length > 0 ? (

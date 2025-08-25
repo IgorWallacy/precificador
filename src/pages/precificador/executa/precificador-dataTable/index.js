@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 
 import "./styless.css";
+import "../../../../components/prime-react-styles.css";
 import DestaqueImg from "../../../../assets/img/animaccao_check.json";
 import { Player } from "@lottiefiles/react-lottie-player";
 import { SelectButton } from "primereact/selectbutton";
-import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
+import ActionFooter from "../../../../components/action-footer";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
@@ -39,6 +40,8 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { Card, message } from "antd";
 import { element } from "prop-types";
+import { motion } from "framer-motion";
+import { Chart } from "primereact/chart";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -823,110 +826,7 @@ const PrecificadorExecuta = () => {
   const imprimeEtiquetaPrecosAgendadosModelo1 = () => {
     if (produtoSelecionado?.length) {
       var dd = {
-        pageSize: { width: 1010, height: 310 },
-        pageOrientation: "landscape",
-
-        styles: {
-          data: {
-            fontSize: 25,
-            bold: true,
-          },
-          eanTexto: { fontSize: 25, bold: true },
-          ean: {
-            fontSize: 100,
-            alignment: "left",
-            bold: true,
-          },
-          descricao: {
-            alignment: "left",
-            bold: true,
-            fontSize: 48,
-          },
-          preco: {
-            alignment: "left",
-            bold: true,
-            fontSize: 85,
-          },
-        },
-
-        content: produtoSelecionado.map(function (item) {
-          return {
-            layout: "noBorders", // optional
-            lineHeight: 1,
-
-            table: {
-              // headers are automatically repeated if the table spans over multiple pages
-              // you can declare how many rows should be treated as headers
-              headerRows: 0,
-              widths: [1000, 100, 100, 100, 50, "*"],
-
-              body: [
-                //   ['', '', ''],
-
-                [
-                  {
-                    image: textToBase64Barcode(
-                      item.ean ? item.ean : item.codigo
-                    ),
-                    margin: [-30, -40],
-                    style: "ean",
-                  },
-
-                  {
-                    text: item.ean
-                      ? "\n\n\n" + "Cód.Barras " + item.ean
-                      : "\n\n\n" + "Código " + item.codigo,
-                    style: "eanTexto",
-                    margin: [-370, 0],
-                  },
-                  //    { qr: item.ean ? item.ean : item.codigo },
-
-                  {
-                    text: "\n\n" + item.descricao.substring(0, 50),
-                    margin: [-1140, 30],
-                    style: "descricao",
-                  },
-
-                  {
-                    text:
-                      "\n R$ " +
-                      Intl.NumberFormat("pt-BR", {
-                        style: "decimal",
-                        currency: "BRL",
-                        minimumFractionDigits: "2",
-                        maximumFractionDigits: "2",
-                      }).format(item.precoagendado),
-                    margin: [-900, -145],
-                    style: "preco",
-                  },
-                  {
-                    text:
-                      "Impresso em \n " +
-                      moment(new Date()).format("DD/MM/YYYY"),
-                    style: "data",
-                    margin: [-540, 10],
-                  },
-                ],
-              ],
-            },
-          };
-        }),
-      };
-
-      pdfMake.createPdf(dd).open();
-    } else {
-      toast.current.show({
-        severity: "warn",
-        summary: "Aviso",
-        detail: `Selecione os produtos que deseja imprimir as etiquetas`,
-      });
-    }
-  };
-
-  const imprimeEtiquetaPrecosAgendados = () => {
-    if (produtoSelecionado?.length) {
-      var dd = {
-        pageSize: { width: 1010, height: 310 },
+        pageSize: { width: 1199, height: 310 },
         pageOrientation: "landscape",
 
         styles: {
@@ -952,7 +852,115 @@ const PrecificadorExecuta = () => {
           preco: {
             alignment: "left",
             bold: true,
-            fontSize: 75,
+            fontSize: 95,
+          },
+        },
+
+        content: produtoSelecionado.map(function (item) {
+          return {
+            layout: "noBorders", // optional
+            lineHeight: 1,
+
+            table: {
+              // headers are automatically repeated if the table spans over multiple pages
+              // you can declare how many rows should be treated as headers
+              headerRows: 0,
+              widths: [235, 500, 400, 200, 300, 0],
+
+              body: [
+                //   ['', '', ''],
+
+                [
+                  {
+                    text: item.ean
+                      ? "\n\n\n\n\n\n" + "Cód.Barras " + item.ean
+                      : "\n\n\n\n\n\n" + "Código " + item.codigo,
+                    style: "eanTexto",
+                    margin: [-55, 0],
+                  },
+                  //    { qr: item.ean ? item.ean : item.codigo },
+
+                  {
+                    text: "\n\n" + item.descricao.substring(0, 50),
+                    margin: [0, -100],
+                    style: "descricao",
+                  },
+
+                  {
+                    text:
+                      "\n R$ " +
+                      Intl.NumberFormat("pt-BR", {
+                        style: "decimal",
+                        currency: "BRL",
+                        minimumFractionDigits: "2",
+                        maximumFractionDigits: "2",
+                      }).format(item.precoagendado),
+                    margin: [-150, 0],
+                    style: "preco",
+                  },
+                  {
+                    text:
+                      "Impresso em \n " +
+                      moment(new Date()).format("DD/MM/YYYY"),
+                    style: "data",
+                    margin: [-380, 0],
+                  },
+                  {
+                    image: textToBase64Barcode(
+                      item.ean ? item.ean : item.codigo
+                    ),
+                    width: 225,
+                    height: 150,
+                    margin: [1400, 0],
+                    style: "ean",
+                  },
+                ],
+              ],
+            },
+          };
+        }),
+      };
+
+      pdfMake.createPdf(dd).open();
+    } else {
+      toast.current.show({
+        severity: "warn",
+        summary: "Aviso",
+        detail: `Selecione os produtos que deseja imprimir as etiquetas`,
+      });
+    }
+  };
+
+  const imprimeEtiquetaPrecosAgendados = () => {
+    if (produtoSelecionado?.length) {
+      var dd = {
+        pageSize: { width: 1199, height: 310 },
+        pageOrientation: "landscape",
+
+        styles: {
+          data: {
+            fontSize: 30,
+            bold: true,
+          },
+          eanTexto: {
+            fontSize: 25,
+            bold: true,
+            alignment: "right",
+          },
+          ean: {
+            fontSize: 25,
+            alignment: "center",
+            bold: true,
+          },
+          descricao: {
+            alignment: "left",
+            bold: true,
+            fontSize: 40,
+          },
+          preco: {
+            alignment: "left",
+            bold: true,
+            fontSize: 95,
           },
         },
 
@@ -1034,7 +1042,7 @@ const PrecificadorExecuta = () => {
   const imprimeEtiquetaPrecosAgendadosQRCode = () => {
     if (produtoSelecionado?.length) {
       var dd = {
-        pageSize: { width: 1010, height: 310 },
+        pageSize: { width: 1199, height: 310 },
         pageOrientation: "landscape",
 
         styles: {
@@ -1056,7 +1064,7 @@ const PrecificadorExecuta = () => {
           preco: {
             alignment: "left",
             bold: true,
-            fontSize: 85,
+            fontSize: 95,
           },
         },
 
@@ -1185,7 +1193,7 @@ const PrecificadorExecuta = () => {
   async function buscarProdutos() {
     usarTabelaFormacaoPreecoProduto();
     getProdutosPendentePreco();
-
+    
     if (replicarPreco === undefined) {
       toast.current.show({
         severity: "warn",
@@ -1420,8 +1428,9 @@ const PrecificadorExecuta = () => {
   };
 
   const buscarUsuarioPorCodigo = () => {
+   
     return api
-      .get(`/api/usuarios/logado/${context?.usuarioLogado}`)
+      .get(`/api/usuarios/logado/${localStorage.getItem("ultimoLogado")}`)
       .then((r) => {
         SetUsuario(r.data);
       })
@@ -1739,477 +1748,270 @@ const PrecificadorExecuta = () => {
     },
   };
 
-  return (
-    <>
-      <Toast ref={toast} position="bottom-center" />
+  
 
-      <Header />
-      <Footer />
+return (
+  <div className="page-container">
+    <Toast ref={toast} position="bottom-center" />
+    <Footer />
+    
+    <div className="page-card">
+      <div className="page-header">
+        <h1>Emitir Etiquetas e Enviar para PDV</h1>
+        <p className="subtitle">Gerencie preços agendados e envie para o sistema PDV</p>
+      </div>
 
-      <div className="agenda-label">
-        <h1 style={{ fontFamily: "cabin-sketch-bold" }}>
-          {produtos?.length < 1 ? "Pesquisar agendamentos de preços," : ""}
-        </h1>
-
-        <h4
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "cabin-sketch-bold",
-          }}
-        >
-          {produtos?.length < 1 ? "Atualizar os preços de venda" : ""}
-        </h4>
-
-        {quantidadeFilial.length > 1 ? (
-          <>
-            {replicarPreco ? (
-              <Tag
-                className="mr-10"
-                style={{ margin: "5px" }}
-                rounded
-                value="Replicar a atualização de preços para todas as lojas"
-                severity="info"
-                icon="pi pi-check"
-              ></Tag>
-            ) : (
-              <Tag
-                className="mr-10"
-                style={{ margin: "5px" }}
-                icon="pi pi-times"
-                rounded
-                severity="danger"
-                value="Não replicar a atualização de preços para todas as lojas"
-              ></Tag>
-            )}
-          </>
-        ) : (
-          <></>
-        )}
+      {/* Aviso de atenção */}
+      <div className="attention-warning">
+        <i className="pi pi-exclamation-triangle"></i>
+        <span>Esta funcionalidade permite emitir etiquetas e enviar preços agendados para o PDV</span>
       </div>
 
       {produtos.length < 1 ? (
         <>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              color: "#f2f2f2",
-              margin: "5px",
-              justifyContent: "center",
-              alignContent: "center",
-              flexWrap: "wrap",
-              gap: "5px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignContent: "center",
-                flexWrap: "wrap",
+          {/* Container de filtros */}
+          <div className="filters-container">
+            {/* Seção de modo de pesquisa */}
+            <div className="filters-section">
+              <h3 className="section-title">
+                <i className="pi pi-search"></i>
+                Modo de Pesquisa
+              </h3>
+              
+              <div className="filters-grid">
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-cog"></i>
+                    Tipo de Pesquisa
+                  </label>
+                  <SelectButton 
+                    value={modoPesquisa} 
+                    onChange={(e) => { 
+                      setDataInicial(null); 
+                      setDataFinal(null); 
+                      setModoPesquisa(e.value); 
+                    }} 
+                    options={modosDePesquisa}
+                    className="filter-select"
+                  />
+                </div>
+              </div>
+            </div>
 
-                gap: "5px",
-              }}
-            >
-              Pesquisar por
-              <SelectButton
-                value={modoPesquisa}
-                onChange={(e) => {
-                  setDataInicial(null);
-                  setDataFinal(null);
-                  setModoPesquisa(e.value);
-                }}
-                options={modosDePesquisa}
-              />
-              Período
-              <Calendar
-                selectOtherMonths
-                required
-                showIcon
-                placeholder="Data inicial do agendamento"
-                dateFormat="dd/mm/yy "
-                viewDate={new Date(new Date().setHours(0, 0, 0, 0))}
-                hideOnDateTimeSelect
-                value={dataInicial}
-                onChange={(e) => {
-                  setDataInicial(e.target.value);
-                  dataInicial?.setUTCHours(dataInicial.getUTCHours() - 3);
-                }}
-                showButtonBar
-                locale="pt-BR"
-                showTime={modoPesquisa}
-                //  showSeconds
-              />
-              até
-              <Calendar
-                selectOtherMonths
-                required
-                showIcon
-                placeholder="Data final do agendamento"
-                dateFormat="dd/mm/yy"
-                hideOnDateTimeSelect
-                value={dataFinal}
-                onChange={(e) => {
-                  setDataFinal(e.value);
-                  dataFinal?.setUTCHours(dataFinal.getUTCHours() - 3);
-                }}
-                showButtonBar
-                locale="pt-BR"
-                showTime={modoPesquisa}
-                //  showSeconds
-              />
-              <MostraListaFilial />
+            {/* Seção de filtros de data */}
+            <div className="filters-section">
+              <h3 className="section-title">
+                <i className="pi pi-calendar"></i>
+                Período de Pesquisa
+              </h3>
+              
+              <div className="filters-grid">
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-calendar-plus"></i>
+                    Data Inicial
+                    {dataInicial && <span className="filter-status active">✓</span>}
+                  </label>
+                  <Calendar 
+                    selectOtherMonths 
+                    required 
+                    showIcon 
+                    placeholder="Data inicial do agendamento" 
+                    dateFormat="dd/mm/yy" 
+                    viewDate={new Date(new Date().setHours(0, 0, 0, 0))} 
+                    hideOnDateTimeSelect 
+                    value={dataInicial} 
+                    onChange={(e) => { 
+                      setDataInicial(e.target.value); 
+                      dataInicial?.setUTCHours(dataInicial.getUTCHours() - 3); 
+                    }} 
+                    showButtonBar 
+                    locale="pt-BR" 
+                    showTime={modoPesquisa}
+                    className="filter-calendar"
+                  />
+                </div>
+                
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-calendar-minus"></i>
+                    Data Final
+                    {dataFinal && <span className="filter-status active">✓</span>}
+                  </label>
+                  <Calendar 
+                    selectOtherMonths 
+                    required 
+                    showIcon 
+                    placeholder="Data final do agendamento" 
+                    hideOnDateTimeSelect 
+                    value={dataFinal} 
+                    onChange={(e) => { 
+                      setDataFinal(e.value); 
+                      dataFinal?.setUTCHours(dataFinal.getUTCHours() - 3); 
+                    }} 
+                    showButtonBar 
+                    locale="pt-BR" 
+                    showTime={modoPesquisa}
+                    className="filter-calendar"
+                  />
+                </div>
+
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-building"></i>
+                    Loja
+                  </label>
+                  <div className="store-selector">
+                    <MostraListaFilial />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Seção de configuração de replicação */}
+            <div className="grouping-section">
+              <h3 className="section-title">
+                <i className="pi pi-copy"></i>
+                Configuração de Replicação
+              </h3>
+              
+              <div className="grouping-content">
+                <p className="grouping-description">
+                  Configure se deseja replicar os preços para todas as filiais:
+                </p>
+                
+                <div className="toggle-container">
+                  <MostraSelectReplicarPrecoFilial />
+                </div>
+              </div>
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              flexDirection: "column",
-              margin: "10px",
-            }}
-          >
-            <MostraSelectReplicarPrecoFilial />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <Button
-              icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
-              label={loading ? "Pesquisando ..." : " Pesquisar agendamento(s) "}
-              disabled={loading}
-              className="p-button-rounded p-button-success p-button-md"
-              onClick={() => buscarProdutos()}
+
+          {/* Botão de pesquisa */}
+          <div className="search-button-container">
+            <div className="search-info">
+              <div className="filters-count">
+                <i className="pi pi-filter"></i>
+                <span>
+                  {[dataInicial, dataFinal].filter(Boolean).length} de 2 filtros preenchidos
+                </span>
+              </div>
+              {(!dataInicial || !dataFinal) && (
+                <div className="validation-warning">
+                  <i className="pi pi-exclamation-triangle"></i>
+                  <span>Preencha as datas inicial e final para continuar</span>
+                </div>
+              )}
+            </div>
+            
+            <Button 
+              icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"} 
+              label={loading ? "Pesquisando..." : "Pesquisar Agendamento(s)"} 
+              disabled={loading || !dataInicial || !dataFinal} 
+              className="search-button" 
+              onClick={() => buscarProdutos()} 
             />
           </div>
         </>
       ) : (
-        <>
-          {produtoStatusPendente?.length > 0 ? (
-            <></>
-          ) : (
-            <Player
-              src={DestaqueImg}
-              loop
-              autoplay
-              style={{ width: "350px" }}
-            />
-          )}
-          <div
-            style={{
-              border: "1px solid #F2f2f2",
-              padding: "1px",
-              margin: "1px",
-            }}
-          >
-            <Toolbar
-              style={{ border: "none" }}
-              left={botaovoltar}
-              right={botaoatualizar}
-            />
-
+        <div className="results-container">
+          {produtoStatusPendente?.length > 0 ? <></> : <Player src={DestaqueImg} loop autoplay style={{ width: "350px" }} />}
+          
+          <div className="action-bar page-card">
+            <ActionFooter leftContent={botaovoltar} rightContent={botaoatualizar} position="sticky" />
+            
             {localStorage.getItem("access_token_uniplus")?.length > 0 ? (
               <>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                ></div>
-
-                {/* <Messages ref={messages} /> */}
-
-                {/* <Tag
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  severity="success"
-                  value="Utilizando a API do uniplus"
-                ></Tag> */}
-
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}></div>
                 {loadingApiUniplus ? (
                   <>
-                    <div
-                      style={{
-                        backgroundColor: "#f2f2f2",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div style={{ backgroundColor: "#f2f2f2", display: "flex", justifyContent: "center", alignItems: "center" }}>
                       <h4> Aguarde por favor, Enviando ao PDV !</h4>
                     </div>
-
-                    <ProgressBar
-                      mode="indeterminate"
-                      style={{ height: "36px" }}
-                    ></ProgressBar>
+                    <ProgressBar mode="indeterminate" style={{ height: "36px" }}></ProgressBar>
                   </>
-                ) : (
-                  <></>
-                )}
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "stretch",
-                    gap: "1rem",
-                    backgroundColor: "#f2f2f2",
-                  }}
-                >
+                ) : <></>}
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "stretch", gap: "1rem" }}>
                   {mensagens[0]?.mensagens?.length > 0 ? (
-                    <>
-                      <div style={{ color: "green" }}>
-                        <p>
-                          Os seguintes produtos foram enviados ao PDV com
-                          sucesso !{" "}
-                        </p>
-                        {mensagens[0]?.mensagens?.map((m, index) => (
-                          <p key={index}>{m}</p>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-
+                    <div className="messages-area messages-area-success">
+                      <p>Os seguintes produtos foram enviados ao PDV com sucesso ! </p>
+                      {mensagens[0]?.mensagens?.map((m, index) => <p key={index}>{m}</p>)}
+                    </div>
+                  ) : <></>}
                   {mensagens[0]?.erros.length > 0 ? (
-                    <>
-                      <div style={{ color: "red" }}>
-                        <p>
-                          Os seguintes produtos não foram enviados ao PDV devido
-                          aos seguintes erros :{" "}
-                        </p>
-                        {mensagens[0]?.erros?.map((m, index) => (
-                          <p key={index}>{m}</p>
-                        ))}
-                        <p>Corrija os erros e tente novamente</p>
-                      </div>
-                    </>
-                  ) : (
-                    <> </>
-                  )}
+                    <div className="messages-area messages-area-error">
+                      <p>Os seguintes produtos não foram enviados ao PDV devido aos seguintes erros : </p>
+                      {mensagens[0]?.erros?.map((m, index) => <p key={index}>{m}</p>)}
+                      <p>Corrija os erros e tente novamente</p>
+                    </div>
+                  ) : <> </>}
                   {mensagens?.length > 0 ? (
-                    <>
-                      <div style={{ margin: "5px" }}>
-                        <Button
-                          label="Fechar"
-                          onClick={() => setMensagens([])}
-                          icon="pi pi-times"
-                          className="p-button p-button-rounded p-button-danger"
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+                    <div style={{ margin: "5px" }}>
+                      <Button label="Fechar" onClick={() => setMensagens([])} icon="pi pi-times" className="p-button p-button-rounded p-button-danger" />
+                    </div>
+                  ) : <></>}
                 </div>
               </>
-            ) : (
-              <></>
-            )}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "1rem",
-              }}
-            >
-              <Button
-                label={`Gravar ( ${
-                  produtoSelecionado ? produtoSelecionado?.length : 0
-                }  ) preços agendados `}
-                icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"}
-                disabled={!produtoSelecionado || !produtoSelecionado.length}
-                className={!produtoSelecionado?.length > 0 ? 'p-button-rounded p-button-danger' : 'p-button-rounded p-button-success'}
-                onClick={() => {
-                  atualizarProdutosSelecionadosUniplusApi();
-                  atualizarProdutosSelecionadosUniplusApiMultEmpresa()
-                  atualizarProdutosSelecionados();
-                }}
+            ) : <></>}
+            
+            <div className="final-actions">
+              <Button 
+                label={`Gravar ( ${produtoSelecionado ? produtoSelecionado?.length : 0}  ) preços agendados `} 
+                icon={loading ? "pi pi-spin pi-spinner" : "pi pi-save"} 
+                disabled={!produtoSelecionado || !produtoSelecionado.length} 
+                className={`p-button-rounded ${!produtoSelecionado?.length > 0 ? 'p-button-danger' : 'p-button-success'} action-button`} 
+                onClick={() => { 
+                  atualizarProdutosSelecionadosUniplusApi(); 
+                  atualizarProdutosSelecionadosUniplusApiMultEmpresa(); 
+                  atualizarProdutosSelecionados(); 
+                }} 
               />
             </div>
           </div>
-          <div ref={tabelaRef}>
-            <DataTable
-              style={{ padding: "1px", margin: "1px", marginBottom: "10px" }}
-              footer={"Existem " + produtos.length + " produto(s) para análise"}
-              loading={loading}
-              stripedRows
-              value={produtos}
-              //   reorderableColumns
-              editMode="row"
-              dataKey="idproduto"
-              onRowEditComplete={onRowEditComplete}
-              //    scrollDirection="vertical"
-              //    scrollable
-              //    scrollHeight="flex"
-              globalFilterFields={[
-                "descricao",
-                "ean",
-                "numeronotafiscal",
-                "razaosocial",
-              ]}
-              filters={filters2}
-              size="small"
-              emptyMessage="Nenhum produto encontrado para precificação"
-              showGridlines
-              header={headerDataTable}
-              //   rowGroupMode="subheader"
-              //    groupRowsBy={agrupamento}
-              //paginator
-              //rows={3}
-              paginatorTemplate={template1}
-              //  sortOrder={1}
-              //     rowGroupHeaderTemplate={headerTemplate}
-              // resizableColumns
-              // columnResizeMode="expand"
-              //  expandableRowGroups
-              //  expandedRows={expandedRows}
-              //   onRowToggle={(e) => setExpandedRows(e.data)}
-              selection={produtoSelecionado}
-              onSelectionChange={(e) => setProdutoSelecionado(e.value)}
-            >
-              <Column
-                selectionMode="multiple"
-                headerStyle={{ width: "3rem" }}
-                exportable={false}
-              ></Column>
-              <Column sortable header="Loja" field="nomeFilial"></Column>
-              <Column header="N° Nota fiscal" field="numeronotafiscal"></Column>
-              <Column header="Código " body={EanOrCodigo}></Column>
-
-              <Column
-                field="descricao"
-                header="Produto"
-                sortable
-                rowSpan={2}
-                body={familiaIcone}
-              ></Column>
-              <Column
-                field={precoCustoTemplate}
-                header="Custo"
-                body={precoCustoTemplate}
-              ></Column>
-
-              <Column
-                field={margem}
-                header={
-                  <>
-                    {" "}
-                    <div>
-                      {" "}
-                      Agendado <hr />{" "}
-                    </div>{" "}
-                    <br /> <div> Margem % </div> <br /> <div> Lucro </div>{" "}
-                  </>
-                }
-                body={margem}
-              ></Column>
-
-              <Column
-                field={margemAtual}
-                header={
-                  <>
-                    <div>
-                      Preço Atual <hr />
-                    </div>
-                    <br /> <div> Margem % </div> <br /> <div> Lucro </div>
-                  </>
-                }
-                body={margemAtual}
-                bodyStyle={{
-                  textAlign: "center",
-                }}
-              ></Column>
-
-              <Column
-                style={{ fontWeight: "600", fontSize: "14px" }}
-                field={sugestaoVenda}
-                header={
-                  <>
-                    {" "}
-                    <div>
-                      {" "}
-                      Sugestão <hr />{" "}
-                    </div>{" "}
-                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                  </>
-                }
-                body={sugestaoVenda}
-              ></Column>
-
-              <Column
-                field="precoagendado"
-                header={
-                  <>
-                    {" "}
-                    <div>
-                      {" "}
-                      Preço Agendado <hr />{" "}
-                    </div>{" "}
-                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                  </>
-                }
-                body={precoAgendadoTemplate}
-                style={{ fontWeight: "600" }}
-                editor={(options) => priceEditor(options)}
-              ></Column>
-
-              <Column
-                field={precoAtualTemplate}
-                header={
-                  <>
-                    {" "}
-                    <div>
-                      {" "}
-                      Preço Atual <hr />{" "}
-                    </div>{" "}
-                    <br /> <div> Markup % </div> <br /> <div> Venda </div>{" "}
-                  </>
-                }
-                style={{ fontSize: "17", fontWeight: "600" }}
-                body={precoAtualTemplate}
-              ></Column>
-
-              <Column
-                header="Agendado por"
-                field={usuarioAgendadoTemplate}
-                style={{ textAlign: "center", fontWeight: "600" }}
-              ></Column>
-
-              <Column
-                header="Status"
-                field={status}
-                body={status}
-                style={{ textAlign: "center", fontWeight: "600" }}
-              ></Column>
-              <Column
-                selectionMode="multiple"
-                headerStyle={{ width: "3rem" }}
-                exportable={false}
-              ></Column>
-            </DataTable>
+          
+          <div className="table-container">
+            <div className="table-wrapper">
+              <DataTable 
+                className="DataTable" 
+                footer={"Existem " + produtos.length + " produto(s) para análise"} 
+                loading={loading} 
+                stripedRows 
+                value={produtos} 
+                editMode="row" 
+                dataKey="idproduto" 
+                onRowEditComplete={onRowEditComplete} 
+                globalFilterFields={["descricao", "ean", "numeronotafiscal", "razaosocial"]} 
+                filters={filters2} 
+                size="small" 
+                emptyMessage="Nenhum produto encontrado para precificação" 
+                showGridlines 
+                header={headerDataTable} 
+                paginatorTemplate={template1} 
+                selection={produtoSelecionado} 
+                onSelectionChange={(e) => setProdutoSelecionado(e.value)}
+              >
+                <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} exportable={false}></Column>
+                <Column sortable header="Loja" field="nomeFilial"></Column>
+                <Column header="N° Nota fiscal" field="numeronotafiscal"></Column>
+                <Column header="Código " body={EanOrCodigo}></Column>
+                <Column field="descricao" header="Produto" sortable rowSpan={2} body={familiaIcone}></Column>
+                <Column field={precoCustoTemplate} header="Custo" body={precoCustoTemplate}></Column>
+                <Column field={margem} header={<> <div> Agendado <hr /> </div> <br /> <div> Margem % </div> <br /> <div> Lucro </div> </>} body={margem}></Column>
+                <Column field={margemAtual} header={<> <div> Preço Atual <hr /> </div> <br /> <div> Margem % </div> <br /> <div> Lucro </div> </>} body={margemAtual} bodyStyle={{ textAlign: "center" }}></Column>
+                <Column style={{ fontWeight: "600", fontSize: "14px" }} field={sugestaoVenda} header={<> <div> Sugestão <hr /> </div> <br /> <div> Markup % </div> <br /> <div> Venda </div> </>} body={sugestaoVenda}></Column>
+                <Column field="precoagendado" header={<> <div> Preço Agendado <hr /> </div> <br /> <div> Markup % </div> <br /> <div> Venda </div> </>} body={precoAgendadoTemplate} style={{ fontWeight: "600" }} editor={(options) => priceEditor(options)}></Column>
+                <Column field={precoAtualTemplate} header={<> <div> Preço Atual <hr /> </div> <br /> <div> Markup % </div> <br /> <div> Venda </div> </>} style={{ fontSize: "17", fontWeight: "600" }} body={precoAtualTemplate}></Column>
+                <Column header="Agendado por" field={usuarioAgendadoTemplate} style={{ textAlign: "center", fontWeight: "600" }}></Column>
+                <Column header="Status" field={status} body={status} style={{ textAlign: "center", fontWeight: "600" }}></Column>
+                <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} exportable={false}></Column>
+              </DataTable>
+            </div>
           </div>
-        </>
+        </div>
       )}
-    </>
-  );
+    </div>
+  </div>
+);
 };
 
 export default PrecificadorExecuta;

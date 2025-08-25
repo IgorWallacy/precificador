@@ -1,0 +1,154 @@
+/* Action Footer Styles */
+.action-footer {
+  width: 100%;
+  background: #ffffff;
+  border-top: 1px solid #e9ecef;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  margin-top: auto;
+}
+
+.action-footer-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.action-footer-sticky {
+  position: sticky;
+  bottom: 0;
+}
+
+.action-footer-toolbar {
+  border: none !important;
+  background: transparent !important;
+  padding: 0.75rem 1rem;
+  min-height: 60px;
+}
+
+.action-footer-toolbar .p-toolbar-group-left,
+.action-footer-toolbar .p-toolbar-group-center,
+.action-footer-toolbar .p-toolbar-group-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Melhor espaçamento para botões flutuantes */
+.action-footer-toolbar .botao-flutuante-atualizar,
+.action-footer-toolbar .botao-flutuante-pesquisar,
+.action-footer-toolbar .botao-flutuante-up-down {
+  margin: 0 0.25rem;
+}
+
+/* Ajustes para SelectButton */
+.action-footer-toolbar .p-selectbutton {
+  border-radius: 6px;
+}
+
+.action-footer-toolbar .p-selectbutton .p-button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.action-footer-toolbar .p-toolbar-group-center {
+  justify-content: center;
+}
+
+.action-footer-toolbar .p-toolbar-group-right {
+  justify-content: flex-end;
+}
+
+/* Melhor alinhamento para o grupo direito */
+.action-footer-toolbar .p-toolbar-group-right .p-inputgroup {
+  align-items: center;
+  margin: 0;
+}
+
+.action-footer-toolbar .p-toolbar-group-right .p-inputgroup-addon {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.action-footer-toolbar .p-toolbar-group-right .p-calendar {
+  min-width: 200px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .action-footer-toolbar {
+    padding: 0.5rem;
+    min-height: 50px;
+  }
+  
+  .action-footer-toolbar .p-toolbar-group-left,
+  .action-footer-toolbar .p-toolbar-group-center,
+  .action-footer-toolbar .p-toolbar-group-right {
+    gap: 0.25rem;
+  }
+  
+  .action-footer-toolbar .p-toolbar-group-right .p-calendar {
+    min-width: 150px;
+  }
+  
+  .action-footer-toolbar .p-selectbutton .p-button {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-footer-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.5rem;
+  }
+  
+  .action-footer-toolbar .p-toolbar-group-left,
+  .action-footer-toolbar .p-toolbar-group-center,
+  .action-footer-toolbar .p-toolbar-group-right {
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .action-footer-toolbar .p-toolbar-group-right:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Button adjustments within action footer */
+.action-footer .p-button {
+  margin: 0 0.25rem;
+}
+
+.action-footer .p-dropdown {
+  margin: 0 0.25rem;
+}
+
+/* Ensure content doesn't get hidden behind fixed footer */
+body.has-action-footer-fixed {
+  padding-bottom: 80px;
+}
+
+/* Animation for smooth appearance */
+.action-footer {
+  transition: all 0.3s ease-in-out;
+}
+
+.action-footer-fixed {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

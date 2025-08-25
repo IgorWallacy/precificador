@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import Header from "../../components/header";
 import Footer from "../../components/footer";
+import "../../components/prime-react-styles.css";
 import api from "../../services/axios";
 
 import { Button } from "primereact/button";
@@ -115,51 +115,89 @@ const AjusteEstoque = () => {
   }, []);
 
   return (
-    <>
-      <Header />
+    <div className="page-container">
       <Footer />
 
       {produtos.length === 0 ? (
-        <>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#FFFF",
-              flexDirection: "column",
-              flexWrap: "wrap",
-              gap: "10px",
-              padding: "1px",
-              marginTop:'50px'
-            }}
-          >
-            <h1>Exportar arquivo EDI para zerar estoque</h1>
-            <h4>Informe a seção que deseja carregar para exportação</h4>
-            <Dropdown
-              value={grupo}
-              placeholder="Selecione um grupo"
-              optionLabel="nome"
-              options={grupoList}
-              onChange={(e) => setGrupo(e.value)}
-              filter
-              showClear
-              filterBy="nome"
-            />
+        <div className="page-card">
+          <div className="page-header">
+            <h1>Exportar Arquivo EDI para Zerar Estoque</h1>
+            <p className="subtitle">Informe a seção que deseja carregar para exportação</p>
+          </div>
+
+          {/* Aviso de atenção */}
+          <div className="attention-warning">
+            <i className="pi pi-exclamation-triangle"></i>
+            <span>Esta funcionalidade permite exportar produtos para zerar o estoque via arquivo EDI</span>
+          </div>
+
+          {/* Container de filtros */}
+          <div className="filters-container">
+            <div className="filters-section">
+              <h3 className="section-title">
+                <i className="pi pi-filter"></i>
+                Seleção de Grupo
+              </h3>
+              
+              <div className="filters-grid">
+                <div className="filter-group">
+                  <label className="filter-label">
+                    <i className="pi pi-tags"></i>
+                    Grupo de Produtos
+                    {grupo && <span className="filter-status active">✓</span>}
+                  </label>
+                  <Dropdown
+                    value={grupo}
+                    placeholder="Selecione um grupo"
+                    optionLabel="nome"
+                    options={grupoList}
+                    onChange={(e) => setGrupo(e.value)}
+                    filter
+                    showClear
+                    filterBy="nome"
+                    className="filter-dropdown"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Botão de pesquisa */}
+          <div className="search-button-container">
+            <div className="search-info">
+              <div className="filters-count">
+                <i className="pi pi-filter"></i>
+                <span>
+                  {grupo ? '1 de 1 filtro preenchido' : '0 de 1 filtro preenchido'}
+                </span>
+              </div>
+              {!grupo && (
+                <div className="validation-warning">
+                  <i className="pi pi-exclamation-triangle"></i>
+                  <span>Selecione um grupo para continuar</span>
+                </div>
+              )}
+            </div>
+            
             <Button
-              className="p-button p-button-primary p-button-rounded"
-              label="Carregar"
+              className="search-button"
+              label="Carregar Produtos"
               icon="pi pi-search"
               loading={loading}
+              disabled={!grupo}
               onClick={() => getProdutosProGrupo()}
             />
           </div>
-        </>
+        </div>
       ) : (
-        <>
-          {" "}
+        <div className="page-card">
+          <div className="page-header">
+            <h1>Produtos para Exportação</h1>
+            <p className="subtitle">Exporte produtos para zerar o estoque via arquivo EDI</p>
+          </div>
+
           <Toolbar
-          style={{marginTop:'50px'}}
+            className="p-toolbar"
             left={
               <Button
                 label="Voltar"
@@ -177,39 +215,43 @@ const AjusteEstoque = () => {
               />
             }
           />
-          <div className="card">
-            <DataTable
-              value={produtos}
-              loading={loading}
-              responsiveLayout="stack"
-              filters={filters}
-              globalFilterFields={["codigo", "ean", "nome"]}
-              stripedRows
-              header={header}
-              paginator
-              rows={10}
-              emptyMessage="Sem dados para serem exibidos"
-              breakpoint="968px"
-              footer={
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  Existem {produtos.length} produtos para exportação
-                </div>
-              }
-            >
-              <Column field="codigo" header="Código"></Column>
-              <Column field="ean" header="Ean"></Column>
-              <Column field="nome" header="Nome"></Column>
-            </DataTable>
+          
+          <div className="table-container">
+            <div className="table-wrapper">
+              <DataTable
+                className="DataTable"
+                value={produtos}
+                loading={loading}
+                responsiveLayout="stack"
+                filters={filters}
+                globalFilterFields={["codigo", "ean", "nome"]}
+                stripedRows
+                header={header}
+                paginator
+                rows={10}
+                emptyMessage="Sem dados para serem exibidos"
+                breakpoint="968px"
+                footer={
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    Existem {produtos.length} produtos para exportação
+                  </div>
+                }
+              >
+                <Column field="codigo" header="Código"></Column>
+                <Column field="ean" header="Ean"></Column>
+                <Column field="nome" header="Nome"></Column>
+              </DataTable>
+            </div>
           </div>
-        </>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 

@@ -16,8 +16,8 @@ import { Column } from "primereact/column";
 
 import api from "../../../services/axios";
 import moment from "moment";
-import Header from "../../../components/header";
 import Footer from "../../../components/footer";
+import "../../../components/prime-react-styles.css";
 
 const RecebimentoPorData = () => {
   const tabelaRef = useRef(null);
@@ -467,62 +467,114 @@ const RecebimentoPorData = () => {
   }, []);
 
   return (
-    <>
-      <Header />
+    <div className="page-container">
       <Footer />
-      <div ref={tabelaRef} style={{ padding: "1px", margin: "1px" }}>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "row",
-            gap: "5px",
-            justifyContent: "center",
-            alignItems: "center",
-            flexWrap: "wrap",
-            color: "#f2f2f2",
-            height: "150px",
-            backgroundColor: "#ec3b83",
-            marginTop: "50px",
-          }}
-        >
-          <h1>Recebimentos por data do pagamento</h1>
-          <RangePicker
-            disabled={loading}
-            format={"DD/MM/YYYY"}
-            locale={locale}
-            showToday
-            onChange={(e) => setResumoData(e)}
-          />
-          <Button
-            style={{ margin: "2px" }}
-            label="Pesquisar recebimentos"
-            icon="pi pi-search"
-            className="p-btton p-button-secondary p-button-rounded"
-            onClick={() => getRecebimentos()}
-          />
-          <Button
-            style={{ margin: "2px" }}
-            label="Imprimir recebimentos"
-            icon="pi pi-print"
-            className="p-btton p-button-warning p-button-rounded"
-            onClick={() => handlePrint()}
-          />
-          <Button
-            style={{ margin: "2px" }}
-            label="Exportar recebimentos excel"
-            icon="pi pi-file-excel"
-            className="p-btton p-button-success p-button-rounded"
-            onClick={() => exportToExcel()}
-          />
-          Exibindo os dados de{" "}
-          {moment(resumoData?.[0]?.$d).format("DD/MM/YYYY")} até{" "}
-          {moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}{" "}
+      
+      <div className="page-card">
+        <div className="page-header">
+          <h1>Recebimentos por Data</h1>
+          <p className="subtitle">Controle e análise de recebimentos por período</p>
         </div>
 
-        <>
-          <div>
+        {/* Aviso de atenção */}
+        <div className="attention-warning">
+          <i className="pi pi-credit-card"></i>
+          <span>Esta funcionalidade permite controlar e analisar recebimentos por período específico</span>
+        </div>
+
+        {/* Container de filtros */}
+        <div className="filters-container">
+          <div className="filters-section">
+            <h3 className="section-title">
+              <i className="pi pi-calendar"></i>
+              Período de Análise
+            </h3>
+            
+            <div className="filters-grid">
+              <div className="filter-group">
+                <label className="filter-label">
+                  <i className="pi pi-calendar-plus"></i>
+                  Período
+                  {resumoData && <span className="filter-status active">✓</span>}
+                </label>
+                <RangePicker
+                  disabled={loading}
+                  format={"DD/MM/YYYY"}
+                  locale={locale}
+                  showToday
+                  onChange={(e) => setResumoData(e)}
+                  className="filter-date-picker"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Botões de ação */}
+        <div className="search-button-container">
+          <div className="search-info">
+            <div className="filters-count">
+              <i className="pi pi-filter"></i>
+              <span>
+                {resumoData ? '1 de 1 filtro preenchido' : '0 de 1 filtro preenchido'}
+              </span>
+            </div>
+            {!resumoData && (
+              <div className="validation-warning">
+                <i className="pi pi-exclamation-triangle"></i>
+                <span>Selecione um período para continuar</span>
+              </div>
+            )}
+          </div>
+          
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+            <Button
+              label="Pesquisar Recebimentos"
+              icon="pi pi-search"
+              className="search-button"
+              onClick={() => getRecebimentos()}
+              disabled={!resumoData}
+            />
+            <Button
+              label="Imprimir"
+              icon="pi pi-print"
+              className="p-button p-button-rounded p-button-warning"
+              onClick={() => handlePrint()}
+            />
+            <Button
+              label="Exportar Excel"
+              icon="pi pi-file-excel"
+              className="p-button p-button-rounded p-button-success"
+              onClick={() => exportToExcel()}
+            />
+          </div>
+        </div>
+
+        {/* Resumo do período */}
+        {resumoData && (
+          <div className="filters-summary">
+            <h4>
+              <i className="pi pi-info-circle"></i>
+              Período Selecionado:
+            </h4>
+            <div className="summary-items">
+              <span className="summary-item">
+                <i className="pi pi-calendar-plus"></i>
+                De: {moment(resumoData?.[0]?.$d).format("DD/MM/YYYY")}
+              </span>
+              <span className="summary-item">
+                <i className="pi pi-calendar-minus"></i>
+                Até: {moment(resumoData?.[1]?.$d).format("DD/MM/YYYY")}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Tabela de recebimentos */}
+        <div className="table-container">
+          <div className="table-wrapper">
             <DataTable
+              className="DataTable"
               size="normal"
               loading={loading}
               style={{ width: "100%" }}
@@ -550,7 +602,6 @@ const RecebimentoPorData = () => {
                   </div>
                 );
               }}
-              //  stripedRows
               rowGroupMode="rowspan"
               groupRowsBy="nomeCliente"
               sortMode="single"
@@ -713,9 +764,9 @@ const RecebimentoPorData = () => {
               ></Column>
             </DataTable>
           </div>
-        </>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -18,7 +18,6 @@ import { addLocale } from "primereact/api";
 
 import moment from "moment/moment";
 
-import Header from "../../../components/header";
 import Footer from '../../../components/footer'
 import {
   BadgeRounded,
@@ -621,7 +620,6 @@ const EstoquePorEmpresa = () => {
     <>
       <Toast ref={toast} position="bottom-center" />
 
-      <Header />
       <Footer/>
 
       {loading ? (

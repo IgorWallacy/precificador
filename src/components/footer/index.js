@@ -96,20 +96,7 @@ const Footer = () => {
   return (
     <>
      
-      <footer
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "row",
-        }}
-        className="footer"
-      >
-         <img src={Logo} width="20px" height="20px" alt="logo do sistema" />
-         <p>Powered by JJ</p>
-       
-       
-      </footer>
+      
 
       <Dialog
         header={`Aplicativo ` + statusApi}
@@ -149,14 +136,7 @@ const Footer = () => {
         </div>
       </Dialog>
 
-      <div style={{ position: "fixed", top: "2%", right: "2%", zIndex: "998" }}>
-        <Badge
-          severity={statusApi === "UP" ? "success" : "danger"}
-          value={
-            statusApi === "UP" ? "Aplicativo On-line " : "Aplicativo Off-line"
-          }
-        ></Badge>
-      </div>
+     
       <div
         style={{
           position: "fixed",
@@ -166,13 +146,8 @@ const Footer = () => {
           zIndex: 999,
         }}
       >
-        <Badge
-          size="normal"
-          severity="warning"
-          value={`${saudacao} ${nome}, hoje é ${moment(new Date()).format(
-            "dddd - DD/MM/yyyy "
-          )}`}
-        ></Badge>
+      
+
       </div>
     </>
   );

@@ -1,248 +1,1064 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+:root {
+  /* Cores principais */
+  --primary-color: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --primary-lighter: #dbeafe;
+  
+  /* Cores secundárias */
+  --secondary-color: #10b981;
+  --secondary-dark: #059669;
+  --secondary-light: #34d399;
+  --secondary-lighter: #d1fae5;
+  
+  /* Cores de acento */
+  --accent-color: #f59e0b;
+  --accent-dark: #d97706;
+  --accent-light: #fbbf24;
+  --accent-lighter: #fef3c7;
+  
+  /* Cores neutras */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  
+  /* Cores de estado */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+  
+  /* Cores de fundo */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-dark: #0f172a;
+  
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Bordas */
+  --border-radius-sm: 0.375rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  --border-radius-2xl: 1.5rem;
+  
+  /* Espaçamentos */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Tipografia */
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-display: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Transições */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+}
 
-
-@import url("https://use.typekit.net/koz6qgk.css");
-
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto+Flex:opsz@8..144&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
-
- *{
-  margin: 0px;
-  padding: 0px;
+* {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto Flex', 'Montserrat', sans-serif;
-  font-size: '14px';
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
- 
- 
- }
-
-/* Estilizando a barra de rolagem */
-::-webkit-scrollbar {
-  width: 8px; /* Largura da barra de rolagem */
- 
 }
-
-/* Estilizando o fundo da barra de rolagem */
-::-webkit-scrollbar-track {
-  background-color: #f1f1f1; /* Cor de fundo */
-}
-
-/* Estilizando o indicador da barra de rolagem */
-::-webkit-scrollbar-thumb {
-  background-color: #888; /* Cor do indicador */
-  border-radius: 4px; /* Cantos arredondados */
-}
-
-/* Estilizando o indicador da barra de rolagem ao passar o mouse */
-::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Cor do indicador ao passar o mouse */
-}
-
-/* Estilizando o canto inferior direito da barra de rolagem */
-::-webkit-scrollbar-corner {
-  background-color: #f1f1f1; /* Cor de fundo */
-}
-
-
-
 
 body {
-  font-family: var(--font-family);
-
-}     
-
-.main{
-  margin: 0px;
-  padding: 0px;
-  min-height: 100vh;
-  box-sizing: border-box;
-  font-family: 'Roboto Flex', 'Montserrat', sans-serif;
-  font-size: '14px';
-  scroll-behavior: smooth;
+  font-family: var(--font-family-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--neutral-700);
+  background-color: var(--bg-secondary);
   -webkit-font-smoothing: antialiased;
-  background-image: url('./assets/img/icones-tela-login.svg');
-  background-position: bottom;
-  background-repeat: no-repeat;
-  
- 
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media screen and (max-width: 960px) {
-  /* Hide table header and footer cells */
-  .p-datatable[pr_id_2] .p-datatable-thead > tr > th,
-  .p-datatable[pr_id_2] .p-datatable-tfoot > tr > td {
-      display: none !important;
-  }
-
-  /* Adjust styling for table body cells */
-  .p-datatable[pr_id_2] .p-datatable-tbody > tr > td {
-      display: flex; /* Changed from "display: flex;" */
-      width: 100% !important;
-      align-items: center;
-      justify-content: space-between;
-  }
-
-  /* Remove border from non-last cells */
-  .p-datatable[pr_id_2] .p-datatable-tbody > tr > td:not(:last-child) {
-      border: none; /* Changed from "border: 0 none;" */
-  }
-
-  /* Remove specific borders for last cell in gridlines mode */
-  .p-datatable[pr_id_2].p-datatable-gridlines .p-datatable-tbody > tr > td:last-child {
-      border-top: 0;
-      border-right: 0;
-      border-left: 0;
-  }
-
-  /* Adjust title display for table cells */
-  .p-datatable[pr_id_2] .p-datatable-tbody > tr > td > .p-column-title {
-      display: block;
-  }
+/* Utilitários */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
 }
 
-
-
-.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  overflow: auto;
-  background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-
-}
-
-
-
-.container-flex {
+.flex {
   display: flex;
-  justify-content: center;
-  align-content: center;
+}
+
+.flex-col {
   flex-direction: column;
-  border: 1px solid #F2F2F2;
-  border-top-left-radius: 50px;
-  border-top-right-radius: 50px;
-  flex-wrap: wrap;
-  margin-bottom: 5px;
- 
- 
-
 }
 
-
-.btn-topo {
-  position: fixed;
-  top: 5px;
-  right: 10px;
-  overflow: visible;
-  z-index: 4;
+.items-center {
+  align-items: center;
 }
 
+.justify-center {
+  justify-content: center;
+}
 
-
-
-.logo {
-  display: flex;
-  flex-flow: row wrap;
+.justify-between {
   justify-content: space-between;
-  align-items: center;
-  margin: 0 40 0px 0px;
-
 }
 
-.p-sidebar-header {
-
-  background-color: #75b5e5;
-
+.gap-sm {
+  gap: var(--spacing-sm);
 }
 
-.p-sidebar-content {
-  background-image: linear-gradient(to right top, #d16b91, #cb75a9, #c080be, #b18dd0, #9f99dd, #8ea3e3, #80ade6, #75b5e5, #73bde0, #79c4d9, #86c9d1, #97cecb);
-
+.gap-md {
+  gap: var(--spacing-md);
 }
 
-.form-precificador {
-  display: flex;
-  flex-direction: row;
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+/* Botões */
+.btn {
+  display: inline-flex;
+      align-items: center;
   justify-content: center;
-  align-items: center;
-  color: #eeeded;
-
-  flex-wrap: wrap;
-  padding: 25px;
-
-
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family-primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
-
-.form-precificador-input {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
-
-  margin: 5px;
-
-  flex-wrap: wrap;
-
-
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.form-precificador div {
-  margin: 5px;
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
 }
 
-
-
-.pesquisa-rapida {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-
-
-
-
-.avatar {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  color: #FFF;
-
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
 }
 
-.p-selectbutton .p-button.p-highlight .p-focus {
-
-
-
-  color: rgba(0, 0, 0, 0.87);
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--secondary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
 
-@keyframes mudar_cor_background {
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  color: white;
+}
 
-  0% {
-    background-position: 0% 0%;
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 12px;
+}
 
+.btn-lg {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 16px;
+}
+
+/* Cards */
+.card {
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--neutral-200);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.card-body {
+  padding: var(--spacing-lg);
+}
+
+.card-footer {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--neutral-200);
+  background-color: var(--bg-secondary);
+}
+
+/* Formulários */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+  color: var(--neutral-700);
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family-primary);
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-lighter);
+}
+
+.form-input:disabled {
+  background-color: var(--neutral-100);
+  cursor: not-allowed;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
   50% {
-
-    background-position: 50% 75%;
-
+    opacity: 0.5;
   }
+}
 
-  100% {
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
 
-    background-position: 25% 100%;
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-sm);
   }
+  
+  .card-header,
+  .card-body,
+  .card-footer {
+    padding: var(--spacing-md);
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-400);
+}
+
+/* ===== DESIGN PROFISSIONAL DO DATATABLE ===== */
+
+.DataTable {
+  
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.DataTable:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Header da Tabela - Estilo Consistente */
+.table-header {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  border: none;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+  margin-bottom: 0;
+}
+
+.table-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #a855f7, #c084fc);
+}
+
+.table-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Cabeçalho das Colunas */
+.DataTable .p-datatable-thead > tr > th {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #0f0f0f;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-bottom: 2px solid #e2e8f0;
+  position: relative;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
 
 
 
+.DataTable .p-datatable-thead > tr > th:first-child {
+  border-top-left-radius: 0;
+}
+
+.DataTable .p-datatable-thead > tr > th:last-child {
+  border-top-right-radius: 0;
+}
+
+/* Linhas do Corpo da Tabela */
+.DataTable .p-datatable-tbody > tr {
+  background: white;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.DataTable .p-datatable-tbody > tr:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.DataTable .p-datatable-tbody > tr:last-child {
+  border-bottom: none;
+}
+
+/* Linhas alternadas (zebra striping) - Melhorada para legibilidade */
+.DataTable .p-datatable-tbody > tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+.DataTable .p-datatable-tbody > tr:nth-child(even):hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+/* Células do Corpo */
+.DataTable .p-datatable-tbody > tr > td {
+  padding: 1rem 1.5rem;
+  border: none;
+  color: #1a1a1a;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+/* Células com conteúdo especial */
+.DataTable .p-datatable-tbody > tr > td .p-button {
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+
+.DataTable .p-datatable-tbody > tr > td .p-button.p-button-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.DataTable .p-datatable-tbody > tr > td .p-button.p-button-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Botões de ação específicos na tabela */
+.DataTable .p-button.p-button-outlined {
+  background: transparent;
+  border: 2px solid #e2e8f0;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.DataTable .p-button.p-button-outlined:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1a1a1a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Ícone de expansão da linha */
+.DataTable .p-row-toggler {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: 6px;
+  width: 2rem;
+  height: 2rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.DataTable .p-row-toggler:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  border-color: #94a3b8;
+  color: #1a1a1a;
+  transform: scale(1.1);
+}
+
+.DataTable .p-row-toggler.p-highlight {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  border-color: #6b7280;
+  color: white;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+}
+
+/* Linha expandida */
+.DataTable .p-datatable-tbody > tr.p-datatable-row-expanded {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border-left: 4px solid #8b5cf6;
+}
+
+.DataTable .p-datatable-tbody > tr.p-datatable-row-expanded > td {
+  background: transparent;
+}
+
+/* Conteúdo expandido */
+.DataTable .p-datatable-tbody > tr.p-datatable-row-expanded + tr > td {
+  background: white;
+  padding: 1.5rem;
+  border: none;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Footer da Tabela - Estilo Consistente */
+.table-footer {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 1.5rem 2rem;
+  border: none;
+  border-top: 2px solid #e2e8f0;
+  border-radius: 0 0 12px 12px;
+  margin-top: 0;
+}
+
+/* Estatísticas do Footer */
+.footer-stats {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #1a1a1a;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.stat-item:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-item i {
+  font-size: 1.125rem;
+  color: #8b5cf6;
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  padding: 0.5rem;
+  border-radius: 8px;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Paginação */
+.DataTable .p-paginator {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.DataTable .p-paginator .p-paginator-pages .p-paginator-page {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  border-radius: 8px;
+  margin: 0 0.25rem;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  transition: all 0.2s ease;
+}
+
+.DataTable .p-paginator .p-paginator-pages .p-paginator-page:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+.DataTable .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  border-color: #6b7280;
+  color: white;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+}
+
+/* Botões de navegação da paginação */
+.DataTable .p-paginator .p-paginator-first,
+.DataTable .p-paginator .p-paginator-prev,
+.DataTable .p-paginator .p-paginator-next,
+.DataTable .p-paginator .p-paginator-last {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  border-radius: 8px;
+  margin: 0 0.25rem;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  transition: all 0.2s ease;
+}
+
+.DataTable .p-paginator .p-paginator-first:hover,
+.DataTable .p-paginator .p-paginator-prev:hover,
+.DataTable .p-paginator .p-paginator-next:hover,
+.DataTable .p-paginator .p-paginator-last:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+/* Filtros */
+.DataTable .p-column-filter {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.DataTable .p-column-filter:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+/* Botões de ação na tabela */
+.DataTable .p-button.p-button-text {
+  background: transparent;
+  border: none;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.DataTable .p-button.p-button-text:hover {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  transform: translateY(-1px);
+}
+
+/* Estilo para células com conteúdo especial */
+.DataTable .p-datatable-tbody > tr > td .company-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.DataTable .p-datatable-tbody > tr > td .company-icon {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  color: #7c3aed;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.DataTable .p-datatable-tbody > tr > td .company-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.DataTable .p-datatable-tbody > tr > td .company-name {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 0.875rem;
+}
+
+.DataTable .p-datatable-tbody > tr > td .company-note {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-family: monospace;
+}
+
+/* Estilo para data e status */
+.DataTable .p-datatable-tbody > tr > td .date-time {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Estilo para o botão de status */
+.DataTable .p-datatable-tbody > tr > td .status-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  color: white;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.DataTable .p-datatable-tbody > tr > td .status-button:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+}
+
+.DataTable .p-datatable-tbody > tr > td .status-button i {
+  font-size: 0.875rem;
+  color: white;
+}
+
+/* Estilo para mensagem de dados vazios */
+.DataTable .p-datatable-emptymessage {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.DataTable .p-datatable-emptymessage i {
+  font-size: 3rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* Estilo para loading da tabela */
+.DataTable .p-datatable-loading {
+  position: relative;
+  min-height: 200px;
+}
+
+.DataTable .p-datatable-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #8b5cf6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Melhorias para filtros de coluna */
+.DataTable .p-column-filter-container {
+  position: relative;
+}
+
+.DataTable .p-column-filter-container .p-inputtext {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.DataTable .p-column-filter-container .p-inputtext:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+.DataTable .p-column-filter-container .p-inputtext:hover {
+  border-color: #cbd5e1;
+}
+
+/* Estilo para o menu de filtros */
+.DataTable .p-column-filter-overlay {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.DataTable .p-column-filter-overlay .p-checkbox {
+  margin-bottom: 0.5rem;
+}
+
+.DataTable .p-column-filter-overlay .p-checkbox .p-checkbox-box {
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.DataTable .p-column-filter-overlay .p-checkbox .p-checkbox-box:hover {
+  border-color: #94a3b8;
+}
+
+.DataTable .p-column-filter-overlay .p-checkbox .p-checkbox-box.p-highlight {
+  background: #6b7280;
+  border-color: #6b7280;
+}
+
+/* Responsividade para header e footer */
+@media (max-width: 1024px) {
+  .table-header,
+  .table-footer {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .footer-stats {
+    gap: 1rem;
+  }
+  
+  .stat-item {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-header,
+  .table-footer {
+    padding: 1rem;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .table-footer {
+    border-radius: 0 0 8px 8px;
+  }
+  
+  .footer-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .stat-item {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+  
+  .stat-item i {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1rem;
+  }
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .DataTable .p-datatable-header {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .DataTable .p-datatable-thead > tr > th,
+  .DataTable .p-datatable-tbody > tr > td {
+    padding: 0.875rem 1rem;
+  }
+  
+  .DataTable .p-datatable-footer {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .DataTable {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+  
+  .DataTable .p-datatable-header {
+    padding: 1rem;
+  }
+  
+  .DataTable .p-datatable-thead > tr > th,
+  .DataTable .p-datatable-tbody > tr > td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .DataTable .p-datatable-footer {
+    padding: 1rem;
+  }
+  
+  .DataTable .p-paginator .p-paginator-pages .p-paginator-page,
+  .DataTable .p-paginator .p-paginator-first,
+  .DataTable .p-paginator .p-paginator-prev,
+  .DataTable .p-paginator .p-paginator-next,
+  .DataTable .p-paginator .p-paginator-last {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Animações */
+@keyframes tableFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.DataTable {
+  animation: tableFadeIn 0.6s ease-out;
+}
+
+/* Efeito de loading */
+.DataTable.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Estilos para tabelas específicas da aplicação */
+.precificador-datatable .p-datatable {
+  margin-bottom: 2rem;
+}
+
+.precificador-datatable .p-datatable-header {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+}
+
+/* Estilos para tabelas de produtos */
+.produtos-datatable .p-datatable-thead > tr > th {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  color: #1a1a1a;
+}
+
+/* Estilos para tabelas de agenda */
+.agenda-datatable .p-datatable-header {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+}
+
+.agenda-datatable .p-datatable-header::after {
+  background: linear-gradient(90deg, #8b5cf6, #a855f7, #c084fc);
+}
+
+/* =============================================== */
+/* ====== GLOBAL LIGHT & CLEAN THEME STYLES ====== */
+/* =============================================== */
+
+/* Page Layout & Theme */
+.page-container {
+  padding-top: 1.5rem;
+  
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.page-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.page-card .p-card-body {
+  padding-top: 2rem;
+}
+
+.page-card .p-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Action Buttons */
+.action-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 0.875rem 1.75rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.action-button.p-button-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.action-button.p-button-success:hover {
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+.action-button.p-button-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.action-button.p-button-danger:hover {
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+/* Message Areas */
+.messages-area {
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.messages-area-success {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.messages-area-error {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }

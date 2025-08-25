@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react";
 
-import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
 import DestaqueImg from "../../../assets/img/package.json";
@@ -8,7 +7,7 @@ import DestaqueImg2 from "../../../assets/img/Animation - 1720833923478.json";
 import { Player } from "@lottiefiles/react-lottie-player";
 
 import { DataTable } from "primereact/datatable";
-import { FilterMatchMode} from 'primereact/api';
+import { FilterMatchMode } from 'primereact/api';
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
@@ -26,7 +25,6 @@ import moment from "moment";
 
 export default function ContagemInventario() {
   const navigate = useNavigate();
-
 
   const toast = useRef(null);
   const toastDialog = useRef(null);
@@ -46,17 +44,17 @@ export default function ContagemInventario() {
     'id': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     'nome': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     'loja': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-   
-});
 
-const onGlobalFilterChange2 = (e) => {
-  const value = e.target.value;
-  let _filters = { ...filters };
-  _filters['global'].value = value;
+  });
 
-  setFilters(_filters);
-  setGlobalFilterValue(value);
-}
+  const onGlobalFilterChange2 = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
+    _filters['global'].value = value;
+
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  }
 
   const getInvenaritos = () => {
     setLoading(true);
@@ -64,7 +62,7 @@ const onGlobalFilterChange2 = (e) => {
       .get("/api/produto/contagem/inventarios")
       .then((r) => {
         setInventariosList(r.data);
-         //console.log(r.data);
+        //console.log(r.data);
       })
       .catch((e) => {
         //    console.log(e);
@@ -83,7 +81,7 @@ const onGlobalFilterChange2 = (e) => {
       .catch((e) => {
         //  console.log(e);
       })
-      .finally((f) => {});
+      .finally((f) => { });
   };
 
   const gravar = () => {
@@ -184,14 +182,14 @@ const onGlobalFilterChange2 = (e) => {
         {rowData?.status ? (
           <Tag severity="success" value={'Aberto em ' + moment(rowData?.inicio).format("DD/MM/YYYY HH:mm:ss")}></Tag>
         ) : (
-          <Tag severity="danger" value={'Fechado em ' +  moment(rowData?.fim).format("DD/MM/YYYY HH:mm:ss")}></Tag>
+          <Tag severity="danger" value={'Fechado em ' + moment(rowData?.fim).format("DD/MM/YYYY HH:mm:ss")}></Tag>
         )}{" "}
       </div>
     );
   };
   const inicioTemplate = (row) => {
     return moment(row?.inicio).format("DD/MM/YYYY HH:mm:ss");
-   }
+  }
 
   const visualizarTemplate = (rowData) => {
     return (
@@ -227,7 +225,7 @@ const onGlobalFilterChange2 = (e) => {
           className="p-button p-button-rounded p-button-warning"
           label="Reabrir"
           disabled={rowData?.status}
-          onClick={()=>reabrirInventario(rowData?.id)}
+          onClick={() => reabrirInventario(rowData?.id)}
         ></Button>
       </>
     );
@@ -239,50 +237,55 @@ const onGlobalFilterChange2 = (e) => {
   }, []);
 
   return (
-    <>
+    <div className="page-container">
       <Toast ref={toast} position="top-center" />
-      <Header />
       <Footer />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          flexWrap: "wrap",
-          width: "100%",
-          padding: "1rem",
-          marginTop:'50px'
-        }}
-      >
-        <h1 style={{ color: "#f2f2f2", margin: "10px" }}>
-          Lista de inventários
-        </h1>
-        <Player src={DestaqueImg} loop autoplay style={{ width: "350px" }} />
-        <Toolbar
-          left={
-            <>
-              {" "}
+
+      <div className="page-card">
+        <div className="page-header">
+          <h1>Controle de Inventário</h1>
+          <p>Gerencie contagens de estoque e inventários</p>
+        </div>
+        <div
+
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "5px",
+            color: "#f2f2f2",
+            width: "100%",
+            padding: "1rem",
+            marginTop: '50px'
+          }}
+        >
+          <Toolbar
+            left={
               <Button
-                label="Novo"
-                className="p-button p-button-rounded p-button-success"
-                icon="pi pi-plus"
-                onClick={() => setVisible(true)}
-              />{" "}
-            </>
-          }
-          right={
-            <>
-              <Button
-                label="Recarregar"
-                className="p-button p-button-rounded p-button-secondary"
-                icon="pi pi-refresh"
-                onClick={() => getInvenaritos()}
-              />
-            
-            </>
-          }
-        />
+                    label="Novo Inventário"
+                    icon="pi pi-plus"
+                    onClick={() => setVisible(true)}
+                    className="action-button"
+                  />
+            }
+            right={
+              <>
+                <div style={{ display: 'flex', gap: '10px', marginLeft: '10px' }}>
+                  
+                  <Button
+                    label="Recarregar"
+                    icon="pi pi-refresh"
+                    onClick={() => getInvenaritos()}
+                    className="action-button"
+                  />
+                </div>
+              </>
+            }
+          />
+        </div>
+
 
         <DataTable
           rows={5}
@@ -299,12 +302,12 @@ const onGlobalFilterChange2 = (e) => {
           globalFilterFields={['nome', 'id', 'loja']}
         >
           <Column field="inicio" header="Abertura" body={inicioTemplate} />
-          <Column field="id" filter filterPlaceholder="Procurar por código"  header="Código"></Column>
-           
-          <Column field="nome" filter filterPlaceholder="Procurar por nome"  header="Nome"></Column>
-          <Column field="loja" filter filterPlaceholder="Procurar por loja"  header="Loja"></Column>
+          <Column field="id" filter filterPlaceholder="Procurar por código" header="Código"></Column>
+
+          <Column field="nome" filter filterPlaceholder="Procurar por nome" header="Nome"></Column>
+          <Column field="loja" filter filterPlaceholder="Procurar por loja" header="Loja"></Column>
           <Column
-             
+
             sortable
             field="status"
             body={statusTemplate}
@@ -315,35 +318,35 @@ const onGlobalFilterChange2 = (e) => {
           <Column header="Finalizar" body={finalizarTemplate} />
         </DataTable>
       </div>
-          
+
       <Dialog
         header="Cadastrar novo inventário"
         visible={visible}
-        style={{ width: "450px" , height:'100vh' }}
+        style={{ width: "450px", height: '100vh' }}
         onHide={() => setVisible(false)}
         modal={false}
-        position="bottom-left" 
-       
+        position="bottom-left"
+
         draggable={false}
       >
         <Toast ref={toastDialog} position="bottom-center" />
         <div
           style={{
             display: "flex",
-            flexDirection:'column',
+            flexDirection: 'column',
             justifyContent: "center",
             alignItems: "center",
             flexWrap: "wrap",
             gap: "10px",
-            margin:'25px',
+            margin: '25px',
           }}
         >
-           <Player
-                src={DestaqueImg2}
-                loop
-                autoplay
-                style={{ width: "350px" }}
-              />
+          <Player
+            src={DestaqueImg2}
+            loop
+            autoplay
+            style={{ width: "350px" }}
+          />
           <div>
             <InputText
               placeholder="Descrição"
@@ -372,6 +375,6 @@ const onGlobalFilterChange2 = (e) => {
           </div>
         </div>
       </Dialog>
-    </>
+    </div>
   );
 }

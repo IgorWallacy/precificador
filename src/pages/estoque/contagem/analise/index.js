@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
-import Header from "../../.././../components/header";
 import Footer from "../../../../components/footer";
 
 import { classNames } from "primereact/utils";
@@ -424,7 +423,6 @@ export default function AnaliseInventario() {
   return (
     <>
       <Toast ref={toast} />
-      <Header />
       <Footer />
       <div
         ref={tabelaRef}
@@ -443,10 +441,11 @@ export default function AnaliseInventario() {
       >
         <h1
           style={{
-            backgroundColor: "black",
+            backgroundColor: "transparent",
             border: "1px solid #f1f1f1",
             borderRadius: "25px",
             padding: "5px",
+            color: "#333",
           }}
         >
           {" "}

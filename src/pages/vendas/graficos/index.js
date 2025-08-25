@@ -14,8 +14,8 @@ import GraficoVendaPorHora from "./por-hora";
 
 import { PivotViewComponent } from "@syncfusion/ej2-react-pivotview";
 
-import Header from "../../../components/header";
 import Footer from "../../../components/footer";
+import "../../../../components/prime-react-styles.css";
 
 import moment from "moment";
 import TicketMedioGrafico from "./ticket-medio";
@@ -278,21 +278,127 @@ const GraficosIndex = () => {
   }, []);
 
   return (
-    <>
-      <Header />
+    <div className="page-container">
       <Footer />
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: "10px",
-          width: "99%",
-          justifyContent: "center",
-          alignItems:'center'
-        }}
-      >
+      <div className="page-card">
+        <div className="page-header">
+          <h1>Dashboard de Vendas</h1>
+          <p className="subtitle">Análise completa de vendas, cancelamentos e métricas de negócio</p>
+        </div>
+
+        {/* Aviso de atenção */}
+        <div className="attention-warning">
+          <i className="pi pi-chart-bar"></i>
+          <span>Este dashboard fornece análises detalhadas de vendas e métricas de negócio</span>
+        </div>
+
+        {/* Container de filtros */}
+        <div className="filters-container">
+          <div className="filters-section">
+            <h3 className="section-title">
+              <i className="pi pi-calendar"></i>
+              Período de Análise
+            </h3>
+            
+            <div className="filters-grid">
+              <div className="filter-group">
+                <label className="filter-label">
+                  <i className="pi pi-calendar-plus"></i>
+                  Período
+                  {ResumoData && <span className="filter-status active">✓</span>}
+                </label>
+                <RangePicker
+                  disabled={loadingResumoVendas}
+                  format={"DD/MM/YYYY"}
+                  locale={locale}
+                  showToday
+                  onChange={(e) => setResumoData(e)}
+                  className="filter-date-picker"
+                />
+              </div>
+              
+              <div className="filter-group">
+                <label className="filter-label">
+                  <i className="pi pi-building"></i>
+                  Loja
+                  {lojaResumoSelecionada && <span className="filter-status active">✓</span>}
+                </label>
+                <Select
+                  disabled={loadingResumoVendas}
+                  placeholder="Selecione uma loja"
+                  allowClear
+                  defaultActiveFirstOption={false}
+                  style={{ width: 240 }}
+                  onChange={(e) => setLojaResumoSelecionada(e)}
+                  className="filter-select"
+                >
+                  {lojaList.map((option) => (
+                    <Option key={option.id} value={option.codigo}>
+                      {option.nome}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Botões de ação */}
+        <div className="search-button-container">
+          <div className="search-info">
+            <div className="filters-count">
+              <i className="pi pi-filter"></i>
+              <span>
+                {[ResumoData, lojaResumoSelecionada].filter(Boolean).length} de 2 filtros preenchidos
+              </span>
+            </div>
+            {(!ResumoData || !lojaResumoSelecionada) && (
+              <div className="validation-warning">
+                <i className="pi pi-exclamation-triangle"></i>
+                <span>Preencha o período e selecione uma loja para continuar</span>
+              </div>
+            )}
+          </div>
+          
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+            <Button
+              icon="pi pi-search"
+              onClick={() => geTResumoVendas()}
+              label={loadingResumoVendas ? "Gerando..." : "Gerar Relatório"}
+              loading={loadingResumoVendas}
+              className="search-button"
+            />
+            <Button
+              label="Imprimir"
+              className="p-button p-button-rounded p-button-warning"
+              onClick={() => handlePrint()}
+              icon="pi pi-print"
+            />
+          </div>
+        </div>
+
+        {/* Resumo do período */}
+        {ResumoData && (
+          <div className="filters-summary">
+            <h4>
+              <i className="pi pi-info-circle"></i>
+              Período Selecionado:
+            </h4>
+            <div className="summary-items">
+              <span className="summary-item">
+                <i className="pi pi-calendar-plus"></i>
+                De: {moment(ResumoData?.[0]?.$d).format("DD/MM/YYYY")}
+              </span>
+              <span className="summary-item">
+                <i className="pi pi-calendar-minus"></i>
+                Até: {moment(ResumoData?.[1]?.$d).format("DD/MM/YYYY")}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Conteúdo dos gráficos */}
         <div
           ref={tabelaRef}
           style={{
@@ -305,7 +411,7 @@ const GraficosIndex = () => {
             alignItems:'center',
             border: "1px solid #FFFF",
             backgroundColor : '#F3F4F9',
-            
+            marginTop: "20px"
           }}
         >
           <div
@@ -318,49 +424,7 @@ const GraficosIndex = () => {
             }}
           >
             <h1 style={{ color: "#000" }}>Vendas e cancelamentos </h1>
-            <RangePicker
-              disabled={loadingResumoVendas}
-              format={"DD/MM/YYYY"}
-              locale={locale}
-              showToday
-              onChange={(e) => setResumoData(e)}
-            />
-            <Select
-              disabled={loadingResumoVendas}
-              placeholder="Selecione uma loja"
-              allowClear
-              defaultActiveFirstOption={false}
-              style={{ width: 240 }}
-              onChange={(e) => setLojaResumoSelecionada(e)}
-            >
-              {lojaList.map((option) => (
-                <Option key={option.id} value={option.codigo}>
-                  {option.nome}
-                </Option>
-              ))}
-            </Select>
-            <Button
-              style={{ margin: "5px" }}
-              icon="pi pi-search"
-              onClick={() => geTResumoVendas()}
-              label={loadingResumoVendas ? "Gerando..." : "Gerar"}
-              loading={loadingResumoVendas}
-              className="p-button p-button-rounded p-button-success"
-            />
-            <Button
-              style={{ margin: "0px 5px" }}
-              label="Imprimir"
-              className="p-button p-button-rounded p-button-warning"
-              onClick={() => handlePrint()}
-              icon="pi pi-print"
-            />
-
-            <h4 style={{ color: "#f2f2f2" }}>
-              {" "}
-              Exibindo os dados de{" "}
-              {moment(ResumoData?.[0]?.$d).format("DD/MM/YYYY")} até{" "}
-              {moment(ResumoData?.[1]?.$d).format("DD/MM/YYYY")}{" "}
-            </h4>
+            
           </div>
           <div
             style={{
@@ -734,9 +798,8 @@ const GraficosIndex = () => {
           
           
         </div>
-        
       </div>
-    </>
+    </div>
   );
 };
 

@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from "react";
 
 import SyncfusionPivot from "./syncfusion";
 
-import Header from "../../components/header";
 import Footer from "../../components/footer";
 
 import api from "../../services/axios";
@@ -136,7 +135,6 @@ const Pivot = () => {
     <>
       <Toast ref={toast} position="top-center" />
 
-      <Header />
       <Footer />
       {data.length < 0 ? (
         <></>

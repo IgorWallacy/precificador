@@ -3,7 +3,6 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 
-import Header from "../../../components/header";
 import Footer from "../../../components/footer";
 
 import api from "../../../services/axios";
@@ -61,7 +60,6 @@ const StatusPdv = () => {
 
   return (
     <>
-      <Header />
       <Footer />
       <div
         style={{

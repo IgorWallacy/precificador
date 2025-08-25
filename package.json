@@ -30,6 +30,7 @@
     "exceljs": "^4.4.0",
     "export-to-csv": "^0.2.1",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.23.12",
     "iframe-resizer-react": "^1.1.0",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.1",

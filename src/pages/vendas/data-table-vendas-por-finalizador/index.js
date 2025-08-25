@@ -8,12 +8,6 @@ import { Player } from "@lottiefiles/react-lottie-player";
 
 import Footer from "../../../components/footer";
 
-import "./index.css";
-
-
-
-import Header from "../../../components/header";
-
 import api from "../../../services/axios";
 
 import { addLocale } from "primereact/api";
@@ -31,6 +25,7 @@ import { Skeleton } from "primereact/skeleton";
 import { useReactToPrint } from "react-to-print";
 
 import AppChart from "./chart";
+import EmptyState from "./EmptyState";
 import "primeflex/primeflex.css";
 function VendasDataTableComponent() {
 
@@ -50,6 +45,8 @@ function VendasDataTableComponent() {
   const [totalGeral, setTotalGeral] = useState(0);
   const [totalGeralNfce, setTotalGeralNfce] = useState(0);
   const [totalGeralECF, setTotalGeralECF] = useState(0);
+  const [topPdvNfce, setTopPdvNfce] = useState(null);
+  const [topPdvEcf, setTopPdvEcf] = useState(null);
 
   const toast = useRef(null);
 
@@ -109,6 +106,7 @@ function VendasDataTableComponent() {
       .get(`/api_vga/vendas/pdvs/${codigo}/${dateI}/${dateF}`)
       .then((response) => {
         setPdvSelectItems(response.data);
+        
       })
       .catch((err) => {
         setLoading(false);
@@ -157,6 +155,7 @@ function VendasDataTableComponent() {
       .then((response) => {
         setVendas(response.data);
         setLoading(false);
+        console.log(response.data);
       })
       .catch((err) => {
         setLoading(false);
@@ -505,84 +504,147 @@ function VendasDataTableComponent() {
       </div>
     );
   };
+ 
+  // ----------------------------------------------------------------------------
+  // Calcula totais globais somente após todos os carregamentos terminarem
+  // ----------------------------------------------------------------------------
+  useEffect(() => {
+    if (!loading && vendas && vendasNfce && vendasECF) {
+      const soma = (arr) => arr?.reduce((acc, cur) => acc + (cur.total || 0), 0);
+
+      const totalVendas = soma(vendas);
+      const totalNfce = soma(vendasNfce);
+      const totalEcf = soma(vendasECF);
+
+      setTotalGeral(
+        Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+          totalVendas
+        )
+      );
+
+      setTotalGeralNfce(
+        Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+          totalNfce
+        )
+      );
+
+      setTotalGeralECF(
+        Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+          totalEcf
+        )
+      );
+    }
+  }, [loading, vendas, vendasNfce, vendasECF]);
+
+  // Efeito para calcular o PDV com mais vendas
+  useEffect(() => {
+    const findTopPdv = (salesData) => {
+      if (!salesData || salesData.length === 0) {
+        return null;
+      }
+
+      const salesByPdv = salesData.reduce((acc, sale) => {
+        acc[sale.pdv] = (acc[sale.pdv] || 0) + sale.total;
+        return acc;
+      }, {});
+
+      if (Object.keys(salesByPdv).length === 0) {
+          return null;
+      }
+
+      const topPdv = Object.entries(salesByPdv).reduce((top, current) => {
+        return current[1] > top[1] ? current : top;
+      });
+
+      return { pdv: topPdv[0], total: topPdv[1] };
+    };
+
+    setTopPdvNfce(findTopPdv(vendasNfce));
+    setTopPdvEcf(findTopPdv(vendasECF));
+
+  }, [vendasNfce, vendasECF]);
+
 
   return (
     <>
       <Toast ref={toast} position="bottom-center" />
 
-      <Header />
       <Footer />
-    <div ref={tabelaRef}>
-      <div className="container-venda">
+    <div ref={tabelaRef} className="page-container">
+      <div className="container-venda page-card">
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
+            justifyContent: "space-between",
             flexWrap: "wrap",
             gap: "1em",
-            marginTop:'50px'
+            padding: "1rem"
           }}
         >
-         <Player src={ImagemDestaque} loop autoplay style={{ width: "250px" }} />
-          <AppChart
-            vendas={vendas}
-            vendasECF={vendasECF}
-            vendasNfce={vendasNfce}
+          <div style={{display: "flex", alignItems: "center", gap: "1rem"}}>
+            <Player src={ImagemDestaque} loop autoplay style={{ width: "120px" }} />
+            <div>
+              <h2 style={{margin: 0, color: '#1f2937'}}>Vendas por Finalizador</h2>
+              <p style={{margin: 0, color: '#6b7280'}}>Análise detalhada de vendas por tipo de documento e finalizador.</p>
+            </div>
+          </div>
+          <Button
+            style={{ margin: "0px 5px" }}
+            label="Imprimir"
+            className="p-button p-button-rounded p-button-warning"
+            onClick={() => handlePrint()}
+            icon="pi pi-print"
           />
-           <Button
-                  style={{ margin: "0px 5px" }}
-                  label="Imprimir"
-                  className="p-button p-button-rounded p-button-warning"
-                  onClick={() => handlePrint()}
-                  icon="pi pi-print"
-                />
         </div>
 
-        <div className="cards-info">
-          <div className="field">
-            <Calendar
-              locale="pt-BR"
-              selectOtherMonths
-              showIcon
-              showButtonBar
-              id="dateI"
-              dateFormat="dd/mm/yy"
-              className="input-calendar"
-              placeholder="Informe o período inicial "
-              value={dataInicial}
-              onChange={(e) => setDataInicial(e.target.value)}
-            ></Calendar>
+        <div className="grid p-fluid align-items-end" style={{padding: '1rem 0'}}>
+          <div className="field col-12 md:col-6 lg:col-3">
+              <label htmlFor="dateI" style={{fontWeight: 'bold', marginBottom: '0.5rem', display: 'block'}}>Período inicial</label>
+              <Calendar
+                locale="pt-BR"
+                selectOtherMonths
+                showIcon
+                showButtonBar
+                id="dateI"
+                dateFormat="dd/mm/yy"
+                className="input-calendar"
+                placeholder="Informe o período inicial "
+                value={dataInicial}
+                onChange={(e) => setDataInicial(e.target.value)}
+              ></Calendar>
           </div>
 
-          <div className="field">
-            <Calendar
-              showIcon
-              selectOtherMonths
-              locale="pt-BR"
-              showButtonBar
-              id="dateF"
-              dateFormat="dd/mm/yy"
-              className="input-calendar"
-              value={dataFinal}
-              placeholder="Informe o período final "
-              onChange={(e) => setDataFinal(e.target.value)}
-            ></Calendar>
+          <div className="field col-12 md:col-6 lg:col-3">
+              <label htmlFor="dateF" style={{fontWeight: 'bold', marginBottom: '0.5rem', display: 'block'}}>Período final</label>
+              <Calendar
+                showIcon
+                selectOtherMonths
+                locale="pt-BR"
+                showButtonBar
+                id="dateF"
+                dateFormat="dd/mm/yy"
+                className="input-calendar"
+                value={dataFinal}
+                placeholder="Informe o período final "
+                onChange={(e) => setDataFinal(e.target.value)}
+              ></Calendar>
           </div>
 
-          <div className="field">
-            <Dropdown
-              itemTemplate={itemTemplateStore}
-              style={{ marginRight: "5px" }}
-              value={loja}
-              valueTemplate={selectedStore}
-              options={filiais}
-              optionLabel="nome"
-              onChange={(e) => setLoja(e.target.value)}
-              placeholder="Selecione uma loja "
-            />
+          <div className="field col-12 md:col-6 lg:col-2">
+              <label style={{fontWeight: 'bold', marginBottom: '0.5rem', display: 'block'}}>Loja</label>
+              <Dropdown
+                itemTemplate={itemTemplateStore}
+                value={loja}
+                valueTemplate={selectedStore}
+                options={filiais}
+                optionLabel="nome"
+                onChange={(e) => setLoja(e.target.value)}
+                placeholder="Selecione uma loja "
+              />
           </div>
-          <div className="field">
+          <div className="field col-12 md:col-6 lg:col-2">
+            <label style={{fontWeight: 'bold', marginBottom: '0.5rem', display: 'block'}}>PDV</label>
             <Dropdown
               itemTemplate={itemTemplateCashier}
               valueTemplate={selectedTemplatePDV}
@@ -594,32 +656,41 @@ function VendasDataTableComponent() {
             />
           </div>
 
-          <div className="buttons">
-            <Button
-              icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
-              onClick={() => getVendasTotal()}
-              className="p-button-rounded p-button-success"
-              style={{ margin: "5px" }}
-              aria-label="Search"
-              label={loading ? "Pesquisando..." : "Pesquisar"}
-              disabled={loading}
-            />
-
-            <Button
-              onClick={clearFields}
-              icon="pi pi-times"
-              style={{ margin: "5px" }}
-              className="p-button-rounded p-button-danger"
-              aria-label="Cancel"
-              label="Limpar"
-            />
+          <div className="field col-12 md:col-12 lg:col-2">
+            <div className="buttons" style={{display: 'flex', gap: '0.5rem'}}>
+                <Button
+                  icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
+                  onClick={() => getVendasTotal()}
+                  className="action-button p-button-success"
+                  style={{ flex: 1 }}
+                  aria-label="Search"
+                  label={loading ? "Pesquisando..." : "Pesquisar"}
+                  disabled={loading}
+                />
+                <Button
+                  onClick={clearFields}
+                  icon="pi pi-times"
+                  style={{ flex: 1 }}
+                  className="action-button p-button-danger"
+                  aria-label="Cancel"
+                  label="Limpar"
+                />
+            </div>
           </div>
         </div>
       </div>
 
-      <div >
-        <div className=" cards-info">
-          <div className="col-12 md:col-6 lg:col-3 justify-content-end">
+      <div className="page-card" style={{marginTop: '1rem', padding: '1rem'}}>
+        <AppChart
+          vendas={vendas}
+          vendasNfce={vendasNfce}
+          vendasECF={vendasECF}
+        />
+      </div>
+
+      <div className="page-card" style={{marginTop: '1rem'}}>
+        <div className="grid">
+          <div className="col-12 md:col-6 lg:col-4">
             <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
               <div className="flex justify-content-between mb-3">
                 <div>
@@ -641,7 +712,7 @@ function VendasDataTableComponent() {
             </div>
           </div>
 
-          <div className="col-12 md:col-6 lg:col-3 justify-content-end">
+          <div className="col-12 md:col-6 lg:col-4">
             <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
               <div className="flex justify-content-between mb-3">
                 <div>
@@ -663,7 +734,7 @@ function VendasDataTableComponent() {
             </div>
           </div>
 
-          <div className="col-12 md:col-6 lg:col-3 justify-content-end">
+          <div className="col-12 md:col-6 lg:col-4">
             <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
               <div className="flex justify-content-between mb-3">
                 <div>
@@ -685,26 +756,63 @@ function VendasDataTableComponent() {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="card">
-          <DataTable
-            emptyMessage={<Skeleton />}
-            ref={dt}
-            dataKey="id"
-            value={vendas}
-            responsiveLayout="scroll"
-            rowGroupMode="subheader"
-            groupRowsBy="finalizador"
-            //  expandableRowGroups
-            //     expandedRows={expandedRows}
-            //    onRowToggle={(e) => setExpandedRows(e.data)}
-            sortMode="single"
-            sortField="finalizador"
-            sortOrder={1}
-            rowGroupHeaderTemplate={headerTemplate}
-            loading={loading}
-          ></DataTable>
+      <div className="page-card" style={{marginTop: '1rem'}}>
+        <div className="grid">
+          <div className="col-12 md:col-6">
+            <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
+              <div className="flex justify-content-between mb-3">
+                <div>
+                  <span className="block text-500 font-medium mb-3">PDV Destaque (NFC-e)</span>
+                  <div className="text-900 font-medium text-xl">PDV {topPdvNfce?.pdv || '-'}</div>
+                </div>
+                <div className="flex align-items-center justify-content-center bg-purple-100 border-round" style={{ width: '2.5rem', height: '2.5rem' }}>
+                  <i className="pi pi-star-fill text-purple-500 text-xl"></i>
+                </div>
+              </div>
+              <span className="text-green-500 font-medium">
+                {topPdvNfce ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(topPdvNfce.total) : 'R$ 0,00'}
+              </span>
+            </div>
+          </div>
+          <div className="col-12 md:col-6">
+            <div className="surface-0 shadow-2 p-3 border-1 border-50 border-round">
+              <div className="flex justify-content-between mb-3">
+                <div>
+                  <span className="block text-500 font-medium mb-3">PDV Destaque (ECF)</span>
+                  <div className="text-900 font-medium text-xl">PDV {topPdvEcf?.pdv || '-'}</div>
+                </div>
+                <div className="flex align-items-center justify-content-center bg-purple-100 border-round" style={{ width: '2.5rem', height: '2.5rem' }}>
+                  <i className="pi pi-star-fill text-purple-500 text-xl"></i>
+                </div>
+              </div>
+              <span className="text-green-500 font-medium">
+                {topPdvEcf ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(topPdvEcf.total) : 'R$ 0,00'}
+              </span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div className="card" style={{marginTop: '1rem'}}>
+        <DataTable
+          emptyMessage={<EmptyState />}
+          ref={dt}
+          dataKey="id"
+          value={vendas}
+          responsiveLayout="scroll"
+          rowGroupMode="subheader"
+          groupRowsBy="finalizador"
+          //  expandableRowGroups
+          //     expandedRows={expandedRows}
+          //    onRowToggle={(e) => setExpandedRows(e.data)}
+          sortMode="single"
+          sortField="finalizador"
+          sortOrder={1}
+          rowGroupHeaderTemplate={headerTemplate}
+          loading={loading}
+        ></DataTable>
       </div>
       </div>
     </>

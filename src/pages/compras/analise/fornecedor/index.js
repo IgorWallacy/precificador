@@ -13,7 +13,6 @@ import { TabView, TabPanel } from "primereact/tabview";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
-import Header from "../../../../components/header";
 import Footer from "../../../../components/footer";
 import { addLocale } from "primereact/api";
 
@@ -714,7 +713,6 @@ export default function AnaliseFornecedor() {
       <Toast ref={toast} position="bottom-center" />
       <Toast ref={toast3} position="bottom" />
       <Messages ref={msgs1} />
-      <Header />
 
       <Footer />
       {/*

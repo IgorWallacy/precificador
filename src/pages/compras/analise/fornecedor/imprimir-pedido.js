@@ -1,8 +1,10 @@
 import { formataMoeda } from "../../../../util";
 import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import moment from "moment";
 
 const ImprimirPedido = ({ loja, pedido, itens }) => {
+  pdfMake.vfs = pdfFonts?.vfs || pdfFonts?.pdfMake?.vfs;
   console.log(pedido);
   // Ordenando os itens por descrição em ordem alfabética crescente
   itens.sort((a, b) => a.idproduto.nome.localeCompare(b.idproduto.nome));
@@ -174,7 +176,15 @@ const ImprimirPedido = ({ loja, pedido, itens }) => {
     ],
   };
 
-  pdfMake.createPdf(dd).open();
+  const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+  if (isStandalone) {
+    pdfMake.createPdf(dd).download(`pedido_${pedido?.codigo || ''}.pdf`);
+  } else {
+    // Retornar Blob para ser exibido em Dialog pelo chamador
+    return new Promise((resolve) => {
+      pdfMake.createPdf(dd).getBlob((blob) => resolve(blob));
+    });
+  }
 };
 
 export { ImprimirPedido };

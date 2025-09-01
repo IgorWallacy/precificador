@@ -1,0 +1,328 @@
+/* Barra de Abas - Apenas Desktop */
+.tab-bar {
+  position: fixed;
+  top: calc(var(--header-height) + 50px);
+  left: 0;
+  right: 0;
+  height: 40px; /* altura similar a VSCode/Chrome */
+  width: 100vw;
+  background: var(--neutral-50);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 1001;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 8px;
+  box-shadow: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  transition: left 0.2s ease, width 0.2s ease;
+  display: none;
+}
+
+/* Mostrar barra de abas apenas em telas grandes (desktop) */
+@media (min-width: 1024px) {
+  .tab-bar {
+    display: flex;
+  }
+}
+
+/* Ajuste quando a sidebar está visível - apenas desktop */
+@media (min-width: 1024px) {
+  .tab-bar.with-sidebar {
+    left: var(--sidebar-width);
+    right: 0;
+    width: calc(100vw - var(--sidebar-width));
+  }
+
+  /* Ajuste quando a sidebar está colapsada */
+  .tab-bar.with-sidebar-collapsed {
+    left: var(--sidebar-collapsed-width);
+    right: 0;
+    width: calc(100vw - var(--sidebar-collapsed-width));
+  }
+  
+  /* Usar toda a largura disponível quando não há sidebar */
+  .tab-bar.full-width {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+  }
+}
+
+/* Lista de abas */
+.tab-list {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  gap: 2px;
+  width: 100%;
+  padding: 0;
+  overflow-x: auto;
+  flex: 1;
+}
+
+/* Aba individual */
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 0 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  min-width: 140px; /* largura típica VSCode */
+  flex: 0 0 auto; /* não esticar todas as abas */
+  position: relative;
+  user-select: none;
+  pointer-events: auto; /* Garantir que toda a aba seja clicável */
+}
+
+/* Alça de arraste para evitar conflito com clique */
+.tab-drag-handle {
+  width: 10px;
+  height: 100%;
+  cursor: grab;
+  background: transparent;
+}
+.tab-drag-handle:active { cursor: grabbing; }
+
+.tab:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.tab.active {
+  background: transparent;
+  border-bottom-color: var(--primary-color);
+}
+
+/* Feedback visual para cliques */
+.tab:active {
+  background: rgba(0,0,0,0.08);
+}
+
+.reorder-mode .tab {
+  cursor: grab;
+}
+.reorder-mode .tab:active { cursor: grabbing; }
+.tab.reorderable .tab-title { pointer-events: none; }
+
+/* Garantir que a aba seja completamente clicável quando não está em modo reorder */
+.tab:not(.reorderable) {
+  pointer-events: auto;
+}
+
+.tab:not(.reorderable) * {
+  pointer-events: none; /* Todos os filhos passam o evento para o pai */
+}
+
+.tab:not(.reorderable) .tab-close-btn {
+  pointer-events: auto; /* Exceto o botão de fechar */
+}
+
+.tab.working {
+  position: relative;
+}
+
+.tab.working::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-color), #f59e0b);
+  border-radius: 12px 12px 0 0;
+}
+
+/* Ícone da aba */
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 16px;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  pointer-events: none; /* Permitir que o clique passe para a aba pai */
+}
+
+.tab.active .tab-icon {
+  color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.tab:hover .tab-icon {
+  color: var(--text-color);
+}
+
+/* Título da aba */
+.tab-title {
+  flex: 1 1 auto;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+  pointer-events: none; /* Permitir que o clique passe para a aba pai */
+}
+
+.tab.active .tab-title {
+  color: var(--primary-color);
+}
+
+.tab:hover .tab-title {
+  color: var(--text-color);
+}
+
+/* Indicador de trabalho */
+.tab-working-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--neutral-300);
+  border-top: 2px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 4px rgba(245, 158, 11, 0.3);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Botão de fechar */
+.tab-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: background 0.12s ease, color 0.12s ease;
+  pointer-events: auto; /* Manter interatividade do botão de fechar */
+  opacity: .7;
+  margin-left: 4px;
+}
+
+.tab:hover .tab-close-btn { opacity: 1; }
+
+.tab-close-btn:hover { background: rgba(0,0,0,0.08); color: var(--text-color); }
+
+.tab.active .tab-close-btn {
+  opacity: 1;
+  color: var(--primary-color);
+}
+
+/* Menu de contexto */
+.tab-context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  min-width: 200px;
+  padding: 8px 0;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tab-context-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+
+.tab-context-menu button:hover {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  transform: translateX(4px);
+}
+
+.tab-context-menu button:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.tab-context-menu button:last-child {
+  border-radius: 0 0 12px 12px;
+}
+
+/* Sistema de abas apenas para desktop - responsividade removida */
+/* Em telas menores que desktop, o sistema de abas estará oculto */
+
+/* Scrollbar personalizada para a barra de abas */
+.tab-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tab-bar::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+}
+
+.tab-bar::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: 2px;
+}
+
+.tab-bar::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-400);
+}
+
+/* Remover animações grandes para evitar "pulos" */
+
+/* Estado de carregamento */
+.tab.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.tab.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}

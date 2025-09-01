@@ -20,11 +20,16 @@ import { Toast } from "primereact/toast";
 import api from "../../../services/axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTabNavigation } from "../../../hooks/useTabNavigation";
 import moment from "moment";
+
+// Importar componente da análise de inventário
+import AnaliseInventario from "./analise";
 
 
 export default function ContagemInventario() {
   const navigate = useNavigate();
+  const { navigateToRoute } = useTabNavigation();
 
   const toast = useRef(null);
   const toastDialog = useRef(null);
@@ -191,6 +196,24 @@ export default function ContagemInventario() {
     return moment(row?.inicio).format("DD/MM/YYYY HH:mm:ss");
   }
 
+  // Função para abrir análise de inventário em nova aba
+  const abrirAnaliseInventario = (inventarioId, nomeInventario) => {
+    const route = `/estoque/lista-inventario/${inventarioId}`;
+    const title = `Análise Inventário #${inventarioId} - ${nomeInventario}`;
+    const icon = '🔍';
+    
+    // Verificar se é desktop (onde as abas funcionam)
+    const isDesktop = window.innerWidth >= 1024;
+    
+    if (isDesktop) {
+      // Usar sistema de abas
+      navigateToRoute(route, AnaliseInventario, title, icon);
+    } else {
+      // Navegação tradicional para mobile/tablet
+      navigate(route);
+    }
+  };
+
   const visualizarTemplate = (rowData) => {
     return (
       <>
@@ -200,7 +223,7 @@ export default function ContagemInventario() {
           className="p-button p-button-rounded"
           icon="pi pi-eye"
           disabled={rowData?.status}
-          onClick={() => navigate(`/estoque/lista-inventario/${rowData?.id}`)}
+          onClick={() => abrirAnaliseInventario(rowData?.id, rowData?.nome)}
         />
       </>
     );

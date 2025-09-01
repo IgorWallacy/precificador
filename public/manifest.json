@@ -1,5 +1,14 @@
 {
- "name": " J J",
+ "name": "JJ Sistemas",
+ "short_name": "JJ",
+ "start_url": "/",
+ "scope": "/",
+ "display": "standalone",
+ "display_override": ["window-controls-overlay","standalone"],
+ "theme_color": "#111827",
+ "background_color": "#111827",
+ "capture_links": "existing-client-nav",
+ "launch_handler": { "client_mode": "navigate-existing" },
  "icons": [
   {
    "src": "\/favicon-36x36.png",

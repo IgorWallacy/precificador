@@ -10,6 +10,8 @@ import { Tag } from "primereact/tag";
 import { useEffect } from "react";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import { useTabNavigation } from "../../../../hooks/useTabNavigation";
+import { getComponentForRoute } from "../../../../Routes/registry";
 
 const IncluirContagemInventario = () => {
   const toast = useRef(null);
@@ -17,6 +19,7 @@ const IncluirContagemInventario = () => {
   const [inventario, setInventario] = useState([]);
 
   const navigate = useNavigate()
+  const { navigateToRoute, getRouteConfig } = useTabNavigation();
 
   const getInventario = () => {
     return api
@@ -99,8 +102,14 @@ const IncluirContagemInventario = () => {
                     label="Iniciar a contagem"
                     icon="pi pi-qrcode"
                     className="p-button p-button-rounded p-button-success"
-                    onClick={() =>  navigate('/estoque/inventario/contar', { state: { inventario : row } })}
-                  />
+                    onClick={() =>  {
+                      const route = `/estoque/inventario/contar/${row?.id}`;
+                      const component = getComponentForRoute(route);
+                      const cfg = getRouteConfig(route);
+                      // Abrir/ativar a aba e navegar preservando state
+                      navigateToRoute(route, component, cfg.title, cfg.icon, { inventario: row });
+                    }}
+                  /> 
                 ) : (
                   <Tag value="Inventário encerrado" icon="pi pi-lock" severity="danger" />
                 );

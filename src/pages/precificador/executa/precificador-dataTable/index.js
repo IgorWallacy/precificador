@@ -13,6 +13,7 @@ import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Toast } from "primereact/toast";
 import { FilterMatchMode } from "primereact/api";
+import { Dialog } from "primereact/dialog";
 import { ProgressBar } from "primereact/progressbar";
 import { Dropdown } from "primereact/dropdown";
 import { Toolbar } from "primereact/toolbar";
@@ -20,7 +21,7 @@ import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { addLocale } from "primereact/api";
 
-import JsBarcode from "jsbarcode/bin/JsBarcode";
+import JsBarcode from "jsbarcode";
 
 import { Tag } from "primereact/tag";
 import { Ripple } from "primereact/ripple";
@@ -43,12 +44,14 @@ import { element } from "prop-types";
 import { motion } from "framer-motion";
 import { Chart } from "primereact/chart";
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts?.vfs || pdfFonts?.pdfMake?.vfs;
 
 const PrecificadorExecuta = () => {
   const navigate = useNavigate();
 
   const [mensagens, setMensagens] = useState([]);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfVisible, setPdfVisible] = useState(false);
 
   const tabelaRef = useRef();
   const handlePrint = useReactToPrint({
@@ -95,8 +98,7 @@ const PrecificadorExecuta = () => {
     numeronotafiscal: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
 
-  //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
-  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
+  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 
   useEffect(() => {
     pegarTokenLocalStorageUniplus();
@@ -807,8 +809,16 @@ const PrecificadorExecuta = () => {
         };
       }),
     };
-
-    pdfMake.createPdf(dd).open();
+    const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+    if (isStandalone) {
+      pdfMake.createPdf(dd).download(`precos_agendados_${moment().format('YYYYMMDD_HHmmss')}.pdf`);
+    } else {
+      pdfMake.createPdf(dd).getBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        setPdfUrl(url);
+        setPdfVisible(true);
+      });
+    }
   };
 
   const textToBase64Barcode = (text) => {
@@ -921,7 +931,16 @@ const PrecificadorExecuta = () => {
         }),
       };
 
-      pdfMake.createPdf(dd).open();
+      const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+      if (isStandalone) {
+        pdfMake.createPdf(dd).download(`etiquetas_${moment().format('YYYYMMDD_HHmmss')}.pdf`);
+      } else {
+        pdfMake.createPdf(dd).getBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          setPdfUrl(url);
+          setPdfVisible(true);
+        });
+      }
     } else {
       toast.current.show({
         severity: "warn",
@@ -1029,7 +1048,16 @@ const PrecificadorExecuta = () => {
         }),
       };
 
-      pdfMake.createPdf(dd).open();
+      const isStandalone2 = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+      if (isStandalone2) {
+        pdfMake.createPdf(dd).download(`etiquetas_${moment().format('YYYYMMDD_HHmmss')}.pdf`);
+      } else {
+        pdfMake.createPdf(dd).getBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          setPdfUrl(url);
+          setPdfVisible(true);
+        });
+      }
     } else {
       toast.current.show({
         severity: "warn",
@@ -1149,7 +1177,16 @@ const PrecificadorExecuta = () => {
         }),
       };
 
-      pdfMake.createPdf(dd).open();
+      const isStandalone3 = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+      if (isStandalone3) {
+        pdfMake.createPdf(dd).download(`etiquetas_${moment().format('YYYYMMDD_HHmmss')}.pdf`);
+      } else {
+        pdfMake.createPdf(dd).getBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          setPdfUrl(url);
+          setPdfVisible(true);
+        });
+      }
     } else {
       toast.current.show({
         severity: "warn",
@@ -1409,7 +1446,7 @@ const PrecificadorExecuta = () => {
     if (quantidadeFilial.length > 1) {
       return (
         <>
-          Loja
+         
           <Dropdown
             showClear
             onChange={(e) => setFiliaisSelect(e.value)}
@@ -1754,6 +1791,15 @@ return (
   <div className="page-container">
     <Toast ref={toast} position="bottom-center" />
     <Footer />
+    <Dialog
+      header="Visualizar PDF"
+      visible={pdfVisible}
+      style={{ width: "85vw", maxWidth: "1000px" }}
+      onHide={() => { setPdfVisible(false); if (pdfUrl) { URL.revokeObjectURL(pdfUrl); setPdfUrl(null);} }}
+      maximizable
+    >
+      {pdfUrl ? <iframe title="PDF" src={pdfUrl} style={{ width: "100%", height: "80vh", border: 0 }} /> : null}
+    </Dialog>
     
     <div className="page-card">
       <div className="page-header">

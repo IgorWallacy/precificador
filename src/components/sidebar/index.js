@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "primereact/button";
-import { Tooltip } from "primereact/tooltip";
+
 import "./styles.css";
 
 const MENU_ITEMS = [
@@ -11,6 +11,14 @@ const MENU_ITEMS = [
     icon: "pi pi-chart-bar",
     items: [
       { id: "metabase", label: "Dashboard Geral", icon: "pi pi-chart-pie", route: "/metabase" }
+    ]
+  },
+  {
+    id: "bi",
+    label: "Business Intelligence",
+    icon: "pi pi-chart-line",
+    items: [
+      { id: "bi-custo-venda", label: "Análise Custo x Venda", icon: "pi pi-money-bill", route: "/bi/custo-venda" }
     ]
   },
   {
@@ -163,7 +171,7 @@ const Sidebar = () => {
         </button>
       )}
 
-      {/* Área de hover para desktop */}
+      {/* Área de hover para desktop - agora do lado direito */}
       {!isMobile && (
         <div 
           className="sidebar-hover-area"
@@ -171,7 +179,7 @@ const Sidebar = () => {
         />
       )}
 
-      {/* Sidebar principal */}
+      {/* Sidebar principal - agora posicionado à direita */}
       <aside 
         className={`sidebar ${isOpen ? 'open' : ''} ${isMobile ? 'mobile' : ''}`}
         onMouseLeave={() => !isMobile && setIsOpen(false)}

@@ -150,19 +150,7 @@ export default function AppChart({ vendas, vendasNfce, vendasECF }) {
 
   return (
     <div className="grid">
-      <div className="col-12 lg:col-6">
-        <div className="chart-container" style={{borderRight: '1px solid #eee', padding: '0 1rem'}}>
-          <h3 style={{ textAlign: 'center', fontWeight: 600, color: '#374151' }}>Vendas por Finalizador</h3>
-          {hasVendasData ? (
-            <>
-              <ReactApexChart options={finalizadorOptions} series={finalizadorSeries} type="donut" width="100%" />
-              <DetailedLegend data={finalizadorLegendData} />
-            </>
-          ) : (
-            <NoDataComponent title="Vendas por Finalizador" />
-          )}
-        </div>
-      </div>
+      
       <div className="col-12 lg:col-6">
         <div className="chart-container" style={{padding: '0 1rem'}}>
           <h3 style={{ textAlign: 'center', fontWeight: 600, color: '#374151' }}>Vendas por Documento</h3>

@@ -214,7 +214,7 @@ const PrecificadorAgenda = () => {
 
   //let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 
-  let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
+  let eanUrl = "https://cdn-cosmos.bluesoft.com.br/products";
 
   useEffect(() => {
     // window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
@@ -1144,7 +1144,9 @@ const PrecificadorAgenda = () => {
 
         if (quantidadeFilial.length < 1) {
           setQuantidadeFilial(0);
+
         } else {
+
         }
       })
       .catch((error) => { });
@@ -1289,7 +1291,7 @@ const PrecificadorAgenda = () => {
           <InputText
             value={globalFilterValue2}
             onChange={onGlobalFilterChange2}
-            placeholder="Pesquisar produtos, fornecedores, notas..." 
+            placeholder="Pesquisar produtos, fornecedores, notas..."
           />
         </div>
       </>
@@ -1634,7 +1636,7 @@ const PrecificadorAgenda = () => {
             .then((response) => {
               setProdutos(response.data);
 
-              //  //console.log(response.data);
+              console.log(response.data);
 
               setLoading(false);
 
@@ -1708,7 +1710,8 @@ const PrecificadorAgenda = () => {
   );
 
   const MostraListaFilial = () => {
-    if (quantidadeFilial.length > 1) {
+   
+    if (quantidadeFilial?.length > 1) {
       return (
         <>
           <Dropdown
@@ -1724,7 +1727,9 @@ const PrecificadorAgenda = () => {
         </>
       );
     } else {
-      return <></>;
+      return <>
+     
+      </>;
     }
   };
 
@@ -1871,12 +1876,12 @@ const PrecificadorAgenda = () => {
           </div>
         ) : (
           <>
-           
+
           </>
         )}
       </div>
 
-      {produtos.length < 1 ? ( 
+      {produtos.length < 1 ? (
         <>
           {/* Container de filtros */}
           <div className="filters-container">
@@ -1886,7 +1891,7 @@ const PrecificadorAgenda = () => {
                 <i className="pi pi-calendar"></i>
                 Filtros de Pesquisa
               </h3>
-              
+
               <div className="filters-grid">
                 <div className="filter-group">
                   <label className="filter-label">
@@ -1917,7 +1922,7 @@ const PrecificadorAgenda = () => {
                     </small>
                   )}
                 </div>
-                
+
                 <div className="filter-group">
                   <label className="filter-label">
                     <i className="pi pi-calendar-minus"></i>
@@ -1952,19 +1957,19 @@ const PrecificadorAgenda = () => {
                   )}
                 </div>
 
-                 { quantidadeFilial > 1 && (
-                <div className="filter-group">
-                  <label className="filter-label">
-                    <i className="pi pi-building"></i>
-                    Loja
-                  </label>
-                  <div className="store-selector">
-                    <MostraListaFilial />
+                {quantidadeFilial?.length > 1 && (
+                  <div className="filter-group">
+                    <label className="filter-label">
+                      <i className="pi pi-building"></i>
+                      Loja
+                    </label>
+                    <div className="store-selector">
+                      <MostraListaFilial />
+                    </div>
                   </div>
-                </div>
                 )}
               </div>
-              
+
               {/* Resumo dos filtros selecionados */}
               {(dataInicial || dataFinal) && (
                 <div className="filters-summary">
@@ -1996,12 +2001,12 @@ const PrecificadorAgenda = () => {
                 <i className="pi pi-sitemap"></i>
                 Configuração de Agrupamento
               </h3>
-              
+
               <div className="grouping-content">
                 <p className="grouping-description">
                   Escolha como deseja organizar os resultados da pesquisa:
                 </p>
-                
+
                 <div className="toggle-container">
                   <ToggleButton
                     onLabel="Agrupar por Fornecedor"
@@ -2012,7 +2017,7 @@ const PrecificadorAgenda = () => {
                     onChange={(e) => setAgrupadoPorFornecedor(e.value)}
                     className="grouping-toggle"
                   />
-                  
+
                   <div className="toggle-info">
                     <div className={`info-item ${agrupadoPorFornecedor ? 'active' : ''}`} onClick={() => setAgrupadoPorFornecedor(true)}>
                       <i className="pi pi-users"></i>
@@ -2026,7 +2031,7 @@ const PrecificadorAgenda = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Status de preparação */}
                 {dataInicial && dataFinal && !(dataInicial > dataFinal) && (
                   <div className="ready-status">
@@ -2055,7 +2060,7 @@ const PrecificadorAgenda = () => {
                 </div>
               )}
             </div>
-            
+
             <Button
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-search"}
               label={
@@ -2234,353 +2239,353 @@ const PrecificadorAgenda = () => {
 
           {/* Painel de informações do produto atual - FIXO NO BOTTOM */}
           <div className={`product-info-panel ${painelExpandido ? 'expanded' : 'collapsed'}`}>
-              <div className="panel-header">
-                <div className="panel-title">
-                  <div className="header-main">
-                    <h3>📋 {infoPainel?.fornecedor || "Selecione um produto"}</h3>
-                    <div className="header-details">
-                      <span className="detail-item">
-                        <i className="pi pi-file"></i>
-                        NF: {infoPainel?.notaFiscal || "-"}
-                      </span>
-                      <span className="detail-item">
-                        <i className="pi pi-calendar"></i>
-                        {infoPainel?.data || "-"}
-                      </span>
+            <div className="panel-header">
+              <div className="panel-title">
+                <div className="header-main">
+                  <h3>📋 {infoPainel?.fornecedor || "Selecione um produto"}</h3>
+                  <div className="header-details">
+                    <span className="detail-item">
+                      <i className="pi pi-file"></i>
+                      NF: {infoPainel?.notaFiscal || "-"}
+                    </span>
+                    <span className="detail-item">
+                      <i className="pi pi-calendar"></i>
+                      {infoPainel?.data || "-"}
+                    </span>
 
 
-                    </div>
                   </div>
-
                 </div>
-                <div className="panel-controls">
 
-                  <Button
-                    onClick={() => buscarProdutos()}
-                    tooltip="Atualizar"
-                    label="Atualizar"
-                    tooltipOptions={{ position: "bottom" }}
-                    icon={loading ? "pi pi-spin pi-spinner" : "pi pi-refresh"}
-                    className=" p-button-info p-button-sm"
-                  />
-                 
-
-                  <SelectButton
-                    value={usarMarkup}
-                    options={options}
-                    optionLabel="name"
-                    onChange={(e) => setUsarMarkup(e.target.value)}
-
-                  />
-                  <Button
-                    icon={painelExpandido ? 'pi pi-eye-slash' : 'pi pi-eye'}
-                    className="p-button-rounded p-button-text p-button-sm"
-                    onClick={() => setPainelExpandido(!painelExpandido)}
-                    tooltip={painelExpandido ? 'Recolher detalhes' : 'Expandir detalhes'}
-                    tooltipOptions={{ position: 'left' }}
-                  />
-                </div>
               </div>
+              <div className="panel-controls">
 
-              {painelExpandido && produtoSelecionado && infoPainel?.produto && (
-                <>
+                <Button
+                  onClick={() => buscarProdutos()}
+                  tooltip="Atualizar"
+                  label="Atualizar"
+                  tooltipOptions={{ position: "bottom" }}
+                  icon={loading ? "pi pi-spin pi-spinner" : "pi pi-refresh"}
+                  className=" p-button-info p-button-sm"
+                />
 
 
-                  <div className="panel-content">
+                <SelectButton
+                  value={usarMarkup}
+                  options={options}
+                  optionLabel="name"
+                  onChange={(e) => setUsarMarkup(e.target.value)}
 
-                    {/* Preços Compactos */}
-                    <div className="pricing-compact">
-                      <div className="price-row">
-                        <div className="price-item cost">
-                          <span className="price-label">
-                            <i className="pi pi-dollar" style={{ color: '#dc2626', marginRight: '0.25rem' }}></i>
-                            Custo
-                          </span>
-                          <span className="price-value" style={{ color: '#dc2626' }}>
-                            {Intl.NumberFormat("pt-BR", {
-                              style: "currency",
-                              currency: "BRL"
-                            }).format(infoPainel?.produto?.custo || 0)}
-                          </span>
-                          <span className="price-profit">
-                            <Tag severity="danger" value="Base" icon="pi pi-exclamation-triangle" />
-                          </span>
-                        </div>
+                />
+                <Button
+                  icon={painelExpandido ? 'pi pi-eye-slash' : 'pi pi-eye'}
+                  className="p-button-rounded p-button-text p-button-sm"
+                  onClick={() => setPainelExpandido(!painelExpandido)}
+                  tooltip={painelExpandido ? 'Recolher detalhes' : 'Expandir detalhes'}
+                  tooltipOptions={{ position: 'left' }}
+                />
+              </div>
+            </div>
 
-                        <div className={`price-item current ${(() => {
-                          const precoAtual = infoPainel?.produto?.precoAtual || 0;
-                          const custo = infoPainel?.produto?.custo || 0;
-                          const lucro = precoAtual - custo;
-                          return lucro < 0 ? 'loss-alert' : '';
-                        })()}`}>
-                          <span className="price-label">
-                            <i className="pi pi-chart-line" style={{ color: '#059669', marginRight: '0.25rem' }}></i>
-                            Atual {(() => {
-                              const precoAtual = infoPainel?.produto?.precoAtual || 0;
-                              const custo = infoPainel?.produto?.custo || 0;
+            {painelExpandido && produtoSelecionado && infoPainel?.produto && (
+              <>
 
-                              if (usarMarkup.value) {
-                                // Cálculo baseado em markup (sobre o custo)
-                                const markup = precoAtual - custo;
-                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
-                                return `(+${percentualMarkup.toFixed(1)}%)`;
-                              } else {
-                                // Cálculo baseado em markdown (sobre o preço)
-                                const markdown = precoAtual - custo;
-                                const percentualMarkdown = precoAtual > 0 ? (markdown / precoAtual) * 100 : 0;
-                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
-                              }
-                            })()}
-                          </span>
-                          <span className="price-value">
-                            {Intl.NumberFormat("pt-BR", {
-                              style: "currency",
-                              currency: "BRL"
-                            }).format(infoPainel?.produto?.precoAtual || 0)}
-                          </span>
-                          <span className="price-profit">
-                            {(() => {
-                              const precoAtual = infoPainel?.produto?.precoAtual || 0;
-                              const custo = infoPainel?.produto?.custo || 0;
 
-                              if (usarMarkup.value) {
-                                // Cálculo baseado em markup (sobre o custo)
-                                const markup = precoAtual - custo;
-                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                <div className="panel-content">
 
-                                return markup >= 0 ? (
-                                  <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
-                                ) : (
-                                  <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
-                                );
-                              } else {
-                                // Cálculo baseado em markdown (sobre o preço)
-                                const markdown = precoAtual - custo;
-                                const percentualMarkdown = precoAtual > 0 ? (markdown / precoAtual) * 100 : 0;
-
-                                return markdown >= 0 ? (
-                                  <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
-                                ) : (
-                                  <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
-                                );
-                              }
-                            })()}
-                          </span>
-                        </div>
-
-                        {(infoPainel?.produto?.precoPromocional > 0 || infoPainel?.produto?.precoPromocionalFamilia > 0) && (
-                          <div className={`price-item promotional ${(() => {
-                            const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
-                            const custo = infoPainel?.produto?.custo || 0;
-                            const lucro = precoPromo - custo;
-                            return lucro < 0 ? 'loss-alert' : '';
-                          })()}`}>
-                            <span className="price-label">
-                              <i className="pi pi-tag" style={{ color: '#ea580c', marginRight: '0.25rem' }}></i>
-                              Promoção {(() => {
-                                const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
-                                const custo = infoPainel?.produto?.custo || 0;
-
-                                if (usarMarkup.value) {
-                                  // Cálculo baseado em markup (sobre o custo)
-                                  const markup = precoPromo - custo;
-                                  const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
-                                  return `(+${percentualMarkup.toFixed(1)}%)`;
-                                } else {
-                                  // Cálculo baseado em markdown (sobre o preço)
-                                  const markdown = precoPromo - custo;
-                                  const percentualMarkdown = precoPromo > 0 ? (markdown / precoPromo) * 100 : 0;
-                                  return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
-                                }
-                              })()}
-                              {infoPainel?.produto?.precoPromocionalFamilia > 0 ? ' (Família)' : ''}
-                            </span>
-                            <span className="price-value">
-                              {Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL"
-                              }).format(infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0)}
-                            </span>
-                            <span className="price-profit">
-                              {(() => {
-                                const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
-                                const custo = infoPainel?.produto?.custo || 0;
-
-                                if (usarMarkup.value) {
-                                  // Cálculo baseado em markup (sobre o custo)
-                                  const markup = precoPromo - custo;
-                                  const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
-
-                                  return markup >= 0 ? (
-                                    <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
-                                  ) : (
-                                    <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
-                                  );
-                                } else {
-                                  // Cálculo baseado em markdown (sobre o preço)
-                                  const markdown = precoPromo - custo;
-                                  const percentualMarkdown = precoPromo > 0 ? (markdown / precoPromo) * 100 : 0;
-
-                                  return markdown >= 0 ? (
-                                    <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
-                                  ) : (
-                                    <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
-                                  );
-                                }
-                              })()}
-                            </span>
-                          </div>
-                        )}
-
-                        <div className={`price-item suggestion ${(() => {
-                          const sugestao = infoPainel?.produto?.sugestao || 0;
-                          const custo = infoPainel?.produto?.custo || 0;
-                          const lucro = sugestao - custo;
-                          return lucro < 0 ? 'loss-alert' : '';
-                        })()}`}>
-                          <span className="price-label">
-                            <i className="pi pi-lightbulb" style={{ color: '#2563eb', marginRight: '0.25rem' }}></i>
-                            Sugestão {(() => {
-                              const sugestao = infoPainel?.produto?.sugestao || 0;
-                              const custo = infoPainel?.produto?.custo || 0;
-
-                              if (usarMarkup.value) {
-                                // Cálculo baseado em markup (sobre o custo)
-                                const markup = sugestao - custo;
-                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
-                                return `(+${percentualMarkup.toFixed(1)}%)`;
-                              } else {
-                                // Cálculo baseado em markdown (sobre o preço)
-                                const markdown = sugestao - custo;
-                                const percentualMarkdown = sugestao > 0 ? (markdown / sugestao) * 100 : 0;
-                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
-                              }
-                            })()}
-                          </span>
-                          <span className="price-value">
-                            {Intl.NumberFormat("pt-BR", {
-                              style: "currency",
-                              currency: "BRL"
-                            }).format(infoPainel?.produto?.sugestao || 0)}
-                          </span>
-                          <span className="price-profit">
-                            {(() => {
-                              const sugestao = infoPainel?.produto?.sugestao || 0;
-                              const custo = infoPainel?.produto?.custo || 0;
-
-                              if (usarMarkup.value) {
-                                // Cálculo baseado em markup (sobre o custo)
-                                const markup = sugestao - custo;
-                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
-
-                                return markup >= 0 ? (
-                                  <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
-                                ) : (
-                                  <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
-                                );
-                              } else {
-                                // Cálculo baseado em markdown (sobre o preço)
-                                const markdown = sugestao - custo;
-                                const percentualMarkdown = sugestao > 0 ? (markdown / sugestao) * 100 : 0;
-                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
-                              }
-                            })()}
-                          </span>
-                        </div>
-
-                        <div className={`price-item scheduled ${(() => {
-                          const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
-                          const custo = infoPainel?.produto?.custo || 0;
-                          const lucro = precoAgendado - custo;
-                          return lucro < 0 ? 'loss-alert' : '';
-                        })()}`}>
-                          <span className="price-label">
-                            <i className="pi pi-calendar" style={{ color: '#7c3aed', marginRight: '0.25rem' }}></i>
-                            Agendado {(() => {
-                              const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
-                              const custo = infoPainel?.produto?.custo || 0;
-
-                              if (usarMarkup.value) {
-                                // Cálculo baseado em markup (sobre o custo)
-                                const markup = precoAgendado - custo;
-                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
-                                return `(+${percentualMarkup.toFixed(1)}%)`;
-                              } else {
-                                // Cálculo baseado em markdown (sobre o preço)
-                                const markdown = precoAgendado - custo;
-                                const percentualMarkdown = precoAgendado > 0 ? (markdown / precoAgendado) * 100 : 0;
-                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
-                              }
-                            })()}
-                          </span>
-                          <span className="price-value">
-                            {(() => {
-                              const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
-                              if (precoAgendado === null || precoAgendado === 0) {
-                                return (
-                                  <div className="no-schedule-text">
-                                    <i className="pi pi-times-circle" style={{ color: '#6b7280', marginRight: '0.25rem' }}></i>
-                                    Sem agendamento
-                                  </div>
-                                );
-                              }
-                              return Intl.NumberFormat("pt-BR", {
-                                style: "currency",
-                                currency: "BRL"
-                              }).format(precoAgendado);
-                            })()}
-                          </span>
-                          <span className="price-profit">
-                            {(() => {
-                              const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
-                              if (precoAgendado === null || precoAgendado === 0) {
-                                return <Tag severity="secondary" value="N/A" />;
-                              }
-                              const custo = infoPainel?.produto?.custo || 0;
-
-                              if (usarMarkup.value) {
-                                // Cálculo baseado em markup (sobre o custo)
-                                const markup = precoAgendado - custo;
-                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
-
-                                return markup >= 0 ? (
-                                  <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
-                                ) : (
-                                  <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
-                                );
-                              } else {
-                                // Cálculo baseado em markdown (sobre o preço)
-                                const markdown = precoAgendado - custo;
-                                const percentualMarkdown = precoAgendado > 0 ? (markdown / precoAgendado) * 100 : 0;
-
-                                return markdown >= 0 ? (
-                                  <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
-                                ) : (
-                                  <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
-                                );
-                              }
-                            })()}
-                          </span>
-
-                        </div>
-                        {produtoSelecionado && infoPainel?.produto && (
-                          <div className="product-title">
-                            <h3>{infoPainel?.produto?.nome}</h3>
-                            <span className="product-code">{infoPainel?.produto?.codigo}</span>
-                          </div>
-                        )}
+                  {/* Preços Compactos */}
+                  <div className="pricing-compact">
+                    <div className="price-row">
+                      <div className="price-item cost">
+                        <span className="price-label">
+                          <i className="pi pi-dollar" style={{ color: '#dc2626', marginRight: '0.25rem' }}></i>
+                          Custo
+                        </span>
+                        <span className="price-value" style={{ color: '#dc2626' }}>
+                          {Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL"
+                          }).format(infoPainel?.produto?.custo || 0)}
+                        </span>
+                        <span className="price-profit">
+                          <Tag severity="danger" value="Base" icon="pi pi-exclamation-triangle" />
+                        </span>
                       </div>
+
+                      <div className={`price-item current ${(() => {
+                        const precoAtual = infoPainel?.produto?.precoAtual || 0;
+                        const custo = infoPainel?.produto?.custo || 0;
+                        const lucro = precoAtual - custo;
+                        return lucro < 0 ? 'loss-alert' : '';
+                      })()}`}>
+                        <span className="price-label">
+                          <i className="pi pi-chart-line" style={{ color: '#059669', marginRight: '0.25rem' }}></i>
+                          Atual {(() => {
+                            const precoAtual = infoPainel?.produto?.precoAtual || 0;
+                            const custo = infoPainel?.produto?.custo || 0;
+
+                            if (usarMarkup.value) {
+                              // Cálculo baseado em markup (sobre o custo)
+                              const markup = precoAtual - custo;
+                              const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                              return `(+${percentualMarkup.toFixed(1)}%)`;
+                            } else {
+                              // Cálculo baseado em markdown (sobre o preço)
+                              const markdown = precoAtual - custo;
+                              const percentualMarkdown = precoAtual > 0 ? (markdown / precoAtual) * 100 : 0;
+                              return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                            }
+                          })()}
+                        </span>
+                        <span className="price-value">
+                          {Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL"
+                          }).format(infoPainel?.produto?.precoAtual || 0)}
+                        </span>
+                        <span className="price-profit">
+                          {(() => {
+                            const precoAtual = infoPainel?.produto?.precoAtual || 0;
+                            const custo = infoPainel?.produto?.custo || 0;
+
+                            if (usarMarkup.value) {
+                              // Cálculo baseado em markup (sobre o custo)
+                              const markup = precoAtual - custo;
+                              const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                              return markup >= 0 ? (
+                                <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                              ) : (
+                                <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                              );
+                            } else {
+                              // Cálculo baseado em markdown (sobre o preço)
+                              const markdown = precoAtual - custo;
+                              const percentualMarkdown = precoAtual > 0 ? (markdown / precoAtual) * 100 : 0;
+
+                              return markdown >= 0 ? (
+                                <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                              ) : (
+                                <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                              );
+                            }
+                          })()}
+                        </span>
+                      </div>
+
+                      {(infoPainel?.produto?.precoPromocional > 0 || infoPainel?.produto?.precoPromocionalFamilia > 0) && (
+                        <div className={`price-item promotional ${(() => {
+                          const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
+                          const custo = infoPainel?.produto?.custo || 0;
+                          const lucro = precoPromo - custo;
+                          return lucro < 0 ? 'loss-alert' : '';
+                        })()}`}>
+                          <span className="price-label">
+                            <i className="pi pi-tag" style={{ color: '#ea580c', marginRight: '0.25rem' }}></i>
+                            Promoção {(() => {
+                              const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = precoPromo - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                                return `(+${percentualMarkup.toFixed(1)}%)`;
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = precoPromo - custo;
+                                const percentualMarkdown = precoPromo > 0 ? (markdown / precoPromo) * 100 : 0;
+                                return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                              }
+                            })()}
+                            {infoPainel?.produto?.precoPromocionalFamilia > 0 ? ' (Família)' : ''}
+                          </span>
+                          <span className="price-value">
+                            {Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL"
+                            }).format(infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0)}
+                          </span>
+                          <span className="price-profit">
+                            {(() => {
+                              const precoPromo = infoPainel?.produto?.precoPromocional || infoPainel?.produto?.precoPromocionalFamilia || 0;
+                              const custo = infoPainel?.produto?.custo || 0;
+
+                              if (usarMarkup.value) {
+                                // Cálculo baseado em markup (sobre o custo)
+                                const markup = precoPromo - custo;
+                                const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                                return markup >= 0 ? (
+                                  <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                ) : (
+                                  <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                );
+                              } else {
+                                // Cálculo baseado em markdown (sobre o preço)
+                                const markdown = precoPromo - custo;
+                                const percentualMarkdown = precoPromo > 0 ? (markdown / precoPromo) * 100 : 0;
+
+                                return markdown >= 0 ? (
+                                  <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                                ) : (
+                                  <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                                );
+                              }
+                            })()}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className={`price-item suggestion ${(() => {
+                        const sugestao = infoPainel?.produto?.sugestao || 0;
+                        const custo = infoPainel?.produto?.custo || 0;
+                        const lucro = sugestao - custo;
+                        return lucro < 0 ? 'loss-alert' : '';
+                      })()}`}>
+                        <span className="price-label">
+                          <i className="pi pi-lightbulb" style={{ color: '#2563eb', marginRight: '0.25rem' }}></i>
+                          Sugestão {(() => {
+                            const sugestao = infoPainel?.produto?.sugestao || 0;
+                            const custo = infoPainel?.produto?.custo || 0;
+
+                            if (usarMarkup.value) {
+                              // Cálculo baseado em markup (sobre o custo)
+                              const markup = sugestao - custo;
+                              const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                              return `(+${percentualMarkup.toFixed(1)}%)`;
+                            } else {
+                              // Cálculo baseado em markdown (sobre o preço)
+                              const markdown = sugestao - custo;
+                              const percentualMarkdown = sugestao > 0 ? (markdown / sugestao) * 100 : 0;
+                              return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                            }
+                          })()}
+                        </span>
+                        <span className="price-value">
+                          {Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL"
+                          }).format(infoPainel?.produto?.sugestao || 0)}
+                        </span>
+                        <span className="price-profit">
+                          {(() => {
+                            const sugestao = infoPainel?.produto?.sugestao || 0;
+                            const custo = infoPainel?.produto?.custo || 0;
+
+                            if (usarMarkup.value) {
+                              // Cálculo baseado em markup (sobre o custo)
+                              const markup = sugestao - custo;
+                              const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                              return markup >= 0 ? (
+                                <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                              ) : (
+                                <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                              );
+                            } else {
+                              // Cálculo baseado em markdown (sobre o preço)
+                              const markdown = sugestao - custo;
+                              const percentualMarkdown = sugestao > 0 ? (markdown / sugestao) * 100 : 0;
+                              return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                            }
+                          })()}
+                        </span>
+                      </div>
+
+                      <div className={`price-item scheduled ${(() => {
+                        const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                        const custo = infoPainel?.produto?.custo || 0;
+                        const lucro = precoAgendado - custo;
+                        return lucro < 0 ? 'loss-alert' : '';
+                      })()}`}>
+                        <span className="price-label">
+                          <i className="pi pi-calendar" style={{ color: '#7c3aed', marginRight: '0.25rem' }}></i>
+                          Agendado {(() => {
+                            const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                            const custo = infoPainel?.produto?.custo || 0;
+
+                            if (usarMarkup.value) {
+                              // Cálculo baseado em markup (sobre o custo)
+                              const markup = precoAgendado - custo;
+                              const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+                              return `(+${percentualMarkup.toFixed(1)}%)`;
+                            } else {
+                              // Cálculo baseado em markdown (sobre o preço)
+                              const markdown = precoAgendado - custo;
+                              const percentualMarkdown = precoAgendado > 0 ? (markdown / precoAgendado) * 100 : 0;
+                              return `(-${Math.abs(percentualMarkdown).toFixed(1)}%)`;
+                            }
+                          })()}
+                        </span>
+                        <span className="price-value">
+                          {(() => {
+                            const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                            if (precoAgendado === null || precoAgendado === 0) {
+                              return (
+                                <div className="no-schedule-text">
+                                  <i className="pi pi-times-circle" style={{ color: '#6b7280', marginRight: '0.25rem' }}></i>
+                                  Sem agendamento
+                                </div>
+                              );
+                            }
+                            return Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL"
+                            }).format(precoAgendado);
+                          })()}
+                        </span>
+                        <span className="price-profit">
+                          {(() => {
+                            const precoAgendado = infoPainel?.produto?.precoAgendado || 0;
+                            if (precoAgendado === null || precoAgendado === 0) {
+                              return <Tag severity="secondary" value="N/A" />;
+                            }
+                            const custo = infoPainel?.produto?.custo || 0;
+
+                            if (usarMarkup.value) {
+                              // Cálculo baseado em markup (sobre o custo)
+                              const markup = precoAgendado - custo;
+                              const percentualMarkup = custo > 0 ? (markup / custo) * 100 : 0;
+
+                              return markup >= 0 ? (
+                                <Tag severity="success" value={`+${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                              ) : (
+                                <Tag severity="danger" value={`${percentualMarkup.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                              );
+                            } else {
+                              // Cálculo baseado em markdown (sobre o preço)
+                              const markdown = precoAgendado - custo;
+                              const percentualMarkdown = precoAgendado > 0 ? (markdown / precoAgendado) * 100 : 0;
+
+                              return markdown >= 0 ? (
+                                <Tag severity="success" value={`+${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-up" />
+                              ) : (
+                                <Tag severity="danger" value={`${percentualMarkdown.toFixed(1)}%`} icon="pi pi-arrow-down" />
+                              );
+                            }
+                          })()}
+                        </span>
+
+                      </div>
+                      {produtoSelecionado && infoPainel?.produto && (
+                        <div className="product-title">
+                          <h3>{infoPainel?.produto?.nome}</h3>
+                          <span className="product-code">{infoPainel?.produto?.codigo}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* DataTable principal */}
           <div className="table-wrapper">
 
             <DataTable
-             
+
               onValueChange={(filteredData) => setProdutoFilter(filteredData)}
               responsiveLayout="stack"
               breakpoint="960px"

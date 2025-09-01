@@ -9,6 +9,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
 import { FilterMatchMode } from "primereact/api";
+import { useParams } from "react-router-dom";
 
 
 import api from "../../../../../services/axios";
@@ -18,6 +19,7 @@ const IncluirContagemProdutosInventario = () => {
   let eanUrl = "http://www.eanpictures.com.br:9000/api/gtin";
   const location = useLocation();
   const { inventario } = location.state;
+  let { id } = useParams();
 
   const toast = useRef(null);
   const produtoEan = useRef(null);
@@ -121,9 +123,7 @@ const IncluirContagemProdutosInventario = () => {
     setloadingInventario(true);
     return api
       .get(
-        `/api/produto/contagem/inventarios/${parseInt(
-          JSON.stringify(inventario?.id)
-        )}`
+        `/api/produto/contagem/inventarios/${id}`
       )
       .then((r) => {
         inventarioStatus.current = r.data?.status;

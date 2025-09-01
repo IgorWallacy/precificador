@@ -6,15 +6,16 @@ import { Column } from "primereact/column";
 import { useEffect, useState, useRef } from "react";
 import api from "../../../services/axios";
 import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
-import JsBarcode from "jsbarcode/bin/JsBarcode";
+import JsBarcode from "jsbarcode";
 import moment from "moment";
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts?.vfs || pdfFonts?.pdfMake?.vfs;
 
 const EtiquetaUsuario = () => {
   const toast = useRef(null);
@@ -22,6 +23,8 @@ const EtiquetaUsuario = () => {
   const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
   const [globalFilterValue2, setGlobalFilterValue2] = useState("");
   const [senha, setSenha] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfVisible, setPdfVisible] = useState(false);
   const [filters2, setFilters2] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     nome: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -126,7 +129,16 @@ const EtiquetaUsuario = () => {
         ],
       };
 
-      pdfMake.createPdf(dd).open();
+      const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+      if (isStandalone) {
+        pdfMake.createPdf(dd).download(`etiqueta_${usuarioSelecionado?.codigo || ''}.pdf`);
+      } else {
+        pdfMake.createPdf(dd).getBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          setPdfUrl(url);
+          setPdfVisible(true);
+        });
+      }
     }
   };
 
@@ -174,6 +186,23 @@ const EtiquetaUsuario = () => {
     <>
       <Footer />
       <Toast ref={toast} position="bottom-center" />
+      <Dialog
+        header="Etiqueta"
+        visible={pdfVisible}
+        style={{ width: "80vw", maxWidth: "900px" }}
+        onHide={() => {
+          setPdfVisible(false);
+          if (pdfUrl) {
+            URL.revokeObjectURL(pdfUrl);
+            setPdfUrl(null);
+          }
+        }}
+        maximizable
+      >
+        {pdfUrl ? (
+          <iframe title="Etiqueta PDF" src={pdfUrl} style={{ width: "100%", height: "80vh", border: 0 }} />
+        ) : null}
+      </Dialog>
       <div
         style={{
           display: "flex",

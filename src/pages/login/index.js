@@ -12,6 +12,7 @@ import React, { useState, useContext, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Context from "../../contexts";
+import { useTabContext } from "../../contexts/TabContext";
 import { ProgressBar } from "primereact/progressbar";
 import { Avatar } from "primereact/avatar";
 import { Toast } from "primereact/toast";
@@ -43,6 +44,7 @@ const Login = () => {
   const input2Ref = useRef(null);
 
   let navigate = useNavigate();
+  const { closeAllTabs } = useTabContext();
 
   let clientId = "doks";
   let clientSecret = "1234";
@@ -135,6 +137,11 @@ const Login = () => {
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("ultimoLogado", usuario?.toUpperCase());
         localStorage.setItem("nome_logado", JSON.parse(accessToken)?.nome);
+
+        // Resetar abas salvas e abrir somente /metabase
+        localStorage.removeItem('app_tabs');
+        localStorage.removeItem('app_active_tab');
+        closeAllTabs();
 
         navigate("/metabase");
 

@@ -38,7 +38,7 @@ import { useReactToPrint } from "react-to-print";
 
 import { ImprimirPedido } from "./imprimir-pedido";
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts?.vfs || pdfFonts?.pdfMake?.vfs;
 
 export default function AnaliseFornecedor() {
   const location = useLocation();
@@ -126,6 +126,8 @@ export default function AnaliseFornecedor() {
   const [pedidos, setPedidos] = useState([]);
 
   const [displayDialog, setDisplayDialog] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfVisible, setPdfVisible] = useState(false);
 
   const [unidadeMedidaLista, setUnidadeMedidaLista] = useState([]);
 
@@ -687,8 +689,18 @@ export default function AnaliseFornecedor() {
     getItensPedido(params.id);
   };
 
-  const imprimir = () => {
-    ImprimirPedido({ loja: filial, pedido: pedidoData.data, itens: pedidos });
+  const imprimir = async () => {
+    try {
+      const maybePromise = ImprimirPedido({ loja: filial, pedido: pedidoData.data, itens: pedidos });
+      if (maybePromise && typeof maybePromise.then === 'function') {
+        const blob = await maybePromise;
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          setPdfUrl(url);
+          setPdfVisible(true);
+        }
+      }
+    } catch (_) {}
   };
 
   useEffect(() => {
@@ -910,6 +922,18 @@ export default function AnaliseFornecedor() {
                     {TEXTS[index % TEXTS.length]}
                   </TextTransition>
                 </h1>
+              </Dialog>
+
+              <Dialog
+                header="Visualizar PDF"
+                visible={pdfVisible}
+                style={{ width: "85vw", maxWidth: "1000px" }}
+                onHide={() => { setPdfVisible(false); if (pdfUrl) { URL.revokeObjectURL(pdfUrl); setPdfUrl(null);} }}
+                maximizable
+              >
+                {pdfUrl ? (
+                  <iframe title="PDF" src={pdfUrl} style={{ width: "100%", height: "80vh", border: 0 }} />
+                ) : null}
               </Dialog>
 
               {idPedido ? (

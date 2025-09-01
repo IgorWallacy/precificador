@@ -70,24 +70,14 @@ const TabBar = () => {
   }, []);
 
   const handleTabClick = useCallback((tabId) => {
-    console.log(`🖱️ CLIQUE NA ABA: Tentando ativar aba ${tabId}`, {
-      currentActive: activeTabId,
-      timestamp: Date.now(),
-      target: tabs.find(t => t.id === tabId)?.title
-    });
+    // Clique direto e simples - sem logs desnecessários
+    if (activeTabId === tabId) return; // Ignorar se já está ativa
     
-    // Rastrear tentativa de clique
-    trackTabClick(tabId, false);
+    console.log(`🚀 CLIQUE RÁPIDO: Ativando aba ${tabId} em ${Date.now()}`);
     
-    // Evitar ativar a mesma aba que já está ativa
-    if (activeTabId === tabId) {
-      console.log(`⚠️ ABA JÁ ATIVA: Aba ${tabId} já está ativa, ignorando clique`);
-      return;
-    }
-    
-    // Ativar aba
+    // Ativar aba imediatamente
     activateTab(tabId);
-  }, [activeTabId, activateTab, trackTabClick, tabs]);
+  }, [activeTabId, activateTab]);
 
   const handleTabClose = (e, tabId) => {
     e.stopPropagation();
@@ -149,10 +139,35 @@ const TabBar = () => {
     moveTab(from, to);
   };
 
+  // Componente de aba simples para modo normal (sem drag and drop)
+  const SimpleTab = ({ tab }) => {
+    return (
+      <div
+        className={`tab ${tab.isActive ? 'active' : ''}`}
+        onClick={() => handleTabClick(tab.id)}
+        title={tab.title}
+      >
+        {tab.icon && <span className="tab-icon">{tab.icon}</span>}
+        <span className="tab-title">{tab.title}</span>
+        <button 
+          className="tab-close-btn" 
+          onClick={(e) => {
+            e.stopPropagation();
+            handleTabClose(e, tab.id);
+          }} 
+          title="Fechar aba"
+        >
+          ×
+        </button>
+      </div>
+    );
+  };
+
+  // Componente de aba com drag and drop para modo reorder
   const SortableTab = ({ tab }) => {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ 
       id: String(tab.id), 
-      disabled: !reorderMode 
+      disabled: false 
     });
     const style = { transform: CSS.Transform.toString(transform), transition };
     
@@ -160,34 +175,18 @@ const TabBar = () => {
       <div
         ref={setNodeRef}
         style={style}
-        className={`tab ${tab.isActive ? 'active' : ''} ${reorderMode ? 'reorderable' : ''}`}
-        onClick={(e) => { 
-          e.preventDefault();
-          e.stopPropagation();
-          if (!reorderMode) {
-            handleTabClick(tab.id);
-          }
-        }}
-        onMouseDown={(e) => {
-          // Evitar interferência do drag quando não está no modo de reordenação
-          if (!reorderMode) {
-            e.preventDefault();
-          }
-        }}
+        className={`tab ${tab.isActive ? 'active' : ''} reorderable`}
         title={tab.title}
-        {...(reorderMode ? { ...attributes, ...listeners } : {})}
+        {...attributes}
+        {...listeners}
       >
-        {/* Exibir alça somente no modo de reposicionamento */}
-        {reorderMode && (
-          <span className="tab-drag-handle" aria-label="Reordenar" {...attributes} {...listeners} />
-        )}
+        <span className="tab-drag-handle" aria-label="Reordenar" />
         {tab.icon && <span className="tab-icon">{tab.icon}</span>}
         <span className="tab-title">{tab.title}</span>
         <button 
           className="tab-close-btn" 
           onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation(); // Importante: evitar que o clique se propague para a aba
+            e.stopPropagation();
             handleTabClose(e, tab.id);
           }} 
           title="Fechar aba"
@@ -200,15 +199,23 @@ const TabBar = () => {
 
   return (
     <div className={`${getTabBarClass()} ${reorderMode ? 'reorder-mode' : ''}`}>
-      <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-        <SortableContext items={tabs.map(t => String(t.id))} strategy={horizontalListSortingStrategy}>
-          <div className="tab-list">
-            {tabs.map((tab) => (
-              <SortableTab key={tab.id} tab={tab} />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+      {reorderMode ? (
+        <DndContext sensors={sensors} onDragEnd={onDragEnd}>
+          <SortableContext items={tabs.map(t => String(t.id))} strategy={horizontalListSortingStrategy}>
+            <div className="tab-list">
+              {tabs.map((tab) => (
+                <SortableTab key={tab.id} tab={tab} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <div className="tab-list">
+          {tabs.map((tab) => (
+            <SimpleTab key={tab.id} tab={tab} />
+          ))}
+        </div>
+      )}
 
       {/* Ações da barra de abas: botão para alternar modo de reposicionamento */}
       <div style={{ position: 'absolute', right: 8, top: 4, display: 'flex', gap: 8 }}>

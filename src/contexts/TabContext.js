@@ -104,17 +104,25 @@ export const TabProvider = ({ children }) => {
     });
   }, [activeTabId]);
 
-  // Ativar aba
+  // Ativar aba - versão otimizada
   const activateTab = useCallback((tabId) => {
-    setTabs(prevTabs => 
-      prevTabs.map(tab => ({
+    // Evitar atualizações desnecessárias
+    if (activeTabId === tabId) return;
+    
+    setTabs(prevTabs => {
+      // Verificar se realmente precisa atualizar
+      const currentActive = prevTabs.find(tab => tab.isActive);
+      if (currentActive && currentActive.id === tabId) return prevTabs;
+      
+      return prevTabs.map(tab => ({
         ...tab,
         isActive: tab.id === tabId,
         lastActivity: tab.id === tabId ? Date.now() : tab.lastActivity
-      }))
-    );
+      }));
+    });
+    
     setActiveTabId(tabId);
-  }, []);
+  }, [activeTabId]);
 
   // Atualizar estado de uma aba
   const updateTabState = useCallback((tabId, newState) => {

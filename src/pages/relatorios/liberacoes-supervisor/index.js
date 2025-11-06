@@ -74,16 +74,31 @@ const RelatorioLiberacoesSupervisor = () => {
     });
   }, [removerCamposIndesejados, formatarDataBrasileira]);
 
+  // Função para obter o campo NUMERO_DOC de um item
+  const obterNumeroDoc = useCallback((item) => {
+    // Lista de possíveis nomes do campo
+    const possiveisCampos = [
+      'NUMERO_DOC', 'numero_doc', 'numeroDoc', 'NUMERO_DOCUMENTO',
+      'numero_documento', 'numeroDocumento', 'numerodocumento',
+      'NUM_DOC', 'num_doc', 'numDoc', 'documento', 'DOCUMENTO'
+    ];
+    
+    // Tentar encontrar o campo
+    for (const campo of possiveisCampos) {
+      if (item[campo] !== undefined && item[campo] !== null && item[campo] !== '') {
+        return String(item[campo]);
+      }
+    }
+    
+    return 'Sem número';
+  }, []);
+
   // Função para agrupar por NUMERO_DOC
   const agruparPorNumeroDoc = useCallback((dados) => {
     const agrupado = {};
     
     dados.forEach(item => {
-      // Tentar diferentes variações do campo NUMERO_DOC
-      const numeroDoc = item.NUMERO_DOC || item.numero_doc || item.numeroDoc || 
-                       item.NUMERO_DOCUMENTO || item.numero_documento || 
-                       item.numeroDocumento || item.numerodocumento || 
-                       'Sem número';
+      const numeroDoc = obterNumeroDoc(item);
       
       if (!agrupado[numeroDoc]) {
         agrupado[numeroDoc] = [];
@@ -92,8 +107,12 @@ const RelatorioLiberacoesSupervisor = () => {
       agrupado[numeroDoc].push(item);
     });
     
+    // Log para debug
+    console.log('📊 Agrupamento realizado:', Object.keys(agrupado).length, 'documentos únicos');
+    console.log('📊 Chaves dos grupos:', Object.keys(agrupado));
+    
     return agrupado;
-  }, []);
+  }, [obterNumeroDoc]);
 
   // Função para buscar liberações
   const buscarLiberacoes = async () => {
@@ -157,13 +176,27 @@ const RelatorioLiberacoesSupervisor = () => {
       // Processar dados: remover campos indesejados e formatar datas
       dados = processarDados(dados);
       
+      // Debug: mostrar campos disponíveis no primeiro item
+      if (dados.length > 0) {
+        console.log('📋 Campos disponíveis no primeiro item após processamento:', Object.keys(dados[0]));
+        console.log('📋 Primeiro item completo:', dados[0]);
+        // Tentar identificar qual campo de número de documento existe
+        const primeiroItem = dados[0];
+        const campoNumDoc = obterNumeroDoc(primeiroItem);
+        console.log('📋 Campo NUMERO_DOC identificado:', campoNumDoc);
+      }
+      
       // Agrupar por NUMERO_DOC
       agrupado = agruparPorNumeroDoc(dados);
 
       setLiberacoes(Array.isArray(dados) ? dados : []);
       setLiberacoesAgrupadas(agrupado);
 
-      toast.success(`${dados.length} liberações encontradas`, { duration: 3000 });
+      const totalGrupos = Object.keys(agrupado).length;
+      toast.success(
+        `${dados.length} liberações encontradas em ${totalGrupos} documento${totalGrupos !== 1 ? 's' : ''}`, 
+        { duration: 3000 }
+      );
     } catch (error) {
       console.error('Erro ao buscar liberações:', error);
       toast.error("Erro ao buscar liberações. Tente novamente.", { duration: 3000 });
@@ -318,6 +351,224 @@ const RelatorioLiberacoesSupervisor = () => {
     }
   };
 
+  // Função para imprimir via tabela HTML
+  const imprimirHTML = () => {
+    try {
+      if (Object.keys(liberacoesAgrupadas).length === 0) {
+        toast.error('Não há dados agrupados para imprimir', { duration: 3000 });
+        return;
+      }
+
+      // Obter colunas do primeiro item
+      const primeiroItem = Object.values(liberacoesAgrupadas)[0]?.[0];
+      if (!primeiroItem) {
+        toast.error('Não há dados para imprimir', { duration: 3000 });
+        return;
+      }
+
+      const headers = Object.keys(primeiroItem);
+      const headerLabels = headers.map(h => 
+        h.charAt(0).toUpperCase() + h.slice(1).replace(/([A-Z])/g, ' $1')
+      );
+
+      // Gerar HTML da tabela agrupada
+      let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Relatório de Liberações por Supervisor</title>
+          <style>
+            @media print {
+              @page {
+                margin: 1cm;
+                size: A4 landscape;
+              }
+              body {
+                margin: 0;
+              }
+              .no-print {
+                display: none;
+              }
+            }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 10px;
+              margin: 20px;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 10px;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 18px;
+              color: #333;
+            }
+            .header p {
+              margin: 5px 0;
+              font-size: 12px;
+              color: #666;
+            }
+            .grupo-documento {
+              margin-bottom: 30px;
+              page-break-inside: avoid;
+            }
+            .grupo-header {
+              background-color: #f0f0f0;
+              padding: 10px;
+              font-weight: bold;
+              font-size: 12px;
+              border: 1px solid #ddd;
+              margin-bottom: 10px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 20px;
+              font-size: 9px;
+            }
+            th {
+              background-color: #4a90e2;
+              color: white;
+              padding: 8px 4px;
+              text-align: left;
+              border: 1px solid #ddd;
+              font-weight: bold;
+            }
+            td {
+              padding: 6px 4px;
+              border: 1px solid #ddd;
+            }
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+            tr:hover {
+              background-color: #f5f5f5;
+            }
+            .no-print {
+              text-align: center;
+              margin: 20px 0;
+              padding: 10px;
+              background-color: #f0f0f0;
+            }
+            .no-print button {
+              padding: 10px 20px;
+              font-size: 14px;
+              background-color: #4a90e2;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+            .no-print button:hover {
+              background-color: #357abd;
+            }
+            .resumo {
+              margin: 20px 0;
+              padding: 15px;
+              background-color: #e8f4f8;
+              border-left: 4px solid #4a90e2;
+            }
+            .resumo h3 {
+              margin-top: 0;
+              color: #333;
+            }
+            .resumo p {
+              margin: 5px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Relatório de Liberações por Supervisor</h1>
+            <p>Período: ${periodoData ? moment(periodoData[0].$d).format('DD/MM/YYYY') : ''} até ${periodoData ? moment(periodoData[1].$d).format('DD/MM/YYYY') : ''}</p>
+            <p>Total: ${estatisticas.totalLiberacoes} liberações | ${estatisticas.totalDocumentos} documentos | Valor Total: ${formatCurrency(estatisticas.totalValor)}</p>
+          </div>
+
+          <div class="no-print">
+            <button onclick="window.print()">🖨️ Imprimir</button>
+            <button onclick="window.close()">❌ Fechar</button>
+          </div>
+
+          <div class="resumo">
+            <h3>Resumo</h3>
+            <p><strong>Total de Liberações:</strong> ${estatisticas.totalLiberacoes}</p>
+            <p><strong>Total de Documentos:</strong> ${estatisticas.totalDocumentos}</p>
+            <p><strong>Valor Total:</strong> ${formatCurrency(estatisticas.totalValor)}</p>
+          </div>
+      `;
+
+      // Gerar tabelas agrupadas por NUMERO_DOC
+      Object.entries(liberacoesAgrupadas).forEach(([numeroDoc, items]) => {
+        htmlContent += `
+          <div class="grupo-documento">
+            <div class="grupo-header">
+              Documento: ${numeroDoc} - ${items.length} item${items.length !== 1 ? 's' : ''}
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  ${headerLabels.map(label => `<th>${label}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        items.forEach(item => {
+          htmlContent += '<tr>';
+          headers.forEach(header => {
+            let valor = item[header] || '';
+            
+            // Formatar valores numéricos
+            if (typeof item[header] === 'number') {
+              if (header.toLowerCase().includes('valor') || header.toLowerCase().includes('preco')) {
+                valor = formatCurrency(item[header]);
+              } else {
+                valor = item[header].toLocaleString('pt-BR');
+              }
+            } else {
+              valor = String(valor);
+            }
+            
+            htmlContent += `<td>${valor}</td>`;
+          });
+          htmlContent += '</tr>';
+        });
+
+        htmlContent += `
+              </tbody>
+            </table>
+          </div>
+        `;
+      });
+
+      htmlContent += `
+        </body>
+        </html>
+      `;
+
+      // Abrir nova janela com o HTML
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      // Aguardar carregamento e abrir diálogo de impressão
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 250);
+      };
+
+      toast.success('Abrindo visualização para impressão...', { duration: 3000 });
+    } catch (error) {
+      console.error('Erro ao imprimir:', error);
+      toast.error('Erro ao gerar visualização para impressão', { duration: 3000 });
+    }
+  };
+
   return (
     <div className="page-container">
       <Footer />
@@ -394,6 +645,13 @@ const RelatorioLiberacoesSupervisor = () => {
                 onClick={buscarLiberacoes}
                 loading={loading}
                 className="p-button-primary"
+              />
+              <Button
+                label="Imprimir"
+                icon="pi pi-print"
+                onClick={imprimirHTML}
+                disabled={Object.keys(liberacoesAgrupadas).length === 0}
+                className="p-button-info"
               />
               <Button
                 label="Exportar Excel"
